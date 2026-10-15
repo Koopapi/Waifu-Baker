@@ -237,3 +237,15 @@ export const pityCounters = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.setId] })],
 );
+
+/** Álbum público de cada usuario (spec 006). Desactivado hasta que el usuario lo activa. */
+export const albums = pgTable("albums", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id),
+  slug: text("slug").notNull().unique(),
+  isPublic: boolean("is_public").notNull().default(false),
+  alias: text("alias").notNull().default("Coleccionista"),
+  featuredCardIds: uuid("featured_card_ids").array().notNull().default(sql`'{}'::uuid[]`),
+  ...timestamps,
+});

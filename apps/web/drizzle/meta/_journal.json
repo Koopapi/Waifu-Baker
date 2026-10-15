@@ -22,6 +22,13 @@
       "when": 1792084305295,
       "tag": "0002_pity_and_holo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1792087601350,
+      "tag": "0003_albums",
+      "breakpoints": true
     }
   ]
 }

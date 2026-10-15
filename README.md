@@ -18,4 +18,6 @@ Estado (15 oct 2026):
 - Prototipo de apertura en `/lab`; el panel la reutiliza para simular sobres con cartas reales.
 - **Spec 004 — Sobres: concesión y apertura: terminada.** 21 de 21 RF (`specs/004-sobres-apertura/validation.md`).
   El coleccionista entra, ve «Mis sobres», los abre con la animación, recupera aperturas a medias y usa «Abrir todos».
-- Siguiente: spec 006 (colección y álbum público) y spec 001 (Patreon real) cuando la página esté aprobada.
+- **Spec 006 — Colección y álbum público: terminada.** 17 de 17 RF (`specs/006-coleccion-album/validation.md`).
+  «Mi colección» en `/coleccion`, ajustes del álbum en `/coleccion/album` y álbum público en `/album/<enlace>`.
+- Siguiente: spec 001 (Patreon real) cuando la página esté aprobada, y spec 007 (operación y cumplimiento).

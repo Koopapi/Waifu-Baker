@@ -15,7 +15,7 @@ export async function login(browser: Browser, name: string, admin: boolean, next
 }
 
 /** Crea por el panel una colección publicada de 2 cartas por sobre: ranura 1 común, ranura 2 rara. */
-export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number) {
+export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number) {
   await page.goto("/admin/characters");
   await page.fill('form:has-text("Nuevo personaje") input[name="name"]', `Personaje ${code}`);
   await page.click("text=Crear personaje");
@@ -53,6 +53,7 @@ export async function createPublishedSet(page: Page, code: string, images: strin
   };
   await fill(1, { Común: 100 });
   await fill(2, { Rara: 100 });
+  if (holoPct !== undefined) await page.locator('label:has-text("Probabilidad de holo") input').fill(String(holoPct));
   await page.click("text=Guardar probabilidades");
   await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
   await page.click("text=Comprobar y publicar");

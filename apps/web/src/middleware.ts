@@ -8,4 +8,4 @@ export function middleware(req: NextRequest) {
   return NextResponse.next({ request: { headers } });
 }
 
-export const config = { matcher: ["/admin/:path*", "/sobres/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/sobres/:path*", "/coleccion/:path*"] };

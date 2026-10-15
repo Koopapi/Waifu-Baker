@@ -14,6 +14,11 @@ export default async function Home() {
           <Link href={session?.user?.id ? "/sobres" : "/login?next=/sobres"} className="rounded-full bg-[#d6b370] px-6 py-3 font-semibold text-[#0b0c0e]">
             {session?.user?.id ? "Mis sobres" : "Entrar"}
           </Link>
+          {session?.user?.id && (
+            <Link href="/coleccion" className="rounded-full border border-white/20 px-6 py-3">
+              Mi colección
+            </Link>
+          )}
           <Link href="/drop-rates" className="rounded-full border border-white/20 px-6 py-3">
             Probabilidades
           </Link>
