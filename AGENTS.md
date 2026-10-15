@@ -66,3 +66,8 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 ## Al terminar cualquier tarea
 - Ejecuta `pnpm test` (y `pnpm e2e` si tocaste la interfaz) y confirma en tu respuesta que
   todo pasa.
+
+## Reglas de negocio
+
+`docs/reglas-de-negocio.md` resume todas las reglas acordadas, con la spec de origen de cada una. Al aprobar o
+terminar una spec, actualízalo en la misma tarea (estado «Aprobada» → «Vigente»). Si choca con una spec, manda la spec.

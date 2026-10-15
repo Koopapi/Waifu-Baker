@@ -1,0 +1,150 @@
+# Reglas de negocio — Waifu Baker TCG
+
+Resumen de todas las reglas acordadas, en un solo sitio. **La fuente de verdad son las specs**: cada
+regla cita la suya. Si una regla cambia, se cambia primero la spec y después este documento.
+
+Estado de cada regla: **Vigente** (construida y con tests) o **Aprobada** (en una spec aprobada,
+pendiente de construir).
+
+Última actualización: 15 de octubre de 2026 (specs 001, 003, 004, 006 y 008).
+
+---
+
+## 1. Principios que no se negocian
+
+Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otra regla.
+
+| # | Regla |
+|---|---|
+| RN-1 | El contenido de un sobre lo decide siempre el servidor, con un generador aleatorio criptográfico, y se guarda antes de mostrarse. El navegador solo anima. |
+| RN-2 | Las probabilidades de cada colección son públicas y no cambian una vez publicada. |
+| RN-3 | No hay intercambio de cartas, ni venta, ni retirada de dinero, ni premios por completar una colección. Las cartas no tienen valor monetario. |
+| RN-4 | En Bélgica no se pueden abrir sobres (la ley los trata como juego de azar). Los sobres se conservan. |
+| RN-5 | Las cartas de pago solo usan personajes originales y adultos. Ningún personaje con licencia en contenido de pago. |
+| RN-6 | El contenido 18+ exige doble verificación: declaración de edad más tier adulto de Patreon. |
+| RN-7 | De cada persona solo se guarda lo mínimo: identificador, nombre y avatar de Patreon, y su estado de membresía. Nunca el email. |
+| RN-8 | Las ilustraciones se declaran generadas con IA en la web. |
+
+## 2. Cuentas y Patreon
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-10 | Se entra con la cuenta de Patreon; no hace falta ser patron. | Vigente | 001 |
+| RN-11 | Al entrar se lee el estado de membresía (tiers, estado de patron, último cobro) y se vuelve a leer si tiene más de 15 minutos. | Aprobada | 001 RF-1, RF-3 |
+| RN-12 | Si Patreon no responde, se entra igual con el último estado conocido. | Aprobada | 001 RF-4 |
+| RN-13 | El administrador es la cuenta de creador de Patreon configurada en el servidor. Hay un solo rol de administrador. | Vigente | 003 |
+| RN-14 | Borrar la cuenta la desactiva: se cierra la sesión y se oculta el álbum público. | Aprobada | 001 RF-22 |
+| RN-15 | Durante 30 días tras borrarla, volver a entrar con el mismo Patreon la recupera con todo. | Aprobada | 001 RF-23 |
+| RN-16 | A los 30 días se borra de forma definitiva: perfil, cartas, sobres y álbum. El registro de aperturas se conserva sin datos personales. | Aprobada | 001 RF-24 |
+| RN-17 | Quien vuelve tras el borrado definitivo empieza con una cuenta nueva y vacía. | Aprobada | 001 RF-25 |
+
+## 3. Cómo se consiguen sobres
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-20 | **Bienvenida**: 1 sobre de la colección de bienvenida al entrar por primera vez, sea patron o no. | Aprobada | 001 RF-6 |
+| RN-21 | La colección de bienvenida la elige el administrador en el panel; solo puede haber una y debe ser SFW y publicada. | Aprobada | 001 RF-5 |
+| RN-22 | Si al entrar no hay colección de bienvenida, el sobre llega en el primer inicio de sesión en que la haya. | Aprobada | 001 RF-7 |
+| RN-23 | Un solo sobre de bienvenida por cuenta de Patreon en toda su historia, aunque borre la cuenta y vuelva. | Aprobada | 001 RF-8 |
+| RN-24 | **Suscripción**: cada cobro pagado concede los sobres de las reglas de sus tiers, una sola vez por cobro. | Aprobada | 001 RF-9 |
+| RN-25 | Con varios tiers a la vez se suman los sobres de todos. Un tier sin reglas (por ejemplo «Free») no concede sobres de suscripción. | Aprobada | 001 |
+| RN-26 | Subir a un tier con más sobres concede la diferencia al confirmarse el pago, una sola vez por ciclo. Bajar y volver a subir no da sobres extra. | Aprobada | 001 RF-10, RF-11 |
+| RN-27 | Quien vincula su cuenta tarde solo recibe los sobres de su último cobro pagado, no los de meses anteriores. | Aprobada | 001 RF-12 |
+| RN-28 | Un cobro pendiente o rechazado no concede nada hasta que pase a pagado. | Aprobada | 001 |
+| RN-29 | Si un cobro pasa a reembolsado o fraude, se anulan los sobres sin abrir de ese cobro; lo ya abierto se queda y se anota en el historial. | Aprobada | 001 RF-14 |
+| RN-30 | Al cancelar o dejar de pagar se conservan los sobres sin abrir y dejan de llegar nuevos. | Aprobada | 001 RF-13 |
+| RN-31 | Las reglas de cada tier (colecciones y sobres al mes, de 1 a 50) se configuran en el panel y se aplican desde el siguiente cobro de cada miembro. | Vigente | 003 RF-24 |
+| RN-32 | **Regalos**: el administrador puede regalar de 1 a 20 sobres de una colección publicada, con un motivo de 3 a 200 caracteres. Nunca sobres 18+ a quien no está verificado. | Vigente | 003 RF-25, RF-26 |
+| RN-33 | Los avisos de Patreon se aceptan solo con firma válida, y siempre se aplica el estado actual que devuelve Patreon: un aviso repetido o desordenado nunca da sobres de más. | Aprobada | 001 RF-15, RF-16 |
+| RN-34 | Cada 6 horas se revisan todos los miembros para recuperar avisos perdidos. | Aprobada | 001 RF-17 |
+
+## 4. Sobres
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-40 | Los sobres sin abrir no caducan nunca, aunque la persona deje de ser patron o la colección se archive. | Vigente | 004 RF-4 |
+| RN-41 | Un sobre se abre una sola vez. Repetir la petición (doble clic, dos pestañas, recarga) devuelve el mismo resultado. | Vigente | 004 RF-6, RF-17 |
+| RN-42 | Cada apertura guarda la versión de probabilidades, la semilla, las tiradas, si actuó la protección y las cartas. No se puede modificar después. | Vigente | 004 RF-9 |
+| RN-43 | «Abrir todos» abre hasta 50 sobres de una colección, cada uno por separado y con las mismas reglas. | Vigente | 004 RF-18, RF-19 |
+| RN-44 | Como máximo 10 aperturas por minuto y usuario. | Vigente | 004 RF-21 |
+| RN-45 | Las cartas repetidas se acumulan (x2, x3…). Una carta holo cuenta aparte de su versión normal. | Vigente | 004 RF-10 |
+
+## 5. Probabilidades, rarezas y protección
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-50 | Rarezas, de menor a mayor: Común, Poco común, Rara, Épica, Legendaria, Secreta. | Vigente | 003 |
+| RN-51 | Cada sobre tiene entre 1 y 10 cartas (5 por defecto). Cada ranura tiene sus porcentajes por rareza, que deben sumar 100 %. Dentro de una rareza, todas las cartas tienen la misma probabilidad. | Vigente | 003 RF-6, RF-20 |
+| RN-52 | Probabilidades iniciales de una colección nueva: ranuras normales 70 / 25 / 5 (común / poco común / rara); penúltima ranura 60 / 30 / 8 / 2 (poco común / rara / épica / legendaria); última ranura con rara o mejor garantizada: 75 / 18 / 6 / 1 (rara / épica / legendaria / secreta). | Vigente | 003 |
+| RN-53 | Una carta rara o mejor puede salir holo; la probabilidad se fija por colección (20 % por defecto). | Vigente | 003 RF-20 |
+| RN-54 | **Protección de mala suerte**: tras N−1 sobres seguidos de una colección sin épica o mejor, el siguiente garantiza al menos una (sustituye la carta de la última ranura). N es de 0 a 100, 10 por defecto; 0 la desactiva. | Vigente | 004 RF-12, RF-13 |
+| RN-55 | El contador de protección es de cada usuario y colección, y vuelve a cero al salir una épica o mejor. | Vigente | 004 RF-14 |
+| RN-56 | La página pública de probabilidades muestra, por colección, cada ranura, la probabilidad de holo, la regla de protección y la fecha y versión de publicación. | Vigente | 003 RF-21, 004 RF-15 |
+
+## 6. Colecciones y cartas (panel)
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-60 | Una colección nace en borrador, con código único de 2 a 8 letras o números, nombre de hasta 80 caracteres e indicación SFW o 18+. | Vigente | 003 RF-4 |
+| RN-61 | En borrador no la ven los usuarios ni se usa para sobres. | Vigente | 003 RF-5 |
+| RN-62 | Para publicar: cada ranura suma 100 %, toda rareza con probabilidad tiene cartas, toda carta tiene personaje, nombre, rareza e imagen, y en una 18+ todas están revisadas. Si algo falla, se listan todos los problemas. | Vigente | 003 RF-6, RF-7 |
+| RN-63 | Publicada, no se pueden añadir ni quitar cartas, ni cambiar rarezas, números o probabilidades. Sí nombres, textos y arte. | Vigente | 003 RF-8 |
+| RN-64 | Archivada, deja de usarse en concesiones nuevas; lo obtenido y los sobres sin abrir se conservan y se pueden abrir. | Vigente | 003 RF-9 |
+| RN-65 | Imágenes aceptadas: PNG, JPEG o WebP, hasta 20 MB y al menos 600 px de ancho. Una imagen idéntica a otra de la misma colección se rechaza. | Vigente | 003 RF-12, RF-13 |
+| RN-66 | La carta no lleva textos: solo el marco del color de su rareza, el sello WB y su número. | Vigente | DESIGN.md |
+| RN-67 | Cada carta 18+ debe revisarla un administrador con la confirmación «personaje claramente adulto». Cambiar su imagen anula la revisión. | Vigente | 003 RF-18, RF-19 |
+| RN-68 | Todo cambio del panel queda en el historial con autor, fecha, valores anteriores y nuevos. | Vigente | 003 RF-3 |
+| RN-69 | Quien no es administrador recibe un 404 en el panel, y el intento queda registrado. | Vigente | 003 RF-2 |
+
+## 7. Contenido 18+
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-70 | Para ver o abrir contenido 18+ hacen falta la declaración de edad y un tier adulto activo en el momento de verificarse. | Aprobada | 001 RF-18, RF-19 |
+| RN-71 | Sin verificación, las colecciones y sobres 18+ aparecen bloqueados, con una explicación de cómo verificarse. | Vigente | 004 RF-3, 006 RF-4 |
+| RN-72 | La verificación es permanente: si después cancela o baja de tier, conserva y ve sus cartas 18+ y puede abrir los sobres 18+ que le queden. Solo deja de recibir nuevos. | Aprobada | 001 RF-20 |
+| RN-73 | Nada 18+ aparece nunca en un álbum público. | Vigente | 006 RF-14 |
+
+## 8. Colección y álbum público
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-80 | «Mi colección» muestra cada colección con su progreso: cartas distintas obtenidas sobre el total (la holo no cuenta aparte). | Vigente | 006 RF-1 |
+| RN-81 | De una carta que no se tiene solo se ve su número: ni imagen, ni nombre, ni rareza. | Vigente | 006 RF-3 |
+| RN-82 | El álbum público está desactivado hasta que su dueño lo activa con un alias de 2 a 30 caracteres. | Vigente | 006 RF-8, RF-9 |
+| RN-83 | El enlace del álbum es aleatorio y no adivinable. Desactivarlo lo apaga; reactivarlo recupera el mismo enlace; pedir uno nuevo invalida el anterior. | Vigente | 006 RF-9 a RF-11 |
+| RN-84 | Hasta 5 cartas destacadas, propias y SFW, en el orden que elija su dueño. | Vigente | 006 RF-12 |
+| RN-85 | El álbum público nunca muestra el nombre ni el identificador de Patreon, y solo usa imágenes reducidas con marca de agua. | Vigente | 006 RF-14, RF-15 |
+| RN-86 | Los buscadores no indexan los álbumes públicos. | Vigente | 006 RF-17 |
+| RN-87 | Las imágenes completas de las cartas solo se sirven a quien las posee, con enlaces que caducan a los 10 minutos. | Vigente | 004 RF-20 |
+
+## 9. Idiomas
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-90 | La web está en inglés por defecto, y en español con el selector de cada página. La elección se recuerda un año en ese navegador. | Vigente | 008 |
+| RN-91 | No se traduce el contenido creado por el administrador (nombres y textos de cartas, colecciones y personajes) ni el alias de un álbum. | Vigente | 008 RF-9 |
+
+---
+
+## Parámetros en un vistazo
+
+| Parámetro | Valor |
+|---|---|
+| Sobre de bienvenida | 1, de la colección elegida en el panel |
+| Sobres al mes por regla de tier | 1 a 50 |
+| Regalo del panel | 1 a 20 sobres, motivo de 3 a 200 caracteres |
+| Cartas por sobre | 1 a 10 (5 por defecto) |
+| Probabilidad de holo (rara o mejor) | 20 % por defecto, configurable |
+| Protección de mala suerte | N de 0 a 100, 10 por defecto |
+| «Abrir todos» | hasta 50 sobres |
+| Aperturas por minuto | 10 por usuario |
+| Caducidad de los sobres | ninguna |
+| Enlaces de imagen privados | 10 minutos |
+| Revisión del estado de Patreon | al entrar, cada 15 minutos con sesión y cada 6 horas para todos |
+| Plazo para recuperar una cuenta borrada | 30 días |
+| Alias del álbum | 2 a 30 caracteres |
+| Cartas destacadas | hasta 5 |
+| Imágenes subidas | PNG, JPEG o WebP; hasta 20 MB; mínimo 600 px de ancho |
+| Código de colección | 2 a 8 letras o números |
+| Idioma por defecto | inglés |
