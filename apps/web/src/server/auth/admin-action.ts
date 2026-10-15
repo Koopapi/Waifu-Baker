@@ -2,6 +2,8 @@ import "server-only";
 import { revalidatePath } from "next/cache";
 import { db } from "@/db/client";
 import type { Db } from "@/db/client";
+import { translateError } from "@/i18n/errors";
+import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import { requireAdmin } from "./require-admin";
 
@@ -22,7 +24,7 @@ export async function adminAction(
     for (const p of revalidate) revalidatePath(p);
     return { ok: true, message: message ?? undefined, at: Date.now() };
   } catch (e) {
-    if (isAdminError(e)) return { ok: false, error: e.message, code: e.code, at: Date.now() };
+    if (isAdminError(e)) return { ok: false, error: translateError(await getDict(), e), code: e.code, at: Date.now() };
     throw e;
   }
 }

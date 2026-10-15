@@ -4,6 +4,7 @@ import { adminAction, type ActionState } from "@/server/auth/admin-action";
 import { archiveSet, createSet, publishSet, saveOdds, updateSet } from "@/server/services/collections";
 import type { Problem } from "@/domain/catalog/odds";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
+import { getDict } from "@/i18n/server";
 
 export async function createSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
   return adminAction("createSet", ["/admin/sets", "/admin"], async ({ db, actorId }) => {
@@ -13,7 +14,7 @@ export async function createSetAction(_: ActionState | null, fd: FormData): Prom
       isAdult: fd.get("isAdult") === "on",
       packSize: Number(fd.get("packSize") ?? 5),
     });
-    return `Colección ${s.code} creada en borrador.`;
+    return (await getDict()).admin.sets.created(s.code);
   });
 }
 
@@ -25,7 +26,7 @@ export async function updateSetAction(_: ActionState | null, fd: FormData): Prom
     if (fd.has("packSize")) patch.packSize = Number(fd.get("packSize"));
     if (fd.has("adultField")) patch.isAdult = fd.get("isAdult") === "on";
     await updateSet(db, actorId, id, Number(fd.get("version")), patch);
-    return "Cambios guardados.";
+    return (await getDict()).admin.changesSaved;
   });
 }
 
@@ -41,7 +42,7 @@ export async function saveOddsAction(
   return adminAction("saveOdds", paths(setId), async ({ db, actorId }) => {
     const clean = slots.map((s) => Object.fromEntries(RARITIES.map((r) => [r, Number(s[r] ?? 0)])) as Record<Rarity, number>);
     await saveOdds(db, actorId, setId, version, { slots: clean, holoChance: holoPercent / 100, pityThreshold });
-    return "Probabilidades guardadas.";
+    return (await getDict()).admin.sets.oddsSaved;
   });
 }
 
@@ -49,14 +50,14 @@ export async function publishSetAction(setId: string, version: number): Promise<
   let problems: Problem[] = [];
   const r = await adminAction("publishSet", paths(setId), async ({ db, actorId }) => {
     problems = (await publishSet(db, actorId, setId, version)).problems;
-    return problems.length ? undefined : "Colección publicada. Sus probabilidades ya son públicas.";
+    return problems.length ? undefined : (await getDict()).admin.sets.published;
   });
-  return problems.length ? { ok: false, error: `No se puede publicar: ${problems.length} problema(s).`, problems } : r;
+  return problems.length ? { ok: false, error: (await getDict()).admin.sets.cannotPublish(problems.length), problems } : r;
 }
 
 export async function archiveSetAction(setId: string, version: number): Promise<ActionState> {
   return adminAction("archiveSet", paths(setId), async ({ db, actorId }) => {
     await archiveSet(db, actorId, setId, version);
-    return "Colección archivada: ya no se concede en sobres nuevos.";
+    return (await getDict()).admin.sets.archived;
   });
 }

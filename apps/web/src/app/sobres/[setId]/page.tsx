@@ -4,9 +4,13 @@ import { z } from "zod";
 import { db } from "@/db/client";
 import { packs, sets } from "@/db/schema";
 import { requireUser } from "@/server/auth/require-user";
+import { getDict } from "@/i18n/server";
 import { PackOpener } from "@/features/packs/PackOpener";
 
-export const metadata = { title: "Abrir sobre" };
+export async function generateMetadata() {
+  const t = await getDict();
+  return { title: t.packs.meta.openPack };
+}
 
 /** RF-16 y RF-17: apertura real con la escena del laboratorio; `?pack=` reanuda una sin terminar. */
 export default async function OpenPackPage({ params, searchParams }: { params: Promise<{ setId: string }>; searchParams: Promise<{ pack?: string }> }) {

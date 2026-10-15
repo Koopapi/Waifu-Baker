@@ -3,6 +3,8 @@ export class AdminError extends Error {
   constructor(
     public readonly code: string,
     message: string,
+    /** Variables del mensaje, para traducirlo por código (spec 008). */
+    public readonly params?: Record<string, string | number>,
   ) {
     super(message);
     this.name = "AdminError";

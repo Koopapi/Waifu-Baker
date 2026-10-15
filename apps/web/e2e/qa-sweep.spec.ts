@@ -4,6 +4,7 @@
 import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
+import { dictionaries } from "../src/i18n/index";
 import { LAB, createPublishedSet, giftPacks, login } from "./helpers";
 
 const VIEWPORTS = [
@@ -87,6 +88,9 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await fan.goto(`/sobres/${setId}/todos`);
   await fan.evaluate(() => 0);
   const anon = await (await browser.newContext()).newPage();
+  // Los datos se preparan con los textos en español; el barrido se hace en inglés, el idioma por defecto.
+  const base = test.info().project.use.baseURL!;
+  for (const p of [admin, fan, anon]) await p.context().addCookies([{ name: "wb_locale", value: "en", url: base }]);
 
   const ctxFor = (p: Page) => {
     const c = { url: "", vp: "" };
@@ -118,7 +122,7 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await run(fan, cFan, "/coleccion/album", "fan-album-privado");
   await fan.setViewportSize({ width: 1360, height: 950 });
   await fan.goto("/coleccion/album");
-  await fan.click("text=Activar álbum público");
+  await fan.click(`text=${dictionaries.en.collection.album.activate}`);
   await expect(fan.locator('[data-testid="album-url"]')).toBeVisible();
   const albumUrl = new URL(await fan.locator('[data-testid="album-url"]').inputValue()).pathname;
   await run(fan, cFan, "/coleccion/album", "fan-album-ajustes");

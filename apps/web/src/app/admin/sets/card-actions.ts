@@ -5,9 +5,11 @@ import { getCardStore } from "@/server/cards/store-instance";
 import { bulkUpdateCards, deleteCard, regenerateSet, reorderCards, reviewCard, simulatePack, updateCard, type CardPatch } from "@/server/services/cards";
 import { requireAdmin } from "@/server/auth/require-admin";
 import { db } from "@/db/client";
+import { translateError } from "@/i18n/errors";
+import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import type { LabCard } from "@/features/opening/fakePack";
-import { RARITIES, RARITY_LABEL, type Rarity } from "@/domain/catalog/card-rules";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 
 const paths = (setId: string) => [`/admin/sets/${setId}`, "/admin/sets", "/admin"];
 const rarityOf = (v: unknown): Rarity | null | undefined =>
@@ -24,7 +26,7 @@ export async function bulkUpdateCardsAction(
     if (patch.rarity !== undefined) clean.rarity = rarityOf(patch.rarity);
     if (patch.variant === "normal" || patch.variant === "holo" || patch.variant === "alt") clean.variant = patch.variant;
     const n = await bulkUpdateCards(db, getCardStore(), actorId, setId, versions, clean);
-    return `${n} carta(s) actualizada(s).`;
+    return (await getDict()).admin.cards.updated(n);
   });
 }
 
@@ -40,35 +42,36 @@ export async function updateCardAction(setId: string, cardId: string, version: n
     if (fd.has("rarity")) patch.rarity = rarityOf(String(fd.get("rarity")));
     if (variant === "normal" || variant === "holo" || variant === "alt") patch.variant = variant;
     await updateCard(db, getCardStore(), actorId, cardId, version, patch);
-    return "Carta guardada.";
+    return (await getDict()).admin.cards.saved;
   });
 }
 
 export async function reorderCardsAction(setId: string, orderedIds: string[]): Promise<ActionState> {
   return adminAction("reorderCards", paths(setId), async ({ db, actorId }) => {
     await reorderCards(db, getCardStore(), actorId, setId, orderedIds);
-    return "Orden guardado.";
+    return (await getDict()).admin.cards.orderSaved;
   });
 }
 
 export async function deleteCardAction(setId: string, cardId: string): Promise<ActionState> {
   return adminAction("deleteCard", paths(setId), async ({ db, actorId }) => {
     await deleteCard(db, getCardStore(), actorId, cardId);
-    return "Carta eliminada.";
+    return (await getDict()).admin.cards.deleted;
   });
 }
 
 export async function regenerateSetAction(setId: string): Promise<ActionState> {
   return adminAction("regenerateSet", paths(setId), async ({ db, actorId }) => {
     const n = await regenerateSet(db, getCardStore(), actorId, setId);
-    return `${n} carta(s) regenerada(s) con el marco actual.`;
+    return (await getDict()).admin.cards.regenerated(n);
   });
 }
 
 export async function reviewCardAction(setId: string, cardId: string, version: number, reviewed: boolean): Promise<ActionState> {
   return adminAction("reviewCard", paths(setId), async ({ db, actorId }) => {
     const c = await reviewCard(db, getCardStore(), actorId, cardId, version, reviewed);
-    return reviewed ? (c.pendingOriginalKey ? "Revisada." : "Carta revisada: personaje claramente adulto.") : "Revisión retirada.";
+    const t = (await getDict()).admin.cards;
+    return reviewed ? (c.pendingOriginalKey ? t.reviewedShort : t.reviewedAdult) : t.reviewRemoved;
   });
 }
 
@@ -77,21 +80,22 @@ export async function simulatePackAction(setId: string): Promise<{ ok: boolean; 
   await requireAdmin("action:simulatePack");
   try {
     const pack = await simulatePack(db, setId);
+    const t = await getDict();
     return {
       ok: true,
       cards: pack.map((c) => ({
         id: c.id,
-        name: c.name || `Carta ${String(c.number).padStart(3, "0")}`,
+        name: c.name || t.admin.cards.cardN(String(c.number).padStart(3, "0")),
         number: c.number,
         rarity: c.rarity!,
         holo: c.holo,
         image: `/api/admin/assets/${c.keyMid}`,
         framed: true,
-        note: c.substitutedFrom ? `Salió ${RARITY_LABEL[c.substitutedFrom as Rarity]}, pero aún no hay cartas de esa rareza` : undefined,
+        note: c.substitutedFrom ? t.admin.simulate.substituted(t.common.rarity[c.substitutedFrom as Rarity]) : undefined,
       })),
     };
   } catch (e) {
-    if (isAdminError(e)) return { ok: false, error: e.message };
+    if (isAdminError(e)) return { ok: false, error: translateError(await getDict(), e) };
     throw e;
   }
 }

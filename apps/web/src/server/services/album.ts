@@ -22,7 +22,7 @@ export async function getMyAlbum(db: DbLike, userId: string) {
 /** RF-8 y RF-9: activa el álbum con un alias; si ya existía, conserva su enlace. */
 export async function activateAlbum(db: DbLike, userId: string, rawAlias: string) {
   const alias = validateAlias(rawAlias);
-  if (!alias.ok) throw new AppError("invalid_alias", alias.message);
+  if (!alias.ok) throw new AppError("invalid_alias", alias.message, alias.params);
   const [row] = await db
     .insert(albums)
     .values({ userId, slug: newSlug(), alias: alias.value, isPublic: true })
@@ -68,7 +68,7 @@ export async function featurableCards(db: DbLike, userId: string) {
 /** RF-12: hasta 5 destacadas propias y SFW, en el orden elegido. */
 export async function setFeatured(db: DbLike, userId: string, cardIds: string[]) {
   const v = validateFeatured(cardIds, await featurableIds(db, userId));
-  if (!v.ok) throw new AppError("invalid_featured", v.message);
+  if (!v.ok) throw new AppError("invalid_featured", v.message, { ...v.params, reason: v.code });
   const [row] = await db.update(albums).set({ featuredCardIds: v.value, updatedAt: sql`now()` }).where(eq(albums.userId, userId)).returning();
   if (!row) throw new AppError("no_album", "Activa primero tu álbum público.");
   return row;

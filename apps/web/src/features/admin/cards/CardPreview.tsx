@@ -4,13 +4,15 @@ import { useState } from "react";
 import { Card3D } from "@/features/opening/Card3D";
 import { useTiltSource } from "@/features/opening/useTiltSource";
 import type { CardDTO } from "./types";
+import { useT } from "@/i18n/client";
 import "@/features/opening/opening.css";
 
 /** RF-22: la carta tal como la verá el usuario, con inclinación y efecto holo. */
 export function CardPreview({ card }: { card: CardDTO }) {
   const tilt = useTiltSource();
   const [holo, setHolo] = useState(card.variant === "holo");
-  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-xl bg-white/5 text-xs text-white/40">Procesando…</div>;
+  const t = useT().admin.cards;
+  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-xl bg-white/5 text-xs text-white/40">{t.processing}</div>;
   return (
     <div className="space-y-2">
       <div
@@ -29,7 +31,7 @@ export function CardPreview({ card }: { card: CardDTO }) {
         />
       </div>
       <label className="flex items-center gap-2 text-xs text-white/60">
-        <input type="checkbox" checked={holo} onChange={(e) => setHolo(e.target.checked)} /> Ver con efecto holo
+        <input type="checkbox" checked={holo} onChange={(e) => setHolo(e.target.checked)} /> {t.previewHolo}
       </label>
     </div>
   );

@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { RARITIES, RARITY_LABEL, type Rarity } from "@/domain/catalog/card-rules";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { bulkUpdateCardsAction, deleteCardAction, reorderCardsAction, reviewCardAction, updateCardAction } from "@/app/admin/sets/card-actions";
 import type { ActionState } from "@/server/auth/admin-action";
 import { inputCls } from "@/features/admin/ui";
 import { CardPreview } from "./CardPreview";
 import type { CardDTO, CharacterOption, Permissions } from "./types";
+import { useLocale, useT } from "@/i18n/client";
+import { formatPercent } from "@/i18n/format";
+import type { Locale } from "@/i18n";
 
 const RARITY_DOT: Record<Rarity, string> = {
   common: "bg-[#9aa0a6]",
@@ -22,11 +25,12 @@ const RARITY_DOT: Record<Rarity, string> = {
 };
 
 const pad = (n: number) => String(n).padStart(3, "0");
-const pct = (x: number) => `${(x * 100).toLocaleString("es", { maximumFractionDigits: x < 0.01 ? 2 : 1 })} %`;
+const pct = (locale: Locale, x: number) => formatPercent(locale, x * 100, x < 0.01 ? 2 : 1);
 
 function ReviewBadge({ card }: { card: CardDTO }) {
-  if (card.pendingArtUrl) return <span className="text-sky-300">Arte pendiente</span>;
-  return card.adultReviewedAt ? <span className="text-emerald-300">Revisada</span> : <span className="text-rose-300">Sin revisar</span>;
+  const t = useT().admin.cards;
+  if (card.pendingArtUrl) return <span className="text-sky-300">{t.pendingArt}</span>;
+  return card.adultReviewedAt ? <span className="text-emerald-300">{t.reviewed}</span> : <span className="text-rose-300">{t.notReviewed}</span>;
 }
 
 function Notice({ state }: { state: ActionState | null }) {
@@ -55,6 +59,9 @@ function Tile({
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: card.id, disabled: !sortable });
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 10 : undefined };
+  const tt = useT();
+  const t = tt.admin.cards;
+  const locale = useLocale();
   return (
     <div
       ref={setNodeRef}
@@ -64,12 +71,12 @@ function Tile({
       className={`group relative overflow-hidden rounded-xl border bg-white/[0.03] ${selected ? "border-[#d6b370] ring-2 ring-[#d6b370]/60" : "border-white/10"} ${isDragging ? "opacity-80 shadow-2xl" : ""}`}
       {...(sortable ? { ...attributes, ...listeners } : {})}
     >
-      <button type="button" onClick={sortable ? undefined : onOpen} className={`block w-full ${sortable ? "cursor-grab" : "cursor-pointer"}`} aria-label={`Editar carta ${pad(card.number)}`}>
+      <button type="button" onClick={sortable ? undefined : onOpen} className={`block w-full ${sortable ? "cursor-grab" : "cursor-pointer"}`} aria-label={t.editAria(pad(card.number))}>
         {card.thumbUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- recurso privado servido por la API del panel
           <img src={card.thumbUrl} alt="" className="aspect-[63/88] w-full object-cover" draggable={false} />
         ) : (
-          <div className="grid aspect-[63/88] place-items-center text-xs text-white/40">Procesando…</div>
+          <div className="grid aspect-[63/88] place-items-center text-xs text-white/40">{t.processing}</div>
         )}
       </button>
       {!sortable && (
@@ -79,7 +86,7 @@ function Tile({
             checked={selected}
             onChange={() => {}}
             onClick={onToggle}
-            aria-label={`Seleccionar carta ${pad(card.number)}`}
+            aria-label={t.selectAria(pad(card.number))}
             className="h-4 w-4 accent-[#d6b370]"
           />
         </label>
@@ -90,19 +97,19 @@ function Tile({
           {card.rarity ? (
             <span className="flex items-center gap-1">
               <span className={`h-2 w-2 rounded-full ${RARITY_DOT[card.rarity]}`} />
-              {RARITY_LABEL[card.rarity]}
+              {tt.common.rarity[card.rarity]}
             </span>
           ) : (
-            <span className="text-amber-300">Sin rareza</span>
+            <span className="text-amber-300">{t.noRarity}</span>
           )}
         </div>
-        <div className="truncate font-medium">{card.name || <span className="text-white/40">Sin nombre</span>}</div>
+        <div className="truncate font-medium">{card.name || <span className="text-white/40">{tt.admin.noName}</span>}</div>
         <div className="flex items-center justify-between gap-2 text-white/50">
-          <span className="truncate">{card.characterName ?? "Sin personaje"}</span>
-          {card.status === "ready" ? <span className="text-emerald-300">Lista</span> : <span className="text-amber-300">Incompleta</span>}
+          <span className="truncate">{card.characterName ?? t.noCharacter}</span>
+          {card.status === "ready" ? <span className="text-emerald-300">{t.ready}</span> : <span className="text-amber-300">{t.incomplete}</span>}
         </div>
         <div className="flex items-center justify-between gap-2 text-white/40">
-          <span title="Probabilidad de que salga en un sobre">{pct(card.chance)} / sobre</span>
+          <span title={t.chanceTitle}>{t.perPack(pct(locale, card.chance))}</span>
           {isAdult && <ReviewBadge card={card} />}
         </div>
       </div>
@@ -124,6 +131,9 @@ function CardEditor({
   onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const tt = useT();
+  const t = tt.admin.cards;
+  const locale = useLocale();
   const [state, setState] = useState<ActionState | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
@@ -161,8 +171,8 @@ function CardEditor({
       fd.append("file", file);
       fd.append("version", String(card.version));
       const res = await fetch(`/api/admin/cards/${card.id}/art`, { method: "POST", body: fd });
-      const body = await res.json().catch(() => ({ ok: false, message: `Error del servidor (${res.status}).` }));
-      setState(body.ok ? { ok: true, message: body.pending ? "Arte nuevo pendiente de revisión." : "Arte reemplazado." } : { ok: false, error: body.message });
+      const body = await res.json().catch(() => ({ ok: false, message: tt.admin.serverError(res.status) }));
+      setState(body.ok ? { ok: true, message: body.pending ? t.newArtPending : t.artReplaced } : { ok: false, error: body.message });
       if (body.ok) {
         router.refresh();
         onClose();
@@ -171,7 +181,7 @@ function CardEditor({
 
   const remove = () =>
     start(async () => {
-      if (!window.confirm(`¿Eliminar la carta ${pad(card.number)}? Las siguientes se renumerarán.`)) return;
+      if (!window.confirm(t.confirmDelete(pad(card.number)))) return;
       const r = await deleteCardAction(setId, card.id);
       setState(r);
       if (r.ok) {
@@ -189,44 +199,44 @@ function CardEditor({
       <form action={save} className="grid gap-6 p-6 md:grid-cols-[300px_1fr]">
         <div>
           <CardPreview card={card} />
-          <p className="mt-2 text-xs text-white/40">Mueve el ratón sobre la carta para inclinarla.</p>
+          <p className="mt-2 text-xs text-white/40">{t.tiltHint}</p>
           {card.pendingArtUrl && (
             <div className="mt-3 space-y-1 rounded-lg border border-sky-400/30 p-2">
-              <p className="text-xs text-sky-300">Arte nuevo pendiente de revisión (los usuarios siguen viendo el actual):</p>
+              <p className="text-xs text-sky-300">{t.pendingArtNote}</p>
               {/* eslint-disable-next-line @next/next/no-img-element -- original privado servido por la API del panel */}
-              <img src={card.pendingArtUrl} alt="Arte pendiente" className="w-full rounded" />
+              <img src={card.pendingArtUrl} alt={t.pendingArtAlt} className="w-full rounded" />
             </div>
           )}
           <div className="mt-3 space-y-2">
-            <span className="text-xs uppercase tracking-wider text-white/60">Reemplazar arte</span>
+            <span className="text-xs uppercase tracking-wider text-white/60">{t.replaceArt}</span>
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs" data-testid="replace-art" />
             {file && (
               <button type="button" onClick={replaceArt} disabled={pending} className="rounded-full border border-white/15 px-3 py-1.5 text-xs">
-                Subir arte nuevo
+                {t.uploadNewArt}
               </button>
             )}
           </div>
         </div>
         <div className="space-y-4">
           <div className="flex items-start justify-between">
-            <h2 className="text-lg font-bold">Carta {pad(card.number)}</h2>
-            <button type="button" onClick={onClose} className="text-white/50 hover:text-white" aria-label="Cerrar">
+            <h2 className="text-lg font-bold">{t.cardN(pad(card.number))}</h2>
+            <button type="button" onClick={onClose} className="text-white/50 hover:text-white" aria-label={tt.common.close}>
               ✕
             </button>
           </div>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wider text-white/60">Nombre</span>
+            <span className="text-xs uppercase tracking-wider text-white/60">{t.name}</span>
             <input name="name" defaultValue={card.name} maxLength={60} className={inputCls} autoFocus />
           </label>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wider text-white/60">Texto de la carta</span>
+            <span className="text-xs uppercase tracking-wider text-white/60">{t.flavorText}</span>
             <textarea name="flavorText" defaultValue={card.flavorText} rows={2} className={inputCls} />
           </label>
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-white/60">Personaje</span>
+              <span className="text-xs uppercase tracking-wider text-white/60">{t.character}</span>
               <select name="characterId" defaultValue={card.characterId ?? ""} className={inputCls}>
-                <option value="">Sin personaje</option>
+                <option value="">{t.noCharacter}</option>
                 {characters.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -235,38 +245,38 @@ function CardEditor({
               </select>
             </label>
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-white/60">Rareza</span>
+              <span className="text-xs uppercase tracking-wider text-white/60">{t.rarity}</span>
               <select name="rarity" defaultValue={card.rarity ?? "__none"} disabled={!perms.canEditRarity} className={inputCls}>
-                <option value="__none">Sin rareza</option>
+                <option value="__none">{t.noRarity}</option>
                 {RARITIES.map((r) => (
                   <option key={r} value={r}>
-                    {RARITY_LABEL[r]}
+                    {tt.common.rarity[r]}
                   </option>
                 ))}
               </select>
             </label>
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-white/60">Variante</span>
+              <span className="text-xs uppercase tracking-wider text-white/60">{t.variant}</span>
               <select name="variant" defaultValue={card.variant} disabled={!perms.canEditRarity} className={inputCls}>
-                <option value="normal">Normal</option>
-                <option value="holo">Holo</option>
-                <option value="alt">Arte alternativo</option>
+                <option value="normal">{t.variants.normal}</option>
+                <option value="holo">{t.variants.holo}</option>
+                <option value="alt">{t.variants.alt}</option>
               </select>
             </label>
           </div>
-          <p className="text-xs text-white/50">Probabilidad de salir en un sobre: {pct(card.chance)}</p>
+          <p className="text-xs text-white/50">{t.chance(pct(locale, card.chance))}</p>
           {perms.isAdultSet && (
             <div className="space-y-2 rounded-lg border border-rose-400/30 bg-rose-400/5 p-3" data-testid="review-box">
               <p className="text-sm">
-                Revisión 18+: <ReviewBadge card={card} />
+                {t.review18} <ReviewBadge card={card} />
               </p>
               {card.adultReviewedAt && !card.pendingArtUrl ? (
                 <button type="button" onClick={() => review(false)} disabled={pending} className="rounded-full border border-white/15 px-3 py-1.5 text-xs">
-                  Quitar revisión
+                  {t.removeReview}
                 </button>
               ) : (
                 <button type="button" onClick={() => review(true)} disabled={pending} className="rounded-full bg-rose-300 px-3 py-1.5 text-xs font-semibold text-black">
-                  {card.pendingArtUrl ? "Aprobar arte nuevo: personaje claramente adulto" : "Confirmo: personaje claramente adulto"}
+                  {card.pendingArtUrl ? t.approveNewArt : t.confirmAdult}
                 </button>
               )}
             </div>
@@ -274,14 +284,14 @@ function CardEditor({
           <Notice state={state} />
           <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
             <button disabled={pending} className="rounded-full bg-[#d6b370] px-5 py-2 text-sm font-semibold text-[#0b0c0e] disabled:opacity-60">
-              {pending ? "Guardando…" : "Guardar"}
+              {pending ? tt.common.saving : tt.common.save}
             </button>
             <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-4 py-2 text-sm">
-              Cancelar
+              {tt.common.cancel}
             </button>
             {perms.canRemove && (
               <button type="button" onClick={remove} disabled={pending} className="ml-auto rounded-full border border-red-400/40 px-4 py-2 text-sm text-red-300">
-                Eliminar carta
+                {t.deleteCard}
               </button>
             )}
           </div>
@@ -312,6 +322,8 @@ export function CardWorkspace({
   const [state, setState] = useState<ActionState | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
+  const tt = useT();
+  const t = tt.admin.cards;
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
   const byId = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
@@ -340,7 +352,7 @@ export function CardWorkspace({
       if (bulk.characterId) patch.characterId = bulk.characterId;
       if (bulk.rarity) patch.rarity = bulk.rarity;
       if (bulk.variant) patch.variant = bulk.variant;
-      if (!Object.keys(patch).length) return setState({ ok: false, error: "Elige al menos un personaje, una rareza o una variante." });
+      if (!Object.keys(patch).length) return setState({ ok: false, error: t.pickSomething });
       const versions = Object.fromEntries([...selected].map((id) => [id, byId.get(id)!.version]));
       const r = await bulkUpdateCardsAction(setId, versions, patch);
       setState(r);
@@ -364,7 +376,7 @@ export function CardWorkspace({
     });
   };
 
-  if (cards.length === 0) return <p className="text-sm text-white/50">Aún no hay cartas. Suelta imágenes en la zona de arriba.</p>;
+  if (cards.length === 0) return <p className="text-sm text-white/50">{t.empty}</p>;
 
   const shown = sorting ? order.map((id) => byId.get(id)!).filter(Boolean) : cards;
 
@@ -373,24 +385,24 @@ export function CardWorkspace({
       <div className="sticky top-0 z-20 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-[#0f0d16]/95 px-4 py-3 backdrop-blur">
         {sorting ? (
           <>
-            <span className="text-sm">Arrastra las cartas para cambiar su número. El orden se guarda al soltar.</span>
+            <span className="text-sm">{t.dragHint}</span>
             <button onClick={() => setSorting(false)} className="ml-auto rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e]">
-              Terminar
+              {t.done}
             </button>
           </>
         ) : (
           <>
             <span className="text-sm tabular-nums">
-              {selected.size} de {cards.length} seleccionada(s)
+              {t.selectedCount(selected.size, cards.length)}
             </span>
             <button className="text-sm underline" onClick={() => setSelected(selected.size === cards.length ? new Set() : new Set(cards.map((c) => c.id)))}>
-              {selected.size === cards.length ? "Quitar selección" : "Seleccionar todas"}
+              {selected.size === cards.length ? t.clearSelection : t.selectAll}
             </button>
             {selected.size > 0 && (
               <>
-                <select aria-label="Personaje para la selección" value={bulk.characterId} onChange={(e) => setBulk({ ...bulk, characterId: e.target.value })} className={`${inputCls} w-auto`}>
-                  <option value="">Personaje…</option>
-                  <option value="__none">Quitar personaje</option>
+                <select aria-label={t.bulkCharacterAria} value={bulk.characterId} onChange={(e) => setBulk({ ...bulk, characterId: e.target.value })} className={`${inputCls} w-auto`}>
+                  <option value="">{t.bulkCharacter}</option>
+                  <option value="__none">{t.removeCharacter}</option>
                   {characters.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -399,30 +411,30 @@ export function CardWorkspace({
                 </select>
                 {perms.canEditRarity && (
                   <>
-                    <select aria-label="Rareza para la selección" value={bulk.rarity} onChange={(e) => setBulk({ ...bulk, rarity: e.target.value })} className={`${inputCls} w-auto`}>
-                      <option value="">Rareza…</option>
+                    <select aria-label={t.bulkRarityAria} value={bulk.rarity} onChange={(e) => setBulk({ ...bulk, rarity: e.target.value })} className={`${inputCls} w-auto`}>
+                      <option value="">{t.bulkRarity}</option>
                       {RARITIES.map((r) => (
                         <option key={r} value={r}>
-                          {RARITY_LABEL[r]}
+                          {tt.common.rarity[r]}
                         </option>
                       ))}
                     </select>
-                    <select aria-label="Variante para la selección" value={bulk.variant} onChange={(e) => setBulk({ ...bulk, variant: e.target.value })} className={`${inputCls} w-auto`}>
-                      <option value="">Variante…</option>
-                      <option value="normal">Normal</option>
-                      <option value="holo">Holo</option>
-                      <option value="alt">Arte alternativo</option>
+                    <select aria-label={t.bulkVariantAria} value={bulk.variant} onChange={(e) => setBulk({ ...bulk, variant: e.target.value })} className={`${inputCls} w-auto`}>
+                      <option value="">{t.bulkVariant}</option>
+                      <option value="normal">{t.variants.normal}</option>
+                      <option value="holo">{t.variants.holo}</option>
+                      <option value="alt">{t.variants.alt}</option>
                     </select>
                   </>
                 )}
                 <button onClick={applyBulk} disabled={pending} className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-60">
-                  {pending ? "Aplicando…" : "Aplicar a la selección"}
+                  {pending ? t.applying : t.apply}
                 </button>
               </>
             )}
             {perms.canReorder && selected.size === 0 && (
               <button onClick={() => setSorting(true)} className="ml-auto rounded-full border border-white/15 px-4 py-1.5 text-sm">
-                Reordenar
+                {t.reorder}
               </button>
             )}
           </>

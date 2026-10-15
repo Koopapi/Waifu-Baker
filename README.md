@@ -20,4 +20,5 @@ Estado (15 oct 2026):
   El coleccionista entra, ve «Mis sobres», los abre con la animación, recupera aperturas a medias y usa «Abrir todos».
 - **Spec 006 — Colección y álbum público: terminada.** 17 de 17 RF (`specs/006-coleccion-album/validation.md`).
   «Mi colección» en `/coleccion`, ajustes del álbum en `/coleccion/album` y álbum público en `/album/<enlace>`.
-- Siguiente: spec 001 (Patreon real) cuando la página esté aprobada, y spec 007 (operación y cumplimiento).
+- **Spec 008 — Idiomas: terminada.** 10 de 10 RF. Inglés por defecto y español con el selector EN/ES de cada página.
+- Siguiente: lo que decida el usuario (sobres gratis con espera, recompensas diarias, spec 001 con Patreon real). Todo en local hasta la beta.

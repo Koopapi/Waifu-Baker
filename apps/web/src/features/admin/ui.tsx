@@ -3,6 +3,7 @@
 import { useFormStatus } from "react-dom";
 import type { ReactNode } from "react";
 import type { ActionState } from "@/server/auth/admin-action";
+import { useT } from "@/i18n/client";
 
 export const inputCls =
   "w-full rounded-lg border border-white/15 bg-black/20 px-3 py-2 text-sm outline-none focus:border-[#d6b370] disabled:opacity-50";
@@ -19,6 +20,7 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 
 export function SubmitButton({ children, variant = "primary" }: { children: ReactNode; variant?: "primary" | "danger" | "ghost" }) {
   const { pending } = useFormStatus();
+  const t = useT();
   const cls =
     variant === "primary"
       ? "bg-[#d6b370] text-[#0b0c0e] font-semibold"
@@ -27,7 +29,7 @@ export function SubmitButton({ children, variant = "primary" }: { children: Reac
         : "border border-white/15 text-white/80 hover:bg-white/5";
   return (
     <button disabled={pending} className={`rounded-full px-4 py-2 text-sm disabled:opacity-60 ${cls}`}>
-      {pending ? "Guardando…" : children}
+      {pending ? t.common.saving : children}
     </button>
   );
 }
@@ -45,12 +47,13 @@ export function FormMessage({ state }: { state: ActionState | null }) {
 }
 
 export function StatusBadge({ status }: { status: "draft" | "published" | "archived" }) {
+  const t = useT();
   const map = {
-    draft: ["Borrador", "bg-white/10 text-white/80"],
-    published: ["Publicada", "bg-emerald-400/15 text-emerald-300"],
-    archived: ["Archivada", "bg-white/5 text-white/40"],
+    draft: "bg-white/10 text-white/80",
+    published: "bg-emerald-400/15 text-emerald-300",
+    archived: "bg-white/5 text-white/40",
   } as const;
-  const [label, cls] = map[status];
+  const [label, cls] = [t.admin.status[status], map[status]];
   return <span className={`rounded-md px-2 py-0.5 text-xs font-semibold ${cls}`}>{label}</span>;
 }
 

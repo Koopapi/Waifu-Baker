@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { canEdit } from "@/domain/catalog/collection-rules";
-import { RARITIES, RARITY_LABEL } from "@/domain/catalog/card-rules";
+import { RARITIES } from "@/domain/catalog/card-rules";
 import { cardChances } from "@/domain/catalog/odds";
 import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
@@ -14,6 +14,7 @@ import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
 import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
+import { getDict } from "@/i18n/server";
 import { EditSetForm } from "../forms";
 
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,6 +23,8 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   const [overview, characters] = await Promise.all([getSetOverview(db, id), listCharacters(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
+  const tt = await getDict();
+  const t = tt.admin.set;
 
   const perms = {
     canAdd: canEdit(set.status, "addCard"),
@@ -57,7 +60,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
     <div className="space-y-8">
       <div className="space-y-2">
         <Link href="/admin/sets" className="text-sm text-white/50 hover:text-white">
-          ← Colecciones
+          {t.back}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold">
@@ -69,16 +72,16 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
       </div>
 
       <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
-        <h2 className="font-semibold">Datos de la colección</h2>
+        <h2 className="font-semibold">{t.details}</h2>
         <EditSetForm set={set} lockedForUsers={!perms.canEditRarity} />
       </section>
 
       <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold">Publicación</h2>
+          <h2 className="font-semibold">{t.publishing}</h2>
           {cards.some((c) => c.rarity) && (
             <Link href={`/admin/sets/${set.id}/simulate`} className="rounded-full border border-white/15 px-4 py-1.5 text-sm hover:bg-white/5" data-testid="simulate-link">
-              Simular un sobre
+              {t.simulate}
             </Link>
           )}
         </div>
@@ -87,7 +90,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
 
       {overview.odds && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold">Probabilidades del sobre</h2>
+          <h2 className="text-lg font-semibold">{t.odds}</h2>
           <OddsEditor
             setId={set.id}
             version={set.version}
@@ -103,23 +106,23 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
       <section className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-lg font-semibold">Cartas ({cards.length})</h2>
+            <h2 className="text-lg font-semibold">{t.cards(cards.length)}</h2>
             <RegenerateButton setId={set.id} count={cards.length} />
           </div>
           <div className="flex flex-wrap gap-2 text-xs" data-testid="rarity-counts">
             {RARITIES.map((r) => (
               <span key={r} className={`rounded-md border px-2 py-1 ${gaps.includes(r) ? "border-amber-400/50 text-amber-300" : "border-white/10 text-white/70"}`}>
-                {RARITY_LABEL[r]} <b className="tabular-nums">{counts[r]}</b>
+                {tt.common.rarity[r]} <b className="tabular-nums">{counts[r]}</b>
               </span>
             ))}
-            {counts.none > 0 && <span className="rounded-md border border-white/10 px-2 py-1 text-white/50">Sin rareza {counts.none}</span>}
+            {counts.none > 0 && <span className="rounded-md border border-white/10 px-2 py-1 text-white/50">{t.noRarityCount(counts.none)}</span>}
           </div>
         </div>
         {(gaps.length > 0 || incomplete > 0 || unreviewed > 0) && cards.length > 0 && (
           <ul className="space-y-1 rounded-xl border border-amber-400/30 bg-amber-400/5 p-3 text-sm text-amber-200" data-testid="set-warnings">
-            {gaps.length > 0 && <li>Sin cartas para rarezas que pueden salir en el sobre: {gaps.map((g) => RARITY_LABEL[g]).join(", ")}.</li>}
-            {incomplete > 0 && <li>{incomplete} carta(s) incompleta(s): les falta personaje, nombre o rareza.</li>}
-            {unreviewed > 0 && <li>{unreviewed} carta(s) sin la revisión 18+ «personaje claramente adulto».</li>}
+            {gaps.length > 0 && <li>{t.gaps(gaps.map((g) => tt.common.rarity[g]).join(", "))}</li>}
+            {incomplete > 0 && <li>{t.incomplete(incomplete)}</li>}
+            {unreviewed > 0 && <li>{t.unreviewed(unreviewed)}</li>}
           </ul>
         )}
         <Dropzone setId={set.id} disabled={!perms.canAdd} />

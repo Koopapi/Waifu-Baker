@@ -1,0 +1,35 @@
+import type { common as en } from "../en/common";
+
+export const common: typeof en = {
+  brand: "WAIFU BAKER",
+  siteTitle: "Waifu Baker · Cartas coleccionables",
+  siteDescription: "Cartas coleccionables digitales de ilustración anime. Abre sobres, colecciona tus favoritas y completa cada colección.",
+  language: "Idioma",
+  switchTo: (name) => `Cambiar a ${name}`,
+  localeNames: { en: "English", es: "Español" },
+  nav: {
+    myPacks: "Mis sobres",
+    myCollection: "Mi colección",
+    odds: "Probabilidades",
+    panel: "Panel",
+    signOut: "Salir",
+    signIn: "Entrar",
+    home: "Inicio",
+  },
+  rarity: {
+    common: "Común",
+    uncommon: "Poco común",
+    rare: "Rara",
+    epic: "Épica",
+    legendary: "Legendaria",
+    secret: "Secreta",
+  },
+  aiNotice: "Las ilustraciones de las cartas están generadas con IA. Las cartas no tienen valor monetario ni se pueden intercambiar.",
+  sessionExpired: "Tu sesión ha caducado: vuelve a entrar.",
+  back: "Volver",
+  close: "Cerrar",
+  save: "Guardar",
+  saving: "Guardando…",
+  cancel: "Cancelar",
+  retry: "Reintentar",
+};

@@ -2,6 +2,7 @@
 
 import { adminAction, type ActionState } from "@/server/auth/admin-action";
 import { giftPacks } from "@/server/services/users-admin";
+import { getDict } from "@/i18n/server";
 
 export async function giftPacksAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
   const userId = String(fd.get("userId"));
@@ -12,6 +13,6 @@ export async function giftPacksAction(_: ActionState | null, fd: FormData): Prom
       count: Number(fd.get("count")),
       reason: String(fd.get("reason") ?? ""),
     });
-    return `${n} sobre(s) regalado(s).`;
+    return (await getDict()).admin.users.gifted(n);
   });
 }

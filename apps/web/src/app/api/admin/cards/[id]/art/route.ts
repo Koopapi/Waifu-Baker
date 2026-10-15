@@ -1,6 +1,8 @@
 import { db } from "@/db/client";
 import { adminFromRequest, notFoundResponse } from "@/server/auth/admin-request";
 import { getCardStore } from "@/server/cards/store-instance";
+import { translateError } from "@/i18n/errors";
+import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import { replaceCardArt } from "@/server/services/cards";
 
@@ -15,7 +17,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const file = form.get("file");
   const version = Number(form.get("version"));
   if (!(file instanceof File) || !Number.isInteger(version)) {
-    return Response.json({ ok: false, message: "Falta el archivo o la versión de la carta." }, { status: 400 });
+    return Response.json({ ok: false, message: (await getDict()).admin.api.missingFileOrVersion }, { status: 400 });
   }
   try {
     const card = await replaceCardArt(db, getCardStore(), session.user.id, id, version, {
@@ -25,7 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
     return Response.json({ ok: true, pending: Boolean(card.pendingOriginalKey) });
   } catch (e) {
-    if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: e.message }, { status: 409 });
+    if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: 409 });
     throw e;
   }
 }

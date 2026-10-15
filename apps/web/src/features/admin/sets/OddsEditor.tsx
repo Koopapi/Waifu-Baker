@@ -2,9 +2,11 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { RARITIES, RARITY_LABEL, type Rarity } from "@/domain/catalog/card-rules";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { saveOddsAction } from "@/app/admin/sets/actions";
 import type { ActionState } from "@/server/auth/admin-action";
+import { useLocale, useT } from "@/i18n/client";
+import { formatNumber, formatPercent } from "@/i18n/format";
 
 type Slot = Record<Rarity, number>;
 
@@ -32,6 +34,9 @@ export function OddsEditor({
   const [state, setState] = useState<ActionState | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
+  const tt = useT();
+  const t = tt.admin.odds;
+  const locale = useLocale();
   // Tras guardar, el servidor devuelve otra versión: se sincronizan los datos sin remontar el
   // editor, para que el mensaje de confirmación siga visible.
   const initialKey = JSON.stringify([initial, holoChance, pityThreshold]);
@@ -53,14 +58,14 @@ export function OddsEditor({
         <table className="w-full min-w-[720px] text-sm">
           <thead className="bg-white/[0.03] text-xs uppercase tracking-wider text-white/50">
             <tr>
-              <th className="px-3 py-2 text-left">Ranura</th>
+              <th className="px-3 py-2 text-left">{t.slot}</th>
               {RARITIES.map((r) => (
                 <th key={r} className="px-2 py-2 text-right">
-                  {RARITY_LABEL[r]}
-                  <span className="block font-normal normal-case tracking-normal text-white/30">{cardCounts[r]} carta(s)</span>
+                  {tt.common.rarity[r]}
+                  <span className="block font-normal normal-case tracking-normal text-white/30">{t.cardCount(cardCounts[r])}</span>
                 </th>
               ))}
-              <th className="px-3 py-2 text-right">Suma</th>
+              <th className="px-3 py-2 text-right">{t.sum}</th>
             </tr>
           </thead>
           <tbody>
@@ -68,7 +73,7 @@ export function OddsEditor({
               <tr key={i} id={`ranura-${i + 1}`} className="border-t border-white/5">
                 <td className="px-3 py-2 text-white/70">
                   {i + 1}
-                  {i === slots.length - 1 && <span className="ml-2 text-xs text-white/40">(garantizada)</span>}
+                  {i === slots.length - 1 && <span className="ml-2 text-xs text-white/40">{t.guaranteed}</span>}
                 </td>
                 {RARITIES.map((r) => (
                   <td key={r} className="px-2 py-1.5 text-right">
@@ -79,24 +84,24 @@ export function OddsEditor({
                       step={0.1}
                       value={s[r]}
                       disabled={locked}
-                      aria-label={`Ranura ${i + 1}, ${RARITY_LABEL[r]}`}
+                      aria-label={t.slotAria(i + 1, tt.common.rarity[r])}
                       onChange={(e) => set(i, r, e.target.value)}
                       className={`w-20 rounded-md border bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60 ${s[r] > 0 && cardCounts[r] === 0 ? "border-amber-400/60" : "border-white/10"}`}
                     />
                   </td>
                 ))}
                 <td className={`px-3 py-2 text-right font-semibold tabular-nums ${Math.abs(sums[i] - 100) < 1e-6 ? "text-emerald-300" : "text-red-300"}`}>
-                  {+sums[i].toFixed(2)} %
+                  {formatPercent(locale, sums[i])}
                 </td>
               </tr>
             ))}
           </tbody>
           <tfoot className="border-t border-white/10 text-xs text-white/50">
             <tr>
-              <td className="px-3 py-2">Cartas esperadas por sobre</td>
+              <td className="px-3 py-2">{t.expected}</td>
               {expected.map(([r, e]) => (
                 <td key={r} className="px-2 py-2 text-right tabular-nums">
-                  {e.toLocaleString("es", { maximumFractionDigits: 2 })}
+                  {formatNumber(locale, e, 2)}
                 </td>
               ))}
               <td />
@@ -106,7 +111,7 @@ export function OddsEditor({
       </div>
       <div className="flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2 text-sm">
-          Probabilidad de holo en Rara o superior
+          {t.holo}
           <input
             type="number"
             min={0}
@@ -119,8 +124,8 @@ export function OddsEditor({
           />
           %
         </label>
-        <label className="flex items-center gap-2 text-sm" title="Tras N−1 sobres seguidos sin épica o superior, el siguiente la garantiza. 0 la desactiva.">
-          Protección: épica o mejor garantizada cada
+        <label className="flex items-center gap-2 text-sm" title={t.pityTitle}>
+          {t.pity}
           <input
             type="number"
             min={0}
@@ -128,11 +133,11 @@ export function OddsEditor({
             step={1}
             value={pity}
             disabled={locked}
-            aria-label="Protección de mala suerte (sobres)"
+            aria-label={t.pityAria}
             onChange={(e) => setPity(Number(e.target.value))}
             className="w-16 rounded-md border border-white/10 bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
           />
-          sobres {pity === 0 && <span className="text-white/40">(desactivada)</span>}
+          {t.packs} {pity === 0 && <span className="text-white/40">{t.disabled}</span>}
         </label>
         {!locked && (
           <button
@@ -147,10 +152,10 @@ export function OddsEditor({
             }
             className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50"
           >
-            {pending ? "Guardando…" : "Guardar probabilidades"}
+            {pending ? tt.common.saving : t.save}
           </button>
         )}
-        {locked && <span className="text-xs text-white/40">Publicadas: congeladas y visibles en /drop-rates (RF-8, RF-21).</span>}
+        {locked && <span className="text-xs text-white/40">{t.locked}</span>}
         {state && <span className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>{state.error ?? state.message}</span>}
       </div>
     </div>

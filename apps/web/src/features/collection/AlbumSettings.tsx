@@ -10,6 +10,7 @@ import {
   saveFeaturedAction,
   type AlbumActionState,
 } from "@/app/coleccion/album/actions";
+import { useT } from "@/i18n/client";
 
 interface FeaturableCard {
   cardId: string;
@@ -32,6 +33,7 @@ function Status({ state }: { state: AlbumActionState }) {
 }
 
 function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: string[] }) {
+  const t = useT();
   const [picked, setPicked] = useState<string[]>(initial.filter((id) => cards.some((c) => c.cardId === id)));
   const [state, setState] = useState<AlbumActionState>(null);
   const [pending, start] = useTransition();
@@ -47,15 +49,15 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
       return n;
     });
 
-  if (cards.length === 0) return <p className="text-white/50">Cuando tengas cartas SFW podrás elegir hasta {MAX_FEATURED} destacadas.</p>;
+  if (cards.length === 0) return <p className="text-white/50">{t.collection.album.featuredEmpty(MAX_FEATURED)}</p>;
   return (
     <div className="space-y-4" data-testid="featured-picker">
       <div>
         <p className="mb-2 text-sm text-white/60">
-          Destacadas, en este orden ({picked.length} de {MAX_FEATURED}):
+          {t.collection.album.featuredOrder(picked.length, MAX_FEATURED)}
         </p>
         {picked.length === 0 ? (
-          <p className="text-sm text-white/40">Aún no has elegido ninguna. Pulsa cartas de abajo.</p>
+          <p className="text-sm text-white/40">{t.collection.album.featuredNone}</p>
         ) : (
           <ol className="flex flex-wrap gap-2" data-testid="featured-order">
             {picked.map((id, i) => {
@@ -63,15 +65,15 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
               return (
                 <li key={id} className="flex items-center gap-1 rounded-full border border-white/15 py-1 pl-3 pr-1 text-sm">
                   <span>
-                    {i + 1}. {c.name || `Carta ${pad(c.number)}`}
+                    {i + 1}. {c.name || t.collection.binder.cardFallbackName(pad(c.number))}
                   </span>
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="px-1.5 text-white/60 disabled:opacity-30" aria-label={`Subir ${c.name}`}>
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="px-1.5 text-white/60 disabled:opacity-30" aria-label={t.collection.album.moveUp(c.name)}>
                     ↑
                   </button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === picked.length - 1} className="px-1.5 text-white/60 disabled:opacity-30" aria-label={`Bajar ${c.name}`}>
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === picked.length - 1} className="px-1.5 text-white/60 disabled:opacity-30" aria-label={t.collection.album.moveDown(c.name)}>
                     ↓
                   </button>
-                  <button type="button" onClick={() => toggle(id)} className="px-1.5 text-white/60" aria-label={`Quitar ${c.name}`}>
+                  <button type="button" onClick={() => toggle(id)} className="px-1.5 text-white/60" aria-label={t.collection.album.remove(c.name)}>
                     ✕
                   </button>
                 </li>
@@ -91,7 +93,7 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
                 onClick={() => toggle(c.cardId)}
                 disabled={full}
                 aria-pressed={on}
-                aria-label={`Destacar ${c.setCode} ${pad(c.number)}`}
+                aria-label={t.collection.album.feature(c.setCode, pad(c.number))}
                 className={`relative block w-full overflow-hidden rounded-lg ring-2 transition disabled:opacity-40 ${on ? "ring-[#d6b370]" : "ring-transparent"}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
@@ -113,7 +115,7 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
           onClick={() => start(async () => setState(await saveFeaturedAction(picked)))}
           className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50"
         >
-          {pending ? "Guardando…" : "Guardar destacadas"}
+          {pending ? t.common.saving : t.collection.album.saveFeatured}
         </button>
         <Status state={state} />
       </div>
@@ -128,14 +130,15 @@ export function AlbumSettings({
   album: { isPublic: boolean; alias: string; url: string; featured: string[] } | null;
   cards: FeaturableCard[];
 }) {
+  const t = useT();
   const [aliasState, activate, activating] = useActionState(activateAlbumAction, null);
   const [state, setState] = useState<AlbumActionState>(null);
   const [pending, start] = useTransition();
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     if (!copied) return;
-    const t = window.setTimeout(() => setCopied(false), 1500);
-    return () => window.clearTimeout(t);
+    const timer = window.setTimeout(() => setCopied(false), 1500);
+    return () => window.clearTimeout(timer);
   }, [copied]);
   const active = Boolean(album?.isPublic);
 
@@ -144,29 +147,29 @@ export function AlbumSettings({
       <section className="space-y-4 rounded-2xl border border-white/10 p-5" data-testid="album-status">
         <div className="flex items-center gap-3">
           <span className={`h-2.5 w-2.5 rounded-full ${active ? "bg-emerald-400" : "bg-white/30"}`} />
-          <h2 className="text-lg font-semibold">{active ? "Tu álbum es público" : "Tu álbum es privado"}</h2>
+          <h2 className="text-lg font-semibold">{active ? t.collection.album.isPublic : t.collection.album.isPrivate}</h2>
         </div>
         {active && album && (
           <div className="flex flex-wrap items-center gap-2">
-            <input readOnly value={album.url} aria-label="Enlace del álbum" className="min-w-0 basis-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-sm sm:basis-auto sm:flex-1" data-testid="album-url" />
+            <input readOnly value={album.url} aria-label={t.collection.album.linkLabel} className="min-w-0 basis-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-sm sm:basis-auto sm:flex-1" data-testid="album-url" />
             <button
               type="button"
               onClick={() => void navigator.clipboard?.writeText(album.url).then(() => setCopied(true))}
               className="rounded-full border border-white/20 px-4 py-2 text-sm"
             >
-              {copied ? "¡Copiado!" : "Copiar"}
+              {copied ? t.collection.album.copied : t.collection.album.copy}
             </button>
             <a href={album.url} target="_blank" rel="noreferrer" className="rounded-full border border-white/20 px-4 py-2 text-sm">
-              Ver
+              {t.collection.album.view}
             </a>
           </div>
         )}
         <form action={activate} className="flex flex-wrap items-end gap-3">
           <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
-            Alias que verán los visitantes
+            {t.collection.album.aliasLabel}
             <input
               name="alias"
-              defaultValue={album?.alias ?? "Coleccionista"}
+              defaultValue={album?.alias ?? t.collection.album.defaultAlias}
               minLength={2}
               maxLength={30}
               required
@@ -174,7 +177,7 @@ export function AlbumSettings({
             />
           </label>
           <button disabled={activating} className="rounded-full bg-[#d6b370] px-4 py-2 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50">
-            {active ? "Guardar alias" : "Activar álbum público"}
+            {active ? t.collection.album.saveAlias : t.collection.album.activate}
           </button>
         </form>
         <Status state={aliasState} />
@@ -186,17 +189,17 @@ export function AlbumSettings({
               onClick={() => start(async () => setState(await deactivateAlbumAction()))}
               className="rounded-full border border-white/20 px-4 py-1.5 text-sm"
             >
-              Desactivar álbum
+              {t.collection.album.deactivate}
             </button>
             <button
               type="button"
               disabled={pending}
               onClick={() => {
-                if (window.confirm("El enlace actual dejará de funcionar. ¿Crear uno nuevo?")) start(async () => setState(await regenerateAlbumLinkAction()));
+                if (window.confirm(t.collection.album.regenerateConfirm)) start(async () => setState(await regenerateAlbumLinkAction()));
               }}
               className="rounded-full border border-white/20 px-4 py-1.5 text-sm"
             >
-              Generar enlace nuevo
+              {t.collection.album.regenerate}
             </button>
           </div>
         )}
@@ -204,7 +207,7 @@ export function AlbumSettings({
       </section>
       {album && (
         <section className="space-y-4 rounded-2xl border border-white/10 p-5">
-          <h2 className="text-lg font-semibold">Cartas destacadas</h2>
+          <h2 className="text-lg font-semibold">{t.collection.album.featuredTitle}</h2>
           <FeaturedPicker cards={cards} initial={album.featured} />
         </section>
       )}

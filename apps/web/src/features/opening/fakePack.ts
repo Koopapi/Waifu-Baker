@@ -18,15 +18,6 @@ export interface LabCard {
 
 export const RARITY_ORDER: Rarity[] = ["common", "uncommon", "rare", "epic", "legendary", "secret"];
 
-export const RARITY_LABEL: Record<Rarity, string> = {
-  common: "Común",
-  uncommon: "Poco común",
-  rare: "Rara",
-  epic: "Épica",
-  legendary: "Legendaria",
-  secret: "Secreta",
-};
-
 const POOL: Omit<LabCard, "holo">[] = [
   { id: "c01", number: 1, name: "Special Week", rarity: "common", image: "/lab/01.webp" },
   { id: "c02", number: 2, name: "Daiwa Scarlet", rarity: "uncommon", image: "/lab/02.webp" },

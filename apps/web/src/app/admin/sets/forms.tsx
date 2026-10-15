@@ -3,29 +3,31 @@
 import { useActionState, useEffect, useRef } from "react";
 import { createSetAction, updateSetAction } from "./actions";
 import { Field, FormMessage, inputCls, SubmitButton } from "@/features/admin/ui";
+import { useT } from "@/i18n/client";
 
 export function CreateSetForm() {
   const [state, action] = useActionState(createSetAction, null);
   const form = useRef<HTMLFormElement>(null);
+  const t = useT().admin.sets;
   useEffect(() => {
     if (state?.ok) form.current?.reset();
   }, [state]);
   return (
     <form ref={form} action={action} className="grid gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-2 lg:grid-cols-[140px_minmax(0,1fr)_120px_auto_auto] lg:items-end">
-      <Field label="Código" hint="2–8 letras o números">
+      <Field label={t.code} hint={t.codeHint}>
         <input name="code" required maxLength={8} placeholder="WB01" className={`${inputCls} uppercase`} />
       </Field>
-      <Field label="Nombre">
-        <input name="name" required maxLength={80} placeholder="Colección base" className={inputCls} />
+      <Field label={t.name}>
+        <input name="name" required maxLength={80} placeholder={t.namePlaceholder} className={inputCls} />
       </Field>
-      <Field label="Cartas por sobre">
+      <Field label={t.packSize}>
         <input name="packSize" type="number" min={1} max={10} defaultValue={5} className={inputCls} />
       </Field>
       <label className="flex items-center gap-2 pb-2 text-sm">
-        <input type="checkbox" name="isAdult" /> Colección 18+
+        <input type="checkbox" name="isAdult" /> {t.adult}
       </label>
       <div className="pb-0.5">
-        <SubmitButton>Crear colección</SubmitButton>
+        <SubmitButton>{t.create}</SubmitButton>
       </div>
       <div className="sm:col-span-2 lg:col-span-5">
         <FormMessage state={state} />
@@ -42,26 +44,28 @@ export function EditSetForm({
   lockedForUsers: boolean;
 }) {
   const [state, action] = useActionState(updateSetAction, null);
+  const tt = useT();
+  const t = tt.admin.sets;
   return (
     <form action={action} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_140px_auto_auto] lg:items-end" key={set.version}>
       <input type="hidden" name="id" value={set.id} />
       <input type="hidden" name="version" value={set.version} />
-      <Field label="Nombre">
+      <Field label={t.name}>
         <input name="name" required maxLength={80} defaultValue={set.name} className={inputCls} />
       </Field>
-      <Field label="Cartas por sobre">
+      <Field label={t.packSize}>
         <input name="packSize" type="number" min={1} max={10} defaultValue={set.packSize} disabled={lockedForUsers} className={inputCls} />
       </Field>
       <label className={`flex items-center gap-2 pb-2 text-sm ${lockedForUsers ? "opacity-50" : ""}`}>
         {!lockedForUsers && <input type="hidden" name="adultField" value="1" />}
-        <input type="checkbox" name="isAdult" defaultChecked={set.isAdult} disabled={lockedForUsers} /> Colección 18+
+        <input type="checkbox" name="isAdult" defaultChecked={set.isAdult} disabled={lockedForUsers} /> {t.adult}
       </label>
       <div className="pb-0.5">
-        <SubmitButton>Guardar</SubmitButton>
+        <SubmitButton>{tt.common.save}</SubmitButton>
       </div>
       <div className="sm:col-span-2 lg:col-span-4">
         <FormMessage state={state} />
-        {lockedForUsers && <p className="text-xs text-white/40">Publicada: el tamaño del sobre y la clasificación 18+ están bloqueados (RF-8).</p>}
+        {lockedForUsers && <p className="text-xs text-white/40">{t.lockedHint}</p>}
       </div>
     </form>
   );

@@ -1,8 +1,12 @@
 import { headers } from "next/headers";
 import { requireUser } from "@/server/auth/require-user";
 import { UserHeader } from "@/features/user/UserHeader";
+import { getDict } from "@/i18n/server";
 
-export const metadata = { title: "Mis sobres" };
+export async function generateMetadata() {
+  const t = await getDict();
+  return { title: t.packs.meta.myPacks };
+}
 
 export default async function SobresLayout({ children }: { children: React.ReactNode }) {
   const path = (await headers()).get("x-pathname") ?? "/sobres";

@@ -13,14 +13,20 @@ export interface UploadCandidate {
 
 export type UploadVerdict =
   | { ok: true }
-  | { ok: false; code: "unsupported_type" | "too_large" | "too_narrow" | "unreadable"; message: string };
+  | {
+      ok: false;
+      code: "unsupported_type" | "too_large" | "too_narrow" | "unreadable";
+      message: string;
+      /** Variables del mensaje para traducirlo por código (spec 008). */
+      params?: Record<string, string | number>;
+    };
 
 export function validateUpload({ mime, bytes, width }: UploadCandidate): UploadVerdict {
   if (!(ALLOWED_UPLOAD_TYPES as readonly string[]).includes(mime)) {
     return { ok: false, code: "unsupported_type", message: "Formato no admitido: sube PNG, JPEG o WebP." };
   }
   if (bytes > MAX_UPLOAD_BYTES) {
-    return { ok: false, code: "too_large", message: "El archivo supera 20 MB: redúcelo o expórtalo como WebP." };
+    return { ok: false, code: "too_large", message: "El archivo supera 20 MB: redúcelo o expórtalo como WebP.", params: { maxMb: MAX_UPLOAD_BYTES / 1024 / 1024 } };
   }
   if (width === null) {
     return { ok: false, code: "unreadable", message: "No se pudo leer la imagen: el archivo parece dañado." };
@@ -30,6 +36,7 @@ export function validateUpload({ mime, bytes, width }: UploadCandidate): UploadV
       ok: false,
       code: "too_narrow",
       message: `La imagen mide ${width} px de ancho; el mínimo es ${MIN_UPLOAD_WIDTH} px.`,
+      params: { width, min: MIN_UPLOAD_WIDTH },
     };
   }
   return { ok: true };

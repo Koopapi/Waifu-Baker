@@ -30,7 +30,12 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
   administrador entra siempre en escritorio y el coleccionista con el dispositivo del proyecto.
   `e2e/qa-sweep.spec.ts` recorre todas las páginas en escritorio, tableta y móvil buscando errores
   de consola, respuestas fallidas, desbordes, imágenes rotas y controles sin nombre.
-  Solo un proyecto: `pnpm exec playwright test --project=iphone-14`.
+  Solo un proyecto: `pnpm exec playwright test --project=iphone-14`. Los contextos usan español por
+  defecto (cookie `wb_locale=es` en `playwright.config.ts`); `e2e/i18n.spec.ts` y el barrido usan inglés.
+- Textos de la interfaz: nunca literales en componentes; van en `src/i18n/dictionaries/{en,es}/<área>.ts`
+  (el inglés manda y el tipo obliga al español a tener las mismas claves). Errores de negocio: código +
+  `params` en `AdminError`, traducción en `dictionaries/*/errors.ts`. `src/i18n/i18n.test.ts` falla si queda
+  texto en español fuera de los diccionarios o un código de error sin traducir.
 - Compilación de producción: `NEXT_DIST_DIR=.next-prod pnpm build` (no pisa `pnpm dev`).
 - Validación RF por RF: `node scripts/rf-coverage.mjs ../../specs/<spec>` (escribe `validation.md`; los tests
   se nombran `test_s<NNN>_rfN_*` —la 003 puede omitir `s003_`— y cada E2E declara su spec en la

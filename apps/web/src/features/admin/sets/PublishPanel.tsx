@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { archiveSetAction, publishSetAction } from "@/app/admin/sets/actions";
 import type { Problem } from "@/domain/catalog/odds";
+import { useT } from "@/i18n/client";
+import { translateError } from "@/i18n/errors";
 
 const anchor = (p: Problem) =>
   p.target.kind === "card"
@@ -20,9 +22,11 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
+  const tt = useT();
+  const t = tt.admin.publish;
 
   if (status === "archived") {
-    return <p className="text-sm text-white/50">Colección archivada: no se concede en sobres nuevos; lo obtenido y los sobres sin abrir se conservan.</p>;
+    return <p className="text-sm text-white/50">{t.archivedNote}</p>;
   }
 
   return (
@@ -37,7 +41,7 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
               setProblems(r.problems ?? []);
               if (r.code === "stale_version") {
                 // Suele ser un guardado propio que aún no había llegado a la página: se refresca sola.
-                setMsg({ ok: false, text: "La colección se acababa de actualizar. Ya ves la versión actual: vuelve a pulsar «Comprobar y publicar»." });
+                setMsg({ ok: false, text: t.stalePublish });
                 router.refresh();
                 return;
               }
@@ -47,7 +51,7 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
           }
           className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-black disabled:opacity-60"
         >
-          {pending ? "Comprobando…" : "Comprobar y publicar"}
+          {pending ? t.checking : t.checkAndPublish}
         </button>
       ) : (
         <button
@@ -55,10 +59,10 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
           disabled={pending}
           onClick={() =>
             start(async () => {
-              if (!window.confirm("¿Archivar la colección? Dejará de concederse en sobres nuevos.")) return;
+              if (!window.confirm(t.confirmArchive)) return;
               const r = await archiveSetAction(setId, version);
               if (r.code === "stale_version") {
-                setMsg({ ok: false, text: "La colección se acababa de actualizar. Ya ves la versión actual: vuelve a pulsar «Archivar colección»." });
+                setMsg({ ok: false, text: t.staleArchive });
                 router.refresh();
                 return;
               }
@@ -68,7 +72,7 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
           }
           className="rounded-full border border-white/20 px-5 py-2 text-sm disabled:opacity-60"
         >
-          Archivar colección
+          {t.archive}
         </button>
       )}
       {msg && <p className={`text-sm ${msg.ok ? "text-emerald-300" : "text-red-300"}`}>{msg.text}</p>}
@@ -81,10 +85,10 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
                 <span className="text-red-300">•</span>
                 {href ? (
                   <a href={href} className="underline decoration-white/20 underline-offset-4 hover:decoration-white">
-                    {p.message}
+                    {translateError(tt, p)}
                   </a>
                 ) : (
-                  <span>{p.message}</span>
+                  <span>{translateError(tt, p)}</span>
                 )}
               </li>
             );

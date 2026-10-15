@@ -13,21 +13,21 @@ const CODE_RE = /^[A-Z0-9]{2,8}$/;
 function normalizeCode(raw: string) {
   const code = raw.trim().toUpperCase();
   if (!CODE_RE.test(code)) {
-    throw new AdminError("invalid_code", "El código debe tener de 2 a 8 letras o números, sin espacios (por ejemplo WB01).");
+    throw new AdminError("invalid_code", "El código debe tener de 2 a 8 letras o números, sin espacios (por ejemplo WB01).", { min: 2, max: 8 });
   }
   return code;
 }
 
 function normalizeName(raw: string) {
   const name = raw.trim();
-  if (!name || name.length > 80) throw new AdminError("invalid_name", "El nombre es obligatorio y admite hasta 80 caracteres.");
+  if (!name || name.length > 80) throw new AdminError("invalid_name", "El nombre es obligatorio y admite hasta 80 caracteres.", { entity: "set", max: 80 });
   return name;
 }
 
 function normalizePackSize(n: number | undefined) {
   const size = n ?? 5;
   if (!Number.isInteger(size) || size < 1 || size > 10) {
-    throw new AdminError("invalid_pack_size", "El sobre debe tener entre 1 y 10 cartas.");
+    throw new AdminError("invalid_pack_size", "El sobre debe tener entre 1 y 10 cartas.", { min: 1, max: 10 });
   }
   return size;
 }
@@ -58,7 +58,7 @@ export async function createSet(
       return set;
     });
   } catch (e) {
-    if (isUniqueViolation(e)) throw new AdminError("duplicate_code", `Ya existe una colección con el código ${code}.`);
+    if (isUniqueViolation(e)) throw new AdminError("duplicate_code", `Ya existe una colección con el código ${code}.`, { code });
     throw e;
   }
 }
@@ -75,9 +75,9 @@ const PATCH_FIELD: Record<keyof SetPatch, EditableField> = { name: "setName", is
 export async function updateSet(db: DbLike, actorUserId: string, setId: string, expectedVersion: number, patch: SetPatch) {
   return db.transaction(async (tx) => {
     const [cur] = await tx.select().from(sets).where(eq(sets.id, setId)).for("update");
-    if (!cur) throw new AdminError("not_found", "La colección no existe.");
+    if (!cur) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
     if (cur.version !== expectedVersion) {
-      throw new AdminError("stale_version", "La colección cambió desde que la abriste. Recarga la página para ver los cambios.");
+      throw new AdminError("stale_version", "La colección cambió desde que la abriste. Recarga la página para ver los cambios.", { entity: "set" });
     }
     const next = {
       name: patch.name === undefined ? cur.name : normalizeName(patch.name),
@@ -86,7 +86,7 @@ export async function updateSet(db: DbLike, actorUserId: string, setId: string, 
     };
     for (const key of Object.keys(PATCH_FIELD) as (keyof SetPatch)[]) {
       if (next[key] !== cur[key] && !canEdit(cur.status, PATCH_FIELD[key])) {
-        throw new AdminError("locked", "Esta colección ya está publicada: solo puedes cambiar su nombre.");
+        throw new AdminError("locked", "Esta colección ya está publicada: solo puedes cambiar su nombre.", { what: "set" });
       }
     }
     const [updated] = await tx
@@ -138,16 +138,16 @@ export async function getSet(db: DbLike, setId: string) {
 
 async function lockForTransition(db: DbLike, setId: string, expectedVersion: number) {
   const [cur] = await db.select().from(sets).where(eq(sets.id, setId)).for("update");
-  if (!cur) throw new AdminError("not_found", "La colección no existe.");
+  if (!cur) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
   if (cur.version !== expectedVersion) {
-    throw new AdminError("stale_version", "La colección cambió desde que la abriste. Recarga la página.");
+    throw new AdminError("stale_version", "La colección cambió desde que la abriste. Recarga la página.", { entity: "set", variant: "short" });
   }
   return cur;
 }
 
 async function editableDropTable(db: DbLike, setId: string) {
   const [dt] = await db.select().from(dropTables).where(eq(dropTables.setId, setId)).orderBy(desc(dropTables.version)).limit(1);
-  if (!dt) throw new AdminError("not_found", "La colección no tiene tabla de probabilidades.");
+  if (!dt) throw new AdminError("not_found", "La colección no tiene tabla de probabilidades.", { entity: "drop_table" });
   return dt;
 }
 
@@ -160,17 +160,21 @@ export async function saveOdds(
   input: { slots: Partial<Slot>[]; holoChance: number; pityThreshold?: number },
 ) {
   if (input.pityThreshold !== undefined && (!Number.isInteger(input.pityThreshold) || input.pityThreshold < 0 || input.pityThreshold > 100)) {
-    throw new AdminError("invalid_odds", "La protección debe ser un número entero de sobres entre 0 y 100 (0 la desactiva).");
+    throw new AdminError("invalid_odds", "La protección debe ser un número entero de sobres entre 0 y 100 (0 la desactiva).", { field: "pity", min: 0, max: 100 });
   }
   return db.transaction(async (tx) => {
     const cur = await lockForTransition(tx, setId, expectedVersion);
     if (!canEdit(cur.status, "odds")) {
-      throw new AdminError("locked", "Las probabilidades de una colección publicada no se pueden cambiar (RF-8).");
+      throw new AdminError("locked", "Las probabilidades de una colección publicada no se pueden cambiar (RF-8).", { what: "odds" });
     }
     const problems = validateOdds(input.slots, cur.packSize, input.holoChance);
-    if (problems.length) throw new AdminError("invalid_odds", problems.map((p) => p.message).join(" "));
+    if (problems.length) {
+      // Spec 008: los problemas viajan como JSON para traducir cada uno por su código.
+      const encoded = JSON.stringify(problems.map((p) => ({ code: p.code, params: p.params })));
+      throw new AdminError("invalid_odds", problems.map((p) => p.message).join(" "), { problems: encoded });
+    }
     const dt = await editableDropTable(tx, setId);
-    if (dt.publishedAt) throw new AdminError("locked", "Esta versión de probabilidades ya está publicada.");
+    if (dt.publishedAt) throw new AdminError("locked", "Esta versión de probabilidades ya está publicada.", { what: "odds_version" });
     const slots = input.slots.map((s) => ({ common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0, ...s }));
     const pityThreshold = input.pityThreshold ?? dt.pityThreshold;
     await tx.update(dropTables).set({ slots, holoChance: input.holoChance, pityThreshold, updatedAt: sql`now()` }).where(eq(dropTables.id, dt.id));
@@ -191,7 +195,7 @@ export async function publishSet(db: DbLike, actorUserId: string, setId: string,
   return db.transaction(async (tx) => {
     const cur = await lockForTransition(tx, setId, expectedVersion);
     if (!nextStatusAllowed(cur.status, "published")) {
-      throw new AdminError("invalid_transition", "Solo se puede publicar una colección en borrador.");
+      throw new AdminError("invalid_transition", "Solo se puede publicar una colección en borrador.", { action: "publish" });
     }
     const dt = await editableDropTable(tx, setId);
     const rows = await tx.select().from(cards).where(eq(cards.setId, setId));
@@ -209,7 +213,7 @@ export async function archiveSet(db: DbLike, actorUserId: string, setId: string,
   return db.transaction(async (tx) => {
     const cur = await lockForTransition(tx, setId, expectedVersion);
     if (!nextStatusAllowed(cur.status as SetStatus, "archived")) {
-      throw new AdminError("invalid_transition", "Solo se puede archivar una colección publicada.");
+      throw new AdminError("invalid_transition", "Solo se puede archivar una colección publicada.", { action: "archive" });
     }
     await tx.update(sets).set({ status: "archived", archivedAt: sql`now()`, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(sets.id, setId));
     await recordAudit(tx, { actorUserId, action: "set_archive", entityType: "set", entityId: setId });

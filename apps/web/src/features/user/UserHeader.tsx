@@ -1,26 +1,29 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
+import { LocaleToggle } from "@/i18n/LocaleToggle";
+import { getDict } from "@/i18n/server";
 
 /** Cabecera de las páginas del coleccionista. */
-export function UserHeader({ name, isAdmin }: { name: string; isAdmin: boolean }) {
+export async function UserHeader({ name, isAdmin }: { name: string; isAdmin: boolean }) {
+  const t = await getDict();
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-4 py-3 sm:px-6">
       <Link href="/" className="font-extrabold tracking-[0.14em]">
-        WAIFU BAKER
+        {t.common.brand}
       </Link>
       <nav className="flex flex-wrap items-center gap-4 text-sm">
         <Link href="/sobres" className="text-white/80 hover:text-white">
-          Mis sobres
+          {t.common.nav.myPacks}
         </Link>
         <Link href="/coleccion" className="text-white/80 hover:text-white">
-          Mi colección
+          {t.common.nav.myCollection}
         </Link>
         <Link href="/drop-rates" className="text-white/60 hover:text-white">
-          Probabilidades
+          {t.common.nav.odds}
         </Link>
         {isAdmin && (
           <Link href="/admin" className="text-white/60 hover:text-white">
-            Panel
+            {t.common.nav.panel}
           </Link>
         )}
         <form
@@ -30,9 +33,10 @@ export function UserHeader({ name, isAdmin }: { name: string; isAdmin: boolean }
           }}
         >
           <button className="text-white/50 hover:text-white" title={name}>
-            Salir
+            {t.common.nav.signOut}
           </button>
         </form>
+        <LocaleToggle />
       </nav>
     </header>
   );

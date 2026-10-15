@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { deleteTierRuleAction, saveTierRuleAction } from "./actions";
 import { FormMessage, inputCls, SubmitButton } from "@/features/admin/ui";
+import { useT } from "@/i18n/client";
 
 type SetOption = { id: string; code: string; name: string; isAdult: boolean };
 type Rule = { id: string; setId: string; setCode: string; setName: string; setIsAdult: boolean; packsPerMonth: number; active: boolean };
@@ -10,6 +11,7 @@ type Rule = { id: string; setId: string; setCode: string; setName: string; setIs
 export function RuleRow({ tierId, tierName, rule }: { tierId: string; tierName: string; rule: Rule }) {
   const [state, action] = useActionState(saveTierRuleAction, null);
   const [delState, delAction] = useActionState(deleteTierRuleAction, null);
+  const t = useT();
   return (
     <div className="flex flex-wrap items-center gap-3 border-t border-white/5 px-4 py-3 text-sm">
       <form action={action} className="flex flex-1 flex-wrap items-center gap-3">
@@ -20,17 +22,17 @@ export function RuleRow({ tierId, tierName, rule }: { tierId: string; tierName: 
           <span className="font-mono">{rule.setCode}</span> · {rule.setName} {rule.setIsAdult && <span className="text-rose-300">18+</span>}
         </span>
         <label className="flex items-center gap-2">
-          <input name="packsPerMonth" type="number" min={1} max={50} defaultValue={rule.packsPerMonth} className={`${inputCls} w-20`} /> sobres/mes
+          <input name="packsPerMonth" type="number" min={1} max={50} defaultValue={rule.packsPerMonth} className={`${inputCls} w-20`} /> {t.admin.tiers.packsPerMonth}
         </label>
         <label className="flex items-center gap-2">
-          <input type="checkbox" name="active" defaultChecked={rule.active} /> Activa
+          <input type="checkbox" name="active" defaultChecked={rule.active} /> {t.admin.tiers.active}
         </label>
-        <SubmitButton variant="ghost">Guardar</SubmitButton>
+        <SubmitButton variant="ghost">{t.common.save}</SubmitButton>
         <FormMessage state={state} />
       </form>
       <form action={delAction}>
         <input type="hidden" name="ruleId" value={rule.id} />
-        <SubmitButton variant="danger">Quitar</SubmitButton>
+        <SubmitButton variant="danger">{t.admin.tiers.remove}</SubmitButton>
         <FormMessage state={delState} />
       </form>
     </div>
@@ -39,10 +41,11 @@ export function RuleRow({ tierId, tierName, rule }: { tierId: string; tierName: 
 
 export function AddRuleForm({ tierId, tierName, sets, anyPublished }: { tierId: string; tierName: string; sets: SetOption[]; anyPublished: boolean }) {
   const [state, action] = useActionState(saveTierRuleAction, null);
+  const t = useT().admin.tiers;
   if (sets.length === 0) {
     return (
       <p className="border-t border-white/5 px-4 py-3 text-xs text-white/40">
-        {anyPublished ? "Todas las colecciones publicadas ya están asignadas a este tier." : "Publica una colección para poder asignarla."}
+        {anyPublished ? t.allAssigned : t.publishFirst}
       </p>
     );
   }
@@ -51,7 +54,7 @@ export function AddRuleForm({ tierId, tierName, sets, anyPublished }: { tierId: 
       <input type="hidden" name="patreonTierId" value={tierId} />
       <input type="hidden" name="tierName" value={tierName} />
       <input type="hidden" name="active" value="on" />
-      <select name="setId" required aria-label={`Colección para ${tierName}`} className={`${inputCls} w-auto`}>
+      <select name="setId" required aria-label={t.setAria(tierName)} className={`${inputCls} w-auto`}>
         {sets.map((s) => (
           <option key={s.id} value={s.id}>
             {s.code} · {s.name}
@@ -60,9 +63,9 @@ export function AddRuleForm({ tierId, tierName, sets, anyPublished }: { tierId: 
         ))}
       </select>
       <label className="flex items-center gap-2">
-        <input name="packsPerMonth" type="number" min={1} max={50} defaultValue={3} className={`${inputCls} w-20`} aria-label={`Sobres al mes para ${tierName}`} /> sobres/mes
+        <input name="packsPerMonth" type="number" min={1} max={50} defaultValue={3} className={`${inputCls} w-20`} aria-label={t.packsAria(tierName)} /> {t.packsPerMonth}
       </label>
-      <SubmitButton>Añadir colección</SubmitButton>
+      <SubmitButton>{t.addSet}</SubmitButton>
       <FormMessage state={state} />
     </form>
   );

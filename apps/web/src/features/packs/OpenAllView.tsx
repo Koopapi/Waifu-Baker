@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { RARITIES } from "@/domain/catalog/card-rules";
 import { openAllPacksAction, type OpenAllCard } from "@/app/sobres/actions";
+import { useT } from "@/i18n/client";
 import "./open-all.css";
 
 const rank = (r: OpenAllCard["rarity"]) => RARITIES.indexOf(r);
@@ -14,6 +15,7 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
   const [opened, setOpened] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
+  const t = useT();
 
   const sorted = useMemo(
     () =>
@@ -47,9 +49,9 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <Link href="/sobres" className="text-sm text-white/50 hover:text-white">
-            ← Mis sobres
+            {t.packs.openAll.backToMine}
           </Link>
-          <h1 className="text-3xl font-bold">Abrir todos · {setName}</h1>
+          <h1 className="text-3xl font-bold">{t.packs.openAll.title(setName)}</h1>
         </div>
         {!cards && (
           <button
@@ -59,7 +61,7 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
             className="rounded-full bg-[#d6b370] px-6 py-2.5 font-semibold text-[#0b0c0e] disabled:opacity-50"
             data-testid="open-all"
           >
-            {pending ? "Abriendo…" : sealed === 0 ? "No quedan sobres" : `Abrir ${sealed} sobre(s)`}
+            {pending ? t.packs.openAll.opening : sealed === 0 ? t.packs.openAll.noneLeft : t.packs.openAll.openN(sealed)}
           </button>
         )}
       </div>
@@ -71,8 +73,8 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
       {cards && (
         <>
           <p className="text-white/70" data-testid="open-all-summary">
-            {opened} sobre(s) abiertos · {stats.total} cartas · {stats.nuevas} nuevas · {stats.holo} holo
-            {stats.pity > 0 && ` · ${stats.pity} garantizada(s) por la protección`}
+            {t.packs.openAll.summary({ packs: opened, total: stats.total, fresh: stats.nuevas, holo: stats.holo })}
+            {stats.pity > 0 && t.packs.openAll.summaryPity(stats.pity)}
           </p>
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-6" data-testid="open-all-grid">
             {sorted.map((c, i) => (
@@ -88,16 +90,16 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
                 <div className="oa-card__meta">
                   <span className="oa-card__name">{c.name}</span>
                   <span>
-                    {c.rarityLabel}
-                    {c.holo ? " · holo" : ""}
+                    {t.common.rarity[c.rarity]}
+                    {c.holo ? t.packs.openAll.holoSuffix : ""}
                   </span>
-                  <span className={c.isNew ? "text-emerald-300" : "text-white/50"}>{c.isNew ? "¡Nueva!" : `Tienes ${finalQty.get(`${c.number}-${c.holo}`) ?? c.qtyAfter}`}</span>
+                  <span className={c.isNew ? "text-emerald-300" : "text-white/50"}>{c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(finalQty.get(`${c.number}-${c.holo}`) ?? c.qtyAfter)}</span>
                 </div>
               </li>
             ))}
           </ul>
           <Link href="/sobres" className="inline-block rounded-full border border-white/20 px-5 py-2 text-sm">
-            Volver a mis sobres
+            {t.packs.openAll.backToMineButton}
           </Link>
         </>
       )}

@@ -1,8 +1,12 @@
 import { headers } from "next/headers";
+import { getDict } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { UserHeader } from "@/features/user/UserHeader";
 
-export const metadata = { title: "Mi colección" };
+export async function generateMetadata() {
+  const t = await getDict();
+  return { title: t.collection.title };
+}
 
 export default async function ColeccionLayout({ children }: { children: React.ReactNode }) {
   const path = (await headers()).get("x-pathname") ?? "/coleccion";

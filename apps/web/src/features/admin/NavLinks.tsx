@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useT } from "@/i18n/client";
 
 const NAV = [
-  { href: "/admin", label: "Resumen" },
-  { href: "/admin/sets", label: "Colecciones" },
-  { href: "/admin/characters", label: "Personajes" },
-  { href: "/admin/tiers", label: "Tiers de Patreon" },
-  { href: "/admin/users", label: "Usuarios" },
-];
+  { href: "/admin", key: "overview" },
+  { href: "/admin/sets", key: "sets" },
+  { href: "/admin/characters", key: "characters" },
+  { href: "/admin/tiers", key: "tiers" },
+  { href: "/admin/users", key: "users" },
+] as const;
 
 export function NavLinks() {
   const path = usePathname();
+  const t = useT().admin.nav;
   return (
     <nav className="flex flex-wrap gap-1 md:flex-col">
       {NAV.map((n) => {
@@ -24,12 +26,12 @@ export function NavLinks() {
             aria-current={active ? "page" : undefined}
             className={`rounded-lg px-3 py-2 text-sm ${active ? "bg-white/10 font-semibold text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
           >
-            {n.label}
+            {t[n.key]}
           </Link>
         );
       })}
       <a href="/drop-rates" target="_blank" className="rounded-lg px-3 py-2 text-sm text-white/50 hover:bg-white/5 hover:text-white">
-        Probabilidades públicas ↗
+        {t.publicOdds}
       </a>
     </nav>
   );

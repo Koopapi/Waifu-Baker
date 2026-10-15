@@ -1,6 +1,8 @@
 import { db } from "@/db/client";
 import { adminFromRequest, notFoundResponse } from "@/server/auth/admin-request";
 import { getCardStore } from "@/server/cards/store-instance";
+import { translateError } from "@/i18n/errors";
+import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import { uploadCardImage } from "@/server/services/cards";
 
@@ -16,7 +18,7 @@ export async function POST(req: Request) {
   const setId = String(form.get("setId") ?? "");
   const file = form.get("file");
   if (!setId || !(file instanceof File)) {
-    return Response.json({ ok: false, code: "bad_request", message: "Falta la colección o el archivo." }, { status: 400 });
+    return Response.json({ ok: false, code: "bad_request", message: (await getDict()).admin.api.missingSetOrFile }, { status: 400 });
   }
   try {
     const card = await uploadCardImage(db, getCardStore(), session.user.id, setId, {
@@ -26,7 +28,7 @@ export async function POST(req: Request) {
     });
     return Response.json({ ok: true, card: { id: card.id, number: card.number } });
   } catch (e) {
-    if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: e.message }, { status: STATUS[e.code] ?? 422 });
+    if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: STATUS[e.code] ?? 422 });
     throw e;
   }
 }

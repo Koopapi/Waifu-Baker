@@ -13,4 +13,4 @@ Principios innegociables. Toda spec, plan y tarea debe cumplirlos.
 7. **Cumplimiento por diseño**: probabilidades públicas y versionadas, rara garantizada por sobre, sin intercambio ni cash-out, sin premio por completar set, bloqueo de Bélgica, divulgación de IA.
 8. **Arte solo con personajes originales y adultos**: ningún personaje con licencia en contenido de pago; ninguna imagen sugerente entra en un set sin revisión de aspecto adulto.
 9. **Rendimiento de animación**: solo `transform` y `opacity`, `prefers-reduced-motion` respetado, 60 fps en Pixel 6a e iPhone 12 como umbral de aceptación.
-10. **Idioma**: código e identificadores en inglés; textos al usuario y documentación en español.
+10. **Idioma**: código e identificadores en inglés; la interfaz en inglés por defecto y en español con selector, sin textos sueltos fuera de los diccionarios (`src/i18n`); documentación y specs en español. (Enmienda del 15 oct 2026, spec 008.)

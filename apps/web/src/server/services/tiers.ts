@@ -17,14 +17,14 @@ export interface TierRuleInput {
 /** RF-24: crea o actualiza la regla tier → colección. Solo colecciones publicadas. */
 export async function saveTierRule(db: DbLike, actorUserId: string, input: TierRuleInput) {
   if (!Number.isInteger(input.packsPerMonth) || input.packsPerMonth < 1 || input.packsPerMonth > 50) {
-    throw new AdminError("invalid_packs", "Los sobres al mes deben ser un número entero entre 1 y 50.");
+    throw new AdminError("invalid_packs", "Los sobres al mes deben ser un número entero entre 1 y 50.", { min: 1, max: 50 });
   }
   if (!input.patreonTierId.trim()) throw new AdminError("invalid_tier", "Falta el tier de Patreon.");
   return db.transaction(async (tx) => {
     const [set] = await tx.select().from(sets).where(eq(sets.id, input.setId));
-    if (!set) throw new AdminError("not_found", "La colección no existe.");
+    if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
     if (!canGrantPacks(set.status)) {
-      throw new AdminError("not_grantable", `${set.code} no está publicada: solo las colecciones publicadas se pueden asignar a un tier.`);
+      throw new AdminError("not_grantable", `${set.code} no está publicada: solo las colecciones publicadas se pueden asignar a un tier.`, { set: set.code, context: "tier" });
     }
     const [prev] = await tx
       .select()
@@ -50,7 +50,7 @@ export async function saveTierRule(db: DbLike, actorUserId: string, input: TierR
 
 export async function deleteTierRule(db: DbLike, actorUserId: string, ruleId: string) {
   const [gone] = await db.delete(tierRules).where(eq(tierRules.id, ruleId)).returning();
-  if (!gone) throw new AdminError("not_found", "La regla no existe.");
+  if (!gone) throw new AdminError("not_found", "La regla no existe.", { entity: "tier_rule" });
   await recordAudit(db, { actorUserId, action: "tier_rule_delete", entityType: "tier_rule", entityId: ruleId, before: gone });
 }
 

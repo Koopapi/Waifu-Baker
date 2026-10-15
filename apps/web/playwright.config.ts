@@ -20,7 +20,12 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   workers: 1,
   reporter: [["list"]],
-  use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure" },
+  use: {
+    baseURL: `http://localhost:${PORT}`,
+    trace: "retain-on-failure",
+    // Los E2E de las specs 003 a 006 comprueban textos en español; la spec 008 prueba el inglés.
+    storageState: { cookies: [{ name: "wb_locale", value: "es", domain: "localhost", path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }], origins: [] },
+  },
   // El coleccionista y el visitante usan el dispositivo del proyecto; el panel, siempre escritorio.
   projects: [
     { name: "warmup", testMatch: /warmup\.setup\.ts/, use: { ...devices["Desktop Chrome"] } },

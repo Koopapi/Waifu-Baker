@@ -3,13 +3,16 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import sharp from "sharp";
 import { db } from "@/db/client";
+import { dictionaries } from "@/i18n";
 import { getCardStore } from "@/server/cards/store-instance";
 import { publicAlbum, publicCardImageKey } from "@/server/services/album";
 
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Álbum de Waifu Baker";
+// RF-8: la vista previa para redes siempre va en inglés (no depende de la cookie).
+const t = dictionaries.en;
+export const alt = t.collection.publicAlbum.ogAlt;
 
 /** La vista previa usa las mismas imágenes con marca de agua que el álbum (RF-15). */
 async function cardPng(slug: string, cardId: string) {
@@ -42,11 +45,11 @@ export default async function OgImage({ params }: { params: Promise<{ slug: stri
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", width: imgs.length ? 520 : 1072, gap: 22 }}>
-          <div style={{ fontSize: 26, letterSpacing: 6, opacity: 0.7 }}>WAIFU BAKER</div>
-          <div style={{ fontSize: 68, fontWeight: 700, lineHeight: 1.05 }}>{a ? a.alias : "Álbum no disponible"}</div>
+          <div style={{ fontSize: 26, letterSpacing: 6, opacity: 0.7 }}>{t.common.brand}</div>
+          <div style={{ fontSize: 68, fontWeight: 700, lineHeight: 1.05 }}>{a ? a.alias : t.collection.publicAlbum.ogUnavailable}</div>
           {a && (
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ fontSize: 32, opacity: 0.85 }}>{`${a.totals.owned} de ${a.totals.total} cartas · ${pct} %`}</div>
+              <div style={{ fontSize: 32, opacity: 0.85 }}>{t.collection.publicAlbum.totals(a.totals.owned, a.totals.total, pct)}</div>
               <div style={{ display: "flex", width: 420, height: 14, borderRadius: 7, background: "rgba(255,255,255,0.12)" }}>
                 <div style={{ width: `${Math.max(pct, 2)}%`, height: 14, borderRadius: 7, background: "linear-gradient(90deg, #d6b370, #ff6ad5)" }} />
               </div>

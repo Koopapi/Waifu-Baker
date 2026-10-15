@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { db } from "@/db/client";
+import { getDict } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { getMyAlbum } from "@/server/services/album";
 import { myCollections } from "@/server/services/collection";
@@ -7,22 +8,22 @@ import { myCollections } from "@/server/services/collection";
 /** RF-1 y RF-4: colecciones del usuario con su progreso. */
 export default async function MiColeccionPage() {
   const user = await requireUser("/coleccion");
-  const [cols, album] = await Promise.all([myCollections(db, user.id), getMyAlbum(db, user.id)]);
+  const [cols, album, t] = await Promise.all([myCollections(db, user.id), getMyAlbum(db, user.id), getDict()]);
   return (
     <main className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <h1 className="text-3xl font-bold">Mi colección</h1>
+        <h1 className="text-3xl font-bold">{t.collection.title}</h1>
         <Link href="/coleccion/album" className="rounded-full border border-white/20 px-4 py-2 text-sm hover:bg-white/5" data-testid="album-settings-link">
-          {album?.isPublic ? "Álbum público: activo" : "Álbum público"}
+          {album?.isPublic ? t.collection.publicAlbumLinkActive : t.collection.publicAlbumLink}
         </Link>
       </div>
       {cols.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/15 p-10 text-center text-white/60">
-          Aún no tienes cartas. Abre tus sobres en{" "}
+          {t.collection.emptyBefore}{" "}
           <Link href="/sobres" className="underline">
-            Mis sobres
+            {t.common.nav.myPacks}
           </Link>{" "}
-          para empezar tu colección.
+          {t.collection.emptyAfter}
         </div>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
@@ -34,7 +35,7 @@ export default async function MiColeccionPage() {
                   <div className="space-y-2 rounded-2xl border border-white/10 p-5">
                     <p className="font-mono text-xs text-white/50">{c.code}</p>
                     <h2 className="text-lg font-semibold">{c.name}</h2>
-                    <p className="text-sm text-rose-200">Colección 18+: verifica tu edad con un tier adulto de Patreon para ver estas cartas.</p>
+                    <p className="text-sm text-rose-200">{t.collection.adultLocked}</p>
                   </div>
                 ) : (
                   <Link href={`/coleccion/${c.setId}`} className="block space-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-5 hover:bg-white/[0.06]">

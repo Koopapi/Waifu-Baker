@@ -49,7 +49,7 @@ interface StoredRolls {
   draws: StoredRoll[];
 }
 
-const notFound = () => new AppError("not_found", "Ese sobre no existe.");
+const notFound = () => new AppError("not_found", "Ese sobre no existe.", { entity: "pack" });
 
 /** Reconstruye el resultado guardado (RF-6, RF-17). */
 async function resultFromOpening(db: DbLike, packId: string): Promise<OpeningResult> {
@@ -106,7 +106,7 @@ export async function openPack(
     if (!user || user.deletedAt) throw notFound();
     const [set] = await tx.select().from(sets).where(eq(sets.id, pack.setId));
     if (set.isAdult && !(user.isAdultDeclared && user.adultVerifiedAt)) {
-      throw new AppError("age_not_verified", "Este sobre es de una colección 18+: verifica tu edad para abrirlo.");
+      throw new AppError("age_not_verified", "Este sobre es de una colección 18+: verifica tu edad para abrirlo.", { context: "open" });
     }
     const [odds] = await tx
       .select()

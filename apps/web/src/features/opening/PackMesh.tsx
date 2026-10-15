@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDrag } from "@use-gesture/react";
 import gsap from "gsap";
+import { useT } from "@/i18n/client";
 
 interface Props {
   /** Se llama una sola vez, cuando la tira termina de salir. */
@@ -16,6 +17,7 @@ const TEAR_DISTANCE = 180; // px de arrastre para completar el rasgado
 const COMMIT_AT = 0.55; // progreso a partir del cual, al soltar, se completa solo
 
 export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: Props) {
+  const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const tl = useRef<gsap.core.Timeline | null>(null);
@@ -75,7 +77,7 @@ export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: P
       <div className="pack__body">
         <div className="pack__foil" />
         <div className="pack__logo">
-          WAIFU BAKER
+          {t.common.brand}
           <span>{label}</span>
         </div>
       </div>
@@ -87,7 +89,7 @@ export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: P
         // Con teclado: Intro o Espacio abren el sobre sin arrastrar.
         role="button"
         tabIndex={0}
-        aria-label="Abrir el sobre: desliza la tira o pulsa Intro"
+        aria-label={t.packs.stage.stripAria}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -95,11 +97,11 @@ export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: P
           }
         }}
       >
-        <span className="pack__strip-hint">{reducedMotion ? "tira de apertura" : "▸▸ desliza para abrir"}</span>
+        <span className="pack__strip-hint">{reducedMotion ? t.packs.stage.stripHintReduced : t.packs.stage.stripHint}</span>
       </div>
       {reducedMotion && (
         <button type="button" className="pack__cta" onClick={openWithoutGesture}>
-          Abrir sobre
+          {t.packs.stage.openPack}
         </button>
       )}
     </div>

@@ -4,6 +4,7 @@ import { db } from "@/db/client";
 import { cards, characters, packs, sets, users } from "@/db/schema";
 import { listSets } from "@/server/services/collections";
 import { AdultBadge, StatusBadge } from "@/features/admin/ui";
+import { getDict } from "@/i18n/server";
 
 export default async function AdminHome() {
   const [[pub], [ch], [us], [sealed], [unreviewed], rows] = await Promise.all([
@@ -18,19 +19,20 @@ export default async function AdminHome() {
       .where(and(eq(sets.isAdult, true), isNull(cards.adultReviewedAt))),
     listSets(db),
   ]);
+  const t = (await getDict()).admin.dashboard;
   const totalCards = rows.reduce((a, r) => a + r.cardCount, 0);
   const stats = [
-    { label: "Colecciones publicadas", value: `${pub.n} de ${rows.length}` },
-    { label: "Cartas", value: totalCards },
-    { label: "Personajes", value: ch.n },
-    { label: "Usuarios", value: us.n },
-    { label: "Sobres sin abrir", value: sealed.n },
+    { label: t.publishedSets, value: t.publishedOf(pub.n, rows.length) },
+    { label: t.cards, value: totalCards },
+    { label: t.characters, value: ch.n },
+    { label: t.users, value: us.n },
+    { label: t.sealedPacks, value: sealed.n },
   ];
   const drafts = rows.filter((r) => r.status === "draft");
 
   return (
     <div className="max-w-5xl space-y-8">
-      <h1 className="text-2xl font-bold">Resumen</h1>
+      <h1 className="text-2xl font-bold">{t.title}</h1>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map((x) => (
           <div key={x.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
@@ -42,19 +44,19 @@ export default async function AdminHome() {
 
       {unreviewed.n > 0 && (
         <p className="rounded-xl border border-rose-400/30 bg-rose-400/5 p-3 text-sm text-rose-200">
-          {unreviewed.n} carta(s) de colecciones 18+ pendientes de la revisión «personaje claramente adulto».
+          {t.unreviewed(unreviewed.n)}
         </p>
       )}
 
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Borradores en preparación</h2>
+          <h2 className="font-semibold">{t.drafts}</h2>
           <Link href="/admin/sets" className="text-sm text-white/60 underline underline-offset-4 hover:text-white">
-            Todas las colecciones
+            {t.allSets}
           </Link>
         </div>
         {drafts.length === 0 ? (
-          <p className="text-sm text-white/50">No hay borradores. Crea una colección para empezar a cargar cartas.</p>
+          <p className="text-sm text-white/50">{t.noDrafts}</p>
         ) : (
           <ul className="divide-y divide-white/5 rounded-xl border border-white/10">
             {drafts.map((d) => (
@@ -64,7 +66,7 @@ export default async function AdminHome() {
                   <span className="flex-1">{d.name}</span>
                   <AdultBadge adult={d.isAdult} />
                   <StatusBadge status={d.status} />
-                  <span className="w-20 text-right text-sm tabular-nums text-white/60">{d.cardCount} cartas</span>
+                  <span className="w-20 text-right text-sm tabular-nums text-white/60">{t.cardCount(d.cardCount)}</span>
                 </Link>
               </li>
             ))}

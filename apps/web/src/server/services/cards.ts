@@ -23,20 +23,20 @@ const sha256 = (b: Buffer) => createHash("sha256").update(b).digest("hex");
 
 async function lockSet(db: DbLike, setId: string) {
   const [set] = await db.select().from(sets).where(eq(sets.id, setId)).for("update");
-  if (!set) throw new AdminError("not_found", "La colección no existe.");
+  if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
   return set;
 }
 
 function assertEditable(status: SetStatus, field: EditableField) {
   if (!canEdit(status, field)) {
-    throw new AdminError("locked", "Esta colección ya está publicada: no se pueden añadir, quitar ni cambiar rarezas, variantes o números.");
+    throw new AdminError("locked", "Esta colección ya está publicada: no se pueden añadir, quitar ni cambiar rarezas, variantes o números.", { what: "cards" });
   }
 }
 
 /** Compone la carta y guarda sus 4 tamaños. Las claves llevan la huella del contenido. */
 async function composeAndStore(store: CardStore, card: Pick<CardRow, "id" | "setId" | "number" | "rarity" | "originalKey">, setCode: string) {
   const original = card.originalKey ? await store.get(card.originalKey) : null;
-  if (!original) throw new AdminError("missing_original", "No se encontró la imagen original de la carta.");
+  if (!original) throw new AdminError("missing_original", "No se encontró la imagen original de la carta.", { what: "original" });
   let composed;
   try {
     composed = await composeCard(original.body, { number: card.number, rarity: card.rarity, setCode });
@@ -97,7 +97,7 @@ async function inspectUpload(file: UploadFile) {
     /* se rechaza abajo como ilegible */
   }
   const verdict = validateUpload({ mime: file.mime, bytes: file.body.length, width: meta.width });
-  if (!verdict.ok) throw new AdminError(verdict.code, verdict.message);
+  if (!verdict.ok) throw new AdminError(verdict.code, verdict.message, verdict.params);
   return meta;
 }
 
@@ -119,7 +119,7 @@ export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId:
         .from(cards)
         .where(and(eq(cards.setId, setId), eq(cards.originalSha256, hash)))
         .limit(1);
-      if (dup) throw new AdminError("duplicate_image", `Esta imagen ya está en la colección (carta ${String(dup.number).padStart(3, "0")}).`);
+      if (dup) throw new AdminError("duplicate_image", `Esta imagen ya está en la colección (carta ${String(dup.number).padStart(3, "0")}).`, { number: dup.number });
       const [last] = await tx.select({ n: cards.number }).from(cards).where(eq(cards.setId, setId)).orderBy(desc(cards.number)).limit(1);
       const [row] = await tx
         .insert(cards)
@@ -175,7 +175,7 @@ function applyPatch(cur: CardRow, patch: CardPatch, status: SetStatus) {
     rarity: patch.rarity === undefined ? cur.rarity : patch.rarity,
     variant: patch.variant === undefined ? cur.variant : patch.variant,
   };
-  if (next.name.length > 60) throw new AdminError("invalid_name", "El nombre de la carta admite hasta 60 caracteres.");
+  if (next.name.length > 60) throw new AdminError("invalid_name", "El nombre de la carta admite hasta 60 caracteres.", { entity: "card", max: 60 });
   for (const key of Object.keys(FIELD_RULE) as (keyof CardPatch)[]) {
     if (next[key] !== cur[key]) assertEditable(status, FIELD_RULE[key]);
   }
@@ -191,9 +191,9 @@ export async function updateCard(db: DbLike, store: CardStore, actorUserId: stri
   const toDelete: (string | null)[] = [];
   const result = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
-    if (!cur) throw new AdminError("not_found", "La carta no existe.");
+    if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
     if (cur.version !== expectedVersion) {
-      throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.");
+      throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.", { entity: "card" });
     }
     const [set] = await tx.select().from(sets).where(eq(sets.id, cur.setId));
     const next = applyPatch(cur, patch, set.status);
@@ -212,7 +212,7 @@ export async function updateCard(db: DbLike, store: CardStore, actorUserId: stri
       await auditChange(tx, { actorUserId, action: "card_update", entityType: "card", entityId: cardId, before: pick(cur), after: next });
       return row;
     } catch (e) {
-      if ((e as { code?: string }).code === "23503") throw new AdminError("not_found", "El personaje elegido ya no existe.");
+      if ((e as { code?: string }).code === "23503") throw new AdminError("not_found", "El personaje elegido ya no existe.", { entity: "chosen_character" });
       throw e;
     }
   });
@@ -237,9 +237,9 @@ export async function bulkUpdateCards(
   await db.transaction(async (tx) => {
     const set = await lockSet(tx, setId);
     const rows = await tx.select().from(cards).where(and(eq(cards.setId, setId), inArray(cards.id, ids))).for("update");
-    if (rows.length !== ids.length) throw new AdminError("not_found", "Alguna de las cartas seleccionadas ya no existe.");
+    if (rows.length !== ids.length) throw new AdminError("not_found", "Alguna de las cartas seleccionadas ya no existe.", { entity: "selected_cards" });
     if (rows.some((r) => r.version !== versions[r.id])) {
-      throw new AdminError("stale_version", "Alguna carta cambió desde que cargaste la página. Recarga y vuelve a intentarlo.");
+      throw new AdminError("stale_version", "Alguna carta cambió desde que cargaste la página. Recarga y vuelve a intentarlo.", { entity: "selected_cards" });
     }
     const plans = rows.map((cur) => ({ cur, next: applyPatch(cur, patch, set.status) }));
     const recomposed = await mapLimit(plans, COMPOSE_PARALLEL, async ({ cur, next }) =>
@@ -299,7 +299,7 @@ export async function deleteCard(db: DbLike, store: CardStore, actorUserId: stri
   let toDelete: (string | null)[] = [];
   await db.transaction(async (tx) => {
     const [card] = await tx.select().from(cards).where(eq(cards.id, cardId));
-    if (!card) throw new AdminError("not_found", "La carta no existe.");
+    if (!card) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
     const set = await lockSet(tx, card.setId);
     assertEditable(set.status, "removeCard");
     await tx.delete(cards).where(eq(cards.id, cardId));
@@ -328,7 +328,7 @@ export async function getSetOverview(db: DbLike, setId: string) {
 /** Regenera todas las cartas de una colección (por ejemplo, tras cambiar el marco en Pencil). */
 export async function regenerateSet(db: DbLike, store: CardStore, actorUserId: string, setId: string) {
   const [set] = await db.select().from(sets).where(eq(sets.id, setId));
-  if (!set) throw new AdminError("not_found", "La colección no existe.");
+  if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
   const rows = await db.select().from(cards).where(eq(cards.setId, setId)).orderBy(asc(cards.number));
   const keys = await mapLimit(rows, COMPOSE_PARALLEL, (r) => composeAndStore(store, r, set.code));
   for (const [i, r] of rows.entries()) {
@@ -347,8 +347,8 @@ export async function reviewCard(db: DbLike, store: CardStore, actorUserId: stri
   const toDelete: (string | null)[] = [];
   const row = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
-    if (!cur) throw new AdminError("not_found", "La carta no existe.");
-    if (cur.version !== expectedVersion) throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.");
+    if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
+    if (cur.version !== expectedVersion) throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.", { entity: "card" });
     const [set] = await tx.select().from(sets).where(eq(sets.id, cur.setId));
     if (!set.isAdult) throw new AdminError("not_adult", "Solo las cartas de colecciones 18+ necesitan revisión.");
     let patch: Partial<CardRow> = reviewed
@@ -356,7 +356,7 @@ export async function reviewCard(db: DbLike, store: CardStore, actorUserId: stri
       : { adultReviewedBy: null, adultReviewedAt: null };
     if (reviewed && cur.pendingOriginalKey) {
       const pending = await store.get(cur.pendingOriginalKey);
-      if (!pending) throw new AdminError("missing_original", "No se encontró el arte pendiente.");
+      if (!pending) throw new AdminError("missing_original", "No se encontró el arte pendiente.", { what: "pending" });
       const keys = await composeAndStore(store, { ...cur, originalKey: cur.pendingOriginalKey }, set.code);
       toDelete.push(cur.originalKey, ...composedKeys(cur));
       patch = { ...patch, ...keys, originalKey: cur.pendingOriginalKey, originalSha256: sha256(pending.body), pendingOriginalKey: null };
@@ -389,8 +389,8 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
   const toDelete: (string | null)[] = [];
   const row = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
-    if (!cur) throw new AdminError("not_found", "La carta no existe.");
-    if (cur.version !== expectedVersion) throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.");
+    if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
+    if (cur.version !== expectedVersion) throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.", { entity: "card" });
     const [set] = await tx.select().from(sets).where(eq(sets.id, cur.setId));
     assertEditable(set.status, "art");
     const [dup] = await tx
@@ -398,7 +398,7 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
       .from(cards)
       .where(and(eq(cards.setId, cur.setId), eq(cards.originalSha256, hash)))
       .limit(1);
-    if (dup) throw new AdminError("duplicate_image", `Esta imagen ya está en la colección (carta ${String(dup.number).padStart(3, "0")}).`);
+    if (dup) throw new AdminError("duplicate_image", `Esta imagen ya está en la colección (carta ${String(dup.number).padStart(3, "0")}).`, { number: dup.number });
     const key = `sets/${cur.setId}/original/${hash}.${EXT[file.mime]}`;
     await store.put(key, file.body);
 
@@ -439,12 +439,12 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
  */
 export async function simulatePack(db: DbLike, setId: string) {
   const [set] = await db.select().from(sets).where(eq(sets.id, setId));
-  if (!set) throw new AdminError("not_found", "La colección no existe.");
+  if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
   const [odds] = await db.select().from(dropTables).where(eq(dropTables.setId, setId)).orderBy(desc(dropTables.version)).limit(1);
   const rows = await db.select().from(cards).where(eq(cards.setId, setId));
   const withRarity = rows.filter((r) => r.rarity && r.keyMid);
   if (withRarity.length === 0) {
-    throw new AdminError("no_cards", "Asigna rareza al menos a una carta para simular un sobre.");
+    throw new AdminError("no_cards", "Asigna rareza al menos a una carta para simular un sobre.", { context: "simulate" });
   }
   const drawn = drawPack({ cards: withRarity, slots: odds?.slots ?? [], holoChance: odds?.holoChance ?? 0 }, cryptoRng);
   const byId = new Map(rows.map((r) => [r.id, r]));

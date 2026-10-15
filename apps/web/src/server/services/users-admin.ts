@@ -52,19 +52,19 @@ export async function getUserDetail(db: DbLike, userId: string) {
 /** RF-25 y RF-26: regalo de sobres con motivo; 18+ solo a quien superó la verificación de edad. */
 export async function giftPacks(db: DbLike, actorUserId: string, input: { userId: string; setId: string; count: number; reason: string }) {
   const reason = input.reason.trim();
-  if (reason.length < 3 || reason.length > 200) throw new AdminError("invalid_reason", "Escribe un motivo de 3 a 200 caracteres.");
+  if (reason.length < 3 || reason.length > 200) throw new AdminError("invalid_reason", "Escribe un motivo de 3 a 200 caracteres.", { min: 3, max: 200 });
   if (!Number.isInteger(input.count) || input.count < 1 || input.count > 20) {
-    throw new AdminError("invalid_count", "Se pueden regalar de 1 a 20 sobres a la vez.");
+    throw new AdminError("invalid_count", "Se pueden regalar de 1 a 20 sobres a la vez.", { min: 1, max: 20 });
   }
   return db.transaction(async (tx) => {
     const [user] = await tx.select().from(users).where(eq(users.id, input.userId));
-    if (!user) throw new AdminError("not_found", "El usuario no existe.");
+    if (!user) throw new AdminError("not_found", "El usuario no existe.", { entity: "user" });
     if (user.deletedAt) throw new AdminError("user_deleted", "La cuenta de este usuario está borrada.");
     const [set] = await tx.select().from(sets).where(eq(sets.id, input.setId));
-    if (!set) throw new AdminError("not_found", "La colección no existe.");
-    if (!canGrantPacks(set.status)) throw new AdminError("not_grantable", `${set.code} no está publicada: no se pueden regalar sobres de ella.`);
+    if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
+    if (!canGrantPacks(set.status)) throw new AdminError("not_grantable", `${set.code} no está publicada: no se pueden regalar sobres de ella.`, { set: set.code, context: "gift" });
     if (set.isAdult && !(user.isAdultDeclared && user.adultVerifiedAt)) {
-      throw new AdminError("age_not_verified", "Este usuario no ha superado la verificación de edad: no puede recibir sobres 18+.");
+      throw new AdminError("age_not_verified", "Este usuario no ha superado la verificación de edad: no puede recibir sobres 18+.", { context: "gift" });
     }
     await tx.insert(packs).values(
       Array.from({ length: input.count }, () => ({

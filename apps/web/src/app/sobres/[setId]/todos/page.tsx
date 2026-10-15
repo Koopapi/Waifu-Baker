@@ -4,9 +4,13 @@ import { z } from "zod";
 import { db } from "@/db/client";
 import { packs, sets } from "@/db/schema";
 import { requireUser } from "@/server/auth/require-user";
+import { getDict } from "@/i18n/server";
 import { OpenAllView } from "@/features/packs/OpenAllView";
 
-export const metadata = { title: "Abrir todos" };
+export async function generateMetadata() {
+  const t = await getDict();
+  return { title: t.packs.meta.openAll };
+}
 
 export default async function OpenAllPage({ params }: { params: Promise<{ setId: string }> }) {
   const { setId } = await params;

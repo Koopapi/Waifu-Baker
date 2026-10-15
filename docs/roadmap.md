@@ -14,6 +14,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 004 ✓ | Sobres: concesión y apertura | Reglas de grant por tier, transacción de apertura idempotente, RNG auditable, geobloqueo, URLs firmadas | motor |
 | 005 | Experiencia de apertura | Rasgado, abanico, volteo, holo (puntero y giroscopio), reveal por rareza, audio, reduced motion, presupuesto de rendimiento | experiencia (prototipo primero) |
 | 006 ✓ | Colección y álbum público | Binder, filtros, álbum con slug, imagen OG, renders públicos con marca | experiencia (prototipo primero) |
+| 008 ✓ | Idiomas | Inglés por defecto y español con selector en toda la web, panel incluido | motor |
 | 007 | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 Cambio del 14 oct 2026: se añade el panel de administración (003) a petición del usuario y se
@@ -39,3 +40,5 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
 - 15 oct 2026: spec 006 terminada y validada (17/17 RF): «Mi colección» con progreso, álbum por colección
   con huecos y filtros, ficha con holo, álbum público opcional con alias, destacadas, enlace
   regenerable, imágenes con marca de agua, vista previa para redes y `noindex`.
+- 15 oct 2026: spec 008 terminada y validada (10/10 RF): inglés por defecto y español con selector en
+  toda la web, panel y mensajes de error incluidos. El usuario decidió seguir en local hasta una beta.

@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { drawFakePack, RARITY_LABEL, type LabCard, type Rarity } from "./fakePack";
+import { useT } from "@/i18n/client";
+import { drawFakePack, type LabCard, type Rarity } from "./fakePack";
 import { PackMesh } from "./PackMesh";
 import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
@@ -41,6 +42,7 @@ interface StageProps {
 }
 
 export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
+  const t = useT();
   const [phase, setPhase] = useState<Phase>("idle");
   const [cards, setCards] = useState<LabCard[]>([]);
   const [revealed, setRevealed] = useState(0);
@@ -63,7 +65,8 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
         setRevealed(0);
         setPhase("torn");
       } catch (e) {
-        setError(e instanceof Error ? e.message : "No se pudo abrir el sobre.");
+        // Cadena vacía = error sin mensaje: se muestra el texto genérico en el idioma activo.
+        setError(e instanceof Error ? e.message : "");
       }
     })();
   }, [draw]);
@@ -179,10 +182,10 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
   const hint =
     phase === "idle"
       ? reduced
-        ? "Pulsa el botón para abrir el sobre"
-        : "Desliza la tira del sobre hacia la derecha"
+        ? t.packs.stage.hintButton
+        : t.packs.stage.hintSwipe
       : phase === "fanned"
-        ? `Toca la carta de arriba · ${revealed + 1} de ${cards.length}`
+        ? t.packs.stage.hintTap(revealed + 1, cards.length)
         : phase === "torn"
           ? "..."
           : "";
@@ -190,7 +193,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
   return (
     <div ref={stage} className="stage" data-phase={phase} data-revealed={revealed} onPointerMove={tilt.onPointerMove} onPointerLeave={tilt.onPointerLeave}>
       <p className="hint" aria-live="polite">
-        {error ?? hint}
+        {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>
 
       <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} reducedMotion={reduced} label={packLabel} />}</div>
@@ -218,7 +221,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
       {phase === "summary" && (
         <div className="summary">
           <div className="summary__card">
-            <h2 className="summary__title">Sobre abierto</h2>
+            <h2 className="summary__title">{t.packs.stage.summaryTitle}</h2>
             {cards.map((c, i) => (
               <div key={i} className={`summary__row rarity-${c.rarity}`}>
                 <span>
@@ -226,8 +229,8 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
                   {c.note && <small className="summary__note">{c.note}</small>}
                 </span>
                 <span className="badge">
-                  {RARITY_LABEL[c.rarity]}
-                  {c.holo ? " · holo" : ""}
+                  {t.common.rarity[c.rarity]}
+                  {c.holo ? t.packs.stage.holoSuffix : ""}
                 </span>
               </div>
             ))}
@@ -235,7 +238,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
               <div className="summary__actions">{renderSummaryActions(reset)}</div>
             ) : (
               <button type="button" className="hud__btn hud__btn--primary summary__again" onClick={reset}>
-                Abrir otro sobre
+                {t.packs.stage.openAnother}
               </button>
             )}
           </div>
@@ -246,11 +249,11 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
         {extraHud}
         {tilt.gyroAvailable && tilt.mode !== "gyro" && (
           <button type="button" className="hud__btn" onClick={() => void tilt.requestGyro()}>
-            Activar giroscopio
+            {t.packs.stage.enableGyro}
           </button>
         )}
-        {debug && <span className="hud__chip">inclinación: {tilt.mode}</span>}
-        {debug && reduced && <span className="hud__chip">movimiento reducido</span>}
+        {debug && <span className="hud__chip">{t.packs.stage.tiltMode(tilt.mode)}</span>}
+        {debug && reduced && <span className="hud__chip">{t.packs.stage.reducedMotion}</span>}
       </div>
     </div>
   );

@@ -2,18 +2,20 @@ import Link from "next/link";
 import { db } from "@/db/client";
 import { requireUser } from "@/server/auth/require-user";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
+import { getDict } from "@/i18n/server";
 
 /** RF-1, RF-3 y RF-17: sobres sin abrir por colección y aviso de apertura sin terminar. */
 export default async function MisSobresPage() {
   const user = await requireUser("/sobres");
   const [groups, pending] = await Promise.all([listMyPacks(db, user.id), pendingOpening(db, user.id)]);
   const total = groups.reduce((a, g) => a + g.sealed, 0);
+  const t = await getDict();
 
   return (
     <main className="mx-auto max-w-4xl space-y-8 px-4 py-10 sm:px-6">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold">Mis sobres</h1>
-        <p className="text-white/60">{total === 0 ? "No tienes sobres sin abrir." : `Tienes ${total} sobre(s) sin abrir.`}</p>
+        <h1 className="text-3xl font-bold">{t.packs.mine.heading}</h1>
+        <p className="text-white/60">{total === 0 ? t.packs.mine.none : t.packs.mine.sealed(total)}</p>
       </div>
 
       {pending && (
@@ -22,15 +24,15 @@ export default async function MisSobresPage() {
           className="block rounded-2xl border border-[#d6b370]/50 bg-[#d6b370]/10 p-4 text-sm hover:bg-[#d6b370]/15"
           data-testid="pending-opening"
         >
-          Tienes una apertura sin terminar de ver. <span className="underline">Volver a verla</span>
+          {t.packs.mine.pending} <span className="underline">{t.packs.mine.pendingLink}</span>
         </Link>
       )}
 
       {groups.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-white/15 p-10 text-center text-white/60">
-          Cuando recibas sobres por tu suscripción o como regalo aparecerán aquí.{" "}
+          {t.packs.mine.empty}{" "}
           <Link href="/drop-rates" className="underline">
-            Mira qué puede salir
+            {t.packs.mine.emptyLink}
           </Link>
           .
         </div>
@@ -47,16 +49,16 @@ export default async function MisSobresPage() {
               </div>
               {g.locked ? (
                 <p className="text-sm text-rose-200">
-                  Colección 18+. Para abrir estos sobres necesitas verificar tu edad con un tier adulto de Patreon. Tus sobres se conservan mientras tanto.
+                  {t.packs.mine.locked}
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   <Link href={`/sobres/${g.setId}`} className="rounded-full bg-[#d6b370] px-5 py-2 text-sm font-semibold text-[#0b0c0e]">
-                    Abrir un sobre
+                    {t.packs.mine.openOne}
                   </Link>
                   {g.sealed > 1 && (
                     <Link href={`/sobres/${g.setId}/todos`} className="rounded-full border border-white/20 px-5 py-2 text-sm">
-                      Abrir todos ({Math.min(g.sealed, 50)})
+                      {t.packs.mine.openAll(Math.min(g.sealed, 50))}
                     </Link>
                   )}
                 </div>
@@ -65,7 +67,7 @@ export default async function MisSobresPage() {
           ))}
         </ul>
       )}
-      <p className="text-xs text-white/40">Las ilustraciones de las cartas están generadas con IA. Las cartas no tienen valor monetario ni se pueden intercambiar.</p>
+      <p className="text-xs text-white/40">{t.common.aiNotice}</p>
     </main>
   );
 }

@@ -2,7 +2,8 @@
 
 import { forwardRef, useEffect, useRef } from "react";
 import type { CSSProperties, MutableRefObject } from "react";
-import { RARITY_LABEL, type LabCard } from "./fakePack";
+import { useT } from "@/i18n/client";
+import type { LabCard } from "./fakePack";
 import type { Tilt, TiltMode } from "./useTiltSource";
 
 interface Props {
@@ -29,6 +30,7 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
   { card, active, mode, tiltTarget, style, onClick },
   ref,
 ) {
+  const t = useT();
   const el = useRef<HTMLDivElement | null>(null);
 
   const setRefs = (node: HTMLDivElement | null) => {
@@ -90,7 +92,7 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
       data-card={card.id}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
-      aria-label={onClick ? "Voltear la carta" : undefined}
+      aria-label={onClick ? t.packs.stage.flipCard : undefined}
       onKeyDown={
         onClick
           ? (e) => {
@@ -117,8 +119,8 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
               <>
                 <div className="card3d__frame" />
                 <span className="card3d__rarity">
-                  {RARITY_LABEL[card.rarity]}
-                  {card.holo ? " · holo" : ""}
+                  {t.common.rarity[card.rarity]}
+                  {card.holo ? t.packs.stage.holoSuffix : ""}
                 </span>
                 <span className="card3d__name">{card.name}</span>
                 <span className="card3d__num">{String(card.number).padStart(3, "0")}/032</span>

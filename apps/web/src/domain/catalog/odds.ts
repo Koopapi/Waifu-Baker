@@ -13,6 +13,8 @@ export interface Problem {
   code: string;
   message: string;
   target: ProblemTarget;
+  /** Variables del mensaje para traducirlo por código (spec 008). */
+  params?: Record<string, string | number>;
 }
 
 const EPS = 1e-6;
@@ -24,16 +26,22 @@ export function validateOdds(slots: Partial<Slot>[], packSize: number, holoChanc
       code: "slot_count",
       message: `El sobre tiene ${packSize} carta(s) pero hay ${slots.length} ranura(s) de probabilidad.`,
       target: { kind: "set" },
+      params: { packSize, slots: slots.length },
     });
   }
   slots.forEach((slot, index) => {
     const values = RARITIES.map((r) => slot[r] ?? 0);
     if (values.some((v) => v < 0 || !Number.isFinite(v))) {
-      out.push({ code: "negative_weight", message: `La ranura ${index + 1} tiene pesos negativos o no válidos.`, target: { kind: "slot", index } });
+      out.push({ code: "negative_weight", message: `La ranura ${index + 1} tiene pesos negativos o no válidos.`, target: { kind: "slot", index }, params: { slot: index + 1 } });
     }
     const sum = values.reduce((a, b) => a + b, 0);
     if (Math.abs(sum - 100) > EPS) {
-      out.push({ code: "slot_sum", message: `La ranura ${index + 1} suma ${+sum.toFixed(4)} % en vez de 100 %.`, target: { kind: "slot", index } });
+      out.push({
+        code: "slot_sum",
+        message: `La ranura ${index + 1} suma ${+sum.toFixed(4)} % en vez de 100 %.`,
+        target: { kind: "slot", index },
+        params: { slot: index + 1, sum: +sum.toFixed(4) },
+      });
     }
   });
   if (!(holoChance >= 0 && holoChance <= 1)) {
