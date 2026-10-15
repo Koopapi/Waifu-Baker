@@ -1,6 +1,7 @@
 // Criterios de finalización de la spec 003: crear colección → subir 10 imágenes → asignar en
 // lote → editar probabilidades → simular sobre → publicar → comprobar bloqueos → regalar un sobre.
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import type { Browser, Page } from "@playwright/test";
+import { DESKTOP, desktopOnly, expect, test } from "./fixtures";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -11,7 +12,7 @@ const IMAGES = readdirSync(LAB)
   .map((f) => path.join(LAB, f));
 
 async function login(browser: Browser, name: string, admin: boolean): Promise<Page> {
-  const page = await (await browser.newContext()).newPage();
+  const page = await (await browser.newContext(DESKTOP)).newPage();
   page.on("dialog", (d) => d.accept());
   await page.goto("/login?next=/admin");
   await page.fill('input[name="name"]', name);
@@ -22,6 +23,7 @@ async function login(browser: Browser, name: string, admin: boolean): Promise<Pa
 }
 
 test("panel de administración: de colección vacía a sobre regalado", async ({ browser }) => {
+  desktopOnly();
   // Un usuario normal: no ve el panel (RF-1, RF-2) y luego recibirá el regalo.
   const fan = await login(browser, "fan-e2e", false);
   await test.step("RF-2: un usuario normal recibe 404 en el panel", async () => {

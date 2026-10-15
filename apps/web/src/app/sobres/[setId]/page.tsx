@@ -6,7 +6,7 @@ import { packs, sets } from "@/db/schema";
 import { requireUser } from "@/server/auth/require-user";
 import { PackOpener } from "@/features/packs/PackOpener";
 
-export const metadata = { title: "Abrir sobre · Waifu Baker" };
+export const metadata = { title: "Abrir sobre" };
 
 /** RF-16 y RF-17: apertura real con la escena del laboratorio; `?pack=` reanuda una sin terminar. */
 export default async function OpenPackPage({ params, searchParams }: { params: Promise<{ setId: string }>; searchParams: Promise<{ pack?: string }> }) {

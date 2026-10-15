@@ -3,7 +3,7 @@ import { signOut } from "@/auth";
 import { requireAdmin } from "@/server/auth/require-admin";
 import { NavLinks } from "@/features/admin/NavLinks";
 
-export const metadata = { title: "Panel · Waifu Baker" };
+export const metadata = { title: "Panel" };
 
 
 

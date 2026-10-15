@@ -14,7 +14,7 @@ export default async function SetsPage() {
         <p className="text-sm text-white/50">Aún no hay colecciones. Crea la primera con el formulario de arriba.</p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-white/10">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="bg-white/[0.03] text-xs uppercase tracking-wider text-white/50">
               <tr>
                 <th className="px-4 py-3">Código</th>

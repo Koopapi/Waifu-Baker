@@ -5,7 +5,7 @@ import type { Db } from "@/db/client";
 import { isAdminError } from "@/server/errors";
 import { requireAdmin } from "./require-admin";
 
-export type ActionState = { ok: boolean; error?: string; message?: string; at?: number };
+export type ActionState = { ok: boolean; error?: string; code?: string; message?: string; at?: number };
 
 /**
  * Envuelve una server action del panel: verifica rol (RF-1/RF-2), convierte AdminError en un
@@ -22,7 +22,7 @@ export async function adminAction(
     for (const p of revalidate) revalidatePath(p);
     return { ok: true, message: message ?? undefined, at: Date.now() };
   } catch (e) {
-    if (isAdminError(e)) return { ok: false, error: e.message, at: Date.now() };
+    if (isAdminError(e)) return { ok: false, error: e.message, code: e.code, at: Date.now() };
     throw e;
   }
 }

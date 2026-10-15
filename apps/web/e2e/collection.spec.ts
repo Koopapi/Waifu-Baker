@@ -1,11 +1,13 @@
 // Criterios de finalización de la spec 006: abrir un sobre → ver la colección con huecos y filtros
 // → ficha con holo → activar el álbum público → visitarlo sin sesión → vista previa, desactivar y
 // enlace nuevo.
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import path from "node:path";
 import { LAB, createPublishedSet, giftPacks, login } from "./helpers";
 
-const shot = (p: Page, name: string, fullPage = false) => p.screenshot({ path: `test-results/screens/s006-${name}.png`, fullPage });
+const shot = (p: Page, name: string, fullPage = false) =>
+  p.screenshot({ path: `test-results/screens/${test.info().project.name}/s006-${name}.png`, fullPage });
 
 test("colección y álbum público", async ({ browser }) => {
   const fan = await login(browser, "album-e2e", false, "/sobres");
@@ -136,7 +138,7 @@ test("colección y álbum público", async ({ browser }) => {
     expect(res.headers()["content-type"]).toContain("image/png");
     const prev = await anon.context().newPage();
     await prev.goto(og!);
-    await prev.screenshot({ path: "test-results/screens/s006-6-vista-previa.png" });
+    await prev.screenshot({ path: `test-results/screens/${test.info().project.name}/s006-6-vista-previa.png` });
     await prev.close();
   });
 
@@ -162,7 +164,9 @@ test("colección y álbum público", async ({ browser }) => {
       ]);
     expect(await fan.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await shot(fan, "8-coleccion-movil", true);
-    await fan.setViewportSize({ width: 1360, height: 950 });
+    const own = test.info().project.use.viewport ?? { width: 1360, height: 950 };
+    await fan.setViewportSize(own);
+    await anon.setViewportSize(own);
     await fan.goto("/coleccion/album");
   });
 

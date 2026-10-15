@@ -16,10 +16,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const a = await load(slug);
   const robots = { index: false, follow: false };
-  if (!a) return { title: "Álbum no encontrado · Waifu Baker", robots };
-  const title = `Álbum de ${a.alias} · Waifu Baker`;
+  if (!a) return { title: "Álbum no encontrado", robots };
+  const title = `Álbum de ${a.alias}`;
+  const full = `${title} · Waifu Baker`;
   const description = `${a.totals.owned} de ${a.totals.total} cartas coleccionadas.`;
-  return { title, description, robots, openGraph: { title, description, type: "website" }, twitter: { card: "summary_large_image", title, description } };
+  return { title, description, robots, openGraph: { title: full, description, type: "website" }, twitter: { card: "summary_large_image", title: full, description } };
 }
 
 /** RF-13 a RF-15: álbum público, sin sesión. */

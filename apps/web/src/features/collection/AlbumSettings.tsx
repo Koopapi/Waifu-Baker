@@ -148,7 +148,7 @@ export function AlbumSettings({
         </div>
         {active && album && (
           <div className="flex flex-wrap items-center gap-2">
-            <input readOnly value={album.url} aria-label="Enlace del álbum" className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-sm" data-testid="album-url" />
+            <input readOnly value={album.url} aria-label="Enlace del álbum" className="min-w-0 basis-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-sm sm:basis-auto sm:flex-1" data-testid="album-url" />
             <button
               type="button"
               onClick={() => void navigator.clipboard?.writeText(album.url).then(() => setCopied(true))}

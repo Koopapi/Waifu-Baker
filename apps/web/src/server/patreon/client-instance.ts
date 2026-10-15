@@ -13,7 +13,7 @@ const DEV_TIERS: PatreonTier[] = [
  * `PATREON_FAKE_TIERS` (JSON) o dos tiers de ejemplo; en producción sin configurar, null.
  */
 export function getPatreonClient(): { client: PatreonClient | null; mode: "real" | "fake" | "none" } {
-  const { PATREON_CREATOR_TOKEN: token, PATREON_CAMPAIGN_ID: campaign } = process.env;
+  const { PATREON_CREATOR_ACCESS_TOKEN: token, PATREON_CAMPAIGN_ID: campaign } = process.env;
   if (token && campaign) return { client: new HttpPatreonClient(token, campaign), mode: "real" };
   if (process.env.NODE_ENV === "production") return { client: null, mode: "none" };
   const tiers = process.env.PATREON_FAKE_TIERS ? (JSON.parse(process.env.PATREON_FAKE_TIERS) as PatreonTier[]) : DEV_TIERS;

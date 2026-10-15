@@ -1,10 +1,12 @@
-import { expect, type Browser, type Page } from "@playwright/test";
+import type { Browser, Page } from "@playwright/test";
+import { DESKTOP, expect } from "./fixtures";
 import path from "node:path";
 
 export const LAB = path.resolve(__dirname, "../public/lab");
 
+/** El administrador entra siempre en escritorio; el resto, con el dispositivo del proyecto. */
 export async function login(browser: Browser, name: string, admin: boolean, next = "/admin"): Promise<Page> {
-  const page = await (await browser.newContext()).newPage();
+  const page = await (await browser.newContext(admin ? DESKTOP : {})).newPage();
   page.on("dialog", (d) => d.accept());
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
   await page.fill('input[name="name"]', name);
@@ -56,8 +58,11 @@ export async function createPublishedSet(page: Page, code: string, images: strin
   if (holoPct !== undefined) await page.locator('label:has-text("Probabilidad de holo") input').fill(String(holoPct));
   await page.click("text=Guardar probabilidades");
   await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
+  // La página ya tiene la versión nueva cuando el botón vuelve a quedar desactivado.
+  await expect(page.locator("button:has-text('Guardar probabilidades')")).toBeDisabled();
   await page.click("text=Comprobar y publicar");
   await expect(page.locator("text=Colección publicada. Sus probabilidades ya son públicas.")).toBeVisible();
+  await expect(page.locator("h1 ~ span").first()).toHaveText("Publicada");
   return setId;
 }
 
@@ -71,10 +76,38 @@ export async function giftPacks(page: Page, userName: string, code: string, coun
   await expect(page.locator(`text=${count} sobre(s) regalado(s).`)).toBeVisible();
 }
 
-/** Rasga el sobre arrastrando la tira (ratón). */
+/** Rasga el sobre arrastrando la tira; con movimiento reducido, pulsa el botón que la sustituye. */
 export async function tear(page: Page) {
   await page.waitForSelector(".pack__strip");
   await page.waitForLoadState("networkidle");
+  if (await page.locator(".pack__cta").isVisible()) {
+    await page.click(".pack__cta");
+    return;
+  }
+  // En dispositivos táctiles el gesto escucha eventos táctiles: se simula un arrastre con el dedo.
+  if (await page.evaluate(() => "ontouchstart" in window)) {
+    await page.evaluate(async () => {
+      const el = document.querySelector<HTMLElement>(".pack__strip")!;
+      const r = el.getBoundingClientRect();
+      const sx = r.left + r.width * 0.3;
+      const sy = r.top + r.height / 2;
+      // WebKit no deja construir Touch: un Event genérico con las mismas propiedades sirve en ambos motores.
+      const fire = (type: string, x: number) => {
+        const t = { identifier: 1, target: el, clientX: x, clientY: sy, pageX: x, pageY: sy, screenX: x, screenY: sy };
+        const live = type === "touchend" ? [] : [t];
+        const ev = new Event(type, { bubbles: true, cancelable: true });
+        Object.defineProperties(ev, { touches: { value: live }, targetTouches: { value: live }, changedTouches: { value: [t] } });
+        el.dispatchEvent(ev);
+      };
+      fire("touchstart", sx);
+      for (let i = 1; i <= 12; i++) {
+        await new Promise((res) => setTimeout(res, 16));
+        fire("touchmove", sx + (220 * i) / 12);
+      }
+      fire("touchend", sx + 220);
+    });
+    return;
+  }
   const strip = (await page.locator(".pack__strip").boundingBox())!;
   const sx = strip.x + strip.width * 0.3;
   const sy = strip.y + strip.height / 2;

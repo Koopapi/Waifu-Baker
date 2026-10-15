@@ -1,6 +1,6 @@
 // Criterios de finalización de la spec 004: regalar sobres → abrir uno con la animación → reanudar
 // tras recargar → «Abrir todos» → la colección refleja las cartas y las repetidas suman.
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import path from "node:path";
 import { LAB, createPublishedSet, giftPacks, login, tear } from "./helpers";
 
@@ -23,7 +23,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-1: «Mis sobres» muestra los sobres por colección", async () => {
     await fan.goto("/sobres");
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x4");
-    await fan.screenshot({ path: "test-results/screens/1-mis-sobres.png" });
+    await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-1-mis-sobres.png` });
   });
 
   let firstImage = "";
@@ -42,7 +42,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     await expect(fan.locator(".summary__row")).toHaveCount(2);
     await expect(fan.locator(".summary__row").first()).toContainText("¡Nueva!");
     await expect(fan.locator('[data-testid="open-another"]')).toHaveText("Abrir otro (3)");
-    await fan.screenshot({ path: "test-results/screens/2-resumen.png" });
+    await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-2-resumen.png` });
   });
 
   await test.step("RF-20: el enlace de imagen no sirve con la sesión de otra persona", async () => {
@@ -76,7 +76,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(4);
     await expect(fan.locator('[data-testid="open-all-grid"] li').first()).toContainText("Rara");
     await fan.waitForTimeout(800);
-    await fan.screenshot({ path: "test-results/screens/3-abrir-todos.png", fullPage: true });
+    await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-3-abrir-todos.png`, fullPage: true });
     await fan.goto("/sobres");
     await expect(fan.locator("text=No tienes sobres sin abrir.")).toBeVisible();
   });
@@ -92,4 +92,24 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     expect(total).toBe(8);
     expect(texts.some((t) => /x[2-9]$/.test(t))).toBe(true);
   });
+});
+
+test("teclado: abrir un sobre y voltear las cartas sin ratón", async ({ browser }) => {
+  test.skip(test.info().project.name !== "chromium-desktop", "solo en escritorio");
+  const fan = await login(browser, "teclado-e2e", false, "/sobres");
+  const admin = await login(browser, "admin-teclado", true);
+  await createPublishedSet(admin, "KEY1", ["01.webp", "02.webp"].map((f) => path.join(LAB, f)), 2);
+  await giftPacks(admin, "teclado-e2e", "KEY1", 1);
+  await fan.goto("/sobres");
+  await fan.click('[data-testid="group-KEY1"] >> text=Abrir un sobre');
+  await fan.waitForLoadState("networkidle");
+  await fan.locator(".pack__strip").focus();
+  await fan.keyboard.press("Enter");
+  await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+  await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
+  await fan.keyboard.press("Enter");
+  await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
+  await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
+  await fan.keyboard.press(" ");
+  await expect(fan.locator(".summary")).toBeVisible();
 });

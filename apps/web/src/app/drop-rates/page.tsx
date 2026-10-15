@@ -2,8 +2,9 @@ import { db } from "@/db/client";
 import { RARITIES, RARITY_LABEL } from "@/domain/catalog/card-rules";
 import { listPublicOdds } from "@/server/services/collections";
 
-export const metadata = { title: "Probabilidades · Waifu Baker", description: "Probabilidades publicadas de cada colección." };
-export const revalidate = 3600;
+export const metadata = { title: "Probabilidades", description: "Probabilidades publicadas de cada colección." };
+// Dinámica: así la compilación no necesita la BD y lo publicado se ve al momento.
+export const dynamic = "force-dynamic";
 
 const pct = (x: number) => `${x.toLocaleString("es", { maximumFractionDigits: 2 })} %`;
 

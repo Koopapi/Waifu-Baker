@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useEffect, useRef } from "react";
-import type { CSSProperties, MouseEventHandler, MutableRefObject } from "react";
+import type { CSSProperties, MutableRefObject } from "react";
 import { RARITY_LABEL, type LabCard } from "./fakePack";
 import type { Tilt, TiltMode } from "./useTiltSource";
 
@@ -12,7 +12,8 @@ interface Props {
   mode: TiltMode;
   tiltTarget: MutableRefObject<Tilt>;
   style?: CSSProperties;
-  onClick?: MouseEventHandler<HTMLDivElement>;
+  /** Si existe, la carta es un botón (ratón, dedo o Intro/Espacio con teclado). */
+  onClick?: () => void;
 }
 
 const MAX_RX = 10; // grados
@@ -35,6 +36,14 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
     if (typeof ref === "function") ref(node);
     else if (ref) ref.current = node;
   };
+
+  // Con teclado, el foco pasa solo a la siguiente carta por voltear.
+  const clickable = Boolean(onClick);
+  useEffect(() => {
+    if (!clickable || !active) return;
+    const a = document.activeElement;
+    if (!a || a === document.body || a.classList.contains("card3d") || a.classList.contains("pack__strip")) el.current?.focus({ preventScroll: true });
+  }, [clickable, active]);
 
   useEffect(() => {
     const node = el.current;
@@ -73,7 +82,26 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
   const classes = ["card3d", `rarity-${card.rarity}`, card.holo ? "card3d--holo" : "", card.framed ? "card3d--framed" : ""].join(" ");
 
   return (
-    <div ref={setRefs} className={classes} style={style} onClick={onClick} data-card={card.id} role={onClick ? "button" : undefined}>
+    <div
+      ref={setRefs}
+      className={classes}
+      style={style}
+      onClick={onClick}
+      data-card={card.id}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? "Voltear la carta" : undefined}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+    >
       <div className="card3d__tilt">
         <div className="card3d__inner">
           <div className="card3d__face card3d__back">

@@ -35,6 +35,12 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
             start(async () => {
               const r = await publishSetAction(setId, version);
               setProblems(r.problems ?? []);
+              if (r.code === "stale_version") {
+                // Suele ser un guardado propio que aún no había llegado a la página: se refresca sola.
+                setMsg({ ok: false, text: "La colección se acababa de actualizar. Ya ves la versión actual: vuelve a pulsar «Comprobar y publicar»." });
+                router.refresh();
+                return;
+              }
               setMsg({ ok: r.ok, text: r.error ?? r.message ?? "" });
               if (r.ok) router.refresh();
             })
@@ -51,6 +57,11 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
             start(async () => {
               if (!window.confirm("¿Archivar la colección? Dejará de concederse en sobres nuevos.")) return;
               const r = await archiveSetAction(setId, version);
+              if (r.code === "stale_version") {
+                setMsg({ ok: false, text: "La colección se acababa de actualizar. Ya ves la versión actual: vuelve a pulsar «Archivar colección»." });
+                router.refresh();
+                return;
+              }
               setMsg({ ok: r.ok, text: r.error ?? r.message ?? "" });
               if (r.ok) router.refresh();
             })

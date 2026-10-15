@@ -79,7 +79,22 @@ export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: P
           <span>{label}</span>
         </div>
       </div>
-      <div ref={strip} className={`pack__strip${dragging ? " pack__strip--dragging" : ""}`} {...bind()} style={{ touchAction: "none" }}>
+      <div
+        ref={strip}
+        className={`pack__strip${dragging ? " pack__strip--dragging" : ""}`}
+        {...bind()}
+        style={{ touchAction: "none" }}
+        // Con teclado: Intro o Espacio abren el sobre sin arrastrar.
+        role="button"
+        tabIndex={0}
+        aria-label="Abrir el sobre: desliza la tira o pulsa Intro"
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openWithoutGesture();
+          }
+        }}
+      >
         <span className="pack__strip-hint">{reducedMotion ? "tira de apertura" : "▸▸ desliza para abrir"}</span>
       </div>
       {reducedMotion && (

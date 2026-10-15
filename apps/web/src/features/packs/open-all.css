@@ -73,3 +73,10 @@
     animation: none;
   }
 }
+
+/* Mismo arreglo que en opening.css: WebKit quema la imagen con color-dodge semitransparente. */
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+  .oa-card--holo .oa-card__art::after {
+    mix-blend-mode: overlay;
+  }
+}

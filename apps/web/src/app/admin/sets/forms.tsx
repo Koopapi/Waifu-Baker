@@ -11,7 +11,7 @@ export function CreateSetForm() {
     if (state?.ok) form.current?.reset();
   }, [state]);
   return (
-    <form ref={form} action={action} className="grid gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 md:grid-cols-[140px_1fr_120px_auto_auto] md:items-end">
+    <form ref={form} action={action} className="grid gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-2 lg:grid-cols-[140px_minmax(0,1fr)_120px_auto_auto] lg:items-end">
       <Field label="Código" hint="2–8 letras o números">
         <input name="code" required maxLength={8} placeholder="WB01" className={`${inputCls} uppercase`} />
       </Field>
@@ -27,7 +27,7 @@ export function CreateSetForm() {
       <div className="pb-0.5">
         <SubmitButton>Crear colección</SubmitButton>
       </div>
-      <div className="md:col-span-5">
+      <div className="sm:col-span-2 lg:col-span-5">
         <FormMessage state={state} />
       </div>
     </form>
@@ -43,7 +43,7 @@ export function EditSetForm({
 }) {
   const [state, action] = useActionState(updateSetAction, null);
   return (
-    <form action={action} className="grid gap-4 md:grid-cols-[1fr_140px_auto_auto] md:items-end" key={set.version}>
+    <form action={action} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_140px_auto_auto] lg:items-end" key={set.version}>
       <input type="hidden" name="id" value={set.id} />
       <input type="hidden" name="version" value={set.version} />
       <Field label="Nombre">
@@ -59,7 +59,7 @@ export function EditSetForm({
       <div className="pb-0.5">
         <SubmitButton>Guardar</SubmitButton>
       </div>
-      <div className="md:col-span-4">
+      <div className="sm:col-span-2 lg:col-span-4">
         <FormMessage state={state} />
         {lockedForUsers && <p className="text-xs text-white/40">Publicada: el tamaño del sobre y la clasificación 18+ están bloqueados (RF-8).</p>}
       </div>

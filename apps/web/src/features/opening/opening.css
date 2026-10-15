@@ -115,6 +115,11 @@
   will-change: transform, opacity;
 }
 
+.pack__strip:focus-visible {
+  outline: 3px solid #d6b370;
+  outline-offset: 3px;
+}
+
 .pack__strip--dragging {
   cursor: grabbing;
 }
@@ -482,4 +487,13 @@
 .summary__actions > * {
   flex: 1 1 auto;
   text-align: center;
+}
+
+/* WebKit (Safari y todos los navegadores de iPhone) quema la imagen con color-dodge semitransparente:
+   allí el brillo usa overlay, que da un resultado equivalente. Solo WebKit entiende -apple-system-body. */
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+  .holo--shine,
+  .holo--foil {
+    mix-blend-mode: overlay;
+  }
 }

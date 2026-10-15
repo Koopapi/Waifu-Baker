@@ -12,7 +12,7 @@ export default async function TiersPage() {
     return (
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">Tiers de Patreon</h1>
-        <p className="text-sm text-white/60">Configura PATREON_CREATOR_TOKEN y PATREON_CAMPAIGN_ID para leer los tiers de la campaña.</p>
+        <p className="text-sm text-white/60">Configura PATREON_CREATOR_ACCESS_TOKEN y PATREON_CAMPAIGN_ID para leer los tiers de la campaña.</p>
       </div>
     );
   }
@@ -37,7 +37,7 @@ export default async function TiersPage() {
           colección 18+ es también el que verifica la edad.
         </p>
         {mode === "fake" && (
-          <p className="text-xs text-amber-300">Modo desarrollo: tiers de ejemplo. Con PATREON_CREATOR_TOKEN y PATREON_CAMPAIGN_ID se leen los reales.</p>
+          <p className="text-xs text-amber-300">Modo desarrollo: tiers de ejemplo. Con PATREON_CREATOR_ACCESS_TOKEN y PATREON_CAMPAIGN_ID se leen los reales.</p>
         )}
       </div>
       {overview.tiers.map((t) => (

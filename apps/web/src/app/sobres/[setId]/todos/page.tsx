@@ -6,7 +6,7 @@ import { packs, sets } from "@/db/schema";
 import { requireUser } from "@/server/auth/require-user";
 import { OpenAllView } from "@/features/packs/OpenAllView";
 
-export const metadata = { title: "Abrir todos · Waifu Baker" };
+export const metadata = { title: "Abrir todos" };
 
 export default async function OpenAllPage({ params }: { params: Promise<{ setId: string }> }) {
   const { setId } = await params;

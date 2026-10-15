@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth, devLoginEnabled, patreonLoginEnabled, signIn } from "@/auth";
 
-export const metadata = { title: "Entrar · Waifu Baker" };
+export const metadata = { title: "Entrar" };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;

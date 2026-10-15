@@ -24,7 +24,14 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 - En pruebas de la revisión 18+ usar solo arte de personajes adultos; nunca umamusume ni estudiantes
 - Imágenes de cartas en desarrollo: `apps/web/var/cards/` (ignorado por git; `CARD_STORE_DIR` lo cambia)
 - E2E: `pnpm e2e` (Playwright; levanta su propio servidor en el puerto 3200 con la BD `waifu_baker_e2e`,
-  que recrea en cada ejecución, y `.next-e2e`; no toca la BD de desarrollo)
+  que recrea en cada ejecución, y `.next-e2e`; no toca la BD de desarrollo). Corre en cuatro
+  proyectos: `chromium-desktop`, `pixel-7`, `iphone-14` (WebKit) y `reduced-motion`, tras un paso
+  `warmup` que compila todas las rutas. Cada test empieza con la BD vacía (`e2e/fixtures.ts`); el
+  administrador entra siempre en escritorio y el coleccionista con el dispositivo del proyecto.
+  `e2e/qa-sweep.spec.ts` recorre todas las páginas en escritorio, tableta y móvil buscando errores
+  de consola, respuestas fallidas, desbordes, imágenes rotas y controles sin nombre.
+  Solo un proyecto: `pnpm exec playwright test --project=iphone-14`.
+- Compilación de producción: `NEXT_DIST_DIR=.next-prod pnpm build` (no pisa `pnpm dev`).
 - Validación RF por RF: `node scripts/rf-coverage.mjs ../../specs/<spec>` (escribe `validation.md`; los tests
   se nombran `test_s<NNN>_rfN_*` —la 003 puede omitir `s003_`— y cada E2E declara su spec en la
   primera línea y nombra sus pasos con «RF-N»)

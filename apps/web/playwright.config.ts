@@ -9,6 +9,9 @@ const env = {
   AUTH_SECRET: "e2e-secreto-solo-para-pruebas-locales-0123456789",
   AUTH_TRUST_HOST: "true",
   ADMIN_PATREON_IDS: "",
+  // El E2E nunca habla con Patreon de verdad.
+  PATREON_CREATOR_ACCESS_TOKEN: "",
+  PATREON_CAMPAIGN_ID: "",
 };
 
 export default defineConfig({
@@ -18,7 +21,14 @@ export default defineConfig({
   workers: 1,
   reporter: [["list"]],
   use: { baseURL: `http://localhost:${PORT}`, trace: "retain-on-failure" },
-  projects: [{ name: "chromium-desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1360, height: 950 } } }],
+  // El coleccionista y el visitante usan el dispositivo del proyecto; el panel, siempre escritorio.
+  projects: [
+    { name: "warmup", testMatch: /warmup\.setup\.ts/, use: { ...devices["Desktop Chrome"] } },
+    { name: "chromium-desktop", dependencies: ["warmup"], use: { ...devices["Desktop Chrome"], viewport: { width: 1360, height: 950 } } },
+    { name: "pixel-7", dependencies: ["warmup"], use: { ...devices["Pixel 7"] } },
+    { name: "iphone-14", dependencies: ["warmup"], use: { ...devices["iPhone 14"] } },
+    { name: "reduced-motion", dependencies: ["warmup"], use: { ...devices["Desktop Chrome"], viewport: { width: 1360, height: 950 }, contextOptions: { reducedMotion: "reduce" } } },
+  ],
   webServer: {
     command: `node e2e/reset-db.mjs && pnpm exec next dev --port ${PORT}`,
     url: `http://localhost:${PORT}/login`,

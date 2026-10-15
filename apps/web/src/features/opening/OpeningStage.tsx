@@ -36,9 +36,11 @@ interface StageProps {
   onFinished?: (cards: LabCard[]) => void;
   /** Sustituye el botón «Abrir otro sobre» del resumen. Recibe la función para reiniciar. */
   renderSummaryActions?: (reset: () => void) => React.ReactNode;
+  /** Muestra el modo de inclinación (solo en el laboratorio). */
+  debug?: boolean;
 }
 
-export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSummaryActions }: StageProps = {}) {
+export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [cards, setCards] = useState<LabCard[]>([]);
   const [revealed, setRevealed] = useState(0);
@@ -247,8 +249,8 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
             Activar giroscopio
           </button>
         )}
-        <span className="hud__chip">inclinación: {tilt.mode}</span>
-        {reduced && <span className="hud__chip">movimiento reducido</span>}
+        {debug && <span className="hud__chip">inclinación: {tilt.mode}</span>}
+        {debug && reduced && <span className="hud__chip">movimiento reducido</span>}
       </div>
     </div>
   );
