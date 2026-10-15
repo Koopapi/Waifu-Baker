@@ -1,0 +1,84 @@
+import { expect, type Browser, type Page } from "@playwright/test";
+import path from "node:path";
+
+export const LAB = path.resolve(__dirname, "../public/lab");
+
+export async function login(browser: Browser, name: string, admin: boolean, next = "/admin"): Promise<Page> {
+  const page = await (await browser.newContext()).newPage();
+  page.on("dialog", (d) => d.accept());
+  await page.goto(`/login?next=${encodeURIComponent(next)}`);
+  await page.fill('input[name="name"]', name);
+  if (!admin) await page.uncheck('input[name="admin"]');
+  await page.click("text=Entrar (desarrollo)");
+  await page.waitForURL((u) => !u.pathname.startsWith("/login"));
+  return page;
+}
+
+/** Crea por el panel una colección publicada de 2 cartas por sobre: ranura 1 común, ranura 2 rara. */
+export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number) {
+  await page.goto("/admin/characters");
+  await page.fill('form:has-text("Nuevo personaje") input[name="name"]', `Personaje ${code}`);
+  await page.click("text=Crear personaje");
+  await expect(page.locator(`text=Personaje «Personaje ${code}» creado.`)).toBeVisible();
+  await page.goto("/admin/sets");
+  await page.fill('input[name="code"]', code);
+  await page.fill('form input[name="name"]', `Colección ${code}`);
+  await page.fill('input[name="packSize"]', "2");
+  await page.click("text=Crear colección");
+  await page.click(`a:text-is('${code}')`);
+  await page.waitForURL(/\/admin\/sets\/[0-9a-f-]+$/);
+  const setId = page.url().split("/").pop()!;
+  await page.setInputFiles('[data-testid="file-input"]', images);
+  await expect(page.locator(`text=Subida terminada · ${images.length} correctas`)).toBeVisible({ timeout: 90_000 });
+  await page.click("text=Seleccionar todas");
+  await page.selectOption('[aria-label="Personaje para la selección"]', { label: `Personaje ${code}` });
+  await page.selectOption('[aria-label="Rareza para la selección"]', "common");
+  await page.click("text=Aplicar a la selección");
+  await expect(page.locator(`text=${images.length} carta(s) actualizada(s).`)).toBeVisible({ timeout: 60_000 });
+  const rareN = String(rareIndex).padStart(3, "0");
+  await page.check(`[aria-label="Seleccionar carta ${rareN}"]`);
+  await page.selectOption('[aria-label="Rareza para la selección"]', "rare");
+  await page.click("text=Aplicar a la selección");
+  await expect(page.locator("text=1 carta(s) actualizada(s).")).toBeVisible({ timeout: 30_000 });
+  for (let i = 1; i <= images.length; i++) {
+    const n = String(i).padStart(3, "0");
+    await page.click(`[aria-label="Editar carta ${n}"]`);
+    await page.fill('dialog input[name="name"]', `${code} carta ${n}`);
+    await page.click("dialog >> text=Guardar");
+    await expect(page.locator("dialog")).toHaveCount(0);
+  }
+  const R = ["Común", "Poco común", "Rara", "Épica", "Legendaria", "Secreta"];
+  const fill = async (slot: number, weights: Record<string, number>) => {
+    for (const r of R) await page.locator(`[aria-label="Ranura ${slot}, ${r}"]`).fill(String(weights[r] ?? 0));
+  };
+  await fill(1, { Común: 100 });
+  await fill(2, { Rara: 100 });
+  await page.click("text=Guardar probabilidades");
+  await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
+  await page.click("text=Comprobar y publicar");
+  await expect(page.locator("text=Colección publicada. Sus probabilidades ya son públicas.")).toBeVisible();
+  return setId;
+}
+
+export async function giftPacks(page: Page, userName: string, code: string, count: number) {
+  await page.goto(`/admin/users?q=${encodeURIComponent(userName)}`);
+  await page.click(`a:text-is('${userName}')`);
+  await page.selectOption('select[name="setId"]', { label: `${code} · Colección ${code}` });
+  await page.fill('input[name="count"]', String(count));
+  await page.fill('input[name="reason"]', "Regalo del test E2E");
+  await page.click("button:has-text('Regalar sobres')");
+  await expect(page.locator(`text=${count} sobre(s) regalado(s).`)).toBeVisible();
+}
+
+/** Rasga el sobre arrastrando la tira (ratón). */
+export async function tear(page: Page) {
+  await page.waitForSelector(".pack__strip");
+  await page.waitForLoadState("networkidle");
+  const strip = (await page.locator(".pack__strip").boundingBox())!;
+  const sx = strip.x + strip.width * 0.3;
+  const sy = strip.y + strip.height / 2;
+  await page.mouse.move(sx, sy);
+  await page.mouse.down();
+  for (let i = 1; i <= 12; i++) await page.mouse.move(sx + (220 * i) / 12, sy);
+  await page.mouse.up();
+}

@@ -1,0 +1,23 @@
+// Sube las imágenes de public/lab a una colección temporal y muestra archivo → número asignado.
+import { chromium } from "@playwright/test";
+import { readdirSync } from "node:fs";
+import path from "node:path";
+const base = "http://localhost:3100";
+const files = readdirSync("public/lab").filter((f) => f.endsWith(".webp")).map((f) => path.join("public/lab", f)).reverse();
+const browser = await chromium.launch();
+const page = await (await browser.newContext()).newPage();
+await page.goto(`${base}/login?next=/admin/sets`);
+await page.fill('input[name="name"]', "koopa");
+await page.click("text=Entrar (desarrollo)");
+await page.waitForURL((u) => u.pathname === "/admin/sets");
+await page.fill('input[name="code"]', "ORDTEST");
+await page.fill('form input[name="name"]', "Prueba de orden");
+await page.click("text=Crear colección");
+await page.click("a:text-is('ORDTEST')");
+await page.waitForURL(/\/admin\/sets\/[0-9a-f-]+$/);
+const t0 = Date.now();
+await page.setInputFiles('[data-testid="file-input"]', files);
+await page.waitForFunction(() => document.querySelector('[data-testid="upload-list"]') && !document.body.innerText.includes("Subiendo…"), null, { timeout: 120000 });
+console.log(`${files.length} archivos (enviados en orden inverso) en ${((Date.now() - t0) / 1000).toFixed(1)} s`);
+for (const t of await page.locator('[data-testid="upload-list"] li').allInnerTexts()) console.log("  ", t.replace(/\s+/g, " "));
+await browser.close();

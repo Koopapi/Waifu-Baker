@@ -1,0 +1,21 @@
+// Regala sobres de TIER1 a fan-e6 y muestra el resultado. Uso: node scripts/gift-check.mjs <png>
+import { chromium } from "@playwright/test";
+const base = "http://localhost:3100";
+const browser = await chromium.launch();
+const page = await (await browser.newContext({ viewport: { width: 1360, height: 950 } })).newPage();
+await page.goto(`${base}/login?next=/admin/users?q=fan-e6`);
+await page.fill('input[name="name"]', "koopa");
+await page.click("text=Entrar (desarrollo)");
+await page.waitForURL((u) => u.pathname === "/admin/users");
+await page.click("a:text-is('fan-e6')");
+await page.waitForURL(/\/admin\/users\/[0-9a-f-]+$/);
+console.log("opciones:", await page.locator('select[name="setId"] option').allInnerTexts());
+await page.selectOption('select[name="setId"]', { index: 0 });
+await page.fill('input[name="count"]', "2");
+await page.fill('input[name="reason"]', "Prueba nocturna del panel");
+await page.click("button:has-text('Regalar sobres')");
+await page.waitForTimeout(2500);
+console.log("mensaje:", await page.locator('form [role="alert"], form p.text-emerald-300').allInnerTexts());
+console.log("sobres:", await page.locator('[data-testid="sealed-packs"] h2').textContent());
+await page.screenshot({ path: process.argv[2], fullPage: true });
+await browser.close();

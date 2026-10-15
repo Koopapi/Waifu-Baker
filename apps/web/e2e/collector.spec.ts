@@ -1,0 +1,95 @@
+// Criterios de finalización de la spec 004: regalar sobres → abrir uno con la animación → reanudar
+// tras recargar → «Abrir todos» → la colección refleja las cartas y las repetidas suman.
+import { expect, test } from "@playwright/test";
+import path from "node:path";
+import { LAB, createPublishedSet, giftPacks, login, tear } from "./helpers";
+
+test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
+  await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
+    const anon = await (await browser.newContext()).newPage();
+    await anon.goto("/sobres");
+    await expect(anon).toHaveURL(/\/login\?next=%2Fsobres/);
+    await anon.context().close();
+  });
+
+  const fan = await login(browser, "coleccionista-e2e", false, "/sobres");
+  await expect(fan).toHaveURL(/\/sobres$/);
+  await expect(fan.locator("text=No tienes sobres sin abrir.")).toBeVisible();
+
+  const admin = await login(browser, "admin-e2e-2", true);
+  await createPublishedSet(admin, "COL1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
+  await giftPacks(admin, "coleccionista-e2e", "COL1", 4);
+
+  await test.step("RF-1: «Mis sobres» muestra los sobres por colección", async () => {
+    await fan.goto("/sobres");
+    await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x4");
+    await fan.screenshot({ path: "test-results/screens/1-mis-sobres.png" });
+  });
+
+  let firstImage = "";
+  await test.step("RF-16, RF-11 y RF-20: abrir un sobre con la animación y las cartas reales", async () => {
+    await fan.click('[data-testid="group-COL1"] >> text=Abrir un sobre');
+    await tear(fan);
+    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    const img = fan.locator(".card3d img").first();
+    firstImage = (await img.getAttribute("src"))!;
+    expect(firstImage).toMatch(/^\/api\/cards\/img\?c=.+&s=mid&e=\d+&sig=[0-9a-f]{64}$/);
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(750);
+    await fan.locator('.card3d[role="button"]').first().click();
+    await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
+    await fan.locator('.card3d[role="button"]').first().click();
+    await expect(fan.locator(".summary")).toBeVisible();
+    await expect(fan.locator(".summary__row")).toHaveCount(2);
+    await expect(fan.locator(".summary__row").first()).toContainText("¡Nueva!");
+    await expect(fan.locator('[data-testid="open-another"]')).toHaveText("Abrir otro (3)");
+    await fan.screenshot({ path: "test-results/screens/2-resumen.png" });
+  });
+
+  await test.step("RF-20: el enlace de imagen no sirve con la sesión de otra persona", async () => {
+    const res = await admin.request.get(firstImage);
+    expect(res.status()).toBe(404);
+  });
+
+  await test.step("RF-17: recargar a mitad de una apertura la recupera sin abrir otro sobre", async () => {
+    await fan.click('[data-testid="open-another"]');
+    await tear(fan);
+    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    await fan.goto("/sobres");
+    await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
+    await fan.click('[data-testid="pending-opening"]');
+    await tear(fan);
+    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    for (let k = 0; k < 2; k++) {
+      await fan.locator('.card3d[role="button"]').first().click();
+      await expect(fan.locator(`.stage[data-revealed="${k + 1}"]`)).toBeVisible();
+    }
+    await expect(fan.locator(".summary")).toBeVisible();
+    await fan.goto("/sobres");
+    await expect(fan.locator('[data-testid="pending-opening"]')).toHaveCount(0);
+    await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
+  });
+
+  await test.step("RF-18: «Abrir todos» abre el resto y muestra todas las cartas", async () => {
+    await fan.click('[data-testid="group-COL1"] >> text=Abrir todos (2)');
+    await fan.click('[data-testid="open-all"]');
+    await expect(fan.locator('[data-testid="open-all-summary"]')).toContainText("2 sobre(s) abiertos · 4 cartas");
+    await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(4);
+    await expect(fan.locator('[data-testid="open-all-grid"] li').first()).toContainText("Rara");
+    await fan.waitForTimeout(800);
+    await fan.screenshot({ path: "test-results/screens/3-abrir-todos.png", fullPage: true });
+    await fan.goto("/sobres");
+    await expect(fan.locator("text=No tienes sobres sin abrir.")).toBeVisible();
+  });
+
+  await test.step("RF-10: la colección refleja las 8 cartas y las repetidas suman", async () => {
+    await admin.goto("/admin/users?q=coleccionista-e2e");
+    await admin.click("a:text-is('coleccionista-e2e')");
+    await admin.waitForURL(/\/admin\/users\/[0-9a-f-]+$/);
+    await expect(admin.locator("h2", { hasText: "Colección" })).toContainText("8 en total");
+    const items = admin.locator("section:has(h2:has-text('Colección')) li");
+    const texts = await items.allInnerTexts();
+    const total = texts.reduce((a, t) => a + Number(t.match(/x(\d+)$/)?.[1] ?? 0), 0);
+    expect(total).toBe(8);
+    expect(texts.some((t) => /x[2-9]$/.test(t))).toBe(true);
+  });
+});

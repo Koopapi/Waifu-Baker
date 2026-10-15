@@ -1,0 +1,62 @@
+"use server";
+
+import { adminAction, type ActionState } from "@/server/auth/admin-action";
+import { archiveSet, createSet, publishSet, saveOdds, updateSet } from "@/server/services/collections";
+import type { Problem } from "@/domain/catalog/odds";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
+
+export async function createSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
+  return adminAction("createSet", ["/admin/sets", "/admin"], async ({ db, actorId }) => {
+    const s = await createSet(db, actorId, {
+      code: String(fd.get("code") ?? ""),
+      name: String(fd.get("name") ?? ""),
+      isAdult: fd.get("isAdult") === "on",
+      packSize: Number(fd.get("packSize") ?? 5),
+    });
+    return `Colección ${s.code} creada en borrador.`;
+  });
+}
+
+export async function updateSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
+  const id = String(fd.get("id"));
+  return adminAction("updateSet", ["/admin/sets", `/admin/sets/${id}`], async ({ db, actorId }) => {
+    const patch: { name?: string; isAdult?: boolean; packSize?: number } = { name: String(fd.get("name") ?? "") };
+    // Los campos bloqueados llegan deshabilitados y no se envían: solo se tocan si vienen.
+    if (fd.has("packSize")) patch.packSize = Number(fd.get("packSize"));
+    if (fd.has("adultField")) patch.isAdult = fd.get("isAdult") === "on";
+    await updateSet(db, actorId, id, Number(fd.get("version")), patch);
+    return "Cambios guardados.";
+  });
+}
+
+const paths = (id: string) => ["/admin/sets", `/admin/sets/${id}`, "/admin", "/drop-rates"];
+
+export async function saveOddsAction(
+  setId: string,
+  version: number,
+  slots: Record<string, number>[],
+  holoPercent: number,
+  pityThreshold: number,
+): Promise<ActionState> {
+  return adminAction("saveOdds", paths(setId), async ({ db, actorId }) => {
+    const clean = slots.map((s) => Object.fromEntries(RARITIES.map((r) => [r, Number(s[r] ?? 0)])) as Record<Rarity, number>);
+    await saveOdds(db, actorId, setId, version, { slots: clean, holoChance: holoPercent / 100, pityThreshold });
+    return "Probabilidades guardadas.";
+  });
+}
+
+export async function publishSetAction(setId: string, version: number): Promise<ActionState & { problems?: Problem[] }> {
+  let problems: Problem[] = [];
+  const r = await adminAction("publishSet", paths(setId), async ({ db, actorId }) => {
+    problems = (await publishSet(db, actorId, setId, version)).problems;
+    return problems.length ? undefined : "Colección publicada. Sus probabilidades ya son públicas.";
+  });
+  return problems.length ? { ok: false, error: `No se puede publicar: ${problems.length} problema(s).`, problems } : r;
+}
+
+export async function archiveSetAction(setId: string, version: number): Promise<ActionState> {
+  return adminAction("archiveSet", paths(setId), async ({ db, actorId }) => {
+    await archiveSet(db, actorId, setId, version);
+    return "Colección archivada: ya no se concede en sobres nuevos.";
+  });
+}

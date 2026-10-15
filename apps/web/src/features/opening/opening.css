@@ -1,0 +1,485 @@
+/* Prototipo /lab · solo transform y opacity en lo que se anima. */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 15%, #1d1236 0%, #0b0912 55%, #050408 100%);
+  color: #f1eef8;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.stage__center,
+.cards {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 1200px;
+}
+
+.cards {
+  pointer-events: none;
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: max(14px, env(safe-area-inset-top));
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+  z-index: 5;
+}
+
+/* ---------- sobre ---------- */
+
+.pack {
+  position: relative;
+  width: min(62vw, 250px);
+  aspect-ratio: 250 / 370;
+  will-change: transform, opacity;
+}
+
+.pack__body {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #3a1c6f 0%, #7a2fae 45%, #2a1052 100%);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.pack__foil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.28) 45%, transparent 60%);
+  background-size: 250% 100%;
+  animation: packShimmer 3.5s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
+@keyframes packShimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+.pack__logo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42%;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  font-size: clamp(14px, 3.4vw, 20px);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+.pack__logo span {
+  display: block;
+  margin-top: 0.5em;
+  font-weight: 500;
+  font-size: 0.65em;
+  letter-spacing: 0.3em;
+  opacity: 0.8;
+}
+
+.pack__strip {
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 0;
+  height: 46px;
+  border-radius: 14px 14px 4px 4px;
+  background: linear-gradient(180deg, #c3a0ff, #8e5de2);
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.55);
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #2a1050;
+  will-change: transform, opacity;
+}
+
+.pack__strip--dragging {
+  cursor: grabbing;
+}
+
+.pack__cta {
+  position: absolute;
+  left: 50%;
+  bottom: -64px;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #d6b370;
+  color: #0b0c0e;
+  font-weight: 700;
+}
+
+/* ---------- carta ---------- */
+
+.card3d {
+  grid-area: 1 / 1;
+  width: min(64vw, 300px);
+  aspect-ratio: 63 / 88;
+  pointer-events: auto;
+  transform-style: preserve-3d;
+  --rx: 0deg;
+  --ry: 0deg;
+  --px: 0.5;
+  --py: 0.5;
+  will-change: transform;
+}
+
+.card3d[role="button"] {
+  cursor: pointer;
+}
+
+.card3d__tilt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+}
+
+.card3d__inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  border-radius: 14px;
+}
+
+.card3d__face {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55);
+  contain: layout paint;
+}
+
+.card3d__back {
+  transform: rotateY(180deg);
+  background:
+    radial-gradient(60% 50% at 50% 40%, rgba(255, 255, 255, 0.08), transparent 70%),
+    linear-gradient(135deg, #1e1240, #4b2a8a 50%, #1e1240);
+  display: grid;
+  place-items: center;
+}
+
+.card3d__backart {
+  font-weight: 900;
+  font-size: 44px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.22);
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  padding: 18px 22px 18px 28px;
+  border-radius: 12px;
+}
+
+.card3d__front {
+  background: #111;
+}
+
+.card3d__front img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.card3d__frame {
+  position: absolute;
+  inset: 0;
+  border: 6px solid var(--rarity-color, #777);
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.card3d__name,
+.card3d__num,
+.card3d__rarity {
+  position: absolute;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.card3d__name {
+  left: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.65);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.card3d__num {
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.65);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.card3d__rarity {
+  left: 12px;
+  top: 12px;
+  padding: 5px 8px;
+  background: var(--rarity-color, #777);
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- holo ---------- */
+
+.holo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 14px;
+}
+
+.holo--shine {
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255, 70, 180, 0.45) 38%,
+    rgba(70, 230, 255, 0.45) 45%,
+    rgba(255, 240, 90, 0.45) 52%,
+    rgba(90, 255, 170, 0.45) 59%,
+    transparent 72%
+  );
+  background-size: 260% 260%;
+  background-position: calc(var(--px) * 100%) calc(var(--py) * 100%);
+  mix-blend-mode: color-dodge;
+  opacity: 0.5;
+}
+
+.holo--glare {
+  background: radial-gradient(
+    circle at calc(var(--px) * 100%) calc(var(--py) * 100%),
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.12) 25%,
+    transparent 60%
+  );
+  mix-blend-mode: overlay;
+}
+
+.holo--foil {
+  background: repeating-linear-gradient(
+    calc(var(--px) * 180deg),
+    rgba(255, 0, 128, 0.28) 0 6px,
+    rgba(0, 255, 255, 0.28) 6px 12px,
+    rgba(255, 255, 0, 0.28) 12px 18px,
+    rgba(0, 255, 128, 0.28) 18px 24px
+  );
+  mix-blend-mode: color-dodge;
+  opacity: 0.35;
+}
+
+.card3d--holo .holo--shine {
+  opacity: 0.85;
+}
+
+.card3d--revealed::after {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 24px;
+  background: radial-gradient(closest-side, var(--rarity-color, #fff), transparent);
+  opacity: 0.4;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ---------- rarezas ---------- */
+
+.rarity-common {
+  --rarity-color: #9aa0a6;
+}
+.rarity-uncommon {
+  --rarity-color: #4ade80;
+}
+.rarity-rare {
+  --rarity-color: #60a5fa;
+}
+.rarity-epic {
+  --rarity-color: #c084fc;
+}
+.rarity-legendary {
+  --rarity-color: #f5c451;
+}
+.rarity-secret {
+  --rarity-color: #ff6ad5;
+}
+
+/* ---------- efectos y HUD ---------- */
+
+.flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: var(--rarity-color, #fff);
+  mix-blend-mode: screen;
+  animation: flash 0.4s ease-out forwards;
+  z-index: 20;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 0 16px;
+  /* Por encima del resumen (z 30) para que «volver» siga siendo pulsable al terminar. */
+  z-index: 35;
+}
+
+.hud__btn,
+.hud__chip {
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 13px;
+}
+
+.hud__chip {
+  opacity: 0.6;
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+.hud__btn--primary {
+  background: #d6b370;
+  color: #0b0c0e;
+  font-weight: 700;
+  border-color: transparent;
+}
+
+.summary {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 4, 8, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 30;
+}
+
+.summary__card {
+  background: #15121f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px 20px;
+  width: min(92vw, 420px);
+}
+
+.summary__title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.summary__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+}
+
+.summary__again {
+  margin-top: 14px;
+  width: 100%;
+}
+
+.badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: var(--rarity-color, #777);
+  color: #000;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack__foil {
+    animation: none;
+  }
+}
+
+/* Cartas compuestas por el servidor: la imagen ya trae marco, sello y número. */
+.card3d--framed .card3d__front {
+  background: transparent;
+}
+.card3d--framed .card3d__face {
+  border-radius: 4.5% / 3.2%;
+}
+
+.summary__note {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #fbbf24;
+}
+
+.summary__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.summary__actions > * {
+  flex: 1 1 auto;
+  text-align: center;
+}

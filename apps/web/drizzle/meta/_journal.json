@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792040677294,
+      "tag": "0000_catalog_base",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792043849943,
+      "tag": "0001_openings_and_inventory",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792084305295,
+      "tag": "0002_pity_and_holo",
+      "breakpoints": true
+    }
+  ]
+}
