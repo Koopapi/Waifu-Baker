@@ -1,9 +1,9 @@
 import NextAuth, { type DefaultSession } from "next-auth";
-import Patreon from "next-auth/providers/patreon";
 import Credentials from "next-auth/providers/credentials";
 import type { Provider } from "next-auth/providers";
 import { db } from "@/db/client";
 import { isDevLoginEnabled, parseAdminIds, resolveRole, type Role } from "@/domain/auth/access";
+import { patreonProvider } from "@/server/auth/patreon-provider";
 import { upsertUserFromLogin } from "@/server/services/users";
 
 declare module "next-auth" {
@@ -18,7 +18,7 @@ const adminIds = parseAdminIds(process.env.ADMIN_PATREON_IDS);
 
 const providers: Provider[] = [];
 if (patreonLoginEnabled) {
-  providers.push(Patreon({ authorization: { params: { scope: "identity identity.memberships" } } }));
+  providers.push(patreonProvider());
 }
 if (devLoginEnabled) {
   providers.push(
