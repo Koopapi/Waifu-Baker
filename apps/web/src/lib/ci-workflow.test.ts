@@ -8,7 +8,10 @@ const workflow = readFileSync(path.resolve(process.cwd(), "../../.github/workflo
 
 describe("integración continua", () => {
   it("test_s007_rf18_se ejecuta en cada push a main y en cada pull request", () => {
-    expect(workflow).toMatch(/on:\s*\n\s+push:\s*\n\s+branches: \[main\]\s*\n\s+pull_request:/);
+    expect(workflow).toMatch(/on:\s*\n\s+push:\s*\n\s+branches: \[main\]/);
+    expect(workflow).toMatch(/^\s+pull_request:/m);
+    // Solo se salta en cambios de documentación: nunca en código.
+    for (const m of workflow.matchAll(/paths-ignore: \[([^\]]*)\]/g)) expect(m[1]).not.toMatch(/apps|src|\.ts/);
   });
 
   it("test_s007_rf18_ejecuta revisión de código, tipos, Vitest y E2E de escritorio", () => {

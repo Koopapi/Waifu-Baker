@@ -9,16 +9,36 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | Spec | Funcionalidad | Cubre | Pista |
 |---|---|---|---|
 | 001 ✓ | Cuentas y vínculo con Patreon | Login OAuth, entitlements, webhooks + reconcile, gate 18+, sobre de bienvenida, baja de cuenta | motor |
-| 002 | Catálogo: sets, personajes, cartas y probabilidades | Modelo de colecciones, rarezas y variantes, tablas de probabilidad versionadas y públicas, almacenamiento y procesado de imágenes | motor |
+| 002 ✓ | Catálogo: sets, personajes, cartas y probabilidades | Modelo de colecciones, rarezas y variantes, tablas de probabilidad versionadas y públicas, almacenamiento y procesado de imágenes | motor |
 | 003 ✓ | Panel de administración | Acceso de administradores, carga de imágenes, alta y edición de colecciones, personajes y cartas, asignación de rarezas, probabilidades, publicación, vista previa | motor + prototipo de la UI |
 | 004 ✓ | Sobres: concesión y apertura | Reglas de grant por tier, transacción de apertura idempotente, RNG auditable, geobloqueo, URLs firmadas | motor |
-| 005 | Experiencia de apertura | Rasgado, abanico, volteo, holo (puntero y giroscopio), reveal por rareza, audio, reduced motion, presupuesto de rendimiento | experiencia (prototipo primero) |
+| 005 ◐ | Experiencia de apertura | Rasgado, abanico, volteo, holo (puntero y giroscopio), reveal por rareza, audio, reduced motion, presupuesto de rendimiento | experiencia (prototipo primero) |
 | 006 ✓ | Colección y álbum público | Binder, filtros, álbum con slug, imagen OG, renders públicos con marca | experiencia (prototipo primero) |
 | 008 ✓ | Idiomas | Inglés por defecto y español con selector en toda la web, panel incluido | motor |
 | 009 ✓ | Sobres gratis y recompensa diaria | Sobre gratis cada 12 h (hasta 2), racha de 7 días con galletas y sobre, galletas en el panel | motor |
 | 010 ✓ | Acabado premium y demo | Estructura estilo Discord (barra de colecciones, panel, cajón y pestañas en móvil), paleta «Cereza», avisos, esqueletos, edad mínima configurable y `pnpm demo` | experiencia |
 | 011 ✓ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
 | 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
+
+## Camino al lanzamiento (orden acordado el 16 oct 2026)
+
+Cada etapa se cierra antes de abrir la siguiente; dentro de cada una, una spec cada vez (entrevista, spec,
+plan, tareas, tests primero, validación). Lo que depende de una decisión del usuario se le pide al empezar la
+etapa, no antes. Desde aquí cada spec va en su rama (`spec/NNN-nombre`) y entra en `main` por pull request con
+el CI en verde.
+
+| Etapa | Qué | Necesita del usuario |
+|---|---|---|
+| 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012**: moderación de álbumes públicos (los términos ya la prometen); **spec 013**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos) | entrevistas cortas |
+| 2. Contenido de pago | Pista de arte: elegir las 5 OCs, prueba A0 de consistencia, set SFW de ~30 cartas y set 18+; cargarlos con el panel | aprobar OCs y créditos |
+| 3. Salir a internet (**spec 014**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac | proveedor, dominio y presupuesto |
+| 4. Piloto de pago (**spec 015**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
+| 5. Beta cerrada | Pocos patrons invitados, métricas y correcciones antes de abrir | lista de invitados |
+| Después | Tienda de galletas, juegos (una spec por juego), temas por colección, Storybook | — |
+
+Notas del cierre de la etapa 1: la 002 (catálogo) quedó cubierta por la 003 (panel, colecciones, cartas,
+rarezas, probabilidades) y la 004 (sorteo y apertura); la 005 (experiencia de apertura) se construyó en `/lab`
+y quedó en la 004 y la 010, salvo el sonido y la medición de rendimiento, que pasan a la spec 013.
 
 Cambio del 14 oct 2026: se añade el panel de administración (003) a petición del usuario y se
 renumeran las siguientes. El panel sustituye a la carga por línea de comandos como vía principal
