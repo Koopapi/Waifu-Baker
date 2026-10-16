@@ -27,6 +27,8 @@ async function loginEnglish(page: Page, name: string, admin: boolean, next: stri
 const toggle = (p: Page, l: "en" | "es") => p.locator(`[data-testid="locale-toggle"] button[lang="${l}"]`);
 
 test("idiomas: inglés por defecto y cambio a español en toda la web", async ({ browser }) => {
+  // Recorre web, panel y álbum: en WebKit pasa de los 3 minutos por defecto.
+  test.setTimeout(300_000);
   const anon = await fresh(browser);
 
   await test.step("RF-1 y RF-7: sin elegir idioma, la web está en inglés y lo declara", async () => {

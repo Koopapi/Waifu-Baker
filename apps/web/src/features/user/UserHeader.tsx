@@ -18,6 +18,9 @@ export async function UserHeader({ name, isAdmin }: { name: string; isAdmin: boo
         <Link href="/coleccion" className="text-white/80 hover:text-white">
           {t.common.nav.myCollection}
         </Link>
+        <Link href="/cuenta" className="text-white/80 hover:text-white">
+          {t.common.nav.myAccount}
+        </Link>
         <Link href="/drop-rates" className="text-white/60 hover:text-white">
           {t.common.nav.odds}
         </Link>

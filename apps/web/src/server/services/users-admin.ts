@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
-import { cards, packOpenings, packs, sets, userCards, users } from "@/db/schema";
+import { cards, packOpenings, packs, sets, userCards, users, patreonLinks } from "@/db/schema";
 import { canGrantPacks } from "@/domain/catalog/collection-rules";
 import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
@@ -46,7 +46,16 @@ export async function getUserDetail(db: DbLike, userId: string) {
       .orderBy(desc(packOpenings.openedAt))
       .limit(50),
   ]);
-  return { user, sealedPacks, collection, openings };
+  // Spec 001, RF-26: estado de Patreon e historial de concesiones y anulaciones.
+  const [patreon] = await db.select().from(patreonLinks).where(eq(patreonLinks.userId, userId));
+  const packHistory = await db
+    .select({ id: packs.id, setCode: sets.code, source: packs.source, status: packs.status, reason: packs.reason, cycleKey: packs.cycleKey, grantedAt: packs.grantedAt })
+    .from(packs)
+    .innerJoin(sets, eq(sets.id, packs.setId))
+    .where(eq(packs.userId, userId))
+    .orderBy(desc(packs.grantedAt))
+    .limit(100);
+  return { user, sealedPacks, collection, openings, patreon: patreon ?? null, packHistory };
 }
 
 /** RF-25 y RF-26: regalo de sobres con motivo; 18+ solo a quien superó la verificación de edad. */

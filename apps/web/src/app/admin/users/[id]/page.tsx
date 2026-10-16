@@ -6,7 +6,7 @@ import { db } from "@/db/client";
 import { sets } from "@/db/schema";
 import { getUserDetail } from "@/server/services/users-admin";
 import { getDict, getLocale } from "@/i18n/server";
-import { formatDateTime } from "@/i18n/format";
+import { formatDate, formatDateTime } from "@/i18n/format";
 import { GiftForm } from "./gift-form";
 
 const pad = (n: number) => String(n).padStart(3, "0");
@@ -17,7 +17,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
   if (!z.string().uuid().safeParse(id).success) notFound();
   const detail = await getUserDetail(db, id);
   if (!detail) notFound();
-  const { user, sealedPacks, collection, openings } = detail;
+  const { user, sealedPacks, collection, openings, patreon, packHistory } = detail;
   const verified = Boolean(user.isAdultDeclared && user.adultVerifiedAt);
   const published = await db.select().from(sets).where(eq(sets.status, "published"));
   const giftable = published.map((s) => ({ id: s.id, code: s.code, name: s.name, isAdult: s.isAdult, blocked: s.isAdult && !verified }));
@@ -39,6 +39,28 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           {user.deletedAt && <span className="text-red-300">{t.accountDeleted}</span>}
         </p>
       </div>
+
+      <section className="space-y-2 rounded-xl border border-white/10 p-4" data-testid="patreon-state">
+        <h2 className="font-semibold">{t.patreonState.title}</h2>
+        {!patreon ? (
+          <p className="text-sm text-white/50">{t.patreonState.none}</p>
+        ) : (
+          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-sm">
+            <dt className="text-white/50">{t.patreonState.member}</dt>
+            <dd className="font-mono">{patreon.memberId ?? "—"}</dd>
+            <dt className="text-white/50">{t.patreonState.status}</dt>
+            <dd>{patreon.patronStatus ?? "—"}</dd>
+            <dt className="text-white/50">{t.patreonState.tiers}</dt>
+            <dd className="font-mono">{patreon.entitledTierIds.join(", ") || "—"}</dd>
+            <dt className="text-white/50">{t.patreonState.lastCharge}</dt>
+            <dd>{patreon.lastChargeDate ? `${formatDate(locale, patreon.lastChargeDate, "medium")} · ${patreon.lastChargeStatus ?? ""}` : "—"}</dd>
+            <dt className="text-white/50">{t.patreonState.nextCharge}</dt>
+            <dd>{patreon.nextChargeDate ? formatDate(locale, patreon.nextChargeDate, "medium") : "—"}</dd>
+            <dt className="text-white/50">{t.patreonState.synced}</dt>
+            <dd>{formatDateTime(locale, patreon.syncedAt)}</dd>
+          </dl>
+        )}
+      </section>
 
       <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
         <h2 className="font-semibold">{t.gift}</h2>
@@ -68,6 +90,28 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
               ))}
             </ul>
           </>
+        )}
+      </section>
+
+      <section className="space-y-2" data-testid="pack-history">
+        <h2 className="font-semibold">{t.packHistory.title}</h2>
+        {packHistory.length === 0 ? (
+          <p className="text-sm text-white/50">{t.packHistory.empty}</p>
+        ) : (
+          <ul className="divide-y divide-white/5 rounded-xl border border-white/10 text-sm">
+            {packHistory.map((p) => (
+              <li key={p.id} className="flex flex-wrap justify-between gap-x-4 gap-y-1 px-4 py-2" data-status={p.status}>
+                <span>
+                  <span className="font-mono">{p.setCode}</span> · {p.source === "manual" ? t.source.manual : p.source === "promo" ? t.source.promo : t.source.tier}
+                  {p.cycleKey && <span className="text-white/50"> · {t.packHistory.cycle(p.cycleKey)}</span>}
+                  {p.reason && <span className="text-white/50"> · {p.reason}</span>}
+                </span>
+                <span className={p.status === "void" ? "text-red-300" : "text-white/50"}>
+                  {t.packHistory.status[p.status] ?? p.status} · {formatDateTime(locale, p.grantedAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
 

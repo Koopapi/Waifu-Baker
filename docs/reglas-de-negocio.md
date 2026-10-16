@@ -6,7 +6,7 @@ regla cita la suya. Si una regla cambia, se cambia primero la spec y después es
 Estado de cada regla: **Vigente** (construida y con tests) o **Aprobada** (en una spec aprobada,
 pendiente de construir).
 
-Última actualización: 15 de octubre de 2026 (specs 001, 003, 004, 006 y 008).
+Última actualización: 15 de octubre de 2026. Todas las reglas de las specs 001, 003, 004, 006 y 008 están vigentes.
 
 ---
 
@@ -30,33 +30,33 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | # | Regla | Estado | Spec |
 |---|---|---|---|
 | RN-10 | Se entra con la cuenta de Patreon; no hace falta ser patron. | Vigente | 001 |
-| RN-11 | Al entrar se lee el estado de membresía (tiers, estado de patron, último cobro) y se vuelve a leer si tiene más de 15 minutos. | Aprobada | 001 RF-1, RF-3 |
-| RN-12 | Si Patreon no responde, se entra igual con el último estado conocido. | Aprobada | 001 RF-4 |
+| RN-11 | Al entrar se lee el estado de membresía (tiers, estado de patron, último cobro) y se vuelve a leer si tiene más de 15 minutos. | Vigente | 001 RF-1, RF-3 |
+| RN-12 | Si Patreon no responde, se entra igual con el último estado conocido. | Vigente | 001 RF-4 |
 | RN-13 | El administrador es la cuenta de creador de Patreon configurada en el servidor. Hay un solo rol de administrador. | Vigente | 003 |
-| RN-14 | Borrar la cuenta la desactiva: se cierra la sesión y se oculta el álbum público. | Aprobada | 001 RF-22 |
-| RN-15 | Durante 30 días tras borrarla, volver a entrar con el mismo Patreon la recupera con todo. | Aprobada | 001 RF-23 |
-| RN-16 | A los 30 días se borra de forma definitiva: perfil, cartas, sobres y álbum. El registro de aperturas se conserva sin datos personales. | Aprobada | 001 RF-24 |
-| RN-17 | Quien vuelve tras el borrado definitivo empieza con una cuenta nueva y vacía. | Aprobada | 001 RF-25 |
+| RN-14 | Borrar la cuenta la desactiva: se cierra la sesión y se oculta el álbum público. | Vigente | 001 RF-22 |
+| RN-15 | Durante 30 días tras borrarla, volver a entrar con el mismo Patreon la recupera con todo. | Vigente | 001 RF-23 |
+| RN-16 | A los 30 días se borra de forma definitiva: perfil, cartas, sobres y álbum. El registro de aperturas se conserva sin datos personales. | Vigente | 001 RF-24 |
+| RN-17 | Quien vuelve tras el borrado definitivo empieza con una cuenta nueva y vacía. | Vigente | 001 RF-25 |
 
 ## 3. Cómo se consiguen sobres
 
 | # | Regla | Estado | Spec |
 |---|---|---|---|
-| RN-20 | **Bienvenida**: 1 sobre de la colección de bienvenida al entrar por primera vez, sea patron o no. | Aprobada | 001 RF-6 |
-| RN-21 | La colección de bienvenida la elige el administrador en el panel; solo puede haber una y debe ser SFW y publicada. | Aprobada | 001 RF-5 |
-| RN-22 | Si al entrar no hay colección de bienvenida, el sobre llega en el primer inicio de sesión en que la haya. | Aprobada | 001 RF-7 |
-| RN-23 | Un solo sobre de bienvenida por cuenta de Patreon en toda su historia, aunque borre la cuenta y vuelva. | Aprobada | 001 RF-8 |
-| RN-24 | **Suscripción**: cada cobro pagado concede los sobres de las reglas de sus tiers, una sola vez por cobro. | Aprobada | 001 RF-9 |
-| RN-25 | Con varios tiers a la vez se suman los sobres de todos. Un tier sin reglas (por ejemplo «Free») no concede sobres de suscripción. | Aprobada | 001 |
-| RN-26 | Subir a un tier con más sobres concede la diferencia al confirmarse el pago, una sola vez por ciclo. Bajar y volver a subir no da sobres extra. | Aprobada | 001 RF-10, RF-11 |
-| RN-27 | Quien vincula su cuenta tarde solo recibe los sobres de su último cobro pagado, no los de meses anteriores. | Aprobada | 001 RF-12 |
-| RN-28 | Un cobro pendiente o rechazado no concede nada hasta que pase a pagado. | Aprobada | 001 |
-| RN-29 | Si un cobro pasa a reembolsado o fraude, se anulan los sobres sin abrir de ese cobro; lo ya abierto se queda y se anota en el historial. | Aprobada | 001 RF-14 |
-| RN-30 | Al cancelar o dejar de pagar se conservan los sobres sin abrir y dejan de llegar nuevos. | Aprobada | 001 RF-13 |
+| RN-20 | **Bienvenida**: 1 sobre de la colección de bienvenida al entrar por primera vez, sea patron o no. | Vigente | 001 RF-6 |
+| RN-21 | La colección de bienvenida la elige el administrador en el panel; solo puede haber una y debe ser SFW y publicada. | Vigente | 001 RF-5 |
+| RN-22 | Si al entrar no hay colección de bienvenida, el sobre llega en el primer inicio de sesión en que la haya. | Vigente | 001 RF-7 |
+| RN-23 | Un solo sobre de bienvenida por cuenta de Patreon en toda su historia, aunque borre la cuenta y vuelva. | Vigente | 001 RF-8 |
+| RN-24 | **Suscripción**: cada cobro pagado concede los sobres de las reglas de sus tiers, una sola vez por cobro. | Vigente | 001 RF-9 |
+| RN-25 | Con varios tiers a la vez se suman los sobres de todos. Un tier sin reglas (por ejemplo «Free») no concede sobres de suscripción. | Vigente | 001 |
+| RN-26 | Subir a un tier con más sobres concede la diferencia al confirmarse el pago, una sola vez por ciclo. Bajar y volver a subir no da sobres extra. | Vigente | 001 RF-10, RF-11 |
+| RN-27 | Quien vincula su cuenta tarde solo recibe los sobres de su último cobro pagado, no los de meses anteriores. | Vigente | 001 RF-12 |
+| RN-28 | Un cobro pendiente o rechazado no concede nada hasta que pase a pagado. | Vigente | 001 |
+| RN-29 | Si un cobro pasa a reembolsado o fraude, se anulan los sobres sin abrir de ese cobro; lo ya abierto se queda y se anota en el historial. | Vigente | 001 RF-14 |
+| RN-30 | Al cancelar o dejar de pagar se conservan los sobres sin abrir y dejan de llegar nuevos. | Vigente | 001 RF-13 |
 | RN-31 | Las reglas de cada tier (colecciones y sobres al mes, de 1 a 50) se configuran en el panel y se aplican desde el siguiente cobro de cada miembro. | Vigente | 003 RF-24 |
 | RN-32 | **Regalos**: el administrador puede regalar de 1 a 20 sobres de una colección publicada, con un motivo de 3 a 200 caracteres. Nunca sobres 18+ a quien no está verificado. | Vigente | 003 RF-25, RF-26 |
-| RN-33 | Los avisos de Patreon se aceptan solo con firma válida, y siempre se aplica el estado actual que devuelve Patreon: un aviso repetido o desordenado nunca da sobres de más. | Aprobada | 001 RF-15, RF-16 |
-| RN-34 | Cada 6 horas se revisan todos los miembros para recuperar avisos perdidos. | Aprobada | 001 RF-17 |
+| RN-33 | Los avisos de Patreon se aceptan solo con firma válida, y siempre se aplica el estado actual que devuelve Patreon: un aviso repetido o desordenado nunca da sobres de más. | Vigente | 001 RF-15, RF-16 |
+| RN-34 | Cada 6 horas se revisan todos los miembros para recuperar avisos perdidos. | Vigente | 001 RF-17 |
 
 ## 4. Sobres
 
@@ -100,9 +100,9 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 
 | # | Regla | Estado | Spec |
 |---|---|---|---|
-| RN-70 | Para ver o abrir contenido 18+ hacen falta la declaración de edad y un tier adulto activo en el momento de verificarse. | Aprobada | 001 RF-18, RF-19 |
+| RN-70 | Para ver o abrir contenido 18+ hacen falta la declaración de edad y un tier adulto activo en el momento de verificarse. | Vigente | 001 RF-18, RF-19 |
 | RN-71 | Sin verificación, las colecciones y sobres 18+ aparecen bloqueados, con una explicación de cómo verificarse. | Vigente | 004 RF-3, 006 RF-4 |
-| RN-72 | La verificación es permanente: si después cancela o baja de tier, conserva y ve sus cartas 18+ y puede abrir los sobres 18+ que le queden. Solo deja de recibir nuevos. | Aprobada | 001 RF-20 |
+| RN-72 | La verificación es permanente: si después cancela o baja de tier, conserva y ve sus cartas 18+ y puede abrir los sobres 18+ que le queden. Solo deja de recibir nuevos. | Vigente | 001 RF-20 |
 | RN-73 | Nada 18+ aparece nunca en un álbum público. | Vigente | 006 RF-14 |
 
 ## 8. Colección y álbum público

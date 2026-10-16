@@ -16,13 +16,25 @@ async function resetData() {
     await sql.end();
   }
   rmSync(STORE, { recursive: true, force: true });
+  // Miembros simulados de Patreon (spec 001): viven en la memoria del servidor de pruebas.
+  await fetch("http://localhost:3200/api/dev/patreon-member", { method: "DELETE" }).catch(() => undefined);
 }
 
-export const test = base.extend<{ cleanDb: void }>({
+export const test = base.extend<{ cleanDb: void; closeContexts: void }>({
   cleanDb: [
     async ({}, use) => {
       await resetData();
       await use();
+    },
+    { auto: true },
+  ],
+  // Los tests abren contextos con browser.newContext(); si no se cierran, sus páginas animadas se
+  // acumulan en el navegador compartido y WebKit se vuelve cada vez más lento.
+  closeContexts: [
+    async ({ browser }, use) => {
+      const before = new Set(browser.contexts());
+      await use();
+      await Promise.all(browser.contexts().filter((c) => !before.has(c)).map((c) => c.close().catch(() => undefined)));
     },
     { auto: true },
   ],

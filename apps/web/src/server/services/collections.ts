@@ -122,6 +122,7 @@ export async function listSets(db: DbLike) {
       isAdult: sets.isAdult,
       status: sets.status,
       packSize: sets.packSize,
+      isWelcome: sets.isWelcome,
       updatedAt: sets.updatedAt,
       cardCount: count(cards.id),
     })
@@ -215,7 +216,8 @@ export async function archiveSet(db: DbLike, actorUserId: string, setId: string,
     if (!nextStatusAllowed(cur.status as SetStatus, "archived")) {
       throw new AdminError("invalid_transition", "Solo se puede archivar una colección publicada.", { action: "archive" });
     }
-    await tx.update(sets).set({ status: "archived", archivedAt: sql`now()`, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(sets.id, setId));
+    // Una colección archivada deja de ser la de bienvenida (spec 001).
+    await tx.update(sets).set({ status: "archived", archivedAt: sql`now()`, isWelcome: false, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(sets.id, setId));
     await recordAudit(tx, { actorUserId, action: "set_archive", entityType: "set", entityId: setId });
   });
 }

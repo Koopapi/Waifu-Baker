@@ -8,7 +8,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 
 | Spec | Funcionalidad | Cubre | Pista |
 |---|---|---|---|
-| 001 | Cuentas y vínculo con Patreon | Login OAuth, entitlements, webhooks + reconcile, gate 18+, sobre de bienvenida, baja de cuenta | motor |
+| 001 ✓ | Cuentas y vínculo con Patreon | Login OAuth, entitlements, webhooks + reconcile, gate 18+, sobre de bienvenida, baja de cuenta | motor |
 | 002 | Catálogo: sets, personajes, cartas y probabilidades | Modelo de colecciones, rarezas y variantes, tablas de probabilidad versionadas y públicas, almacenamiento y procesado de imágenes | motor |
 | 003 ✓ | Panel de administración | Acceso de administradores, carga de imágenes, alta y edición de colecciones, personajes y cartas, asignación de rarezas, probabilidades, publicación, vista previa | motor + prototipo de la UI |
 | 004 ✓ | Sobres: concesión y apertura | Reglas de grant por tier, transacción de apertura idempotente, RNG auditable, geobloqueo, URLs firmadas | motor |
@@ -42,3 +42,7 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   regenerable, imágenes con marca de agua, vista previa para redes y `noindex`.
 - 15 oct 2026: spec 008 terminada y validada (10/10 RF): inglés por defecto y español con selector en
   toda la web, panel y mensajes de error incluidos. El usuario decidió seguir en local hasta una beta.
+- 15 oct 2026: spec 001 terminada y validada (26/26 RF): membresía de Patreon al entrar y cada 15 min,
+  sobre de bienvenida, sobres por cobro idempotentes, subida de tier, reembolsos, avisos firmados,
+  revisión cada 6 h, verificación 18+, «Mi cuenta» y borrado con 30 días. Faltan los tiers reales
+  en Patreon y una dirección pública para los avisos.

@@ -40,7 +40,10 @@ export const users = pgTable("users", {
   adultVerifiedAt: timestamp("adult_verified_at", { withTimezone: true }),
   lastCountry: text("last_country"),
   ...timestamps,
+  /** Spec 001: cuenta desactivada por su dueño (se puede recuperar 30 días). */
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  /** Spec 001: borrado definitivo hecho; la fila queda anónima. */
+  purgedAt: timestamp("purged_at", { withTimezone: true }),
 });
 
 export const characters = pgTable("characters", {
@@ -64,8 +67,10 @@ export const sets = pgTable("sets", {
   publishedAt: timestamp("published_at", { withTimezone: true }),
   archivedAt: timestamp("archived_at", { withTimezone: true }),
   version: integer("version").notNull().default(1),
+  /** Spec 001, RF-5: colección de la que sale el sobre de bienvenida (solo una). */
+  isWelcome: boolean("is_welcome").notNull().default(false),
   ...timestamps,
-});
+}, (t) => [uniqueIndex("sets_single_welcome_uq").on(t.isWelcome).where(sql`${t.isWelcome}`)]);
 
 export const cards = pgTable(
   "cards",
@@ -155,6 +160,8 @@ export const packs = pgTable(
       .references(() => sets.id),
     source: packSource("source").notNull(),
     grantKey: text("grant_key").notNull().unique(),
+    /** Spec 001: ciclo de cobro de Patreon que concedió el sobre (para anularlo si se reembolsa). */
+    cycleKey: text("cycle_key"),
     status: packStatus("status").notNull().default("sealed"),
     reason: text("reason"),
     grantedBy: uuid("granted_by").references(() => users.id),
@@ -248,4 +255,31 @@ export const albums = pgTable("albums", {
   alias: text("alias").notNull().default("Coleccionista"),
   featuredCardIds: uuid("featured_card_ids").array().notNull().default(sql`'{}'::uuid[]`),
   ...timestamps,
+});
+
+/** Spec 001: último estado conocido de la membresía de Patreon de cada usuario. */
+export const patreonLinks = pgTable("patreon_links", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id),
+  memberId: text("member_id").unique(),
+  patronStatus: text("patron_status"),
+  lastChargeDate: timestamp("last_charge_date", { withTimezone: true }),
+  lastChargeStatus: text("last_charge_status"),
+  nextChargeDate: timestamp("next_charge_date", { withTimezone: true }),
+  entitledTierIds: text("entitled_tier_ids").array().notNull().default(sql`'{}'::text[]`),
+  syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+  ...timestamps,
+});
+
+/** Spec 001, RF-15 y RF-16: avisos recibidos de Patreon (los repetidos se ignoran). */
+export const webhookEvents = pgTable("webhook_events", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  eventType: text("event_type").notNull(),
+  dedupeKey: text("dedupe_key").notNull().unique(),
+  memberId: text("member_id"),
+  payload: jsonb("payload").notNull(),
+  receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  processedAt: timestamp("processed_at", { withTimezone: true }),
+  error: text("error"),
 });

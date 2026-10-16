@@ -62,6 +62,15 @@ export const admin: typeof en = {
     archived: "Colección archivada: ya no se concede en sobres nuevos.",
   },
   set: {
+    welcome: {
+      title: "Sobre de bienvenida",
+      isWelcome: "Es la colección de bienvenida: todos reciben 1 sobre de ella la primera vez que entran.",
+      make: "Usar como colección de bienvenida",
+      remove: "Dejar de usarla como bienvenida",
+      onlyPublishedSfw: "Solo una colección SFW publicada puede ser la de bienvenida.",
+      made: "Colección de bienvenida actualizada.",
+      badge: "Bienvenida",
+    },
     back: "← Colecciones",
     details: "Datos de la colección",
     publishing: "Publicación",
@@ -194,6 +203,9 @@ export const admin: typeof en = {
     deleted: "Personaje borrado.",
   },
   tiers: {
+    sync: "Revisar ahora a todos los miembros de Patreon",
+    syncing: "Revisando…",
+    synced: (members: number, granted: number, voided: number) => `${members} miembro(s) revisado(s) · ${granted} sobre(s) concedido(s) · ${voided} anulado(s).`,
     title: "Tiers de Patreon",
     notConfigured: "Configura PATREON_CREATOR_ACCESS_TOKEN y PATREON_CAMPAIGN_ID para leer los tiers de la campaña.",
     loadFailed: (msg) => `No se pudieron leer los tiers: ${msg}`,
@@ -215,6 +227,22 @@ export const admin: typeof en = {
     deleted: "Regla eliminada.",
   },
   users: {
+    patreonState: {
+      title: "Patreon",
+      none: "Aún no hay datos de membresía (no es miembro o no ha entrado desde la spec 001).",
+      member: "Miembro",
+      status: "Estado",
+      tiers: "Tiers",
+      lastCharge: "Último cobro",
+      nextCharge: "Próximo cobro",
+      synced: "Última lectura",
+    },
+    packHistory: {
+      title: "Historial de sobres",
+      empty: "Todavía no tiene sobres.",
+      status: { sealed: "sellado", opened: "abierto", void: "anulado" },
+      cycle: (c: string) => `ciclo ${c}`,
+    },
     title: "Usuarios",
     searchPlaceholder: "Nombre o id de Patreon",
     searchAria: "Buscar usuarios",

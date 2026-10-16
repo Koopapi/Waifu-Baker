@@ -7,7 +7,8 @@ import { CreateSetForm } from "./forms";
 
 export default async function SetsPage() {
   const rows = await listSets(db);
-  const t = (await getDict()).admin.sets;
+  const tt = await getDict();
+  const t = tt.admin.sets;
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t.title}</h1>
@@ -41,6 +42,11 @@ export default async function SetsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={r.status} />
+                    {r.isWelcome && (
+                      <span className="ml-2 rounded-md bg-emerald-400/15 px-2 py-0.5 text-xs text-emerald-300" data-testid="welcome-badge">
+                        {tt.admin.set.welcome.badge}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.cardCount}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{r.packSize}</td>

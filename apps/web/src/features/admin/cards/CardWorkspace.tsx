@@ -123,12 +123,15 @@ function CardEditor({
   characters,
   perms,
   onClose,
+  onSaved,
 }: {
   setId: string;
   card: CardDTO;
   characters: CharacterOption[];
   perms: Permissions;
   onClose: () => void;
+  /** Versión nueva tras guardar: la cuadrícula la recuerda aunque el refresco llegue tarde. */
+  onSaved: (version: number) => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const tt = useT();
@@ -146,6 +149,8 @@ function CardEditor({
     start(async () => {
       const r = await updateCardAction(setId, card.id, card.version, fd);
       setState(r);
+      if (r.version) onSaved(r.version);
+      if (r.code === "stale_version") router.refresh();
       if (r.ok) {
         router.refresh();
         onClose();
@@ -158,6 +163,8 @@ function CardEditor({
     start(async () => {
       const r = await reviewCardAction(setId, card.id, card.version, reviewed);
       setState(r);
+      if (r.version) onSaved(r.version);
+      if (r.code === "stale_version") router.refresh();
       if (r.ok) {
         router.refresh();
         onClose();
@@ -316,6 +323,9 @@ export function CardWorkspace({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [anchor, setAnchor] = useState<number | null>(null);
   const [editing, setEditing] = useState<CardDTO | null>(null);
+  // Última versión conocida de cada carta guardada desde aquí (el refresco del servidor puede tardar).
+  const [known, setKnown] = useState<Record<string, number>>({});
+  const latest = (c: CardDTO) => (known[c.id] && known[c.id] > c.version ? { ...c, version: known[c.id] } : c);
   const [sorting, setSorting] = useState(false);
   const [order, setOrder] = useState(cards.map((c) => c.id));
   const [bulk, setBulk] = useState({ characterId: "", rarity: "", variant: "" });
@@ -455,14 +465,23 @@ export function CardWorkspace({
                 isAdult={perms.isAdultSet}
                 selected={selected.has(c.id)}
                 onToggle={toggle(cards.indexOf(c))}
-                onOpen={() => setEditing(c)}
+                onOpen={() => setEditing(latest(c))}
               />
             ))}
           </div>
         </SortableContext>
       </DndContext>
 
-      {editing && <CardEditor setId={setId} card={editing} characters={characters} perms={perms} onClose={() => setEditing(null)} />}
+      {editing && (
+        <CardEditor
+          setId={setId}
+          card={latest(byId.get(editing.id) ?? editing)}
+          characters={characters}
+          perms={perms}
+          onClose={() => setEditing(null)}
+          onSaved={(v) => setKnown((k) => ({ ...k, [editing.id]: Math.max(k[editing.id] ?? 0, v) }))}
+        />
+      )}
     </div>
   );
 }

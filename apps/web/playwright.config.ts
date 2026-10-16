@@ -12,6 +12,9 @@ const env = {
   // El E2E nunca habla con Patreon de verdad.
   PATREON_CREATOR_ACCESS_TOKEN: "",
   PATREON_CAMPAIGN_ID: "",
+  PATREON_WEBHOOK_SECRET: "e2e-webhook-secret",
+  // La batería completa dura más de 10 min: con el límite por defecto, `next dev` se reinicia a mitad.
+  NODE_OPTIONS: "--max-old-space-size=8192",
 };
 
 export default defineConfig({

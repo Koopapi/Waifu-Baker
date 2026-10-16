@@ -27,6 +27,9 @@ function oddsProblems(raw: string | number): string {
 
 export const errors: Record<string, Msg> = {
   unknown: "Algo ha fallado. Inténtalo de nuevo.",
+  welcome_not_allowed: "Solo una colección SFW publicada puede ser la de bienvenida.",
+  adult_tier_required: "Para ver contenido 18+ necesitas un tier adulto activo en Patreon.",
+  patreon_unavailable: "Patreon no está configurado o no respondió. Inténtalo más tarde.",
 
   // Genéricos con varios significados: un parámetro distingue cada caso.
   not_found: (p) =>

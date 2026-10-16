@@ -9,6 +9,7 @@ export const common = {
   nav: {
     myPacks: "My packs",
     myCollection: "My collection",
+    myAccount: "My account",
     odds: "Drop rates",
     panel: "Admin",
     signOut: "Sign out",

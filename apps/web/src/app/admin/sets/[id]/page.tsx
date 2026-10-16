@@ -7,6 +7,7 @@ import { RARITIES } from "@/domain/catalog/card-rules";
 import { cardChances } from "@/domain/catalog/odds";
 import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
+import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
 import { AdultBadge, StatusBadge } from "@/features/admin/ui";
@@ -86,6 +87,11 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           )}
         </div>
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
+      </section>
+
+      <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <h2 className="font-semibold">{t.welcome.title}</h2>
+        <WelcomeToggle setId={set.id} isWelcome={set.isWelcome} eligible={set.status === "published" && !set.isAdult} />
       </section>
 
       {overview.odds && (

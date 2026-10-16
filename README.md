@@ -21,4 +21,6 @@ Estado (15 oct 2026):
 - **Spec 006 — Colección y álbum público: terminada.** 17 de 17 RF (`specs/006-coleccion-album/validation.md`).
   «Mi colección» en `/coleccion`, ajustes del álbum en `/coleccion/album` y álbum público en `/album/<enlace>`.
 - **Spec 008 — Idiomas: terminada.** 10 de 10 RF. Inglés por defecto y español con el selector EN/ES de cada página.
-- Siguiente: lo que decida el usuario (sobres gratis con espera, recompensas diarias, spec 001 con Patreon real). Todo en local hasta la beta.
+- **Spec 001 — Cuentas y vínculo con Patreon: terminada.** 26 de 26 RF. Login real, bienvenida, sobres por cobro, 18+, «Mi cuenta» en `/cuenta` y borrado de cuenta.
+- Reglas de negocio en un solo sitio: `docs/reglas-de-negocio.md`.
+- Siguiente: spec 009 (sobres gratis con espera y recompensas diarias). Todo en local hasta la beta.

@@ -30,8 +30,9 @@ export async function bulkUpdateCardsAction(
   });
 }
 
-export async function updateCardAction(setId: string, cardId: string, version: number, fd: FormData): Promise<ActionState> {
-  return adminAction("updateCard", paths(setId), async ({ db, actorId }) => {
+export async function updateCardAction(setId: string, cardId: string, version: number, fd: FormData): Promise<ActionState & { version?: number }> {
+  let saved: number | undefined;
+  const r = await adminAction("updateCard", paths(setId), async ({ db, actorId }) => {
     const character = String(fd.get("characterId") ?? "");
     const variant = String(fd.get("variant") ?? "");
     const patch: CardPatch = {
@@ -41,9 +42,11 @@ export async function updateCardAction(setId: string, cardId: string, version: n
     };
     if (fd.has("rarity")) patch.rarity = rarityOf(String(fd.get("rarity")));
     if (variant === "normal" || variant === "holo" || variant === "alt") patch.variant = variant;
-    await updateCard(db, getCardStore(), actorId, cardId, version, patch);
+    saved = (await updateCard(db, getCardStore(), actorId, cardId, version, patch)).version;
     return (await getDict()).admin.cards.saved;
   });
+  // La versión nueva viaja con la respuesta: el panel no depende de que llegue el refresco.
+  return { ...r, version: saved };
 }
 
 export async function reorderCardsAction(setId: string, orderedIds: string[]): Promise<ActionState> {
@@ -67,12 +70,15 @@ export async function regenerateSetAction(setId: string): Promise<ActionState> {
   });
 }
 
-export async function reviewCardAction(setId: string, cardId: string, version: number, reviewed: boolean): Promise<ActionState> {
-  return adminAction("reviewCard", paths(setId), async ({ db, actorId }) => {
+export async function reviewCardAction(setId: string, cardId: string, version: number, reviewed: boolean): Promise<ActionState & { version?: number }> {
+  let saved: number | undefined;
+  const r = await adminAction("reviewCard", paths(setId), async ({ db, actorId }) => {
     const c = await reviewCard(db, getCardStore(), actorId, cardId, version, reviewed);
+    saved = c.version;
     const t = (await getDict()).admin.cards;
     return reviewed ? (c.pendingOriginalKey ? t.reviewedShort : t.reviewedAdult) : t.reviewRemoved;
   });
+  return { ...r, version: saved };
 }
 
 /** RF-23: sobre simulado con cartas reales; no escribe nada (ni historial). */

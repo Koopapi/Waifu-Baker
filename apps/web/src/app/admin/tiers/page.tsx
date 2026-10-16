@@ -1,3 +1,4 @@
+import { ReconcileButton } from "@/features/admin/tiers/ReconcileButton";
 import { db } from "@/db/client";
 import { getPatreonClient } from "@/server/patreon/client-instance";
 import { tierOverview } from "@/server/services/tiers";
@@ -35,6 +36,7 @@ export default async function TiersPage() {
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">{t.title}</h1>
         <p className="text-sm text-white/60">{t.intro}</p>
+        <ReconcileButton />
         {mode === "fake" && (
           <p className="text-xs text-amber-300">{t.fakeMode}</p>
         )}

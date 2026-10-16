@@ -13,24 +13,36 @@ export async function login(browser: Browser, name: string, admin: boolean, next
   if (!admin) await page.uncheck('input[name="admin"]');
   await page.click("text=Entrar (desarrollo)");
   await page.waitForURL((u) => !u.pathname.startsWith("/login"));
+  // La redirección tras el login debe terminar antes de navegar a otra página.
+  await page.waitForLoadState("networkidle");
   return page;
 }
 
 /** Crea por el panel una colección publicada de 2 cartas por sobre: ranura 1 común, ranura 2 rara. */
-export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number) {
+export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number, adult = false) {
+  // En WebKit, escribir antes de que la página esté lista puede mandar el formulario vacío.
   await page.goto("/admin/characters");
+  await page.waitForLoadState("networkidle");
   await page.fill('form:has-text("Nuevo personaje") input[name="name"]', `Personaje ${code}`);
   await page.click("text=Crear personaje");
   await expect(page.locator(`text=Personaje «Personaje ${code}» creado.`)).toBeVisible();
   await page.goto("/admin/sets");
+  await page.waitForLoadState("networkidle");
   await page.fill('input[name="code"]', code);
   await page.fill('form input[name="name"]', `Colección ${code}`);
   await page.fill('input[name="packSize"]', "2");
+  if (adult) await page.check('form input[name="isAdult"]');
   await page.click("text=Crear colección");
+  await expect(page.locator(`text=Colección ${code} creada en borrador.`)).toBeVisible();
   await page.click(`a:text-is('${code}')`);
   await page.waitForURL(/\/admin\/sets\/[0-9a-f-]+$/);
+  await page.waitForLoadState("networkidle");
   const setId = page.url().split("/").pop()!;
-  await page.setInputFiles('[data-testid="file-input"]', images);
+  // Si una recarga del servidor de desarrollo se come la selección, se repite (no hay subida a medias).
+  await expect(async () => {
+    await page.setInputFiles('[data-testid="file-input"]', images);
+    await expect(page.locator('[data-testid="upload-list"] li')).toHaveCount(images.length, { timeout: 10_000 });
+  }).toPass({ timeout: 60_000 });
   await expect(page.locator(`text=Subida terminada · ${images.length} correctas`)).toBeVisible({ timeout: 90_000 });
   await page.click("text=Seleccionar todas");
   await page.selectOption('[aria-label="Personaje para la selección"]', { label: `Personaje ${code}` });
@@ -48,6 +60,17 @@ export async function createPublishedSet(page: Page, code: string, images: strin
     await page.fill('dialog input[name="name"]', `${code} carta ${n}`);
     await page.click("dialog >> text=Guardar");
     await expect(page.locator("dialog")).toHaveCount(0);
+  }
+  if (adult) {
+    // Revisión 18+ de cada carta (spec 003, RF-18).
+    for (let i = 1; i <= images.length; i++) {
+      const n = String(i).padStart(3, "0");
+      await page.click(`[aria-label="Editar carta ${n}"]`);
+      await page.click("dialog >> text=Confirmo: personaje claramente adulto");
+      await expect(page.locator(`[data-card-tile="${i}"]`)).toContainText("Revisada");
+      if (await page.locator("dialog").count()) await page.keyboard.press("Escape");
+      await expect(page.locator("dialog")).toHaveCount(0);
+    }
   }
   const R = ["Común", "Poco común", "Rara", "Épica", "Legendaria", "Secreta"];
   const fill = async (slot: number, weights: Record<string, number>) => {

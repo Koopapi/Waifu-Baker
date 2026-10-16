@@ -10,6 +10,7 @@ export const common: typeof en = {
   nav: {
     myPacks: "Mis sobres",
     myCollection: "Mi colección",
+    myAccount: "Mi cuenta",
     odds: "Probabilidades",
     panel: "Panel",
     signOut: "Salir",

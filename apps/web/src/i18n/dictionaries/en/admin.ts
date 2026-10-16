@@ -61,6 +61,15 @@ export const admin = {
     archived: "Set archived: it is no longer granted in new packs.",
   },
   set: {
+    welcome: {
+      title: "Welcome pack",
+      isWelcome: "This is the welcome set: everyone gets 1 pack of it the first time they sign in.",
+      make: "Use as welcome set",
+      remove: "Stop using as welcome set",
+      onlyPublishedSfw: "Only a published SFW set can be the welcome set.",
+      made: "Welcome set updated.",
+      badge: "Welcome",
+    },
     back: "← Sets",
     details: "Set details",
     publishing: "Publishing",
@@ -193,6 +202,9 @@ export const admin = {
     deleted: "Character deleted.",
   },
   tiers: {
+    sync: "Check all Patreon members now",
+    syncing: "Checking…",
+    synced: (members: number, granted: number, voided: number) => `${members} member(s) checked · ${granted} pack(s) granted · ${voided} voided.`,
     title: "Patreon tiers",
     notConfigured: "Set PATREON_CREATOR_ACCESS_TOKEN and PATREON_CAMPAIGN_ID to read the campaign's tiers.",
     loadFailed: (msg: string) => `Could not read the tiers: ${msg}`,
@@ -214,6 +226,22 @@ export const admin = {
     deleted: "Rule removed.",
   },
   users: {
+    patreonState: {
+      title: "Patreon",
+      none: "No membership data yet (the person is not a member or has not signed in since spec 001).",
+      member: "Member",
+      status: "Status",
+      tiers: "Tiers",
+      lastCharge: "Last charge",
+      nextCharge: "Next charge",
+      synced: "Last read",
+    },
+    packHistory: {
+      title: "Pack history",
+      empty: "No packs yet.",
+      status: { sealed: "sealed", opened: "opened", void: "voided" } as Record<string, string>,
+      cycle: (c: string) => `cycle ${c}`,
+    },
     title: "Users",
     searchPlaceholder: "Name or Patreon id",
     searchAria: "Search users",

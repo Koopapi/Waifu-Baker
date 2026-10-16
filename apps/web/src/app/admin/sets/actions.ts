@@ -5,6 +5,7 @@ import { archiveSet, createSet, publishSet, saveOdds, updateSet } from "@/server
 import type { Problem } from "@/domain/catalog/odds";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { getDict } from "@/i18n/server";
+import { setWelcomeSet } from "@/server/services/welcome";
 
 export async function createSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
   return adminAction("createSet", ["/admin/sets", "/admin"], async ({ db, actorId }) => {
@@ -59,5 +60,13 @@ export async function archiveSetAction(setId: string, version: number): Promise<
   return adminAction("archiveSet", paths(setId), async ({ db, actorId }) => {
     await archiveSet(db, actorId, setId, version);
     return (await getDict()).admin.sets.archived;
+  });
+}
+
+/** Spec 001, RF-5: marca (o desmarca) la colección de bienvenida. */
+export async function setWelcomeSetAction(setId: string, makeWelcome: boolean): Promise<ActionState> {
+  return adminAction("setWelcomeSet", ["/admin/sets", `/admin/sets/${setId}`], async ({ db, actorId }) => {
+    await setWelcomeSet(db, actorId, makeWelcome ? setId : null);
+    return (await getDict()).admin.set.welcome.made;
   });
 }
