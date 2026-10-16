@@ -21,21 +21,32 @@ export async function login(browser: Browser, name: string, admin: boolean, next
 }
 
 /**
- * Spec 007: si aparece la bienvenida (edad y términos), se acepta y se sigue a donde iba. Tras el
- * login la redirección a la bienvenida llega un instante después, así que se espera a verla.
+ * Spec 007: acepta la bienvenida (edad y términos) si hace falta y sigue a donde iba. No se espera a que
+ * llegue la redirección (en una máquina lenta tarda más que cualquier plazo fijo): se abre la bienvenida
+ * directamente, que manda al destino sin mostrar nada cuando no hay nada que aceptar.
  */
 export async function acceptGate(page: Page) {
-  if (new URL(page.url()).pathname.startsWith("/admin")) return;
-  const gate = page.locator('[data-testid="gate-form"]');
+  const here = new URL(page.url());
+  if (here.pathname.startsWith("/admin")) return;
+  const next = here.pathname.startsWith("/bienvenida")
+    ? (here.searchParams.get("next") ?? "/")
+    : here.pathname + here.search;
   try {
-    await gate.waitFor({ state: "visible", timeout: 5_000 });
-  } catch {
-    return;
+    await page.goto(`/bienvenida?next=${encodeURIComponent(next)}`);
+  } catch (e) {
+    // La redirección de la propia web a la bienvenida puede llegar justo a la vez: va al mismo sitio.
+    if (!String(e).includes("interrupted by another navigation")) throw e;
+    await page.waitForLoadState("load");
   }
-  await page.check('[data-testid="gate-form"] input[name="age"]');
-  await page.check('[data-testid="gate-form"] input[name="terms"]');
-  await page.click('[data-testid="gate-form"] button');
-  await page.waitForURL((u) => !u.pathname.startsWith("/bienvenida"));
+  // En una carga completa, la redirección del servidor ya ha ocurrido cuando `goto` termina.
+  if (new URL(page.url()).pathname.startsWith("/bienvenida")) {
+    const gate = page.locator('[data-testid="gate-form"]');
+    await gate.waitFor({ state: "visible" });
+    await gate.locator('input[name="age"]').check();
+    await gate.locator('input[name="terms"]').check();
+    await gate.locator("button").click();
+    await page.waitForURL((u) => !u.pathname.startsWith("/bienvenida"));
+  }
   await page.waitForLoadState("networkidle");
 }
 
