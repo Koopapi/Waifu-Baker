@@ -47,6 +47,8 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 - Demo local (spec 010): `pnpm demo` recrea la BD `waifu_baker_demo`, la llena con `apps/web/demo/fanart.json`
   (imágenes de `ART_DIR`, fuera de git) y arranca en el puerto 3300 con `DEMO_MODE=1`. El E2E también corre en modo
   demo con `e2e/demo-manifest.json` (imágenes de `public/lab`).
+- Capturas para enseñar: con la demo recién creada, `pnpm showcase <carpeta> escritorio|movil` recorre todas las
+  pantallas y deja las imágenes y un `manifest.json` (abre sobres: una pasada por demo).
 - Copias de seguridad (spec 007): `pnpm backup` hace una copia cifrada en `BACKUP_DIR`; `pnpm backup:restore [archivo]`
   la restaura en `<bd>_restore` y `var/restore/cards` y la compara con su manifiesto. Necesitan `pg_dump`/`pg_restore`.
   Las tareas periódicas (Patreon, cuentas vencidas, copia diaria) se activan con `SCHEDULER=1`.
