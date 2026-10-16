@@ -17,7 +17,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 008 ✓ | Idiomas | Inglés por defecto y español con selector en toda la web, panel incluido | motor |
 | 009 ✓ | Sobres gratis y recompensa diaria | Sobre gratis cada 12 h (hasta 2), racha de 7 días con galletas y sobre, galletas en el panel | motor |
 | 010 ✓ | Acabado premium y demo | Estructura estilo Discord (barra de colecciones, panel, cajón y pestañas en móvil), paleta «Cereza», avisos, esqueletos, edad mínima configurable y `pnpm demo` | experiencia |
-| 011 ◐ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
+| 011 ✓ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
 | 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 Cambio del 14 oct 2026: se añade el panel de administración (003) a petición del usuario y se
@@ -61,3 +61,5 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   desplegable con buscador, avisos con deshacer, modales y confirmaciones, contenido, piezas de juego, estructura y
   acciones optimistas), catálogo `/sistema` y todas las pantallas migradas; peso añadido de 1 a 12 kB por página.
   Falta la lámina de Pencil (RF-16): Pencil no dibujaba elementos nuevos.
+- 16 oct 2026: spec 011 terminada y validada (17/17 RF): lámina «Sistema de diseño» en Pencil con un componente
+  por cada uno del código, y tableros «Pantallas · Escritorio/Móvil» con las capturas reales (`pnpm showcase`).

@@ -48,3 +48,45 @@ con fondo transparente salen en blanco; para verificar, exportar a PNG.
 
 Pendiente: portada, apertura, colección y álbum. Dirección provisional: fondo oscuro para que el
 holo y las partículas destaquen, un acento por rareza, tipografía grande y mucho aire.
+
+## Sistema de diseño (spec 011)
+
+El código vive en `apps/web/src/ui` y el diseño en `Waifu Baker/waifubaker.pen`, lámina «Sistema de diseño
+(spec 011)», con la paleta «Cereza» como variables `ui-*` (tema `paleta`). Cada componente del código tiene su
+componente reutilizable en Pencil con las mismas variantes; el test `src/ui/pencil-map.test.ts` exige que
+cualquier componente nuevo se añada a esta tabla.
+
+| Componente (código) | Componente en Pencil |
+|---|---|
+| Button | Button/Primary, Button/Secondary, Button/Danger, Button/Success, Button/Ghost (y fila «Estados») |
+| IconButton | IconButton |
+| TextField | TextField (y «TextField (error)») |
+| TextArea | TextField (mismo aspecto, varias líneas) |
+| Field | Etiqueta, ayuda y error de TextField (envoltorio común de los campos) |
+| Select | Select (disparador y lista abierta con buscador) |
+| Checkbox | Checkbox |
+| Switch | Switch |
+| RadioGroup | RadioGroup (tarjetas) |
+| ToastProvider | Toast (y «Toast (error)» con Reintentar) |
+| Alert | Alert/info, Alert/success, Alert/warning, Alert/danger |
+| EmptyState | EmptyState |
+| Skeleton | Skeleton |
+| SectionSkeleton | Skeleton |
+| Modal | Modal |
+| ConfirmProvider | ConfirmDialog |
+| Menu | Menu |
+| Tooltip | Tooltip |
+| Card | Card (y «Card (interactiva)») |
+| Badge | Badge/neutral, accent, success, warning, danger, info y Badge/contador |
+| Tabs | Tabs |
+| Progress | Progress |
+| Avatar | Avatares |
+| Table | Table |
+| Countdown | Countdown |
+| AnimatedCounter | AnimatedCounter |
+| FocusView | FocusView |
+| AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
+| Banner | Banner |
+
+Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
+de la demo (`pnpm showcase`). Se regeneran tras cada cambio visible.

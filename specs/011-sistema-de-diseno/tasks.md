@@ -3,7 +3,7 @@
 ## Entrega 1 — Fundamentos
 - [x] **T1 — Tokens completos y ayudante de variantes** · RF-1, RF-2 · Hecho cuando: pasan sus tests.
 - [x] **T2 — Dependencias (`radix-ui`, `cmdk`) y medida de peso inicial** · RNF · Hecho cuando: el build está medido.
-- [ ] **T3 — Lámina «Sistema de diseño» en Pencil** · RF-16 · Hecho cuando: cada componente tiene su versión Pencil con variantes.
+- [x] **T3 — Lámina «Sistema de diseño» en Pencil** · RF-16 · Hecho cuando: cada componente tiene su versión Pencil con variantes.
 
 ## Entrega 2 — Componentes
 - [x] **T4 — Acción: Button, IconButton** · RF-3
@@ -29,4 +29,4 @@
 
 ## Entrega 5 — Cierre
 - [x] **T20 — E2E completo en los cuatro proyectos** · Todos
-- [ ] **T21 — Validación RF por RF y peso medido** · Todos · Hecho cuando: `validation.md` da 17 de 17.
+- [x] **T21 — Validación RF por RF y peso medido** · Todos · Hecho cuando: `validation.md` da 17 de 17.

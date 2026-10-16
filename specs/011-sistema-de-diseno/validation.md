@@ -1,8 +1,8 @@
 # Validación — Spec 011
 
-Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 339 de 339 tests en verde. E2E: `pnpm e2e`.
+Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 340 de 340 tests en verde. E2E: `pnpm e2e`.
 
-**Veredicto: spec NO cumplida** (16 de 17 RF con al menos un test en verde).
+**Veredicto: spec cumplida** (17 de 17 RF con al menos un test en verde).
 
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
@@ -21,5 +21,5 @@ Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 339 de 33
 | RF-13 | EL SISTEMA animará los componentes solo con transform y opacidad, entre 150 y 250 ms, y sin animaciones con movimiento reducido; las animaciones vistosas quedan solo para la apertura de sobres. | ✓ las_duraciones_van_de_150_a_250_ms | RF-13: animaciones cortas, y ninguna con movimiento reducido | Cumplido |
 | RF-14 | EL SISTEMA hará que todos los componentes se usen por completo con teclado y lector de pantalla (foco visible, foco atrapado en modales y menús, Escape para cerrar, roles y etiquetas correctos) y con contraste de al menos 4,5:1. | — | RF-4 y RF-14: desplegable con buscador usable solo con teclado<br>RF-6 y RF-14: el modal atrapa el foco, Escape lo cierra y el foco vuelve | Cumplido |
 | RF-15 | MIENTRAS la web corra en desarrollo, EL SISTEMA ofrecerá una página de catálogo con todos los componentes, sus variantes y estados; en producción esa página no existirá. | ✓ en_produccion_la_pagina_no_existe | RF-15: el catálogo muestra todas las familias de componentes | Cumplido |
-| RF-16 | EL SISTEMA tendrá cada componente diseñado en Pencil como componente reutilizable, con las mismas variantes que en código. | — | — | **Sin cubrir** |
+| RF-16 | EL SISTEMA tendrá cada componente diseñado en Pencil como componente reutilizable, con las mismas variantes que en código. | ✓ cada_componente_del_codigo_tiene_su_componente_en_pencil | — | Cumplido |
 | RF-17 | EL SISTEMA construirá todas las pantallas del coleccionista, del panel, la portada, la demo y las páginas legales solo con componentes del sistema. | ✓ sin_campos_nativos_fuera_del_sistema<br>✓ sin_clases_de_boton_sueltas<br>✓ las_pantallas_importan_cada_componente_por_su_ruta<br>✓ sin_colores_de_tailwind_fuera_de_los_tokens | — | Cumplido |
