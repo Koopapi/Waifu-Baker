@@ -228,3 +228,32 @@ describe("RF-18 y RF-19 abrir todos", () => {
     });
   });
 });
+
+describe("apertura reproducible", () => {
+  // Con la misma semilla salen las mismas cartas aunque Postgres devuelva las filas en otro orden
+  // (al editar una carta, su fila se reescribe al final de la tabla).
+  const openWithSeed = (touchFirst: boolean) =>
+    inRollback(async (tx) => {
+      const admin = await makeAdmin(tx);
+      const { set, cards: list } = await createPublishedSet(tx, admin.id, {
+        code: "SEED",
+        rarities: ["common", "common", "common", "common", "common", "rare"],
+        slots: [{ common: 100 }, { common: 100 }, { common: 100 }, { rare: 100 }],
+      });
+      // Reescribir las filas al revés: una lectura sin orden las devolvería invertidas.
+      if (touchFirst) for (const c of [...list].reverse()) await tx.execute(sql`update cards set name = name || ' ' where id = ${c.id}`);
+      const fan = await upsertUserFromLogin(tx, { patreonUserId: "dev:seed-fan", displayName: "Seed fan", role: "user" });
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 1, reason: "Seed test" });
+      const [p] = await tx.select().from(packs).where(eq(packs.userId, fan.id));
+      // Como en el CI: lectura directa de la tabla, sin el índice que aquí devuelve las filas ordenadas por casualidad.
+      await tx.execute(sql`set local enable_indexscan = off`);
+      await tx.execute(sql`set local enable_bitmapscan = off`);
+      await tx.execute(sql`set local enable_indexonlyscan = off`);
+      const r = await openPack(tx, { userId: fan.id, packId: p.id, seed: Buffer.alloc(32, 7) });
+      return r.cards.map((c) => c.number);
+    });
+
+  it("test_s004_rf6_la_misma_semilla_da_las_mismas_cartas_aunque_cambie_el_orden_de_las_filas", async () => {
+    expect(await openWithSeed(true)).toEqual(await openWithSeed(false));
+  });
+});
