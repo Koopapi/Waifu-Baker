@@ -11,6 +11,7 @@ export const admin = {
     characters: "Characters",
     tiers: "Patreon tiers",
     users: "Users",
+    metrics: "Metrics & backups",
     publicOdds: "Public drop rates ↗",
   },
   status: {
@@ -224,6 +225,18 @@ export const admin = {
     addSet: "Add set",
     saved: "Rule saved. It will apply from each member's next charge.",
     deleted: "Rule removed.",
+  },
+  metrics: {
+    title: "Metrics & backups",
+    intro: "Last 30 days (UTC), from our own data. No tracking cookies or external analytics.",
+    th: { day: "Day", newUsers: "New users", activeUsers: "Active users", packsOpened: "Packs opened", freeClaims: "Free packs", dailyClaims: "Daily rewards" },
+    totals: "Total",
+    activeAlbums: (n: number) => `Public albums active now: ${n}`,
+    backups: "Backups",
+    lastOk: (when: string, size: string) => `Last good backup: ${when} · ${size}`,
+    noBackup: "No backup yet.",
+    lastFailure: (when: string, error: string) => `Last attempt failed (${when}): ${error}`,
+    howTo: "Backups run every day when SCHEDULER=1, BACKUP_DIR and BACKUP_PASSPHRASE are set. Manual: pnpm backup. Check a restore: pnpm backup:restore.",
   },
   users: {
     rewards: {

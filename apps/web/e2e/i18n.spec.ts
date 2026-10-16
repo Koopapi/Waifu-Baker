@@ -7,7 +7,7 @@ import { translateError } from "../src/i18n/errors";
 import { formatDate } from "../src/i18n/format";
 import { dictionaries } from "../src/i18n/index";
 import { DESKTOP, expect, test } from "./fixtures";
-import { LAB, createPublishedSet, giftPacks, login } from "./helpers";
+import { LAB, acceptGate, createPublishedSet, giftPacks, login } from "./helpers";
 
 const en = dictionaries.en;
 const es = dictionaries.es;
@@ -22,6 +22,8 @@ async function loginEnglish(page: Page, name: string, admin: boolean, next: stri
   if (!admin) await page.uncheck('input[name="admin"]');
   await page.click(`text=${en.site.login.devSubmit}`);
   await page.waitForURL((u) => !u.pathname.startsWith("/login"));
+  await page.waitForLoadState("networkidle");
+  await acceptGate(page);
 }
 
 const toggle = (p: Page, l: "en" | "es") => p.locator(`[data-testid="locale-toggle"] button[lang="${l}"]`);

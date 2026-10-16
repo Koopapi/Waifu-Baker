@@ -43,12 +43,12 @@ const packsOf = async (p: Page, code: string) => {
 
 test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrado", async ({ browser, request }) => {
   const admin = await login(browser, "admin-patreon", true);
-  await createPublishedSet(admin, "PAT1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
-  const setUrl = admin.url();
+  const setId = await createPublishedSet(admin, "PAT1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
   await createPublishedSet(admin, "PAT1A", ["04.webp", "05.webp"].map((f) => path.join(LAB, f)), 2, undefined, true);
 
   await test.step("RF-5: el administrador elige la colección de bienvenida", async () => {
-    await admin.goto(setUrl);
+    await admin.goto(`/admin/sets/${setId}`);
+    await admin.waitForLoadState("networkidle");
     await admin.click(`text=${es.admin.set.welcome.make}`);
     await expect(admin.locator(`text=${es.admin.set.welcome.isWelcome}`)).toBeVisible();
     await admin.goto("/admin/sets");
@@ -57,6 +57,7 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
 
   await test.step("Reglas de tiers: SFW da 3 de PAT1; 18+ da 3 de PAT1A", async () => {
     await admin.goto("/admin/tiers");
+    await admin.waitForLoadState("networkidle");
     for (const [tier, label] of [
       ["SFW (desarrollo)", "PAT1 · Colección PAT1"],
       ["18+ (desarrollo)", "PAT1A · Colección PAT1A (18+)"],

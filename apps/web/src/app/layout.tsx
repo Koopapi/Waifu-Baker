@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { I18nProvider } from "@/i18n/client";
 import { getDict, getLocale } from "@/i18n/server";
+import { SiteFooter } from "@/features/legal/SiteFooter";
+import { TimeZoneCookie } from "@/features/rewards/TimeZoneCookie";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -27,7 +29,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
-        <I18nProvider locale={locale}>{children}</I18nProvider>
+        <I18nProvider locale={locale}>
+          <TimeZoneCookie />
+          {children}
+          <SiteFooter />
+        </I18nProvider>
       </body>
     </html>
   );

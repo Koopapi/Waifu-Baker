@@ -12,6 +12,7 @@ export const admin: typeof en = {
     characters: "Personajes",
     tiers: "Tiers de Patreon",
     users: "Usuarios",
+    metrics: "Métricas y copias",
     publicOdds: "Probabilidades públicas ↗",
   },
   status: {
@@ -225,6 +226,18 @@ export const admin: typeof en = {
     addSet: "Añadir colección",
     saved: "Regla guardada. Se aplicará desde el siguiente cobro de cada miembro.",
     deleted: "Regla eliminada.",
+  },
+  metrics: {
+    title: "Métricas y copias",
+    intro: "Últimos 30 días (UTC), con datos propios. Sin cookies de seguimiento ni analítica externa.",
+    th: { day: "Día", newUsers: "Usuarios nuevos", activeUsers: "Usuarios activos", packsOpened: "Sobres abiertos", freeClaims: "Sobres gratis", dailyClaims: "Recompensas diarias" },
+    totals: "Total",
+    activeAlbums: (n: number) => `Álbumes públicos activos ahora: ${n}`,
+    backups: "Copias de seguridad",
+    lastOk: (when: string, size: string) => `Última copia correcta: ${when} · ${size}`,
+    noBackup: "Todavía no hay ninguna copia.",
+    lastFailure: (when: string, error: string) => `El último intento falló (${when}): ${error}`,
+    howTo: "Las copias se hacen cada día con SCHEDULER=1, BACKUP_DIR y BACKUP_PASSPHRASE configurados. A mano: pnpm backup. Comprobar una restauración: pnpm backup:restore.",
   },
   users: {
     rewards: {

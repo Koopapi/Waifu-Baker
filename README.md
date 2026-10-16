@@ -24,4 +24,7 @@ Estado (15 oct 2026):
 - **Spec 001 — Cuentas y vínculo con Patreon: terminada.** 26 de 26 RF. Login real, bienvenida, sobres por cobro, 18+, «Mi cuenta» en `/cuenta` y borrado de cuenta.
 - Reglas de negocio en un solo sitio: `docs/reglas-de-negocio.md`.
 - **Spec 009 — Sobres gratis y recompensa diaria: terminada.** 21 de 21 RF. Tarjetas en «Mis sobres», galletas en «Mi cuenta» y en el panel.
-- Siguiente: lo previo a la beta (páginas legales y copias de seguridad, parte de la spec 007). Todo en local hasta la beta.
+- **Spec 007 (parte beta) — Operación y cumplimiento: terminada.** 18 de 18 RF. Bienvenida con edad y términos,
+  páginas legales en `/legal/*`, Sentry, métricas y copias en `/admin/metricas`, CI en GitHub.
+- Copias: `pnpm backup` y `pnpm backup:restore` (ver `AGENTS.md`).
+- Siguiente: contenido real (pista de arte) y despliegue (parte 2 de la spec 007).

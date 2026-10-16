@@ -1,31 +1,7 @@
-// Compila todas las rutas del servidor de desarrollo antes de los proyectos: la primera
-// compilación provoca recargas completas que interrumpen navegaciones (sobre todo en WebKit).
+// Compila todas las rutas del servidor de desarrollo antes de los proyectos (lista en `warm.ts`).
 import { test } from "./fixtures";
 import { login } from "./helpers";
-
-const ID = "00000000-0000-4000-8000-000000000000";
-const ROUTES = [
-  "/",
-  "/login",
-  "/drop-rates",
-  "/no-existe",
-  "/album/AAAAAAAAAAAA",
-  "/sobres",
-  `/sobres/${ID}`,
-  `/sobres/${ID}/todos`,
-  "/coleccion",
-  `/coleccion/${ID}`,
-  "/coleccion/album",
-  "/cuenta",
-  "/admin",
-  "/admin/sets",
-  `/admin/sets/${ID}`,
-  `/admin/sets/${ID}/simulate`,
-  "/admin/characters",
-  "/admin/tiers",
-  "/admin/users",
-  `/admin/users/${ID}`,
-];
+import { API_CALLS, ROUTES } from "./warm";
 
 test("calentar rutas", async ({ browser }) => {
   test.setTimeout(300_000);
@@ -34,10 +10,6 @@ test("calentar rutas", async ({ browser }) => {
     await page.goto(r);
     await page.waitForLoadState("networkidle");
   }
-  // Rutas de API que los tests llaman a mitad de una página abierta (spec 001).
-  await page.request.post("/api/webhooks/patreon", { data: "{}" });
-  await page.request.delete("/api/dev/patreon-member");
-  await page.request.delete("/api/dev/clock");
-  await page.request.get(`/api/album/AAAAAAAAAAAA/img?c=${ID}`);
-  await page.request.get("/api/cards/img");
+  // Rutas de API que los tests llaman a mitad de una página abierta.
+  for (const c of API_CALLS) await page.request.fetch(c.path, { method: c.method, data: c.body });
 });

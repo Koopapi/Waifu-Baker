@@ -13,8 +13,14 @@ const env = {
   PATREON_CREATOR_ACCESS_TOKEN: "",
   PATREON_CAMPAIGN_ID: "",
   PATREON_WEBHOOK_SECRET: "e2e-webhook-secret",
-  // La batería completa dura más de 10 min: con el límite por defecto, `next dev` se reinicia a mitad.
-  NODE_OPTIONS: "--max-old-space-size=8192",
+  CONTACT_EMAIL: "hello@waifubaker.test",
+  SENTRY_DSN: "",
+  NEXT_PUBLIC_SENTRY_DSN: "",
+  SCHEDULER: "",
+  // `next dev` retiene memoria por cada página servida y se reinicia solo al pasar del 80 % del montón:
+  // montón amplio y `--expose-gc` para que `/api/dev/memory` recoja la basura y, si hace falta, lo
+  // reinicie entre dos tests (`e2e/fixtures.ts`) en vez de en mitad de uno.
+  NODE_OPTIONS: "--max-old-space-size=8192 --expose-gc",
 };
 
 export default defineConfig({

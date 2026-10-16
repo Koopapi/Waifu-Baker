@@ -1,0 +1,26 @@
+# Validación — Spec 007
+
+Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 264 de 264 tests en verde. E2E: `pnpm e2e`.
+
+**Veredicto: spec cumplida** (18 de 18 RF con al menos un test en verde).
+
+| RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
+|---|---|---|---|---|
+| RF-1 | CUANDO alguien entra por primera vez, EL SISTEMA le pedirá confirmar que tiene 16 años o más y aceptar los términos antes de usar sus sobres, su colección o su cuenta. | ✓ aceptar_guarda_la_edad_y_la_version_de_los_terminos<br>✓ un_usuario_nuevo_debe_confirmar_edad_y_aceptar | RF-1: tras entrar, un usuario nuevo debe confirmar edad y términos<br>RF-1: al aceptar vuelve a donde iba | Cumplido |
+| RF-2 | MIENTRAS un usuario no haya confirmado su edad ni aceptado los términos, EL SISTEMA solo le dejará ver las páginas públicas y cerrar sesión. | ✓ quien_no_acepta_sigue_bloqueado<br>✓ tras_aceptar_solo_se_vuelve_a_rutas_internas | RF-2: sin aceptar no ve su colección ni su cuenta, pero sí las páginas públicas | Cumplido |
+| RF-3 | CUANDO se publique una versión nueva de los términos, EL SISTEMA pedirá a cada usuario aceptarla en su siguiente visita. | ✓ una_version_nueva_de_los_terminos_se_vuelve_a_pedir | — | Cumplido |
+| RF-4 | EL SISTEMA publicará, en inglés y en español y sin necesidad de sesión, los términos de uso, la política de privacidad y una página sobre el contenido y el uso de IA, enlazadas desde el pie de todas las páginas junto a la de probabilidades. | — | RF-4 y RF-8: términos, privacidad y contenido sin sesión, con versión y fecha, en inglés<br>RF-4: el pie de todas las páginas enlaza los documentos | Cumplido |
+| RF-5 | Los términos explicarán al menos: que el operador es «Waifu Baker»; que las cartas y las galletas son digitales, sin valor monetario y no intercambiables; que los sobres son aleatorios con probabilidades públicas; la edad mínima de 16 años y los requisitos del contenido 18+; que en Bélgica no se pueden abrir sobres; que los pagos y reembolsos son los de Patreon; y cómo se borra una cuenta. | — | RF-5 y RF-6: los textos cubren lo esencial y también están en español | Cumplido |
+| RF-6 | La política de privacidad explicará qué datos se guardan y para qué, las cookies que usa la web (todas esenciales), el envío de errores a Sentry sin datos personales, cuánto tiempo se conservan los datos y cómo pedir acceso o borrado. | — | RF-5 y RF-6: los textos cubren lo esencial y también están en español | Cumplido |
+| RF-7 | EL SISTEMA mostrará en las páginas legales el correo de contacto configurado; SI no hay correo configurado, ENTONCES mostrará la página de Patreon como vía de contacto. | ✓ correo_configurado_o_si_falta_la_pagina_de_patreon | RF-7: el contacto es el correo configurado | Cumplido |
+| RF-8 | EL SISTEMA mostrará en cada página legal su versión y la fecha de su última actualización. | ✓ cada_documento_tiene_version_y_fecha | RF-4 y RF-8: términos, privacidad y contenido sin sesión, con versión y fecha, en inglés | Cumplido |
+| RF-9 | CUANDO ocurre un error no controlado en el servidor o en el navegador, EL SISTEMA lo enviará a Sentry identificando al usuario solo por su identificador interno, sin nombre, avatar ni identificador de Patreon. | ✓ a_sentry_solo_llega_el_identificador_interno | — | Cumplido |
+| RF-10 | SI Sentry no está configurado, ENTONCES EL SISTEMA funcionará igual sin enviar nada. | ✓ sin_dsn_no_se_inicia_sentry | — | Cumplido |
+| RF-11 | EL SISTEMA mostrará en el panel, por día y para los últimos 30 días: usuarios nuevos, usuarios activos, sobres abiertos, sobres gratis reclamados, recompensas diarias reclamadas y álbumes públicos activos. | ✓ la_actividad_se_anota_una_vez_por_dia<br>✓ metricas_diarias_de_30_dias | RF-11 y RF-17: el administrador ve las métricas de 30 días y el estado de las copias | Cumplido |
+| RF-12 | EL SISTEMA calculará las métricas con sus propios datos, sin cookies de seguimiento ni servicios externos. | ✓ las_metricas_salen_solo_de_datos_propios | — | Cumplido |
+| RF-13 | EL SISTEMA hará cada día una copia cifrada de la base de datos y de las imágenes de las cartas en la carpeta configurada. | ✓ la_copia_se_cifra_y_solo_se_abre_con_la_clave | — | Cumplido |
+| RF-14 | EL SISTEMA borrará las copias con más de 30 días. | ✓ se_borran_las_copias_de_mas_de_30_dias | — | Cumplido |
+| RF-15 | EL SISTEMA permitirá restaurar una copia en una base de datos aparte y comprobar que está completa, sin tocar la base de datos en uso. | ✓ una_copia_se_restaura_en_una_bd_aparte_y_coincide | — | Cumplido |
+| RF-16 | SI una copia falla, ENTONCES EL SISTEMA lo registrará, lo enviará a Sentry y lo mostrará en el panel. | ✓ una_copia_fallida_queda_registrada | — | Cumplido |
+| RF-17 | EL SISTEMA mostrará en el panel la fecha y el tamaño de la última copia correcta. | ✓ el_panel_conoce_la_ultima_copia_correcta | RF-11 y RF-17: el administrador ve las métricas de 30 días y el estado de las copias | Cumplido |
+| RF-18 | CUANDO se sube un cambio a GitHub, EL SISTEMA ejecutará la revisión de código, la comprobación de tipos, los tests unitarios y de integración y los E2E de escritorio, y marcará el cambio como fallido si alguno falla. | ✓ se ejecuta en cada push a main y en cada pull request<br>✓ ejecuta revisión de código, tipos, Vitest y E2E de escritorio | — | Cumplido |

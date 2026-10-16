@@ -6,7 +6,7 @@ regla cita la suya. Si una regla cambia, se cambia primero la spec y después es
 Estado de cada regla: **Vigente** (construida y con tests) o **Aprobada** (en una spec aprobada,
 pendiente de construir).
 
-Última actualización: 15 de octubre de 2026. Todas las reglas de las specs 001, 003, 004, 006, 008 y 009 están vigentes.
+Última actualización: 15 de octubre de 2026. Todas las reglas de las specs 001, 003, 004, 006, 007 (parte beta), 008 y 009 están vigentes.
 
 ---
 
@@ -141,6 +141,18 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-109 | El administrador puede dar o quitar galletas con un motivo de 3 a 200 caracteres. | Vigente | 009 RF-21 |
 | RN-110 | Al borrar una cuenta de forma definitiva se borran también sus cargas, su racha y sus galletas. | Vigente | 009 |
 
+## 11. Edad, legales y operación
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-120 | Edad mínima para usar la web: 16 años. Al entrar por primera vez hay que confirmarla y aceptar los términos; sin eso solo se ven las páginas públicas. | Vigente | 007 RF-1, RF-2 |
+| RN-121 | Una versión nueva de los términos se vuelve a pedir en la siguiente visita. | Vigente | 007 RF-3 |
+| RN-122 | Términos, privacidad y la página de contenido e IA son públicos, en inglés y español, con versión y fecha, y enlazados desde el pie de todas las páginas. El operador figura como «Waifu Baker». | Vigente | 007 RF-4 a RF-8 |
+| RN-123 | Contacto legal: el correo configurado del proyecto o, si no lo hay, la página de Patreon. | Vigente | 007 RF-7 |
+| RN-124 | Solo se usan cookies esenciales (sesión, idioma y zona horaria): no hay aviso de cookies ni analítica externa. | Vigente | 007 RF-6, RF-12 |
+| RN-125 | Los errores se envían a Sentry solo con el identificador interno del usuario; sin Sentry configurado no se envía nada. | Vigente | 007 RF-9, RF-10 |
+| RN-126 | Copia de seguridad diaria, cifrada, de la base de datos y de las imágenes; se conservan 30 días y se puede restaurar en una base aparte para comprobarla. | Vigente | 007 RF-13 a RF-15 |
+
 ---
 
 ## Parámetros en un vistazo
@@ -167,3 +179,5 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |
 | Racha diaria | 10, 10, 15, 15, 20, 20 galletas y un sobre el día 7; 1 día de gracia |
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
+| Edad mínima de la web | 16 años (18+ y tier adulto para el contenido adulto) |
+| Copias de seguridad | diarias, cifradas, 30 días |

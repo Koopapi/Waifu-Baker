@@ -1,0 +1,26 @@
+import Link from "next/link";
+import { getDict } from "@/i18n/server";
+
+/** Spec 007, RF-4: enlaces legales en el pie de todas las páginas. */
+export async function SiteFooter() {
+  const t = (await getDict()).legal.footer;
+  return (
+    <footer className="border-t border-white/10 bg-[#0b0912] px-4 py-6 text-xs text-white/50 sm:px-6" data-testid="site-footer">
+      <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2">
+        <span>{t.rights}</span>
+        <Link href="/legal/terms" className="hover:text-white">
+          {t.terms}
+        </Link>
+        <Link href="/legal/privacy" className="hover:text-white">
+          {t.privacy}
+        </Link>
+        <Link href="/legal/content" className="hover:text-white">
+          {t.content}
+        </Link>
+        <Link href="/drop-rates" className="hover:text-white">
+          {t.odds}
+        </Link>
+      </nav>
+    </footer>
+  );
+}

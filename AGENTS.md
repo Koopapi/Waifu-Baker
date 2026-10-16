@@ -26,8 +26,13 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 - E2E: `pnpm e2e` (Playwright; levanta su propio servidor en el puerto 3200 con la BD `waifu_baker_e2e`,
   que recrea en cada ejecución, y `.next-e2e`; no toca la BD de desarrollo). Corre en cuatro
   proyectos: `chromium-desktop`, `pixel-7`, `iphone-14` (WebKit) y `reduced-motion`, tras un paso
-  `warmup` que compila todas las rutas. Cada test empieza con la BD vacía (`e2e/fixtures.ts`); el
+  `warmup` que compila todas las rutas (`e2e/warm.ts`). Cada test empieza con la BD vacía (`e2e/fixtures.ts`); el
   administrador entra siempre en escritorio y el coleccionista con el dispositivo del proyecto.
+  Los datos de partida (colecciones publicadas, sobres regalados) se siembran con `POST /api/dev/seed`
+  (`createPublishedSet`/`giftPacks` de `e2e/helpers.ts`, mismos servicios que el panel); solo
+  `e2e/admin-panel.spec.ts` recorre el panel de verdad. `next dev` retiene memoria por página servida:
+  antes de cada test `POST /api/dev/memory` recoge basura y, si hace falta, reinicia el servidor entre
+  tests (uso en `test-results/server-memory.log`).
   `e2e/qa-sweep.spec.ts` recorre todas las páginas en escritorio, tableta y móvil buscando errores
   de consola, respuestas fallidas, desbordes, imágenes rotas y controles sin nombre.
   Solo un proyecto: `pnpm exec playwright test --project=iphone-14`. Los contextos usan español por
@@ -39,6 +44,10 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 - Reloj de pruebas (spec 009): en desarrollo, `POST /api/dev/clock {"advanceHours": 24}` adelanta la hora del
   servidor y `DELETE` la devuelve a la real (los E2E la reinician en cada test). Usa `now()` de `server/clock.ts`
   en vez de `new Date()` en todo lo que dependa de esperas o días.
+- Copias de seguridad (spec 007): `pnpm backup` hace una copia cifrada en `BACKUP_DIR`; `pnpm backup:restore [archivo]`
+  la restaura en `<bd>_restore` y `var/restore/cards` y la compara con su manifiesto. Necesitan `pg_dump`/`pg_restore`.
+  Las tareas periódicas (Patreon, cuentas vencidas, copia diaria) se activan con `SCHEDULER=1`.
+- CI: `.github/workflows/ci.yml` corre lint, tipos, Vitest y E2E de escritorio en cada push a `main`.
 - Compilación de producción: `NEXT_DIST_DIR=.next-prod pnpm build` (no pisa `pnpm dev`).
 - Validación RF por RF: `node scripts/rf-coverage.mjs ../../specs/<spec>` (escribe `validation.md`; los tests
   se nombran `test_s<NNN>_rfN_*` —la 003 puede omitir `s003_`— y cada E2E declara su spec en la

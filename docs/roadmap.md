@@ -16,7 +16,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 006 ✓ | Colección y álbum público | Binder, filtros, álbum con slug, imagen OG, renders públicos con marca | experiencia (prototipo primero) |
 | 008 ✓ | Idiomas | Inglés por defecto y español con selector en toda la web, panel incluido | motor |
 | 009 ✓ | Sobres gratis y recompensa diaria | Sobre gratis cada 12 h (hasta 2), racha de 7 días con galletas y sobre, galletas en el panel | motor |
-| 007 | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
+| 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 Cambio del 14 oct 2026: se añade el panel de administración (003) a petición del usuario y se
 renumeran las siguientes. El panel sustituye a la carga por línea de comandos como vía principal
@@ -49,3 +49,6 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   en Patreon y una dirección pública para los avisos.
 - 15 oct 2026: spec 009 terminada y validada (21/21 RF): sobre gratis cada 12 h acumulable hasta 2,
   racha diaria de 7 días con un día de gracia, galletas con historial y ajustes desde el panel.
+- 16 oct 2026: spec 007, parte para la beta, terminada (18/18 RF): edad mínima 16 y aceptación de términos,
+  páginas legales, Sentry, métricas propias, copias cifradas con restauración y CI en GitHub. Queda la
+  parte 2: servidor, dominio, CSP/HSTS y cola de trabajos.

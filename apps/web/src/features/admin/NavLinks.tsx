@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/characters", key: "characters" },
   { href: "/admin/tiers", key: "tiers" },
   { href: "/admin/users", key: "users" },
+  { href: "/admin/metricas", key: "metrics" },
 ] as const;
 
 export function NavLinks() {

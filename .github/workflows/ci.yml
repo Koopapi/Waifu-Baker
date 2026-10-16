@@ -1,0 +1,62 @@
+# Spec 007, RF-18: en cada cambio, revisión de código, tipos, Vitest (unidad e integración) y E2E de escritorio.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      # Las URLs de los tests no llevan usuario: postgres.js, pg_dump y pg_restore lo toman de aquí.
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      NEXT_TELEMETRY_DISABLED: "1"
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Cliente de PostgreSQL 16 (copias de seguridad)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-16
+      - run: pnpm install --frozen-lockfile
+      - name: Revisión de código
+        run: pnpm lint
+      - name: Tipos
+        run: pnpm typecheck
+      - name: Vitest (unidad e integración)
+        run: pnpm test
+      - name: Navegador de Playwright
+        run: pnpm exec playwright install --with-deps chromium
+      - name: E2E de escritorio
+        run: pnpm exec playwright test --project=chromium-desktop
+      - name: Resultados del E2E si falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: apps/web/test-results
+          retention-days: 7

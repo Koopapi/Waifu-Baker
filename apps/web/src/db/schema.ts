@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   bigint,
+  date,
   bigserial,
   boolean,
   check,
@@ -45,6 +46,10 @@ export const users = pgTable("users", {
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
   /** Spec 001: borrado definitivo hecho; la fila queda anónima. */
   purgedAt: timestamp("purged_at", { withTimezone: true }),
+  /** Spec 007: confirmó tener la edad mínima y aceptó esta versión de los términos. */
+  ageConfirmedAt: timestamp("age_confirmed_at", { withTimezone: true }),
+  termsVersion: integer("terms_version"),
+  termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
 });
 
 export const characters = pgTable("characters", {
@@ -319,3 +324,26 @@ export const cookieLedger = pgTable(
   },
   (t) => [index("cookie_ledger_user_idx").on(t.userId, t.createdAt)],
 );
+
+/** Spec 007, RF-11: días con actividad de cada usuario (usuarios activos por día). */
+export const userDays = pgTable(
+  "user_days",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    day: date("day").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.day] }), index("user_days_day_idx").on(t.day)],
+);
+
+/** Spec 007, RF-16 y RF-17: historial de copias de seguridad. */
+export const backupRuns = pgTable("backup_runs", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+  finishedAt: timestamp("finished_at", { withTimezone: true }),
+  ok: boolean("ok").notNull().default(false),
+  file: text("file"),
+  bytes: bigint("bytes", { mode: "number" }),
+  error: text("error"),
+});
