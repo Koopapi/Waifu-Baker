@@ -20,6 +20,9 @@ const manifest = parseDemoManifest(
 );
 const readImage = async (file: string) => testImage({ hue: Number(file.match(/(\d+)\.png$/)![1]) * 50 });
 
+// Cada siembra compone las cartas con sharp: en los ejecutores de GitHub tarda bastante más que en un Mac.
+const SLOW = 90_000;
+
 describe("demo", () => {
   it("test_s010_rf12_crea_la_coleccion_publicada_con_sus_personajes_y_los_dos_usuarios", async () => {
     await inRollback(async (tx) => {
@@ -32,7 +35,7 @@ describe("demo", () => {
       const [admin] = await tx.select().from(users).where(eq(users.id, r.adminId));
       expect(admin.role).toBe("admin");
     });
-  });
+  }, SLOW);
 
   it("test_s010_rf12_el_coleccionista_tiene_cartas_sobres_galletas_racha_y_album", async () => {
     await inRollback(async (tx) => {
@@ -45,7 +48,7 @@ describe("demo", () => {
       expect(album.isPublic).toBe(true);
       expect(album.featuredCardIds).toHaveLength(3);
     });
-  });
+  }, SLOW);
 
   it("test_s010_rf12_dos_ejecuciones_dan_las_mismas_cartas", async () => {
     const run = () =>
@@ -54,5 +57,5 @@ describe("demo", () => {
         return demoCollectorCards(tx, r.collectorId);
       });
     expect(await run()).toEqual(await run());
-  });
+  }, SLOW);
 });
