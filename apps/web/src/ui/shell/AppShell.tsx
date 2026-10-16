@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useT } from "@/i18n/client";
+import { Avatar } from "../content/Avatar";
+import { Badge } from "../content/Badge";
 import { Icon, type IconName } from "./icons";
 
 export interface NavItem {
@@ -47,7 +49,7 @@ export interface ShellProps {
 const isActive = (path: string, item: { href: string; exact?: boolean }) =>
   item.exact ? path === item.href : path === item.href || path.startsWith(`${item.href}/`);
 
-/** Spec 010, RF-1 a RF-5 y RF-16: barra de colecciones, panel de navegación, contenido, cajón y pestañas. */
+/** Spec 010, RF-1 a RF-5 y RF-16; spec 011, RF-9 (componente del sistema): barra de colecciones, panel de navegación, contenido, cajón y pestañas. */
 export function AppShell(p: ShellProps) {
   const path = usePathname();
   const t = useT().common.shell;
@@ -141,13 +143,13 @@ export function AppShell(p: ShellProps) {
           data-testid="app-drawer"
           data-open={open}
           className={`fixed inset-y-0 left-0 z-40 flex w-[312px] max-w-[88vw] transition-transform duration-200 ease-out md:sticky md:top-[var(--banner-h)] md:h-[calc(100dvh-var(--banner-h))] md:max-w-none md:translate-x-0 ${
-            open ? "translate-x-0 shadow-[8px_0_30px_rgb(0_0_0/0.5)]" : "-translate-x-full"
+            open ? "translate-x-0 shadow-3" : "-translate-x-full"
           }`}
           {...(open ? { role: "dialog", "aria-modal": true, "aria-label": t.menu } : {})}
         >
           <Rail {...p} path={path} />
           <nav aria-label={p.header.title} className="flex min-w-0 flex-1 flex-col bg-ui-nav">
-            <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-ui-rail px-4 shadow-[0_1px_0_rgb(0_0_0/0.2)]">
+            <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-ui-rail px-4 shadow-1">
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[15px] font-bold">{p.header.title}</p>
                 <p className="truncate text-[11px] text-ui-text-3">{p.header.subtitle}</p>
@@ -167,10 +169,7 @@ export function AppShell(p: ShellProps) {
               ))}
             </div>
             <div className="flex shrink-0 items-center gap-2.5 bg-ui-rail/80 px-3 py-2.5">
-              <span aria-hidden className="relative grid size-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#f5c451] to-ui-accent text-sm font-bold text-[#1a0d14]">
-                {p.user.name.slice(0, 1).toUpperCase()}
-                <span className="absolute -bottom-0.5 -right-0.5 size-3.5 rounded-full border-[3px] border-ui-rail bg-ui-success" />
-              </span>
+              <Avatar name={p.user.name} online />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-semibold">{p.user.name}</p>
                 <p className="truncate text-[11px] text-ui-text-2" data-testid="shell-user-detail">
@@ -219,7 +218,7 @@ export function AppShell(p: ShellProps) {
               >
                 <Icon name={i.icon} className={`size-[22px] ${active ? "text-ui-accent-text" : ""}`} />
                 {i.label}
-                {!!i.badge && <Badge n={i.badge} className="absolute right-[calc(50%-22px)] top-1.5" />}
+                {!!i.badge && <Badge count={i.badge} className="absolute right-[calc(50%-22px)] top-1.5" />}
               </Link>
             );
           })}
@@ -286,7 +285,7 @@ function RailLink(p: { href: string; label: string; active: boolean; badge?: num
           p.children
         )}
       </Link>
-      {!!p.badge && <Badge n={p.badge} className="absolute bottom-0 right-2.5 border-[3px] border-ui-rail" />}
+      {!!p.badge && <Badge count={p.badge} className="absolute bottom-0 right-2.5 border-[3px] border-ui-rail" />}
     </div>
   );
 }
@@ -303,15 +302,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
     >
       <Icon name={item.icon} className={`size-[18px] shrink-0 ${active ? "text-ui-text" : "text-ui-text-3"}`} />
       <span className="flex-1 truncate">{item.label}</span>
-      {!!item.badge && <Badge n={item.badge} />}
+      {!!item.badge && <Badge count={item.badge} />}
     </Link>
-  );
-}
-
-function Badge({ n, className = "" }: { n: number; className?: string }) {
-  return (
-    <span className={`grid min-w-[18px] place-items-center rounded-full bg-ui-danger px-1.5 text-[11px] font-bold leading-[18px] text-white ${className}`}>
-      {n > 99 ? "99+" : n}
-    </span>
   );
 }

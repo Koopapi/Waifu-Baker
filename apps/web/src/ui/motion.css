@@ -1,0 +1,32 @@
+/*
+ * Sistema de diseño (spec 011, RF-13): movimiento de la interfaz. Solo transform y opacidad, con los tiempos de
+ * tokens.css. Con movimiento reducido no hay animaciones (regla global en app/globals.css). Las animaciones
+ * vistosas son solo de la apertura de sobres (features/opening).
+ */
+@keyframes ui-fade-in {
+  from { opacity: 0; }
+}
+@keyframes ui-rise {
+  from { opacity: 0; transform: translateY(8px); }
+}
+@keyframes ui-pop-in {
+  from { opacity: 0; transform: scale(0.97); }
+}
+@keyframes ui-toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+}
+@keyframes ui-shimmer {
+  50% { opacity: 1; }
+}
+
+/*
+ * `backwards` y no `both`: al terminar no queda un transform aplicado, que convertiría el elemento en el
+ * contenedor de los `fixed` que tenga dentro (pantalla completa, modales).
+ */
+.section-in { animation: ui-rise var(--duration-slow) var(--ease-out) backwards; }
+.card-in { animation: ui-rise var(--duration-slow) var(--ease-out) backwards; animation-delay: calc(min(var(--i, 0), 12) * 35ms); }
+.toast-in { animation: ui-toast-in var(--duration-base) var(--ease-out) backwards; }
+.ui-pop { animation: ui-pop-in var(--duration-fast) var(--ease-out) backwards; transform-origin: var(--radix-popover-content-transform-origin, var(--radix-dropdown-menu-content-transform-origin, top)); }
+.ui-overlay { animation: ui-fade-in var(--duration-base) var(--ease-out) backwards; }
+.ui-modal { animation: ui-pop-in var(--duration-slow) var(--ease-out) backwards; }
+.skeleton { opacity: 0.55; animation: ui-shimmer 1.4s ease-in-out infinite; }

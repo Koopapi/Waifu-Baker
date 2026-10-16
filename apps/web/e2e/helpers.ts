@@ -1,4 +1,4 @@
-import type { Browser, Page } from "@playwright/test";
+import type { Browser, Locator, Page } from "@playwright/test";
 import { DESKTOP } from "./fixtures";
 import path from "node:path";
 
@@ -10,7 +10,7 @@ export async function login(browser: Browser, name: string, admin: boolean, next
   page.on("dialog", (d) => d.accept());
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
   await page.fill('input[name="name"]', name);
-  if (!admin) await page.uncheck('input[name="admin"]');
+  if (!admin) await untickAdmin(page);
   await page.click("text=Entrar (desarrollo)");
   // Se espera al destino final (o a la bienvenida): en WebKit hay pasos intermedios tras el login.
   const target = next.split("?")[0];
@@ -42,9 +42,8 @@ export async function acceptGate(page: Page) {
   if (new URL(page.url()).pathname.startsWith("/bienvenida")) {
     const gate = page.locator('[data-testid="gate-form"]');
     await gate.waitFor({ state: "visible" });
-    await gate.locator('input[name="age"]').check();
-    await gate.locator('input[name="terms"]').check();
-    await gate.locator("button").click();
+    await tickAll(gate);
+    await gate.locator('button[type="submit"]').click();
     await page.waitForURL((u) => !u.pathname.startsWith("/bienvenida"));
   }
   await page.waitForLoadState("networkidle");
@@ -124,4 +123,34 @@ export async function tear(page: Page) {
   await page.mouse.down();
   for (let i = 1; i <= 12; i++) await page.mouse.move(sx + (220 * i) / 12, sy);
   await page.mouse.up();
+}
+
+/**
+ * Spec 011: elige una opción en un desplegable del sistema de diseño (combobox con lista en un portal).
+ * `scope` acota dónde está el desplegable; la lista se busca en toda la página.
+ */
+export async function choose(scope: Page | Locator, label: string | RegExp, option: string | RegExp) {
+  const page = "page" in scope && typeof scope.page === "function" ? (scope as Locator).page() : (scope as Page);
+  await scope.getByRole("combobox", { name: label }).click();
+  await page.getByRole("option", { name: option }).first().click();
+}
+
+/** Spec 011: marca o desmarca una casilla del sistema de diseño (botón con role=checkbox). */
+export async function tick(scope: Page | Locator, label: string | RegExp, on = true) {
+  const box = scope.getByRole("checkbox", { name: label });
+  if ((await box.getAttribute("aria-checked")) !== String(on)) await box.click();
+}
+
+/** Spec 011: en el login de desarrollo, entrar sin el papel de administrador (casilla del sistema de diseño). */
+export async function untickAdmin(page: Page) {
+  const box = page.locator('form:has(input[name="name"]) button[role="checkbox"]');
+  if ((await box.getAttribute("aria-checked")) === "true") await box.click();
+}
+
+/** Spec 011: marca todas las casillas de un formulario (p. ej. la bienvenida: edad y términos). */
+export async function tickAll(scope: Locator) {
+  const boxes = scope.locator('button[role="checkbox"]');
+  for (let i = 0; i < (await boxes.count()); i++) {
+    if ((await boxes.nth(i).getAttribute("aria-checked")) !== "true") await boxes.nth(i).click();
+  }
 }

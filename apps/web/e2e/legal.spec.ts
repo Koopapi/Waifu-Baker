@@ -3,7 +3,7 @@
 // administrador ve las métricas y la última copia.
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { login } from "./helpers";
+import { login, tickAll, untickAdmin } from "./helpers";
 
 const en = dictionaries.en.legal;
 const es = dictionaries.es.legal;
@@ -14,7 +14,7 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
   await test.step("RF-1: tras entrar, un usuario nuevo debe confirmar edad y términos", async () => {
     await page.goto("/login?next=%2Fsobres");
     await page.fill('input[name="name"]', "nuevo-legal");
-    await page.uncheck('input[name="admin"]');
+    await untickAdmin(page);
     await page.click("text=Entrar (desarrollo)");
     await page.waitForURL(/\/bienvenida\?next=%2Fsobres/);
     await expect(page.locator("h1")).toHaveText(es.gate.title);
@@ -34,8 +34,7 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
 
   await test.step("RF-1: al aceptar vuelve a donde iba", async () => {
     await page.goto("/bienvenida?next=%2Fcoleccion");
-    await page.check('[data-testid="gate-form"] input[name="age"]');
-    await page.check('[data-testid="gate-form"] input[name="terms"]');
+    await tickAll(page.locator('[data-testid="gate-form"]'));
     await page.click(`[data-testid="gate-form"] >> text=${es.gate.submit}`);
     await page.waitForURL(/\/coleccion$/);
     await page.goto("/sobres");

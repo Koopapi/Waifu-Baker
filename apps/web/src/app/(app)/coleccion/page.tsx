@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { db } from "@/db/client";
 import { getDict } from "@/i18n/server";
+import { Button } from "@/ui/action/Button";
+import { Card } from "@/ui/content/Card";
+import { Progress } from "@/ui/content/Progress";
+import { EmptyState } from "@/ui/feedback/EmptyState";
+import { focusRing } from "@/ui/focus";
 import { requireUser } from "@/server/auth/require-user";
 import { getMyAlbum } from "@/server/services/album";
 import { myCollections } from "@/server/services/collection";
@@ -13,32 +18,34 @@ export default async function MiColeccionPage() {
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-3xl font-bold">{t.collection.title}</h1>
-        <Link href="/coleccion/album" className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover" data-testid="album-settings-link">
-          {album?.isPublic ? t.collection.publicAlbumLinkActive : t.collection.publicAlbumLink}
-        </Link>
+        <Button variant="secondary" asChild>
+          <Link href="/coleccion/album" data-testid="album-settings-link">
+            {album?.isPublic ? t.collection.publicAlbumLinkActive : t.collection.publicAlbumLink}
+          </Link>
+        </Button>
       </div>
       {cols.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-ui-line p-10 text-center text-ui-text-2">
-          {t.collection.emptyBefore}{" "}
-          <Link href="/sobres" className="underline">
-            {t.common.nav.myPacks}
-          </Link>{" "}
-          {t.collection.emptyAfter}
-        </div>
+        <EmptyState
+          title={`${t.collection.emptyBefore} ${t.common.nav.myPacks} ${t.collection.emptyAfter}`}
+          action={
+            <Button asChild>
+              <Link href="/sobres">{t.common.nav.myPacks}</Link>
+            </Button>
+          }
+        />
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
-          {cols.map((c) => {
-            const pct = c.progress.total ? Math.round((c.progress.owned / c.progress.total) * 100) : 0;
-            return (
-              <li key={c.setId} data-testid={`collection-${c.code}`}>
-                {c.locked ? (
-                  <div className="space-y-2 rounded-2xl border border-ui-line p-5">
-                    <p className="font-mono text-xs text-ui-text-3">{c.code}</p>
-                    <h2 className="text-lg font-semibold">{c.name}</h2>
-                    <p className="text-sm text-rose-200">{t.collection.adultLocked}</p>
-                  </div>
-                ) : (
-                  <Link href={`/coleccion/${c.setId}`} className="block space-y-3 rounded-2xl border border-ui-line bg-ui-raised p-5 hover:bg-ui-hover">
+          {cols.map((c, i) => (
+            <li key={c.setId} data-testid={`collection-${c.code}`} className="card-in" style={{ "--i": i } as React.CSSProperties}>
+              {c.locked ? (
+                <Card as="div" className="space-y-2">
+                  <p className="font-mono text-xs text-ui-text-3">{c.code}</p>
+                  <h2 className="text-lg font-semibold">{c.name}</h2>
+                  <p className="text-sm text-ui-danger-text">{t.collection.adultLocked}</p>
+                </Card>
+              ) : (
+                <Link href={`/coleccion/${c.setId}`} className={`block rounded-l ${focusRing}`}>
+                  <Card as="div" interactive className="space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="font-mono text-xs text-ui-text-3">{c.code}</p>
@@ -48,14 +55,12 @@ export default async function MiColeccionPage() {
                         {c.progress.owned}/{c.progress.total}
                       </span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-ui-hover" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100}>
-                      <div className="h-full rounded-full bg-gradient-to-r from-ui-accent to-ui-accent-text" style={{ width: `${pct}%` }} />
-                    </div>
-                  </Link>
-                )}
-              </li>
-            );
-          })}
+                    <Progress label={c.name} value={c.progress.owned} max={c.progress.total} />
+                  </Card>
+                </Link>
+              )}
+            </li>
+          ))}
         </ul>
       )}
     </main>

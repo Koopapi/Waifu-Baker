@@ -57,3 +57,7 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
 - 16 oct 2026: spec 010 terminada y validada (19/19 RF): estructura estilo Discord con barra de colecciones, panel,
   cajón y pestañas en móvil, paleta «Cereza», avisos, esqueletos, edad mínima configurable (16/18) y `pnpm demo` con la
   colección de fan art (26 cartas con nombres propios). Spec 011 (sistema de diseño) aprobada.
+- 16 oct 2026: spec 011 casi terminada (16/17 RF): sistema de diseño en `src/ui` (tokens, botones, formularios,
+  desplegable con buscador, avisos con deshacer, modales y confirmaciones, contenido, piezas de juego, estructura y
+  acciones optimistas), catálogo `/sistema` y todas las pantallas migradas; peso añadido de 1 a 12 kB por página.
+  Falta la lámina de Pencil (RF-16): Pencil no dibujaba elementos nuevos.

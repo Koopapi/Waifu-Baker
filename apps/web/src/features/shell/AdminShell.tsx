@@ -4,7 +4,7 @@ import { users } from "@/db/schema";
 import { getDict } from "@/i18n/server";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { listSets } from "@/server/services/collections";
-import { AppShell } from "./AppShell";
+import { AppShell } from "@/ui/shell/AppShell";
 import { SignOutButton } from "./CollectorShell";
 import { DemoBanner, demoRoleOf } from "@/features/demo/DemoBanner";
 

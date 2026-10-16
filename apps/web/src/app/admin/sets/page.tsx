@@ -3,6 +3,9 @@ import { db } from "@/db/client";
 import { listSets } from "@/server/services/collections";
 import { AdultBadge, StatusBadge } from "@/features/admin/ui";
 import { getDict } from "@/i18n/server";
+import { Badge } from "@/ui/content/Badge";
+import { Table } from "@/ui/content/Table";
+import { EmptyState } from "@/ui/feedback/EmptyState";
 import { CreateSetForm } from "./forms";
 
 export default async function SetsPage() {
@@ -14,47 +17,41 @@ export default async function SetsPage() {
       <h1 className="text-2xl font-bold">{t.title}</h1>
       <CreateSetForm />
       {rows.length === 0 ? (
-        <p className="text-sm text-ui-text-3">{t.empty}</p>
+        <EmptyState title={t.empty} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-ui-line">
-          <table className="w-full min-w-[560px] text-left text-sm">
-            <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
-              <tr>
-                <th className="px-4 py-3">{t.th.code}</th>
-                <th className="px-4 py-3">{t.th.name}</th>
-                <th className="px-4 py-3">{t.th.type}</th>
-                <th className="px-4 py-3">{t.th.status}</th>
-                <th className="px-4 py-3 text-right">{t.th.cards}</th>
-                <th className="px-4 py-3 text-right">{t.th.perPack}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className="border-t border-ui-line hover:bg-ui-raised">
-                  <td className="px-4 py-3 font-mono">
-                    <Link className="underline decoration-white/20 underline-offset-4 hover:decoration-white" href={`/admin/sets/${r.id}`}>
-                      {r.code}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{r.name}</td>
-                  <td className="px-4 py-3">
-                    <AdultBadge adult={r.isAdult} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={r.status} />
-                    {r.isWelcome && (
-                      <span className="ml-2 rounded-md bg-emerald-400/15 px-2 py-0.5 text-xs text-emerald-300" data-testid="welcome-badge">
-                        {tt.admin.set.welcome.badge}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-right tabular-nums">{r.cardCount}</td>
-                  <td className="px-4 py-3 text-right tabular-nums">{r.packSize}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          caption={t.title}
+          columns={[
+            {
+              key: "code",
+              header: t.th.code,
+              render: (r) => (
+                <Link className="font-mono underline decoration-ui-line underline-offset-4 hover:decoration-ui-text" href={`/admin/sets/${r.id}`}>
+                  {r.code}
+                </Link>
+              ),
+            },
+            { key: "name", header: t.th.name },
+            { key: "isAdult", header: t.th.type, render: (r) => <AdultBadge adult={r.isAdult} /> },
+            {
+              key: "status",
+              header: t.th.status,
+              render: (r) => (
+                <span className="flex flex-wrap items-center gap-2">
+                  <StatusBadge status={r.status} />
+                  {r.isWelcome && (
+                    <span data-testid="welcome-badge">
+                      <Badge tone="success">{tt.admin.set.welcome.badge}</Badge>
+                    </span>
+                  )}
+                </span>
+              ),
+            },
+            { key: "cardCount", header: t.th.cards, align: "end" },
+            { key: "packSize", header: t.th.perPack, align: "end" },
+          ]}
+          rows={rows}
+        />
       )}
     </div>
   );

@@ -103,6 +103,7 @@ export const admin: typeof en = {
     checking: "Comprobando…",
     stalePublish: "La colección se acababa de actualizar. Ya ves la versión actual: vuelve a pulsar «Comprobar y publicar».",
     staleArchive: "La colección se acababa de actualizar. Ya ves la versión actual: vuelve a pulsar «Archivar colección».",
+    confirmPublish: "¿Publicar esta colección? Sus probabilidades serán públicas y ya no se podrán cambiar.",
     confirmArchive: "¿Archivar la colección? Dejará de concederse en sobres nuevos.",
     archive: "Archivar colección",
   },

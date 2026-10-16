@@ -6,6 +6,7 @@ import { getDict } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { cardImageUrl } from "@/server/cards/image-urls";
 import { myBinder } from "@/server/services/collection";
+import { Alert } from "@/ui/feedback/Alert";
 import { BinderView, type BinderSlotDTO } from "@/features/collection/BinderView";
 
 /** RF-2 a RF-7: el álbum de una colección con huecos, filtros y ficha. */
@@ -31,7 +32,7 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-8">
       <div>
-        <Link href="/coleccion" className="text-sm text-ui-text-3 hover:text-white">
+        <Link href="/coleccion" className="text-sm text-ui-text-3 hover:text-ui-text">
           {t.collection.backToCollection}
         </Link>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -44,7 +45,7 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
         </div>
       </div>
       {b.locked ? (
-        <p className="text-rose-200">{t.collection.adultLocked}</p>
+        <Alert tone="warning">{t.collection.adultLocked}</Alert>
       ) : (
         <BinderView slots={slots} setCode={b.set.code} />
       )}

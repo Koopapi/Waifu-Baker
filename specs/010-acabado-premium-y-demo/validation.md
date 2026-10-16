@@ -1,6 +1,6 @@
 # Validación — Spec 010
 
-Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 290 de 290 tests en verde. E2E: `pnpm e2e`.
+Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 339 de 339 tests en verde. E2E: `pnpm e2e`.
 
 **Veredicto: spec cumplida** (19 de 19 RF con al menos un test en verde).
 

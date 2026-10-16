@@ -5,6 +5,7 @@ import { Card3D } from "@/features/opening/Card3D";
 import { useTiltSource } from "@/features/opening/useTiltSource";
 import type { CardDTO } from "./types";
 import { useT } from "@/i18n/client";
+import { Checkbox } from "@/ui/form/Choice";
 import "@/features/opening/opening.css";
 
 /** RF-22: la carta tal como la verá el usuario, con inclinación y efecto holo. */
@@ -12,11 +13,11 @@ export function CardPreview({ card }: { card: CardDTO }) {
   const tilt = useTiltSource();
   const [holo, setHolo] = useState(card.variant === "holo");
   const t = useT().admin.cards;
-  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-xl bg-ui-raised text-xs text-ui-text-3">{t.processing}</div>;
+  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-l bg-ui-raised text-xs text-ui-text-3">{t.processing}</div>;
   return (
     <div className="space-y-2">
       <div
-        className="card-preview grid place-items-center rounded-xl bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_70%)] p-4"
+        className="card-preview grid place-items-center rounded-l bg-ui-rail p-4"
         style={{ perspective: 1200 }}
         onPointerMove={tilt.onPointerMove}
         onPointerLeave={tilt.onPointerLeave}
@@ -30,9 +31,7 @@ export function CardPreview({ card }: { card: CardDTO }) {
           style={{ width: "100%" }}
         />
       </div>
-      <label className="flex items-center gap-2 text-xs text-ui-text-2">
-        <input type="checkbox" checked={holo} onChange={(e) => setHolo(e.target.checked)} /> {t.previewHolo}
-      </label>
+      <Checkbox checked={holo} onCheckedChange={(v) => setHolo(v === true)} label={t.previewHolo} />
     </div>
   );
 }

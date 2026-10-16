@@ -33,6 +33,13 @@ Waifu Baker/waifubaker.pen       lámina «Sistema de diseño» con un component
 | `cmdk` | Desplegable con buscador (RF-4) | Filtrado y navegación con teclado accesibles; ~4 KB. |
 
 Presupuesto (RNF): menos de 30 KB comprimidos añadidos a las páginas principales; se mide con el análisis del build.
+Las pantallas importan cada componente por su ruta (`@/ui/action/Button`…), nunca el índice `@/ui`: desde
+un componente de servidor, el índice mete en la página todos los componentes de cliente. El desplegable, la
+confirmación y la ficha de carta se descargan aparte (`lazy`) y `radix-ui` va en `optimizePackageImports`.
+Peso de partida (build de producción del 16 oct 2026, antes de la 011): JS compartido 192 kB; primera carga de
+`/` 218 kB, `/sobres` 220 kB, `/coleccion/[setId]` 221 kB, `/admin` 219 kB, `/sobres/[setId]` 258 kB.
+Peso final: `/` 219 kB (+1), `/sobres` 225 kB (+5), `/coleccion/[setId]` 223 kB (+2), `/admin` 223 kB (+4),
+`/sobres/[setId]` 259 kB (+1), `/recompensas` 223 kB, `/cuenta` 229 kB (+12). Todas por debajo de +30 kB.
 
 ## 3. Decisiones
 

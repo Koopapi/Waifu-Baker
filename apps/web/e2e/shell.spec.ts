@@ -2,6 +2,7 @@
 import type { Page } from "@playwright/test";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
+import { tickAll } from "./helpers";
 
 const es = dictionaries.es;
 const sh = es.common.shell;
@@ -76,7 +77,7 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
 
   await test.step("RF-8: al reclamar aparece un aviso que desaparece solo", async () => {
     await page.goto("/recompensas");
-    await page.locator('[data-testid="free-pack"] button').click();
+    await page.locator('[data-testid="free-pack"]').getByRole("button", { name: es.rewards.free.claim }).click();
     const toast = page.locator('[data-testid="toast"]');
     await expect(toast).toBeVisible();
     await expect(toast).toHaveAttribute("data-kind", "success");
@@ -121,8 +122,10 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   await test.step("RF-17 y RF-19: el administrador sube la edad mínima a 18 y los textos la muestran", async () => {
     await page.goto("/admin/ajustes");
     await expect(page.locator('[data-testid="min-age-current"]')).toHaveText(es.admin.settings.minAge.current(16));
-    await page.locator('[data-testid="min-age-form"] label:has-text("18+")').click();
+    await page.locator('[data-testid="min-age-form"]').getByRole("radio", { name: "18+" }).click();
     await page.locator(`[data-testid="min-age-form"] button:has-text("${es.admin.settings.minAge.save}")`).click();
+    // Spec 011, RF-12: subir la edad se confirma en el modal propio.
+    await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator('[data-testid="min-age-current"]')).toHaveText(es.admin.settings.minAge.current(18));
     await page.goto("/legal/terms");
     await expect(page.locator('[data-testid="legal-terms"]')).toContainText("18");
@@ -134,9 +137,8 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
     await page.waitForURL(/\/bienvenida/);
     await expect(page.locator(`text=${es.legal.gate.ageRaised(18)}`)).toBeVisible();
     await expect(page.locator(`text=${es.legal.gate.age(18)}`)).toBeVisible();
-    await page.check('[data-testid="gate-form"] input[name="age"]');
-    await page.check('[data-testid="gate-form"] input[name="terms"]');
-    await page.click('[data-testid="gate-form"] button');
+    await tickAll(page.locator('[data-testid="gate-form"]'));
+    await page.click('[data-testid="gate-form"] button[type="submit"]');
     await page.waitForURL(/\/sobres$/);
   });
 });

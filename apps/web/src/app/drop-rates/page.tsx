@@ -44,7 +44,7 @@ export default async function DropRatesPage() {
                 ? t.site.dropRates.pity(odds.pityThreshold - 1)
                 : t.site.dropRates.noPity}
             </p>
-            <div className="overflow-x-auto rounded-xl border border-ui-line">
+            <div className="overflow-x-auto rounded-l border border-ui-line">
               <table className="w-full text-sm">
                 <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
                   <tr>

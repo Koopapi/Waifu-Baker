@@ -4,7 +4,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import path from "node:path";
-import { LAB, createPublishedSet, giftPacks, login } from "./helpers";
+import { LAB, choose, createPublishedSet, giftPacks, login } from "./helpers";
 
 const shot = (p: Page, name: string, fullPage = false) =>
   p.screenshot({ path: `test-results/screens/${test.info().project.name}/s006-${name}.png`, fullPage });
@@ -53,9 +53,9 @@ test("colección y álbum público", async ({ browser }) => {
     await expect(items).toHaveCount(1);
     await expect(items.first()).toHaveAttribute("data-slot", "3");
     await fan.click('[data-testid="binder-filters"] >> text=Todas');
-    await fan.selectOption('[aria-label="Filtrar por rareza"]', "common");
+    await choose(fan, "Filtrar por rareza", /^Común$/);
     await expect(items).toHaveCount(1);
-    await fan.selectOption('[aria-label="Filtrar por rareza"]', "");
+    await choose(fan, "Filtrar por rareza", "Todas las rarezas");
     await expect(items).toHaveCount(3);
   });
 
@@ -181,6 +181,8 @@ test("colección y álbum público", async ({ browser }) => {
 
   await test.step("RF-11: un enlace nuevo invalida el anterior", async () => {
     await fan.click("text=Generar enlace nuevo");
+    // Spec 011, RF-12: confirmación en el modal propio.
+    await fan.click('[data-testid="confirm-accept"]');
     await expect(fan.locator("text=Enlace nuevo creado. El anterior ya no funciona.")).toBeVisible();
     await expect(fan.locator('[data-testid="album-url"]')).not.toHaveValue(url);
     const next = await fan.locator('[data-testid="album-url"]').inputValue();

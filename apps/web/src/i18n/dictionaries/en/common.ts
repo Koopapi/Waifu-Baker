@@ -53,5 +53,7 @@ export const common = {
   save: "Save",
   saving: "Saving…",
   cancel: "Cancel",
+  confirm: "Confirm",
   retry: "Try again",
+  undo: "Undo",
 };

@@ -165,6 +165,13 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 
 ---
 
+## 13. Interfaz
+
+| Regla | Descripción | Estado | Origen |
+|---|---|---|---|
+| RN-140 | Las acciones irreversibles o importantes (borrar la cuenta o una carta, publicar o archivar una colección, regenerar el enlace del álbum, subir la edad mínima) se confirman en un modal que explica qué pasará. | Vigente | 011 RF-12 |
+| RN-141 | Las acciones reversibles se aplican al momento; si el servidor las rechaza se deshacen solas y se avisa. Mientras dura el aviso de éxito se pueden deshacer. | Vigente | 011 RF-10, RF-11 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -191,3 +198,4 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
 | Edad mínima de la web | 16 o 18 años, la elige el administrador (16 por defecto); 18+ y tier adulto para el contenido adulto |
 | Copias de seguridad | diarias, cifradas, 30 días |
+| Avisos emergentes | 4 s (éxito), 7 s (error), 6 s si se pueden deshacer; como mucho 3 a la vez |

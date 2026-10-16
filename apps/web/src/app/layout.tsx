@@ -5,7 +5,8 @@ import { I18nProvider } from "@/i18n/client";
 import { getDict, getLocale } from "@/i18n/server";
 import { SiteFooter } from "@/features/legal/SiteFooter";
 import { TimeZoneCookie } from "@/features/rewards/TimeZoneCookie";
-import { ToastProvider } from "@/features/ui/Toast";
+import { ToastProvider } from "@/ui/feedback/Toast";
+import { ConfirmProvider } from "@/ui/overlay/Confirm";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -32,9 +33,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <I18nProvider locale={locale}>
           <ToastProvider>
-            <TimeZoneCookie />
-            {children}
-            <SiteFooter />
+            <ConfirmProvider>
+              <TimeZoneCookie />
+              {children}
+              <SiteFooter />
+            </ConfirmProvider>
           </ToastProvider>
         </I18nProvider>
       </body>

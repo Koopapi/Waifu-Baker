@@ -3,6 +3,10 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/client";
+import { Button } from "@/ui/action/Button";
+import { Progress } from "@/ui/content/Progress";
+import { Alert } from "@/ui/feedback/Alert";
+import { focusRing } from "@/ui/focus";
 import type { Dict } from "@/i18n";
 
 type Item = { id: string; name: string; status: "queued" | "uploading" | "ok" | "error"; progress: number; message?: string };
@@ -63,7 +67,7 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
   }
 
   if (disabled) {
-    return <p className="rounded-xl border border-ui-line p-4 text-sm text-ui-text-3">{t.upload.locked}</p>;
+    return <Alert tone="info">{t.upload.locked}</Alert>;
   }
 
   const done = items.filter((i) => i.status === "ok").length;
@@ -86,7 +90,7 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && input.current?.click()}
-        className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition ${over ? "border-ui-accent bg-ui-accent/10" : "border-ui-line hover:border-ui-line"}`}
+        className={`cursor-pointer rounded-l border-2 border-dashed p-8 text-center transition-colors duration-[var(--duration-fast)] ${focusRing} ${over ? "border-ui-accent bg-ui-accent/10" : "border-ui-line hover:border-ui-hover"}`}
       >
         <p className="font-semibold">{t.upload.dropHere}</p>
         <p className="mt-1 text-sm text-ui-text-3">{t.upload.hint}</p>
@@ -104,15 +108,15 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         />
       </div>
       {items.length > 0 && (
-        <div className="rounded-xl border border-ui-line">
+        <div className="rounded-l border border-ui-line">
           <div className="flex items-center justify-between border-b border-ui-line px-4 py-2 text-xs text-ui-text-2">
             <span>
               {busy ? t.upload.uploading : t.upload.finished} · {t.upload.summary(done, failed)}
             </span>
             {!busy && (
-              <button className="underline" onClick={() => setItems([])}>
+              <Button size="sm" variant="ghost" onClick={() => setItems([])}>
                 {t.upload.clear}
-              </button>
+              </Button>
             )}
           </div>
           <ul className="max-h-56 divide-y divide-ui-line overflow-y-auto text-sm" data-testid="upload-list">
@@ -121,11 +125,9 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
                 <span className="w-5 text-center">{i.status === "ok" ? "✓" : i.status === "error" ? "✕" : "…"}</span>
                 <span className="min-w-0 flex-1 truncate">{i.name}</span>
                 {i.status === "uploading" && (
-                  <span className="h-1.5 w-28 overflow-hidden rounded bg-ui-hover">
-                    <span className="block h-full bg-ui-accent" style={{ width: `${i.progress}%` }} />
-                  </span>
+                  <Progress label={i.name} value={i.progress} className="w-28" />
                 )}
-                {i.message && <span className={`text-xs ${i.status === "error" ? "text-red-300" : "text-ui-text-3"}`}>{i.message}</span>}
+                {i.message && <span className={`text-xs ${i.status === "error" ? "text-ui-danger-text" : "text-ui-text-3"}`}>{i.message}</span>}
               </li>
             ))}
           </ul>

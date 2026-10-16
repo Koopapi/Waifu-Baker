@@ -5,6 +5,8 @@ import { useMemo, useState, useTransition } from "react";
 import { RARITIES } from "@/domain/catalog/card-rules";
 import { openAllPacksAction, type OpenAllCard } from "@/app/sobres/actions";
 import { useT } from "@/i18n/client";
+import { Button } from "@/ui/action/Button";
+import { Alert } from "@/ui/feedback/Alert";
 import "./open-all.css";
 
 const rank = (r: OpenAllCard["rarity"]) => RARITIES.indexOf(r);
@@ -48,28 +50,18 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-white">
+          <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-ui-text">
             {t.packs.openAll.backToMine}
           </Link>
           <h1 className="text-3xl font-bold">{t.packs.openAll.title(setName)}</h1>
         </div>
         {!cards && (
-          <button
-            type="button"
-            onClick={openAll}
-            disabled={pending || sealed === 0}
-            className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-6 py-2.5 font-semibold text-ui-on-accent disabled:opacity-50"
-            data-testid="open-all"
-          >
+          <Button size="lg" onClick={openAll} loading={pending} disabled={sealed === 0} data-testid="open-all">
             {pending ? t.packs.openAll.opening : sealed === 0 ? t.packs.openAll.noneLeft : t.packs.openAll.openN(sealed)}
-          </button>
+          </Button>
         )}
       </div>
-      {error && (
-        <p role="alert" className="text-red-300">
-          {error}
-        </p>
-      )}
+      {error && <Alert tone="danger">{error}</Alert>}
       {cards && (
         <>
           <p className="text-ui-text-2" data-testid="open-all-summary">
@@ -93,14 +85,14 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
                     {t.common.rarity[c.rarity]}
                     {c.holo ? t.packs.openAll.holoSuffix : ""}
                   </span>
-                  <span className={c.isNew ? "text-emerald-300" : "text-ui-text-3"}>{c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(finalQty.get(`${c.number}-${c.holo}`) ?? c.qtyAfter)}</span>
+                  <span className={c.isNew ? "text-ui-success-text" : "text-ui-text-3"}>{c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(finalQty.get(`${c.number}-${c.holo}`) ?? c.qtyAfter)}</span>
                 </div>
               </li>
             ))}
           </ul>
-          <Link href="/sobres" className="inline-block btn rounded-md border border-ui-line px-5 py-2 text-sm hover:bg-ui-hover">
-            {t.packs.openAll.backToMineButton}
-          </Link>
+          <Button variant="secondary" asChild>
+            <Link href="/sobres">{t.packs.openAll.backToMineButton}</Link>
+          </Button>
         </>
       )}
     </main>

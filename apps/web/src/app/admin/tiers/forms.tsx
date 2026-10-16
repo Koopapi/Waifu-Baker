@@ -2,7 +2,11 @@
 
 import { useActionState } from "react";
 import { deleteTierRuleAction, saveTierRuleAction } from "./actions";
-import { FormMessage, inputCls, SubmitButton } from "@/features/admin/ui";
+import { ConfirmSubmitButton, FormMessage, SubmitButton } from "@/features/admin/ui";
+import { Badge } from "@/ui/content/Badge";
+import { Checkbox } from "@/ui/form/Choice";
+import { Select } from "@/ui/form/Select";
+import { TextField } from "@/ui/form/TextField";
 import { useT } from "@/i18n/client";
 
 type SetOption = { id: string; code: string; name: string; isAdult: boolean };
@@ -14,25 +18,21 @@ export function RuleRow({ tierId, tierName, rule }: { tierId: string; tierName: 
   const t = useT();
   return (
     <div className="flex flex-wrap items-center gap-3 border-t border-ui-line px-4 py-3 text-sm">
-      <form action={action} className="flex flex-1 flex-wrap items-center gap-3">
+      <form action={action} className="flex flex-1 flex-wrap items-end gap-3">
         <input type="hidden" name="patreonTierId" value={tierId} />
         <input type="hidden" name="tierName" value={tierName} />
         <input type="hidden" name="setId" value={rule.setId} />
         <span className="min-w-40">
-          <span className="font-mono">{rule.setCode}</span> · {rule.setName} {rule.setIsAdult && <span className="text-rose-300">18+</span>}
+          <span className="font-mono">{rule.setCode}</span> · {rule.setName} {rule.setIsAdult && <Badge tone="danger">18+</Badge>}
         </span>
-        <label className="flex items-center gap-2">
-          <input name="packsPerMonth" type="number" min={1} max={50} defaultValue={rule.packsPerMonth} className={`${inputCls} w-20`} /> {t.admin.tiers.packsPerMonth}
-        </label>
-        <label className="flex items-center gap-2">
-          <input type="checkbox" name="active" defaultChecked={rule.active} /> {t.admin.tiers.active}
-        </label>
-        <SubmitButton variant="ghost">{t.common.save}</SubmitButton>
+        <TextField label={t.admin.tiers.packsPerMonth} name="packsPerMonth" type="number" min={1} max={50} defaultValue={rule.packsPerMonth} fieldClassName="w-28" />
+        <Checkbox name="active" defaultChecked={rule.active} label={t.admin.tiers.active} />
+        <SubmitButton variant="secondary">{t.common.save}</SubmitButton>
         <FormMessage state={state} />
       </form>
       <form action={delAction}>
         <input type="hidden" name="ruleId" value={rule.id} />
-        <SubmitButton variant="danger">{t.admin.tiers.remove}</SubmitButton>
+        <ConfirmSubmitButton title={t.admin.tiers.remove}>{t.admin.tiers.remove}</ConfirmSubmitButton>
         <FormMessage state={delState} />
       </form>
     </div>
@@ -50,21 +50,20 @@ export function AddRuleForm({ tierId, tierName, sets, anyPublished }: { tierId: 
     );
   }
   return (
-    <form action={action} className="flex flex-wrap items-center gap-3 border-t border-ui-line bg-ui-raised px-4 py-3 text-sm">
+    <form action={action} className="flex flex-wrap items-end gap-3 border-t border-ui-line bg-ui-raised px-4 py-3 text-sm">
       <input type="hidden" name="patreonTierId" value={tierId} />
       <input type="hidden" name="tierName" value={tierName} />
       <input type="hidden" name="active" value="on" />
-      <select name="setId" required aria-label={t.setAria(tierName)} className={`${inputCls} w-auto`}>
-        {sets.map((s) => (
-          <option key={s.id} value={s.id}>
-            {s.code} · {s.name}
-            {s.isAdult ? " (18+)" : ""}
-          </option>
-        ))}
-      </select>
-      <label className="flex items-center gap-2">
-        <input name="packsPerMonth" type="number" min={1} max={50} defaultValue={3} className={`${inputCls} w-20`} aria-label={t.packsAria(tierName)} /> {t.packsPerMonth}
-      </label>
+      <Select
+        name="setId"
+        label={t.setAria(tierName)}
+        hideLabel
+        defaultValue={sets[0].id}
+        options={sets.map((s) => ({ value: s.id, label: `${s.code} · ${s.name}${s.isAdult ? " (18+)" : ""}` }))}
+        className="min-w-64"
+      />
+      <TextField label={t.packsAria(tierName)} hideLabel name="packsPerMonth" type="number" min={1} max={50} defaultValue={3} fieldClassName="w-24" />
+      <span>{t.packsPerMonth}</span>
       <SubmitButton>{t.addSet}</SubmitButton>
       <FormMessage state={state} />
     </form>

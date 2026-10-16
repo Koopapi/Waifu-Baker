@@ -7,7 +7,7 @@ import path from "node:path";
 import { signPatreonBody } from "../src/domain/patreon/webhook-signature";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, login } from "./helpers";
+import { LAB, choose, createPublishedSet, login, tick } from "./helpers";
 
 const es = dictionaries.es;
 const SECRET = "e2e-webhook-secret";
@@ -51,8 +51,14 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
     await admin.waitForLoadState("networkidle");
     await admin.click(`text=${es.admin.set.welcome.make}`);
     await expect(admin.locator(`text=${es.admin.set.welcome.isWelcome}`)).toBeVisible();
-    await admin.goto("/admin/sets");
-    await expect(admin.locator('[data-testid="welcome-badge"]')).toHaveCount(1);
+    // Spec 011, RF-10: el cambio se ve al instante; el aviso de éxito llega cuando el servidor lo guardó.
+    await expect(admin.locator('[data-testid="toast"][data-kind="success"]')).toBeVisible();
+    // Tras guardar, la página pide sus datos de nuevo y en WebKit esa recarga puede cortar la navegación
+    // siguiente: se reintenta hasta llegar a la lista con la marca de bienvenida.
+    await expect(async () => {
+      await admin.goto("/admin/sets");
+      await expect(admin.locator('[data-testid="welcome-badge"]')).toHaveCount(1, { timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
   });
 
   await test.step("Reglas de tiers: SFW da 3 de PAT1; 18+ da 3 de PAT1A", async () => {
@@ -62,8 +68,8 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
       ["SFW (desarrollo)", "PAT1 · Colección PAT1"],
       ["18+ (desarrollo)", "PAT1A · Colección PAT1A (18+)"],
     ]) {
-      await admin.selectOption(`[aria-label="${es.admin.tiers.setAria(tier)}"]`, { label });
-      await admin.locator(`form:has([aria-label="${es.admin.tiers.setAria(tier)}"]) >> text=${es.admin.tiers.addSet}`).click();
+      await choose(admin, es.admin.tiers.setAria(tier), label);
+      await admin.locator(`form:has(label:text-is("${es.admin.tiers.setAria(tier)}")) >> text=${es.admin.tiers.addSet}`).click();
       await expect(admin.locator(`text=${es.admin.tiers.saved}`).first()).toBeVisible();
     }
   });
@@ -125,7 +131,7 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
     expect(await packsOf(fan, "PAT1A")).toBe(3);
     await expect(fan.locator('[data-testid="group-PAT1A"]')).toContainText(es.packs.mine.locked.slice(0, 20));
     await fan.goto("/cuenta");
-    await fan.check('[data-testid="declare-adult"] input[name="confirm"]');
+    await tick(fan.locator('[data-testid="declare-adult"]'), es.account.adult.confirm);
     await fan.click(`text=${es.account.adult.submit}`);
     await expect(fan.locator(`text=${es.account.adult.verified}`)).toBeVisible();
     await fan.goto("/sobres");
@@ -135,6 +141,8 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
   await test.step("RF-22 y RF-23: borra su cuenta y la recupera al volver antes de 30 días", async () => {
     await fan.goto("/cuenta");
     await fan.click('[data-testid="delete-account"]');
+    // Spec 011, RF-12: confirmación en el modal propio.
+    await fan.click('[data-testid="confirm-accept"]');
     await fan.waitForURL((u) => u.pathname === "/");
     await fan.goto("/sobres");
     await expect(fan).toHaveURL(/\/login/);

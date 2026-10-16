@@ -9,7 +9,8 @@ import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { cardImageUrl } from "@/server/cards/image-urls";
 import { now } from "@/server/clock";
 import { shellSummary } from "@/server/services/shell";
-import { AppShell, type NavItem } from "./AppShell";
+import { AppShell, type NavItem } from "@/ui/shell/AppShell";
+import { IconButton } from "@/ui/action/Button";
 import { DemoBanner, demoRoleOf } from "@/features/demo/DemoBanner";
 
 /** Iniciales para el icono de una colección sin portada: «Fan Art Vol. 1» → «FA». */
@@ -81,9 +82,9 @@ export function SignOutButton({ label }: { label: string }) {
           await signOut({ redirectTo: "/" });
         }}
       >
-      <button aria-label={label} title={label} className="rounded p-1.5 text-ui-text-2 hover:bg-ui-hover hover:text-ui-text">
+      <IconButton type="submit" label={label} size="sm">
         <LogOut className="size-[18px]" aria-hidden />
-      </button>
+      </IconButton>
     </form>
   );
 }

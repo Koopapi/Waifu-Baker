@@ -4,7 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const SRC = path.resolve(__dirname, "../..");
-const css = readFileSync(path.join(SRC, "app/globals.css"), "utf8");
+const css = readFileSync(path.join(SRC, "ui/tokens.css"), "utf8");
 const token = (name: string) => {
   const m = css.match(new RegExp(`--${name}:\\s*(#[0-9a-f]{6})`, "i"));
   if (!m) throw new Error(`Falta el token --${name}`);
@@ -57,7 +57,12 @@ describe("acabado", () => {
         expect(contrast(token(fg), token(bg)), `${fg} sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
       }
     }
-    for (const bg of ["ui-accent", "ui-accent-hover", "ui-success", "ui-danger"]) {
+    for (const bg of ["ui-bg", "ui-nav", "ui-raised"]) {
+      for (const fg of ["ui-success-text", "ui-warning-text", "ui-danger-text", "ui-info-text"]) {
+        expect(contrast(token(fg), token(bg)), `${fg} sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+    for (const bg of ["ui-accent", "ui-accent-hover", "ui-success", "ui-warning", "ui-danger", "ui-info"]) {
       expect(contrast("#ffffff", token(bg)), `blanco sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
     }
   });

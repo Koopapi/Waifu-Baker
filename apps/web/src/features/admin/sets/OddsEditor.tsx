@@ -6,6 +6,9 @@ import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { saveOddsAction } from "@/app/admin/sets/actions";
 import type { ActionState } from "@/server/auth/admin-action";
 import { useLocale, useT } from "@/i18n/client";
+import { Button } from "@/ui/action/Button";
+import { Alert } from "@/ui/feedback/Alert";
+import { TextField } from "@/ui/form/TextField";
 import { formatNumber, formatPercent } from "@/i18n/format";
 
 type Slot = Record<Rarity, number>;
@@ -54,7 +57,7 @@ export function OddsEditor({
 
   return (
     <div className="space-y-4" id="probabilidades">
-      <div className="overflow-x-auto rounded-xl border border-ui-line">
+      <div className="overflow-x-auto rounded-l border border-ui-line">
         <table className="w-full min-w-[720px] text-sm">
           <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
             <tr>
@@ -77,20 +80,23 @@ export function OddsEditor({
                 </td>
                 {RARITIES.map((r) => (
                   <td key={r} className="px-2 py-1.5 text-right">
-                    <input
+                    <TextField
+                      label={t.slotAria(i + 1, tt.common.rarity[r])}
+                      hideLabel
+                      aria-label={t.slotAria(i + 1, tt.common.rarity[r])}
                       type="number"
                       min={0}
                       max={100}
                       step={0.1}
                       value={s[r]}
                       disabled={locked}
-                      aria-label={t.slotAria(i + 1, tt.common.rarity[r])}
                       onChange={(e) => set(i, r, e.target.value)}
-                      className={`w-20 rounded-md border bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60 ${s[r] > 0 && cardCounts[r] === 0 ? "border-amber-400/60" : "border-ui-line"}`}
+                      fieldClassName="inline-block"
+                      className={`h-8 w-20 px-2 text-right tabular-nums ${s[r] > 0 && cardCounts[r] === 0 ? "border-ui-warning-text" : ""}`}
                     />
                   </td>
                 ))}
-                <td className={`px-3 py-2 text-right font-semibold tabular-nums ${Math.abs(sums[i] - 100) < 1e-6 ? "text-emerald-300" : "text-red-300"}`}>
+                <td className={`px-3 py-2 text-right font-semibold tabular-nums ${Math.abs(sums[i] - 100) < 1e-6 ? "text-ui-success-text" : "text-ui-danger-text"}`}>
                   {formatPercent(locale, sums[i])}
                 </td>
               </tr>
@@ -109,40 +115,27 @@ export function OddsEditor({
           </tfoot>
         </table>
       </div>
-      <div className="flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-2 text-sm">
-          {t.holo}
-          <input
-            type="number"
-            min={0}
-            max={100}
-            step={0.5}
-            value={holo}
-            disabled={locked}
-            onChange={(e) => setHolo(Number(e.target.value))}
-            className="w-20 rounded-md border border-ui-line bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
-          />
-          %
-        </label>
-        <label className="flex items-center gap-2 text-sm" title={t.pityTitle}>
-          {t.pity}
-          <input
-            type="number"
-            min={0}
-            max={100}
-            step={1}
-            value={pity}
-            disabled={locked}
-            aria-label={t.pityAria}
-            onChange={(e) => setPity(Number(e.target.value))}
-            className="w-16 rounded-md border border-ui-line bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
-          />
-          {t.packs} {pity === 0 && <span className="text-ui-text-3">{t.disabled}</span>}
-        </label>
+      <div className="flex flex-wrap items-end gap-4">
+        <TextField label={`${t.holo} (%)`} type="number" min={0} max={100} step={0.5} value={holo} disabled={locked} onChange={(e) => setHolo(Number(e.target.value))} fieldClassName="w-40" className="text-right tabular-nums" />
+        <TextField
+          label={t.pity}
+          aria-label={t.pityAria}
+          title={t.pityTitle}
+          hint={pity === 0 ? t.disabled : t.packs}
+          type="number"
+          min={0}
+          max={100}
+          step={1}
+          value={pity}
+          disabled={locked}
+          onChange={(e) => setPity(Number(e.target.value))}
+          fieldClassName="w-40"
+          className="text-right tabular-nums"
+        />
         {!locked && (
-          <button
-            type="button"
-            disabled={pending || !dirty}
+          <Button
+            loading={pending}
+            disabled={!dirty}
             onClick={() =>
               start(async () => {
                 const r = await saveOddsAction(setId, version, slots, holo, pity);
@@ -150,14 +143,13 @@ export function OddsEditor({
                 if (r.ok) router.refresh();
               })
             }
-            className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-50"
           >
-            {pending ? tt.common.saving : t.save}
-          </button>
+            {t.save}
+          </Button>
         )}
         {locked && <span className="text-xs text-ui-text-3">{t.locked}</span>}
-        {state && <span className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>{state.error ?? state.message}</span>}
       </div>
+      {state && <Alert tone={state.error ? "danger" : "success"}>{state.error ?? state.message}</Alert>}
     </div>
   );
 }

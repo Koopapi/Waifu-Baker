@@ -65,7 +65,7 @@ describe("spec 008 — idiomas", () => {
 
   it("test_s008_rf5_no_quedan_textos_en_espanol_fuera_de_los_diccionarios", () => {
     const files = [...walk(path.join(SRC, "app")), ...walk(path.join(SRC, "features"))].filter(
-      (f) => /\.(tsx?|mts)$/.test(f) && !f.endsWith(".test.ts"),
+      (f) => /\.(tsx?|mts)$/.test(f) && !/\.test\.tsx?$/.test(f),
     );
     const offenders: string[] = [];
     for (const f of files) {

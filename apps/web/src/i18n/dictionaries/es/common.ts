@@ -54,5 +54,7 @@ export const common: typeof en = {
   save: "Guardar",
   saving: "Guardando…",
   cancel: "Cancelar",
+  confirm: "Confirmar",
   retry: "Reintentar",
+  undo: "Deshacer",
 };

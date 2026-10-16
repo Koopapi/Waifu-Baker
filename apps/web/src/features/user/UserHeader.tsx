@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { signOut } from "@/auth";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+import { Button } from "@/ui/action/Button";
 import { getDict } from "@/i18n/server";
 
-/** Cabecera de las páginas del coleccionista. */
+/** Cabecera de las páginas en modo foco (apertura de sobres): el resto usa la estructura de la spec 010. */
 export async function UserHeader({ name, isAdmin }: { name: string; isAdmin: boolean }) {
   const t = await getDict();
   return (
@@ -12,20 +13,20 @@ export async function UserHeader({ name, isAdmin }: { name: string; isAdmin: boo
         {t.common.brand}
       </Link>
       <nav className="flex flex-wrap items-center gap-4 text-sm">
-        <Link href="/sobres" className="text-ui-text-2 hover:text-white">
+        <Link href="/sobres" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.myPacks}
         </Link>
-        <Link href="/coleccion" className="text-ui-text-2 hover:text-white">
+        <Link href="/coleccion" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.myCollection}
         </Link>
-        <Link href="/cuenta" className="text-ui-text-2 hover:text-white">
+        <Link href="/cuenta" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.myAccount}
         </Link>
-        <Link href="/drop-rates" className="text-ui-text-2 hover:text-white">
+        <Link href="/drop-rates" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.odds}
         </Link>
         {isAdmin && (
-          <Link href="/admin" className="text-ui-text-2 hover:text-white">
+          <Link href="/admin" className="text-ui-text-2 hover:text-ui-text">
             {t.common.nav.panel}
           </Link>
         )}
@@ -35,9 +36,9 @@ export async function UserHeader({ name, isAdmin }: { name: string; isAdmin: boo
             await signOut({ redirectTo: "/" });
           }}
         >
-          <button className="text-ui-text-3 hover:text-white" title={name}>
+          <Button type="submit" variant="ghost" size="sm" title={name}>
             {t.common.nav.signOut}
-          </button>
+          </Button>
         </form>
         <LocaleToggle />
       </nav>

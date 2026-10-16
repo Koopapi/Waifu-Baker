@@ -59,7 +59,7 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
               {a.featured.map((c) => (
                 <li key={c.cardId} className={`w-[min(40vw,200px)] rarity-${c.rarity ?? "common"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- imagen pública con marca de agua */}
-                  <img src={img(c.cardId)} alt={c.name} className="aspect-[63/88] w-full rounded-xl object-cover shadow-[0_20px_50px_rgba(0,0,0,0.6)]" />
+                  <img src={img(c.cardId)} alt={c.name} className="aspect-[63/88] w-full rounded-l object-cover shadow-3" />
                   <p className="mt-2 text-center text-sm">{c.name}</p>
                   <p className="text-center text-xs text-ui-text-3">
                     {c.setCode} · {pad(c.number)} · {c.rarity ? t.common.rarity[c.rarity] : ""}
@@ -87,11 +87,11 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
                 s.owned ? (
                   <li key={s.number} data-slot={s.number}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- imagen pública con marca de agua */}
-                    <img src={img(s.owned.cardId)} alt={s.owned.name} loading="lazy" className="aspect-[63/88] w-full rounded-lg object-cover" />
+                    <img src={img(s.owned.cardId)} alt={s.owned.name} loading="lazy" className="aspect-[63/88] w-full rounded-m object-cover" />
                   </li>
                 ) : (
                   <li key={s.number} data-slot={s.number} data-missing="true">
-                    <div className="grid aspect-[63/88] w-full place-items-center rounded-lg border-2 border-dashed border-ui-line">
+                    <div className="grid aspect-[63/88] w-full place-items-center rounded-m border-2 border-dashed border-ui-line">
                       <span className="font-mono text-sm text-ui-text-3">{pad(s.number)}</span>
                     </div>
                   </li>

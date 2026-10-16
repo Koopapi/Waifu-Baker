@@ -6,7 +6,7 @@ import type { APIRequestContext, Page } from "@playwright/test";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, login, tear } from "./helpers";
+import { LAB, choose, createPublishedSet, login, tear } from "./helpers";
 
 const es = dictionaries.es.rewards;
 
@@ -33,7 +33,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   });
 
   await test.step("RF-4 y RF-8: lo reclama eligiendo colección y lo abre", async () => {
-    await fan.selectOption(`[data-testid="free-pack"] select`, { label: "FREE1 · Colección FREE1" });
+    await choose(fan.locator('[data-testid="free-pack"]'), es.free.chooseSet, "FREE1 · Colección FREE1");
     await fan.locator('[data-testid="free-pack"]').getByRole("button", { name: es.free.claim }).click();
     await expect(fan.locator(`text=${es.free.claimed}`)).toBeVisible();
     await expect(fan.locator('[data-testid="group-FREE1"]')).toContainText("x1");
@@ -81,7 +81,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
     await advance(request, 24);
     await reload(fan);
     await expect(fan.locator('[data-testid="cookie-balance"]')).toHaveText(es.cookies.balance(90));
-    await fan.selectOption(`[aria-label="${es.daily.chooseSetForPack}"]`, { label: "FREE1 · Colección FREE1" });
+    await choose(fan, es.daily.chooseSetForPack, "FREE1 · Colección FREE1");
     await claimDaily(fan);
     await expect(fan.locator(`text=${es.daily.gotPack}`)).toBeVisible();
     await reload(fan);

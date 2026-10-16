@@ -3,12 +3,14 @@ import path from "node:path";
 
 export default defineConfig({
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
+  // tsconfig deja el JSX sin transformar (lo hace Next); los tests de componentes (spec 011) lo necesitan.
+  oxc: { jsx: { runtime: "automatic" } },
   test: {
     environment: "node",
     projects: [
       {
         extends: true,
-        test: { name: "unit", include: ["src/**/*.test.ts"] },
+        test: { name: "unit", include: ["src/**/*.test.{ts,tsx}"] },
       },
       {
         extends: true,

@@ -29,8 +29,9 @@ const env = {
 
 export default defineConfig({
   testDir: "e2e",
-  timeout: 180_000,
-  expect: { timeout: 15_000 },
+  // Los ejecutores de GitHub son bastante más lentos que un Mac: allí se dobla la espera.
+  timeout: process.env.CI ? 360_000 : 180_000,
+  expect: { timeout: process.env.CI ? 30_000 : 15_000 },
   workers: 1,
   reporter: [["list"]],
   use: {

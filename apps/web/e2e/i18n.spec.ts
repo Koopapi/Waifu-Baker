@@ -7,7 +7,7 @@ import { translateError } from "../src/i18n/errors";
 import { formatDate } from "../src/i18n/format";
 import { dictionaries } from "../src/i18n/index";
 import { DESKTOP, expect, test } from "./fixtures";
-import { LAB, acceptGate, createPublishedSet, giftPacks, login } from "./helpers";
+import { acceptGate, createPublishedSet, giftPacks, LAB, login, untickAdmin } from "./helpers";
 
 const en = dictionaries.en;
 const es = dictionaries.es;
@@ -19,7 +19,7 @@ const fresh = async (browser: Browser, opts = {}) => (await browser.newContext({
 async function loginEnglish(page: Page, name: string, admin: boolean, next: string) {
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
   await page.fill('input[name="name"]', name);
-  if (!admin) await page.uncheck('input[name="admin"]');
+  if (!admin) await untickAdmin(page);
   await page.click(`text=${en.site.login.devSubmit}`);
   await page.waitForURL((u) => !u.pathname.startsWith("/login"));
   await page.waitForLoadState("networkidle");

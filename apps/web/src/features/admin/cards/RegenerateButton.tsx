@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { regenerateSetAction } from "@/app/admin/sets/card-actions";
+import { Button } from "@/ui/action/Button";
 import { useT } from "@/i18n/client";
 
 /** Vuelve a componer todas las cartas con el marco actual (tras actualizar los marcos de Pencil). */
@@ -14,9 +15,10 @@ export function RegenerateButton({ setId, count }: { setId: string; count: numbe
   if (count === 0) return null;
   return (
     <span className="flex items-center gap-3">
-      <button
-        type="button"
-        disabled={pending}
+      <Button
+        size="sm"
+        variant="secondary"
+        loading={pending}
         onClick={() =>
           start(async () => {
             const r = await regenerateSetAction(setId);
@@ -24,10 +26,9 @@ export function RegenerateButton({ setId, count }: { setId: string; count: numbe
             router.refresh();
           })
         }
-        className="btn rounded-md border border-ui-line px-3 py-1.5 text-xs text-ui-text-2 hover:bg-ui-hover disabled:opacity-60"
       >
         {pending ? t.regenerating(count) : t.regenerate}
-      </button>
+      </Button>
       {msg && <span className="text-xs text-ui-text-3">{msg}</span>}
     </span>
   );

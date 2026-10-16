@@ -3,6 +3,8 @@ import { formatDateTime, formatNumber } from "@/i18n/format";
 import { getDict, getLocale } from "@/i18n/server";
 import { now } from "@/server/clock";
 import { backupStatus } from "@/server/services/backups";
+import { Card } from "@/ui/content/Card";
+import { Alert } from "@/ui/feedback/Alert";
 import { dailyMetrics } from "@/server/services/metrics";
 
 export async function generateMetadata() {
@@ -25,26 +27,25 @@ export default async function MetricsPage() {
         <p className="text-sm text-ui-text-2">{t.intro}</p>
       </div>
 
-      <section className="space-y-2 rounded-xl border border-ui-line p-4" data-testid="backup-status">
-        <h2 className="font-semibold">{t.backups}</h2>
+      <Card className="space-y-2" data-testid="backup-status" title={t.backups}>
         <p className="text-sm" data-testid="backup-last-ok">
           {b.lastOk ? t.lastOk(formatDateTime(locale, b.lastOk.finishedAt ?? b.lastOk.startedAt), mb(b.lastOk.bytes)) : t.noBackup}
         </p>
         {b.lastFailure && (
-          <p className="text-sm text-red-300" data-testid="backup-last-failure">
-            {t.lastFailure(formatDateTime(locale, b.lastFailure.startedAt), b.lastFailure.error ?? "")}
-          </p>
+          <div data-testid="backup-last-failure">
+            <Alert tone="danger">{t.lastFailure(formatDateTime(locale, b.lastFailure.startedAt), b.lastFailure.error ?? "")}</Alert>
+          </div>
         )}
         <p className="text-xs text-ui-text-3">{t.howTo}</p>
-      </section>
+      </Card>
 
       <section className="space-y-3" data-testid="metrics">
         <p className="text-sm text-ui-text-2" data-testid="active-albums">
           {t.activeAlbums(m.activeAlbums)}
         </p>
-        <div className="overflow-x-auto rounded-xl border border-ui-line">
+        <div className="overflow-x-auto rounded-l bg-ui-nav">
           <table className="w-full min-w-[640px] text-sm">
-            <thead className="bg-ui-raised text-left text-xs uppercase tracking-wider text-ui-text-3">
+            <thead className="bg-ui-rail text-left text-xs uppercase tracking-wider text-ui-text-3">
               <tr>
                 <th className="px-3 py-2">{t.th.day}</th>
                 {KEYS.map((k) => (

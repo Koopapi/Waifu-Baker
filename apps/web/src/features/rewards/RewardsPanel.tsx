@@ -4,7 +4,11 @@ import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { claimDailyAction, claimFreePackAction, type RewardActionState } from "@/app/sobres/rewards-actions";
 import { useT } from "@/i18n/client";
-import { useToast } from "@/features/ui/Toast";
+import { Button } from "@/ui/action/Button";
+import { Card } from "@/ui/content/Card";
+import { Alert } from "@/ui/feedback/Alert";
+import { useToast } from "@/ui/feedback/Toast";
+import { Select } from "@/ui/form/Select";
 import { Countdown } from "./Countdown";
 
 type Reward = { kind: "cookies"; amount: number } | { kind: "pack" };
@@ -23,26 +27,11 @@ const browserTz = () => Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC
 
 function Status({ state }: { state: RewardActionState | null }) {
   if (!state) return null;
-  return (
-    <p role="status" className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>
-      {state.error ?? state.message}
-    </p>
-  );
+  return <Alert tone={state.error ? "danger" : "success"}>{state.error ?? state.message}</Alert>;
 }
 
 function SetSelect({ sets, value, onChange, label }: { sets: RewardsDTO["sets"]; value: string; onChange: (v: string) => void; label: string }) {
-  return (
-    <label className="flex flex-wrap items-center gap-2 text-sm">
-      {label}
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="rounded-md border border-ui-line bg-ui-rail px-3 py-1.5" aria-label={label}>
-        {sets.map((s) => (
-          <option key={s.id} value={s.id} className="bg-ui-nav">
-            {s.code} · {s.name}
-          </option>
-        ))}
-      </select>
-    </label>
-  );
+  return <Select label={label} value={value} onValueChange={onChange} options={sets.map((s) => ({ value: s.id, label: `${s.code} · ${s.name}` }))} className="min-w-56 flex-1" />;
 }
 
 /** Spec 009: sobre gratis con espera (RF-4, RF-5) y racha diaria (RF-9, RF-15). */
@@ -74,13 +63,16 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
 
   return (
     <section className={`grid gap-4 ${layout === "grid" ? "md:grid-cols-2" : ""}`} data-testid="rewards">
-      <div className="space-y-3 rounded-xl bg-ui-nav p-5" data-testid="free-pack">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-lg font-semibold">{t.free.title}</h2>
-          <span className="text-sm tabular-nums text-ui-text-2" data-testid="free-charges">
+      <Card
+        className="space-y-3"
+        data-testid="free-pack"
+        title={t.free.title}
+        aside={
+          <span className="tabular-nums" data-testid="free-charges">
             {t.free.ready(data.free.charges, data.free.max)}
           </span>
-        </div>
+        }
+      >
         <p className="text-sm text-ui-text-2">
           {data.free.nextAt ? (
             <>
@@ -93,10 +85,9 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
         {noSets ? (
           <p className="text-sm text-ui-text-3">{t.free.none}</p>
         ) : (
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-end gap-3">
             <SetSelect sets={data.sets} value={freeSet} onChange={setFreeSet} label={t.free.chooseSet} />
-            <button
-              type="button"
+            <Button
               disabled={pending || data.free.charges < 1}
               onClick={() =>
                 start(async () => {
@@ -105,22 +96,24 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
                   notify(r);
                 })
               }
-              className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-40"
             >
               {t.free.claim}
-            </button>
+            </Button>
           </div>
         )}
         <Status state={freeState} />
-      </div>
+      </Card>
 
-      <div className="space-y-3 rounded-xl bg-ui-nav p-5" data-testid="daily">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-lg font-semibold">{t.daily.title}</h2>
-          <span className="text-sm tabular-nums text-ui-text-2" data-testid="cookie-balance">
+      <Card
+        className="space-y-3"
+        data-testid="daily"
+        title={t.daily.title}
+        aside={
+          <span className="tabular-nums" data-testid="cookie-balance">
             {t.cookies.balance(data.cookies)}
           </span>
-        </div>
+        }
+      >
         <ol className={`grid gap-1.5 ${layout === "stack" ? "grid-cols-4" : "grid-cols-7"}`} data-testid="streak">
           {data.daily.schedule.map((r, i) => {
             const day = i + 1;
@@ -131,7 +124,7 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
                 key={day}
                 data-day={day}
                 data-state={done ? "done" : current ? "current" : "next"}
-                className={`rounded-lg border px-1 py-2 text-center text-[11px] leading-tight ${
+                className={`rounded-m border px-1 py-2 text-center text-[11px] leading-tight ${
                   current ? "border-ui-accent bg-ui-accent/15" : done ? "border-ui-success/50 bg-ui-success/15" : "border-ui-line"
                 }`}
               >
@@ -144,10 +137,9 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
         {data.daily.claimedToday ? (
           <p className="text-sm text-ui-text-2">{t.daily.claimed}</p>
         ) : (
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-end gap-3">
             {isPackDay && !noSets && <SetSelect sets={data.sets} value={dailySet} onChange={setDailySet} label={t.daily.chooseSetForPack} />}
-            <button
-              type="button"
+            <Button
               disabled={pending || (isPackDay && noSets)}
               onClick={() =>
                 start(async () => {
@@ -156,15 +148,14 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
                   notify(r);
                 })
               }
-              className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-40"
             >
               {t.daily.claim}
-            </button>
+            </Button>
           </div>
         )}
         <p className="text-xs text-ui-text-3">{t.daily.graceHint}</p>
         <Status state={dailyState} />
-      </div>
+      </Card>
     </section>
   );
 }

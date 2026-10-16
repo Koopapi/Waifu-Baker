@@ -7,6 +7,8 @@ import { needsAcceptance, safeNext } from "@/domain/legal/documents";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { getDict } from "@/i18n/server";
 import { GateForm } from "@/features/legal/GateForm";
+import { Button } from "@/ui/action/Button";
+import { Card } from "@/ui/content/Card";
 import { getMinAge } from "@/server/services/settings";
 
 export async function generateMetadata() {
@@ -26,7 +28,7 @@ export default async function BienvenidaPage({ searchParams }: { searchParams: P
   return (
     <main className="grid min-h-dvh place-items-center bg-ui-bg px-4 text-ui-text">
       <LocaleToggle className="fixed right-4 top-4" />
-      <div className="w-full max-w-md space-y-5 rounded-2xl border border-ui-line bg-ui-raised p-6">
+      <Card as="div" className="w-full max-w-md space-y-5 p-6">
         <h1 className="text-2xl font-bold">{t.title}</h1>
         <p className="text-sm text-ui-text-2">{ageRaised ? t.ageRaised(minAge) : u?.ageConfirmedAt ? t.updated : t.intro}</p>
         <GateForm next={next} minAge={minAge} />
@@ -36,9 +38,11 @@ export default async function BienvenidaPage({ searchParams }: { searchParams: P
             await signOut({ redirectTo: "/" });
           }}
         >
-          <button className="w-full text-sm text-ui-text-3 hover:text-white">{t.signOut}</button>
+          <Button type="submit" variant="ghost" width="full">
+            {t.signOut}
+          </Button>
         </form>
-      </div>
+      </Card>
     </main>
   );
 }

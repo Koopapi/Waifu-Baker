@@ -2,6 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "sideEffects": ["*.css"],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
@@ -26,6 +27,7 @@
     "@sentry/nextjs": "^11.8.0",
     "@use-gesture/react": "^10.3.1",
     "blurhash": "^2.0.5",
+    "cmdk": "1.1.1",
     "drizzle-orm": "^0.45.4",
     "gsap": "^3.15.0",
     "howler": "^2.2.4",
@@ -34,6 +36,7 @@
     "next": "15.5.28",
     "next-auth": "5.0.0-beta.32",
     "postgres": "^3.4.9",
+    "radix-ui": "1.4.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "server-only": "^0.0.1",

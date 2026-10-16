@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
@@ -8,7 +8,16 @@ import { CSS } from "@dnd-kit/utilities";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { bulkUpdateCardsAction, deleteCardAction, reorderCardsAction, reviewCardAction, updateCardAction } from "@/app/admin/sets/card-actions";
 import type { ActionState } from "@/server/auth/admin-action";
-import { inputCls } from "@/features/admin/ui";
+import { Button } from "@/ui/action/Button";
+import { Badge } from "@/ui/content/Badge";
+import { Alert } from "@/ui/feedback/Alert";
+import { EmptyState } from "@/ui/feedback/EmptyState";
+import { focusRing } from "@/ui/focus";
+import { Checkbox } from "@/ui/form/Choice";
+import { Select } from "@/ui/form/Select";
+import { TextArea, TextField } from "@/ui/form/TextField";
+import { useConfirm } from "@/ui/overlay/Confirm";
+import { Modal } from "@/ui/overlay/Modal";
 import { CardPreview } from "./CardPreview";
 import type { CardDTO, CharacterOption, Permissions } from "./types";
 import { useLocale, useT } from "@/i18n/client";
@@ -29,17 +38,13 @@ const pct = (locale: Locale, x: number) => formatPercent(locale, x * 100, x < 0.
 
 function ReviewBadge({ card }: { card: CardDTO }) {
   const t = useT().admin.cards;
-  if (card.pendingArtUrl) return <span className="text-sky-300">{t.pendingArt}</span>;
-  return card.adultReviewedAt ? <span className="text-emerald-300">{t.reviewed}</span> : <span className="text-rose-300">{t.notReviewed}</span>;
+  if (card.pendingArtUrl) return <Badge tone="info">{t.pendingArt}</Badge>;
+  return card.adultReviewedAt ? <Badge tone="success">{t.reviewed}</Badge> : <Badge tone="danger">{t.notReviewed}</Badge>;
 }
 
 function Notice({ state }: { state: ActionState | null }) {
   if (!state) return null;
-  return (
-    <p role={state.error ? "alert" : "status"} className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>
-      {state.error ?? state.message}
-    </p>
-  );
+  return <Alert tone={state.error ? "danger" : "success"}>{state.error ?? state.message}</Alert>;
 }
 
 function Tile({
@@ -68,10 +73,10 @@ function Tile({
       style={style}
       data-card-tile={card.number}
       id={`carta-${pad(card.number)}`}
-      className={`group relative overflow-hidden rounded-xl border bg-ui-raised ${selected ? "border-ui-accent ring-2 ring-ui-accent/60" : "border-ui-line"} ${isDragging ? "opacity-80 shadow-2xl" : ""}`}
+      className={`group relative overflow-hidden rounded-l border bg-ui-raised ${selected ? "border-ui-accent ring-2 ring-ui-accent/60" : "border-ui-line"} ${isDragging ? "opacity-80 shadow-3" : ""}`}
       {...(sortable ? { ...attributes, ...listeners } : {})}
     >
-      <button type="button" onClick={sortable ? undefined : onOpen} className={`block w-full ${sortable ? "cursor-grab" : "cursor-pointer"}`} aria-label={t.editAria(pad(card.number))}>
+      <button type="button" onClick={sortable ? undefined : onOpen} className={`block w-full ${sortable ? "cursor-grab" : "cursor-pointer"} ${focusRing}`} aria-label={t.editAria(pad(card.number))}>
         {card.thumbUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- recurso privado servido por la API del panel
           <img src={card.thumbUrl} alt="" className="aspect-[63/88] w-full object-cover" draggable={false} />
@@ -80,16 +85,10 @@ function Tile({
         )}
       </button>
       {!sortable && (
-        <label className="absolute left-2 top-2 grid h-7 w-7 cursor-pointer place-items-center rounded-md bg-black/60" onClick={(e) => e.stopPropagation()}>
-          <input
-            type="checkbox"
-            checked={selected}
-            onChange={() => {}}
-            onClick={onToggle}
-            aria-label={t.selectAria(pad(card.number))}
-            className="h-4 w-4 accent-ui-accent"
-          />
-        </label>
+        <div className="absolute left-2 top-2 grid size-7 place-items-center rounded-m bg-ui-rail/80">
+          {/* Mayúsculas + clic selecciona un rango (onToggle recibe el evento). */}
+          <Checkbox checked={selected} onClick={onToggle} label={<span className="sr-only">{t.selectAria(pad(card.number))}</span>} className="gap-0" />
+        </div>
       )}
       <div className="space-y-1 p-2 text-xs">
         <div className="flex items-center justify-between gap-2">
@@ -100,13 +99,13 @@ function Tile({
               {tt.common.rarity[card.rarity]}
             </span>
           ) : (
-            <span className="text-amber-300">{t.noRarity}</span>
+            <span className="text-ui-warning-text">{t.noRarity}</span>
           )}
         </div>
         <div className="truncate font-medium">{card.name || <span className="text-ui-text-3">{tt.admin.noName}</span>}</div>
         <div className="flex items-center justify-between gap-2 text-ui-text-3">
           <span className="truncate">{card.characterName ?? t.noCharacter}</span>
-          {card.status === "ready" ? <span className="text-emerald-300">{t.ready}</span> : <span className="text-amber-300">{t.incomplete}</span>}
+          {card.status === "ready" ? <span className="text-ui-success-text">{t.ready}</span> : <span className="text-ui-warning-text">{t.incomplete}</span>}
         </div>
         <div className="flex items-center justify-between gap-2 text-ui-text-3">
           <span title={t.chanceTitle}>{t.perPack(pct(locale, card.chance))}</span>
@@ -133,17 +132,13 @@ function CardEditor({
   /** Versión nueva tras guardar: la cuadrícula la recuerda aunque el refresco llegue tarde. */
   onSaved: (version: number) => void;
 }) {
-  const dialog = useRef<HTMLDialogElement>(null);
   const tt = useT();
+  const confirm = useConfirm();
   const t = tt.admin.cards;
   const locale = useLocale();
   const [state, setState] = useState<ActionState | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
-
-  useEffect(() => {
-    dialog.current?.showModal();
-  }, []);
 
   const save = (fd: FormData) =>
     start(async () => {
@@ -186,9 +181,10 @@ function CardEditor({
       }
     });
 
-  const remove = () =>
+  const remove = async () => {
+    // Spec 011, RF-12: borrar una carta es irreversible.
+    if (!(await confirm({ title: t.deleteCard, body: t.confirmDelete(pad(card.number)), confirmLabel: t.deleteCard, tone: "danger" }))) return;
     start(async () => {
-      if (!window.confirm(t.confirmDelete(pad(card.number)))) return;
       const r = await deleteCardAction(setId, card.id);
       setState(r);
       if (r.ok) {
@@ -196,115 +192,94 @@ function CardEditor({
         onClose();
       }
     });
+  };
 
   return (
-    <dialog
-      ref={dialog}
-      onClose={onClose}
-      className="m-auto w-[min(92vw,860px)] rounded-2xl border border-ui-line bg-ui-nav p-0 text-ui-text backdrop:bg-black/70"
-    >
-      <form action={save} className="grid gap-6 p-6 md:grid-cols-[300px_1fr]">
+    <Modal open onOpenChange={(open) => !open && onClose()} size="xl" testId="card-editor" closeLabel={tt.common.close} title={t.cardN(pad(card.number))} description={t.chance(pct(locale, card.chance))}>
+      <form action={save} className="grid gap-6 md:grid-cols-[300px_1fr]">
         <div>
           <CardPreview card={card} />
           <p className="mt-2 text-xs text-ui-text-3">{t.tiltHint}</p>
           {card.pendingArtUrl && (
-            <div className="mt-3 space-y-1 rounded-lg border border-sky-400/30 p-2">
-              <p className="text-xs text-sky-300">{t.pendingArtNote}</p>
+            <div className="mt-3 space-y-1 rounded-m border border-ui-info/40 p-2">
+              <p className="text-xs text-ui-info-text">{t.pendingArtNote}</p>
               {/* eslint-disable-next-line @next/next/no-img-element -- original privado servido por la API del panel */}
-              <img src={card.pendingArtUrl} alt={t.pendingArtAlt} className="w-full rounded" />
+              <img src={card.pendingArtUrl} alt={t.pendingArtAlt} className="w-full rounded-s" />
             </div>
           )}
           <div className="mt-3 space-y-2">
-            <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.replaceArt}</span>
-            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs" data-testid="replace-art" />
+            <span className="text-xs font-semibold uppercase tracking-wide text-ui-text-2">{t.replaceArt}</span>
+            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-ui-text-2" data-testid="replace-art" />
             {file && (
-              <button type="button" onClick={replaceArt} disabled={pending} className="btn rounded-md border border-ui-line px-3 py-1.5 text-xs hover:bg-ui-hover">
+              <Button size="sm" variant="secondary" onClick={replaceArt} disabled={pending}>
                 {t.uploadNewArt}
-              </button>
+              </Button>
             )}
           </div>
         </div>
         <div className="space-y-4">
-          <div className="flex items-start justify-between">
-            <h2 className="text-lg font-bold">{t.cardN(pad(card.number))}</h2>
-            <button type="button" onClick={onClose} className="text-ui-text-3 hover:text-white" aria-label={tt.common.close}>
-              ✕
-            </button>
-          </div>
-          <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.name}</span>
-            <input name="name" defaultValue={card.name} maxLength={60} className={inputCls} autoFocus />
-          </label>
-          <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.flavorText}</span>
-            <textarea name="flavorText" defaultValue={card.flavorText} rows={2} className={inputCls} />
-          </label>
+          <TextField label={t.name} name="name" defaultValue={card.name} maxLength={60} autoFocus />
+          <TextArea label={t.flavorText} name="flavorText" defaultValue={card.flavorText} rows={2} />
           <div className="grid gap-4 sm:grid-cols-3">
-            <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.character}</span>
-              <select name="characterId" defaultValue={card.characterId ?? ""} className={inputCls}>
-                <option value="">{t.noCharacter}</option>
-                {characters.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.rarity}</span>
-              <select name="rarity" defaultValue={card.rarity ?? "__none"} disabled={!perms.canEditRarity} className={inputCls}>
-                <option value="__none">{t.noRarity}</option>
-                {RARITIES.map((r) => (
-                  <option key={r} value={r}>
-                    {tt.common.rarity[r]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.variant}</span>
-              <select name="variant" defaultValue={card.variant} disabled={!perms.canEditRarity} className={inputCls}>
-                <option value="normal">{t.variants.normal}</option>
-                <option value="holo">{t.variants.holo}</option>
-                <option value="alt">{t.variants.alt}</option>
-              </select>
-            </label>
+            <Select
+              label={t.character}
+              name="characterId"
+              defaultValue={card.characterId ?? ""}
+              searchable={characters.length > 8}
+              options={[{ value: "", label: t.noCharacter }, ...characters.map((c) => ({ value: c.id, label: c.name }))]}
+            />
+            <Select
+              label={t.rarity}
+              name="rarity"
+              defaultValue={card.rarity ?? "__none"}
+              disabled={!perms.canEditRarity}
+              options={[{ value: "__none", label: t.noRarity }, ...RARITIES.map((r) => ({ value: r, label: tt.common.rarity[r] }))]}
+            />
+            <Select
+              label={t.variant}
+              name="variant"
+              defaultValue={card.variant}
+              disabled={!perms.canEditRarity}
+              options={[
+                { value: "normal", label: t.variants.normal },
+                { value: "holo", label: t.variants.holo },
+                { value: "alt", label: t.variants.alt },
+              ]}
+            />
           </div>
-          <p className="text-xs text-ui-text-3">{t.chance(pct(locale, card.chance))}</p>
           {perms.isAdultSet && (
-            <div className="space-y-2 rounded-lg border border-rose-400/30 bg-rose-400/5 p-3" data-testid="review-box">
-              <p className="text-sm">
+            <div className="space-y-2 rounded-m border border-ui-danger/40 bg-ui-danger/5 p-3" data-testid="review-box">
+              <p className="flex flex-wrap items-center gap-2 text-sm">
                 {t.review18} <ReviewBadge card={card} />
               </p>
               {card.adultReviewedAt && !card.pendingArtUrl ? (
-                <button type="button" onClick={() => review(false)} disabled={pending} className="btn rounded-md border border-ui-line px-3 py-1.5 text-xs hover:bg-ui-hover">
+                <Button size="sm" variant="secondary" onClick={() => review(false)} disabled={pending}>
                   {t.removeReview}
-                </button>
+                </Button>
               ) : (
-                <button type="button" onClick={() => review(true)} disabled={pending} className="btn bg-rose-300 px-3 py-1.5 text-xs text-black hover:bg-rose-200">
+                <Button size="sm" onClick={() => review(true)} disabled={pending}>
                   {card.pendingArtUrl ? t.approveNewArt : t.confirmAdult}
-                </button>
+                </Button>
               )}
             </div>
           )}
           <Notice state={state} />
           <div className="flex flex-wrap items-center gap-3 border-t border-ui-line pt-4">
-            <button disabled={pending} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-5 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-60">
-              {pending ? tt.common.saving : tt.common.save}
-            </button>
-            <button type="button" onClick={onClose} className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover">
+            <Button type="submit" loading={pending}>
+              {tt.common.save}
+            </Button>
+            <Button variant="ghost" onClick={onClose}>
               {tt.common.cancel}
-            </button>
+            </Button>
             {perms.canRemove && (
-              <button type="button" onClick={remove} disabled={pending} className="btn ml-auto border border-red-400/40 px-4 py-2 text-sm text-red-300 hover:bg-red-400/10">
+              <Button variant="danger" onClick={remove} disabled={pending} className="ml-auto">
                 {t.deleteCard}
-              </button>
+              </Button>
             )}
           </div>
         </div>
       </form>
-    </dialog>
+    </Modal>
   );
 }
 
@@ -386,66 +361,73 @@ export function CardWorkspace({
     });
   };
 
-  if (cards.length === 0) return <p className="text-sm text-ui-text-3">{t.empty}</p>;
+  if (cards.length === 0) return <EmptyState title={t.empty} />;
 
   const shown = sorting ? order.map((id) => byId.get(id)!).filter(Boolean) : cards;
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 z-20 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border border-ui-line bg-ui-bg/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-[calc(var(--banner-h,0px)+52px)] z-10 -mx-2 flex flex-wrap items-end gap-3 rounded-l border border-ui-line bg-ui-bg/95 px-4 py-3 backdrop-blur">
         {sorting ? (
           <>
             <span className="text-sm">{t.dragHint}</span>
-            <button onClick={() => setSorting(false)} className="ml-auto btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent">
+            <Button size="sm" onClick={() => setSorting(false)} className="ml-auto">
               {t.done}
-            </button>
+            </Button>
           </>
         ) : (
           <>
             <span className="text-sm tabular-nums">
               {t.selectedCount(selected.size, cards.length)}
             </span>
-            <button className="text-sm underline" onClick={() => setSelected(selected.size === cards.length ? new Set() : new Set(cards.map((c) => c.id)))}>
+            <Button size="sm" variant="ghost" onClick={() => setSelected(selected.size === cards.length ? new Set() : new Set(cards.map((c) => c.id)))}>
               {selected.size === cards.length ? t.clearSelection : t.selectAll}
-            </button>
+            </Button>
             {selected.size > 0 && (
               <>
-                <select aria-label={t.bulkCharacterAria} value={bulk.characterId} onChange={(e) => setBulk({ ...bulk, characterId: e.target.value })} className={`${inputCls} w-auto`}>
-                  <option value="">{t.bulkCharacter}</option>
-                  <option value="__none">{t.removeCharacter}</option>
-                  {characters.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
+                <Select
+                  label={t.bulkCharacterAria}
+                  hideLabel
+                  value={bulk.characterId}
+                  onValueChange={(v) => setBulk({ ...bulk, characterId: v })}
+                  searchable={characters.length > 8}
+                  options={[{ value: "", label: t.bulkCharacter }, { value: "__none", label: t.removeCharacter }, ...characters.map((c) => ({ value: c.id, label: c.name }))]}
+                  className="w-52"
+                />
                 {perms.canEditRarity && (
                   <>
-                    <select aria-label={t.bulkRarityAria} value={bulk.rarity} onChange={(e) => setBulk({ ...bulk, rarity: e.target.value })} className={`${inputCls} w-auto`}>
-                      <option value="">{t.bulkRarity}</option>
-                      {RARITIES.map((r) => (
-                        <option key={r} value={r}>
-                          {tt.common.rarity[r]}
-                        </option>
-                      ))}
-                    </select>
-                    <select aria-label={t.bulkVariantAria} value={bulk.variant} onChange={(e) => setBulk({ ...bulk, variant: e.target.value })} className={`${inputCls} w-auto`}>
-                      <option value="">{t.bulkVariant}</option>
-                      <option value="normal">{t.variants.normal}</option>
-                      <option value="holo">{t.variants.holo}</option>
-                      <option value="alt">{t.variants.alt}</option>
-                    </select>
+                    <Select
+                      label={t.bulkRarityAria}
+                      hideLabel
+                      value={bulk.rarity}
+                      onValueChange={(v) => setBulk({ ...bulk, rarity: v })}
+                      options={[{ value: "", label: t.bulkRarity }, ...RARITIES.map((r) => ({ value: r, label: tt.common.rarity[r] }))]}
+                      className="w-44"
+                    />
+                    <Select
+                      label={t.bulkVariantAria}
+                      hideLabel
+                      value={bulk.variant}
+                      onValueChange={(v) => setBulk({ ...bulk, variant: v })}
+                      options={[
+                        { value: "", label: t.bulkVariant },
+                        { value: "normal", label: t.variants.normal },
+                        { value: "holo", label: t.variants.holo },
+                        { value: "alt", label: t.variants.alt },
+                      ]}
+                      className="w-40"
+                    />
                   </>
                 )}
-                <button onClick={applyBulk} disabled={pending} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-60">
+                <Button size="sm" onClick={applyBulk} loading={pending}>
                   {pending ? t.applying : t.apply}
-                </button>
+                </Button>
               </>
             )}
             {perms.canReorder && selected.size === 0 && (
-              <button onClick={() => setSorting(true)} className="ml-auto btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover">
+              <Button size="sm" variant="secondary" onClick={() => setSorting(true)} className="ml-auto">
                 {t.reorder}
-              </button>
+              </Button>
             )}
           </>
         )}

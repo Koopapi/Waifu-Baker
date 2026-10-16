@@ -1,0 +1,88 @@
+/*
+ * Sistema de diseño (spec 011, RF-1 y RF-2): los únicos valores de la interfaz. Paleta «Cereza» (spec 010).
+ * Un tema futuro (por colección o por juego) solo redefine estas variables bajo un selector, p. ej.
+ * `[data-theme="…"]`; los componentes no cambian. Las cartas y el holo tienen sus colores por rareza aparte.
+ * Contraste (RF-14): texto, texto-2, texto-3 y los textos de estado superan 4,5:1 sobre los fondos; el blanco
+ * sobre acento, éxito, aviso, peligro e información también (lo comprueba features/ui/finish.test.ts).
+ */
+:root {
+  /* Fondos, de más oscuro a más claro. */
+  --ui-rail: #140f17;
+  --ui-nav: #1c1520;
+  --ui-bg: #241b29;
+  --ui-raised: #2e2333;
+  --ui-hover: #3a2c40;
+  --ui-line: #41324a;
+  /* Texto. */
+  --ui-text: #f7f0f4;
+  --ui-text-2: #c9b9c4;
+  --ui-text-3: #9d8a98;
+  /* Acento. */
+  --ui-accent: #d6336c;
+  --ui-accent-hover: #bf2a5d;
+  --ui-accent-text: #ff8ab0;
+  --ui-on-accent: #ffffff;
+  /* Estados: fondo sólido (con texto blanco) y su versión para texto sobre fondo oscuro. */
+  --ui-success: #248046;
+  --ui-success-text: #6bd58f;
+  --ui-warning: #9a5b00;
+  --ui-warning-text: #f5b85a;
+  --ui-danger: #da373c;
+  --ui-danger-text: #ff8a8d;
+  --ui-info: #2f6fdb;
+  --ui-info-text: #8db5ff;
+  /* Marca de terceros: el botón de entrar con Patreon (texto oscuro, 6,6:1). */
+  --ui-patreon: #f96854;
+
+  /* Capas (de abajo arriba). */
+  --z-nav: 20;
+  --z-banner: 30;
+  --z-drawer: 40;
+  --z-overlay: 50;
+  --z-toast: 60;
+
+  /* Tiempos (RF-13): rápido para estados, base para entradas, lento para superposiciones. */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+}
+
+@theme inline {
+  --color-ui-rail: var(--ui-rail);
+  --color-ui-nav: var(--ui-nav);
+  --color-ui-bg: var(--ui-bg);
+  --color-ui-raised: var(--ui-raised);
+  --color-ui-hover: var(--ui-hover);
+  --color-ui-line: var(--ui-line);
+  --color-ui-text: var(--ui-text);
+  --color-ui-text-2: var(--ui-text-2);
+  --color-ui-text-3: var(--ui-text-3);
+  --color-ui-accent: var(--ui-accent);
+  --color-ui-accent-hover: var(--ui-accent-hover);
+  --color-ui-accent-text: var(--ui-accent-text);
+  --color-ui-on-accent: var(--ui-on-accent);
+  --color-ui-success: var(--ui-success);
+  --color-ui-success-text: var(--ui-success-text);
+  --color-ui-warning: var(--ui-warning);
+  --color-ui-warning-text: var(--ui-warning-text);
+  --color-ui-danger: var(--ui-danger);
+  --color-ui-danger-text: var(--ui-danger-text);
+  --color-ui-info: var(--ui-info);
+  --color-ui-info-text: var(--ui-info-text);
+  --color-ui-patreon: var(--ui-patreon);
+
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: var(--font-display), var(--font-geist-sans), sans-serif;
+
+  --radius-s: 4px;
+  --radius-m: 6px;
+  --radius-l: 12px;
+  --radius-xl: 16px;
+
+  --shadow-1: 0 1px 0 rgb(0 0 0 / 0.2);
+  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.4);
+  --shadow-3: 0 16px 48px rgb(0 0 0 / 0.55);
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

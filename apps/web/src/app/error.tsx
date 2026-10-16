@@ -4,6 +4,7 @@ import Link from "next/link";
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { useT } from "@/i18n/client";
+import { Button } from "@/ui/action/Button";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 
 export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
@@ -20,12 +21,12 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
         <p className="text-ui-text-2">{t.site.error.body}</p>
         {error.digest && <p className="font-mono text-xs text-ui-text-3">{t.site.error.code(error.digest)}</p>}
         <div className="flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={reset} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-6 py-3 font-semibold text-ui-on-accent">
+          <Button size="lg" onClick={reset}>
             {t.common.retry}
-          </button>
-          <Link href="/" className="btn rounded-md border border-ui-line px-6 py-3 hover:bg-ui-hover">
-            {t.site.error.home}
-          </Link>
+          </Button>
+          <Button size="lg" variant="secondary" asChild>
+            <Link href="/">{t.site.error.home}</Link>
+          </Button>
         </div>
       </div>
     </main>

@@ -10,7 +10,14 @@ import {
   saveFeaturedAction,
   type AlbumActionState,
 } from "@/app/(app)/coleccion/album/actions";
+import { ArrowDown, ArrowUp, X } from "lucide-react";
 import { useT } from "@/i18n/client";
+import { Button, IconButton } from "@/ui/action/Button";
+import { Card } from "@/ui/content/Card";
+import { Alert } from "@/ui/feedback/Alert";
+import { focusRing } from "@/ui/focus";
+import { TextField } from "@/ui/form/TextField";
+import { useConfirm } from "@/ui/overlay/Confirm";
 
 interface FeaturableCard {
   cardId: string;
@@ -25,11 +32,7 @@ const pad = (n: number) => String(n).padStart(3, "0");
 
 function Status({ state }: { state: AlbumActionState }) {
   if (!state) return null;
-  return (
-    <p role="status" className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>
-      {state.error ?? state.message}
-    </p>
-  );
+  return <Alert tone={state.error ? "danger" : "success"}>{state.error ?? state.message}</Alert>;
 }
 
 function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: string[] }) {
@@ -63,19 +66,19 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
             {picked.map((id, i) => {
               const c = byId.get(id)!;
               return (
-                <li key={id} className="flex items-center gap-1 rounded-full border border-ui-line py-1 pl-3 pr-1 text-sm">
+                <li key={id} className="flex items-center gap-1 rounded-m border border-ui-line py-1 pl-3 pr-1 text-sm">
                   <span>
                     {i + 1}. {c.name || t.collection.binder.cardFallbackName(pad(c.number))}
                   </span>
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="px-1.5 text-ui-text-2 disabled:opacity-30" aria-label={t.collection.album.moveUp(c.name)}>
-                    ↑
-                  </button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === picked.length - 1} className="px-1.5 text-ui-text-2 disabled:opacity-30" aria-label={t.collection.album.moveDown(c.name)}>
-                    ↓
-                  </button>
-                  <button type="button" onClick={() => toggle(id)} className="px-1.5 text-ui-text-2" aria-label={t.collection.album.remove(c.name)}>
-                    ✕
-                  </button>
+                  <IconButton size="sm" onClick={() => move(i, -1)} disabled={i === 0} label={t.collection.album.moveUp(c.name)}>
+                    <ArrowUp aria-hidden className="size-4" />
+                  </IconButton>
+                  <IconButton size="sm" onClick={() => move(i, 1)} disabled={i === picked.length - 1} label={t.collection.album.moveDown(c.name)}>
+                    <ArrowDown aria-hidden className="size-4" />
+                  </IconButton>
+                  <IconButton size="sm" onClick={() => toggle(id)} label={t.collection.album.remove(c.name)}>
+                    <X aria-hidden className="size-4" />
+                  </IconButton>
                 </li>
               );
             })}
@@ -94,12 +97,12 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
                 disabled={full}
                 aria-pressed={on}
                 aria-label={t.collection.album.feature(c.setCode, pad(c.number))}
-                className={`relative block w-full overflow-hidden rounded-lg ring-2 transition disabled:opacity-40 ${on ? "ring-ui-accent" : "ring-transparent"}`}
+                className={`relative block w-full overflow-hidden rounded-m ring-2 transition-[box-shadow,opacity] duration-[var(--duration-fast)] disabled:opacity-40 ${on ? "ring-ui-accent" : "ring-transparent"} ${focusRing}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
                 <img src={c.thumb} alt={c.name} loading="lazy" className="aspect-[63/88] w-full object-cover" />
                 {on && (
-                  <span className="absolute right-1 top-1 grid h-6 w-6 place-items-center btn rounded-md bg-ui-accent hover:bg-ui-accent-hover text-xs font-bold text-black">
+                  <span className="absolute right-1 top-1 grid size-6 place-items-center rounded-s bg-ui-accent text-xs font-bold text-ui-on-accent">
                     {picked.indexOf(c.cardId) + 1}
                   </span>
                 )}
@@ -109,14 +112,9 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
         })}
       </ul>
       <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => start(async () => setState(await saveFeaturedAction(picked)))}
-          className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-50"
-        >
-          {pending ? t.common.saving : t.collection.album.saveFeatured}
-        </button>
+        <Button loading={pending} onClick={() => start(async () => setState(await saveFeaturedAction(picked)))}>
+          {t.collection.album.saveFeatured}
+        </Button>
         <Status state={state} />
       </div>
     </div>
@@ -141,75 +139,64 @@ export function AlbumSettings({
     return () => window.clearTimeout(timer);
   }, [copied]);
   const active = Boolean(album?.isPublic);
+  const confirm = useConfirm();
 
   return (
     <div className="space-y-6">
-      <section className="space-y-4 rounded-2xl border border-ui-line p-5" data-testid="album-status">
+      <Card className="space-y-4" data-testid="album-status">
         <div className="flex items-center gap-3">
-          <span className={`h-2.5 w-2.5 rounded-full ${active ? "bg-emerald-400" : "bg-white/30"}`} />
+          <span aria-hidden className={`size-2.5 rounded-full ${active ? "bg-ui-success" : "bg-ui-hover"}`} />
           <h2 className="text-lg font-semibold">{active ? t.collection.album.isPublic : t.collection.album.isPrivate}</h2>
         </div>
         {active && album && (
-          <div className="flex flex-wrap items-center gap-2">
-            <input readOnly value={album.url} aria-label={t.collection.album.linkLabel} className="min-w-0 basis-full rounded-lg border border-ui-line bg-black/30 px-3 py-2 font-mono text-sm sm:basis-auto sm:flex-1" data-testid="album-url" />
-            <button
-              type="button"
-              onClick={() => void navigator.clipboard?.writeText(album.url).then(() => setCopied(true))}
-              className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover"
-            >
+          <div className="flex flex-wrap items-end gap-2">
+            <TextField readOnly value={album.url} label={t.collection.album.linkLabel} hideLabel fieldClassName="min-w-0 basis-full sm:basis-auto sm:flex-1" className="font-mono" data-testid="album-url" />
+            <Button variant="secondary" onClick={() => void navigator.clipboard?.writeText(album.url).then(() => setCopied(true))}>
               {copied ? t.collection.album.copied : t.collection.album.copy}
-            </button>
-            <a href={album.url} target="_blank" rel="noreferrer" className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover">
-              {t.collection.album.view}
-            </a>
+            </Button>
+            <Button variant="secondary" asChild>
+              <a href={album.url} target="_blank" rel="noreferrer">
+                {t.collection.album.view}
+              </a>
+            </Button>
           </div>
         )}
         <form action={activate} className="flex flex-wrap items-end gap-3">
-          <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
-            {t.collection.album.aliasLabel}
-            <input
-              name="alias"
-              defaultValue={album?.alias ?? t.collection.album.defaultAlias}
-              minLength={2}
-              maxLength={30}
-              required
-              className="rounded-lg border border-ui-line bg-black/30 px-3 py-2"
-            />
-          </label>
-          <button disabled={activating} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-50">
-            {active ? t.collection.album.saveAlias : t.collection.album.activate}
-          </button>
+          <TextField
+            label={t.collection.album.aliasLabel}
+            name="alias"
+            defaultValue={album?.alias ?? t.collection.album.defaultAlias}
+            minLength={2}
+            maxLength={30}
+            required
+            fieldClassName="min-w-0 flex-1"
+          />
+          <Button loading={activating}>{active ? t.collection.album.saveAlias : t.collection.album.activate}</Button>
         </form>
         <Status state={aliasState} />
         {active && (
           <div className="flex flex-wrap gap-3 border-t border-ui-line pt-4">
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => start(async () => setState(await deactivateAlbumAction()))}
-              className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover"
-            >
+            <Button variant="secondary" disabled={pending} onClick={() => start(async () => setState(await deactivateAlbumAction()))}>
               {t.collection.album.deactivate}
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              variant="secondary"
               disabled={pending}
-              onClick={() => {
-                if (window.confirm(t.collection.album.regenerateConfirm)) start(async () => setState(await regenerateAlbumLinkAction()));
+              onClick={async () => {
+                if (await confirm({ title: t.collection.album.regenerate, body: t.collection.album.regenerateConfirm, confirmLabel: t.collection.album.regenerate, tone: "danger" }))
+                  start(async () => setState(await regenerateAlbumLinkAction()));
               }}
-              className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover"
             >
               {t.collection.album.regenerate}
-            </button>
+            </Button>
           </div>
         )}
         <Status state={state} />
-      </section>
+      </Card>
       {album && (
-        <section className="space-y-4 rounded-2xl border border-ui-line p-5">
-          <h2 className="text-lg font-semibold">{t.collection.album.featuredTitle}</h2>
+        <Card className="space-y-4" title={t.collection.album.featuredTitle}>
           <FeaturedPicker cards={cards} initial={album.featured} />
-        </section>
+        </Card>
       )}
     </div>
   );

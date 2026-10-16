@@ -102,6 +102,7 @@ export const admin = {
     checking: "Checking…",
     stalePublish: 'The set was just updated. You now see the current version: press "Check and publish" again.',
     staleArchive: 'The set was just updated. You now see the current version: press "Archive set" again.',
+    confirmPublish: "Publish this set? Its drop rates become public and can no longer be changed.",
     confirmArchive: "Archive the set? It will no longer be granted in new packs.",
     archive: "Archive set",
   },

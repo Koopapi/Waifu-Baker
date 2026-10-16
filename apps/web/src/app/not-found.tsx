@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+import { Button } from "@/ui/action/Button";
 import { getDict } from "@/i18n/server";
 
 export async function generateMetadata() {
@@ -16,9 +17,9 @@ export default async function NotFound() {
         <p className="font-mono text-sm tracking-[0.3em] text-ui-text-3">404</p>
         <h1 className="text-3xl font-bold">{t.site.notFound.heading}</h1>
         <p className="text-ui-text-2">{t.site.notFound.body}</p>
-        <Link href="/" className="inline-block btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-6 py-3 font-semibold text-ui-on-accent">
-          {t.site.notFound.home}
-        </Link>
+        <Button size="lg" asChild>
+          <Link href="/">{t.site.notFound.home}</Link>
+        </Button>
       </div>
     </main>
   );

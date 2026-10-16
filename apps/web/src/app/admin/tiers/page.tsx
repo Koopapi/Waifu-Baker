@@ -4,6 +4,7 @@ import { getPatreonClient } from "@/server/patreon/client-instance";
 import { tierOverview } from "@/server/services/tiers";
 import { getDict, getLocale } from "@/i18n/server";
 import { formatMoney } from "@/i18n/format";
+import { Alert } from "@/ui/feedback/Alert";
 import { AddRuleForm, RuleRow } from "./forms";
 
 /** RF-24: qué colección y cuántos sobres al mes da cada tier de Patreon. */
@@ -26,7 +27,7 @@ export default async function TiersPage() {
     return (
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">{t.title}</h1>
-        <p role="alert" className="text-sm text-red-300">{t.loadFailed((e as Error).message)}</p>
+        <Alert tone="danger">{t.loadFailed((e as Error).message)}</Alert>
       </div>
     );
   }
@@ -37,12 +38,10 @@ export default async function TiersPage() {
         <h1 className="text-2xl font-bold">{t.title}</h1>
         <p className="text-sm text-ui-text-2">{t.intro}</p>
         <ReconcileButton />
-        {mode === "fake" && (
-          <p className="text-xs text-amber-300">{t.fakeMode}</p>
-        )}
+        {mode === "fake" && <Alert tone="warning">{t.fakeMode}</Alert>}
       </div>
       {overview.tiers.map((tier) => (
-        <section key={tier.id} className="overflow-hidden rounded-xl border border-ui-line" data-testid={`tier-${tier.id}`}>
+        <section key={tier.id} className="overflow-hidden rounded-l bg-ui-nav" data-testid={`tier-${tier.id}`}>
           <header className="flex items-center justify-between bg-ui-raised px-4 py-3">
             <span className="font-semibold">{tier.title}</span>
             <span className="text-sm text-ui-text-3">
@@ -57,8 +56,8 @@ export default async function TiersPage() {
         </section>
       ))}
       {overview.orphanRules.length > 0 && (
-        <section className="rounded-xl border border-amber-400/30 p-4 text-sm">
-          <h2 className="mb-2 font-semibold text-amber-200">{t.orphans}</h2>
+        <section className="rounded-l border border-ui-warning/60 p-4 text-sm">
+          <h2 className="mb-2 font-semibold text-ui-warning-text">{t.orphans}</h2>
           {overview.orphanRules.map((r) => (
             <RuleRow key={r.id} tierId={r.patreonTierId} tierName={r.name} rule={r} />
           ))}

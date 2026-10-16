@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_TOASTS, TOAST_MS, dismissToast, expireToasts, pushToast, type ToastState } from "./toast-queue";
+import { MAX_TOASTS, TOAST_MS, UNDO_MS, dismissToast, expireToasts, pushToast, type ToastState } from "./toast-queue";
 
 const empty: ToastState = { items: [], seq: 0 };
 
@@ -30,5 +30,18 @@ describe("cola de avisos emergentes", () => {
   it("test_s010_rf8_se puede cerrar a mano", () => {
     const s = pushToast(empty, { kind: "info", title: "A" }, 0);
     expect(dismissToast(s, s.items[0].id).items).toEqual([]);
+  });
+});
+
+describe("avisos con acción (spec 011)", () => {
+  it("test_s011_rf11_el_aviso_puede_llevar_una_accion_deshacer", () => {
+    const undo = () => {};
+    const s = pushToast({ items: [], seq: 0 }, { kind: "success", title: "Archived", action: { label: "Undo", onAction: undo } }, 0);
+    expect(s.items[0].action).toEqual({ label: "Undo", onAction: undo });
+  });
+
+  it("test_s011_rf11_un_aviso_con_accion_dura_lo_que_dura_poder_deshacer", () => {
+    const s = pushToast({ items: [], seq: 0 }, { kind: "success", title: "Archived", action: { label: "Undo", onAction: () => {} } }, 0);
+    expect(s.items[0].expiresAt).toBe(UNDO_MS);
   });
 });

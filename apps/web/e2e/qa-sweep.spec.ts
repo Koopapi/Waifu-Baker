@@ -57,10 +57,17 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
     }
     for (const img of document.querySelectorAll("img")) if (img.complete && img.naturalWidth === 0) out.push(`imagen rota: ${img.getAttribute("src")}`);
     for (const el of document.querySelectorAll<HTMLElement>("button, a[href], [role=button]")) {
-      const name = (el.getAttribute("aria-label") || el.textContent || el.getAttribute("title") || el.querySelector("img")?.getAttribute("alt") || "").trim();
+      // Nombre accesible: aria-label, aria-labelledby, <label for> (los controles del sistema de diseño), texto, title o alt.
+      const labelledBy = (el.getAttribute("aria-labelledby") ?? "")
+        .split(" ")
+        .map((id) => document.getElementById(id)?.textContent ?? "")
+        .join(" ");
+      const forLabel = el.id ? (document.querySelector(`label[for="${CSS.escape(el.id)}"]`)?.textContent ?? "") : "";
+      const name = (el.getAttribute("aria-label") || labelledBy || forLabel || el.textContent || el.getAttribute("title") || el.querySelector("img")?.getAttribute("alt") || "").trim();
       if (!name && el.offsetParent !== null) out.push(`control sin nombre: ${el.outerHTML.slice(0, 120)}`);
     }
-    for (const el of document.querySelectorAll<HTMLInputElement>("input:not([type=hidden]), select, textarea")) {
+    // Los campos con aria-hidden son el reflejo oculto de los controles accesibles (Radix) para enviar formularios.
+    for (const el of document.querySelectorAll<HTMLInputElement>('input:not([type=hidden]):not([aria-hidden="true"]), select, textarea')) {
       const labelled = el.getAttribute("aria-label") || el.labels?.length || el.getAttribute("placeholder") || el.getAttribute("title");
       if (!labelled && el.offsetParent !== null) out.push(`campo sin etiqueta: ${el.outerHTML.slice(0, 120)}`);
     }

@@ -2,6 +2,7 @@
 // lote → editar probabilidades → simular sobre → publicar → comprobar bloqueos → regalar un sobre.
 import type { Browser, Page } from "@playwright/test";
 import { DESKTOP, desktopOnly, expect, test } from "./fixtures";
+import { choose, tick, untickAdmin } from "./helpers";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -16,7 +17,7 @@ async function login(browser: Browser, name: string, admin: boolean): Promise<Pa
   page.on("dialog", (d) => d.accept());
   await page.goto("/login?next=/admin");
   await page.fill('input[name="name"]', name);
-  if (!admin) await page.uncheck('input[name="admin"]');
+  if (!admin) await untickAdmin(page);
   await page.click("text=Entrar (desarrollo)");
   await page.waitForURL((u) => !u.pathname.startsWith("/login"));
   return page;
@@ -60,12 +61,12 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
 
   await test.step("RF-14: asignar personaje y rareza en lote", async () => {
     await page.click("text=Seleccionar todas");
-    await page.selectOption('[aria-label="Personaje para la selección"]', { label: "Aiko Hoshino" });
-    await page.selectOption('[aria-label="Rareza para la selección"]', "common");
+    await choose(page, "Personaje para la selección", "Aiko Hoshino");
+    await choose(page, "Rareza para la selección", /^Común$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator(`text=${IMAGES.length} carta(s) actualizada(s).`)).toBeVisible({ timeout: 60_000 });
-    await page.check('[aria-label="Seleccionar carta 010"]');
-    await page.selectOption('[aria-label="Rareza para la selección"]', "rare");
+    await tick(page, "Seleccionar carta 010");
+    await choose(page, "Rareza para la selección", /^Rara$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator("text=1 carta(s) actualizada(s).")).toBeVisible({ timeout: 30_000 });
   });
@@ -74,9 +75,9 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     for (let i = 1; i <= IMAGES.length; i++) {
       const n = String(i).padStart(3, "0");
       await page.click(`[aria-label="Editar carta ${n}"]`);
-      await page.fill('dialog input[name="name"]', `Carta de prueba ${n}`);
-      await page.click("dialog >> text=Guardar");
-      await expect(page.locator("dialog")).toHaveCount(0);
+      await page.fill('[data-testid="card-editor"] input[name="name"]', `Carta de prueba ${n}`);
+      await page.click('[data-testid="card-editor"] >> text=Guardar');
+      await expect(page.locator('[data-testid="card-editor"]')).toHaveCount(0);
     }
     await expect(page.locator("[data-card-tile] >> text=Lista")).toHaveCount(IMAGES.length);
   });
@@ -87,14 +88,15 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await expect(preview.locator("img")).toHaveAttribute("src", /\/api\/admin\/assets\/.+\/mid\.[0-9a-f]+\.webp$/);
     await expect.poll(() => preview.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(750);
     await expect(preview.locator(".card3d--holo")).toHaveCount(0);
-    await page.check("text=Ver con efecto holo");
+    await tick(page, "Ver con efecto holo");
     await expect(preview.locator(".card3d--holo .holo--foil")).toHaveCount(1);
     await page.keyboard.press("Escape");
-    await expect(page.locator("dialog")).toHaveCount(0);
+    await expect(page.locator('[data-testid="card-editor"]')).toHaveCount(0);
   });
 
   await test.step("RF-6 y RF-7: publicar con problemas los lista y no publica", async () => {
     await page.click("text=Comprobar y publicar");
+    await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator('[data-testid="publish-problems"]')).toContainText("tiene probabilidad en el sobre pero ninguna carta");
     await expect(page.locator("h1 ~ span").first()).toHaveText("Borrador");
   });
@@ -136,6 +138,7 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
 
   await test.step("RF-21 y RF-8: publicar, congelar probabilidades y bloquear la colección", async () => {
     await page.click("text=Comprobar y publicar");
+    await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator("text=Colección publicada. Sus probabilidades ya son públicas.")).toBeVisible();
     await expect(page.locator('[aria-label="Ranura 1, Común"]')).toBeDisabled();
     await expect(page.locator("text=Colección publicada: ya no se pueden añadir cartas (RF-8).")).toBeVisible();
@@ -149,8 +152,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   await test.step("RF-25 y RF-27: regalar un sobre al usuario", async () => {
     await page.goto("/admin/users?q=fan-e2e");
     await page.click("a:text-is('fan-e2e')");
-    await page.selectOption('select[name="setId"]', { label: "E2E1 · Colección E2E" });
-    await page.fill('form:has(select[name="setId"]) input[name="reason"]', "Regalo del test E2E");
+    await choose(page, "Colección", "E2E1 · Colección E2E");
+    await page.fill('form:has(input[name="setId"]) input[name="reason"]', "Regalo del test E2E");
     await page.click("button:has-text('Regalar sobres')");
     await expect(page.locator("text=1 sobre(s) regalado(s).")).toBeVisible();
     await expect(page.locator('[data-testid="sealed-packs"] h2')).toHaveText("Sobres sin abrir (1)");

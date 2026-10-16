@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, lazy, useMemo, useState } from "react";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { filterBinder, type BinderMode } from "@/domain/collection/binder";
-import { useLocale, useT } from "@/i18n/client";
-import { formatDate } from "@/i18n/format";
-import { Card3D } from "@/features/opening/Card3D";
-import { useTiltSource } from "@/features/opening/useTiltSource";
+import { useT } from "@/i18n/client";
 import "@/features/opening/opening.css";
+import { Button } from "@/ui/action/Button";
+import { focusRing } from "@/ui/focus";
+import { Select } from "@/ui/form/Select";
 
 export interface BinderSlotDTO {
   number: number;
@@ -26,76 +26,8 @@ export interface BinderSlotDTO {
 
 const pad = (n: number) => String(n).padStart(3, "0");
 const MODES: BinderMode[] = ["all", "owned", "missing", "holo"];
-
-function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { owned: NonNullable<BinderSlotDTO["owned"]> }; setCode: string; onClose: () => void }) {
-  const t = useT();
-  const locale = useLocale();
-  const ref = useRef<HTMLDialogElement>(null);
-  const tilt = useTiltSource();
-  const o = slot.owned;
-  const [holo, setHolo] = useState(o.qty === 0 && o.holoQty > 0);
-  useEffect(() => {
-    ref.current?.showModal();
-  }, []);
-  return (
-    <dialog ref={ref} onClose={onClose} className="m-auto w-[min(94vw,820px)] rounded-2xl border border-ui-line bg-ui-nav p-0 text-ui-text backdrop:bg-black/75" data-testid="card-sheet">
-      <div className="grid gap-6 p-6 md:grid-cols-[320px_1fr]">
-        <div
-          className="grid place-items-center rounded-xl bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_70%)] p-4"
-          style={{ perspective: 1200 }}
-          data-testid="card-sheet-art"
-          onPointerMove={tilt.onPointerMove}
-          onPointerLeave={tilt.onPointerLeave}
-        >
-          <Card3D
-            card={{ id: o.cardId, name: o.name, number: slot.number, rarity: o.rarity ?? "common", holo, image: o.mid, framed: true }}
-            active
-            mode={tilt.mode}
-            tiltTarget={tilt.target}
-            style={{ width: "100%" }}
-          />
-        </div>
-        <div className="space-y-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="font-mono text-sm text-ui-text-3">
-                {setCode} · {pad(slot.number)}
-              </p>
-              <h2 className="text-2xl font-bold">{o.name || t.collection.binder.cardFallbackName(pad(slot.number))}</h2>
-              <p className="text-ui-text-2">{o.rarity ? t.common.rarity[o.rarity] : "—"}</p>
-            </div>
-            <button type="button" onClick={onClose} className="text-ui-text-3 hover:text-white" aria-label={t.common.close}>
-              ✕
-            </button>
-          </div>
-          {o.flavorText && <p className="italic text-ui-text-2">{t.collection.binder.flavorQuote(o.flavorText)}</p>}
-          <dl className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg border border-ui-line p-3">
-              <dt className="text-ui-text-3">{t.collection.binder.normal}</dt>
-              <dd className="text-xl font-semibold tabular-nums">x{o.qty}</dd>
-            </div>
-            <div className="rounded-lg border border-ui-line p-3">
-              <dt className="text-ui-text-3">{t.collection.binder.holo}</dt>
-              <dd className="text-xl font-semibold tabular-nums">x{o.holoQty}</dd>
-            </div>
-          </dl>
-          <p className="text-sm text-ui-text-3">{t.collection.binder.firstObtained(formatDate(locale, o.firstObtainedAt, "long"))}</p>
-          {o.holoQty > 0 && (
-            <div className="flex gap-2 text-sm" role="group" aria-label={t.collection.binder.version}>
-              <button type="button" aria-pressed={!holo} onClick={() => setHolo(false)} className={`rounded-full px-4 py-1.5 ${!holo ? "bg-ui-hover" : "border border-ui-line"}`}>
-                {t.collection.binder.normal}
-              </button>
-              <button type="button" aria-pressed={holo} onClick={() => setHolo(true)} className={`rounded-full px-4 py-1.5 ${holo ? "bg-ui-hover" : "border border-ui-line"}`}>
-                {t.collection.binder.holo}
-              </button>
-            </div>
-          )}
-          <p className="text-xs text-ui-text-3">{t.collection.binder.aiHint}</p>
-        </div>
-      </div>
-    </dialog>
-  );
-}
+// Spec 011 (RNF de peso): el modal de la ficha se descarga al abrir la primera carta.
+const CardSheet = lazy(() => import("./CardSheet").then((m) => ({ default: m.CardSheet })));
 
 export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode: string }) {
   const t = useT();
@@ -117,29 +49,18 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-2" data-testid="binder-filters">
         {MODES.map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => setMode(m)}
-            aria-pressed={mode === m}
-            className={`rounded-full px-4 py-1.5 text-sm ${mode === m ? "bg-ui-accent font-semibold text-ui-on-accent" : "border border-ui-line text-ui-text-2"}`}
-          >
+          <Button key={m} size="sm" variant={mode === m ? "primary" : "secondary"} onClick={() => setMode(m)} aria-pressed={mode === m}>
             {t.collection.binder.modes[m]}
-          </button>
+          </Button>
         ))}
-        <select
+        <Select
+          label={t.collection.binder.filterByRarity}
+          hideLabel
           value={rarity}
-          onChange={(e) => setRarity(e.target.value as Rarity | "")}
-          aria-label={t.collection.binder.filterByRarity}
-          className="rounded-full border border-ui-line bg-transparent px-3 py-1.5 text-sm"
-        >
-          <option value="">{t.collection.binder.allRarities}</option>
-          {RARITIES.map((r) => (
-            <option key={r} value={r} className="bg-ui-nav">
-              {t.common.rarity[r]}
-            </option>
-          ))}
-        </select>
+          onValueChange={(v) => setRarity(v as Rarity | "")}
+          options={[{ value: "", label: t.collection.binder.allRarities }, ...RARITIES.map((r) => ({ value: r, label: t.common.rarity[r] }))]}
+          className="ml-auto w-48"
+        />
       </div>
       {visible.length === 0 && <p className="text-ui-text-3">{t.collection.binder.noMatches}</p>}
       <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6" data-testid="binder-grid">
@@ -149,25 +70,29 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
               <button
                 type="button"
                 onClick={() => setOpen(s.number)}
-                className={`binder-card group relative block w-full overflow-hidden rounded-xl ${s.owned.holoQty > 0 ? "binder-card--holo" : ""}`}
+                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? "binder-card--holo" : ""}`}
                 aria-label={t.collection.binder.viewCard(pad(s.number))}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
                 <img src={s.owned.thumb} alt={s.owned.name} loading="lazy" className="aspect-[63/88] w-full object-cover transition group-hover:scale-[1.03]" />
                 <span className="absolute right-1.5 top-1.5 rounded-md bg-black/70 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums">x{s.owned.qty + s.owned.holoQty}</span>
-                {s.owned.holoQty > 0 && <span className="absolute left-1.5 top-1.5 rounded-md bg-gradient-to-r from-pink-400 via-sky-300 to-yellow-200 px-1.5 py-0.5 text-[10px] font-bold text-black">HOLO</span>}
+                {s.owned.holoQty > 0 && <span className="absolute left-1.5 top-1.5 rounded-md bg-gradient-to-r from-pink-400 via-sky-300 to-yellow-200 px-1.5 py-0.5 text-[10px] font-bold text-ui-rail">HOLO</span>}
               </button>
             </li>
           ) : (
             <li key={s.number} data-slot={s.number} data-missing="true">
-              <div className="grid aspect-[63/88] w-full place-items-center rounded-xl border-2 border-dashed border-ui-line bg-ui-raised">
+              <div className="grid aspect-[63/88] w-full place-items-center rounded-l border-2 border-dashed border-ui-line bg-ui-raised">
                 <span className="font-mono text-lg text-ui-text-3">{pad(s.number)}</span>
               </div>
             </li>
           ),
         )}
       </ul>
-      {current?.owned && <CardSheet slot={current as BinderSlotDTO & { owned: NonNullable<BinderSlotDTO["owned"]> }} setCode={setCode} onClose={() => setOpen(null)} />}
+      {current?.owned && (
+        <Suspense fallback={null}>
+          <CardSheet slot={current as BinderSlotDTO & { owned: NonNullable<BinderSlotDTO["owned"]> }} setCode={setCode} onClose={() => setOpen(null)} />
+        </Suspense>
+      )}
     </div>
   );
 }

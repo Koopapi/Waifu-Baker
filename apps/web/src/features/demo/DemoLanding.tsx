@@ -4,6 +4,9 @@ import { db } from "@/db/client";
 import { cards, sets } from "@/db/schema";
 import { enterDemoAction } from "@/app/demo/actions";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+import { Button } from "@/ui/action/Button";
+import { Badge } from "@/ui/content/Badge";
+import { Alert } from "@/ui/feedback/Alert";
 import { getDict } from "@/i18n/server";
 
 // Abanico de la portada: cartas de la colección de bienvenida, con su giro y desplazamiento.
@@ -38,7 +41,7 @@ export async function DemoLanding() {
                 className="absolute left-1/2 top-0 h-[210px] w-[150px]"
                 style={{ transform: `translateX(calc(-50% + ${FAN[i].x}px)) translateY(${FAN[i].y}px) rotate(${FAN[i].rot}deg)`, zIndex: i === 2 ? 3 : i === 1 || i === 3 ? 2 : 1 }}
               >
-                <span className="card-in block size-full overflow-hidden rounded-xl border-2 border-white/20 shadow-[0_14px_34px_rgb(0_0_0/0.55)]" style={{ "--i": i } as React.CSSProperties}>
+                <span className="card-in block size-full overflow-hidden rounded-l border-2 border-ui-text/20 shadow-3" style={{ "--i": i } as React.CSSProperties}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- imagen servida por la ruta de la demo */}
                   <img src={`/api/demo/card/${c!.number}`} alt="" className="size-full object-cover object-top" />
                 </span>
@@ -47,18 +50,18 @@ export async function DemoLanding() {
           </div>
         )}
         <div className="space-y-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-ui-accent/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-ui-accent-text">
+          <Badge tone="accent" className="uppercase tracking-wider">
             <FlaskConical className="size-3.5" aria-hidden />
             {d.tag}
-          </span>
+          </Badge>
           <h1 className="font-display text-5xl font-bold sm:text-6xl">Waifu Baker</h1>
           <p className="mx-auto max-w-xl text-base text-ui-text-2 sm:text-lg">{t.site.home.tagline}</p>
         </div>
-        {fan.length === 0 && <p className="text-sm text-amber-200">{d.notSeeded}</p>}
+        {fan.length === 0 && <Alert tone="warning">{d.notSeeded}</Alert>}
         <div className="grid w-full gap-4 sm:grid-cols-2">
           <form action={enterDemoAction.bind(null, "collector")}>
-            <button className="btn w-full justify-start gap-4 bg-ui-accent p-5 text-left text-ui-on-accent hover:bg-ui-accent-hover" data-testid="demo-enter-collector">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/15">
+            <Button type="submit" size="block" width="full" data-testid="demo-enter-collector">
+              <span className="grid size-11 shrink-0 place-items-center rounded-l bg-ui-text/15">
                 <Sparkles className="size-5" aria-hidden />
               </span>
               <span className="flex-1">
@@ -66,11 +69,11 @@ export async function DemoLanding() {
                 <span className="block text-[13px] font-normal opacity-90">{d.enterCollectorDetail}</span>
               </span>
               <ArrowRight className="size-5 shrink-0" aria-hidden />
-            </button>
+            </Button>
           </form>
           <form action={enterDemoAction.bind(null, "admin")}>
-            <button className="btn w-full justify-start gap-4 border border-ui-line bg-ui-raised p-5 text-left text-ui-text hover:bg-ui-hover" data-testid="demo-enter-admin">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-ui-hover">
+            <Button type="submit" size="block" variant="secondary" width="full" data-testid="demo-enter-admin">
+              <span className="grid size-11 shrink-0 place-items-center rounded-l bg-ui-hover">
                 <ShieldCheck className="size-5" aria-hidden />
               </span>
               <span className="flex-1">
@@ -78,7 +81,7 @@ export async function DemoLanding() {
                 <span className="block text-[13px] font-normal text-ui-text-2">{d.enterAdminDetail}</span>
               </span>
               <ArrowRight className="size-5 shrink-0 text-ui-text-2" aria-hidden />
-            </button>
+            </Button>
           </form>
         </div>
         <p className="text-xs text-ui-text-3">{d.note}</p>

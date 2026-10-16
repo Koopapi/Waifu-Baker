@@ -16,7 +16,7 @@ export default async function AlbumSettingsPage() {
   return (
     <main className="mx-auto max-w-4xl space-y-6 px-4 py-6 md:px-8">
       <div>
-        <Link href="/coleccion" className="text-sm text-ui-text-3 hover:text-white">
+        <Link href="/coleccion" className="text-sm text-ui-text-3 hover:text-ui-text">
           {t.collection.backToCollection}
         </Link>
         <h1 className="text-3xl font-bold">{t.collection.album.pageTitle}</h1>

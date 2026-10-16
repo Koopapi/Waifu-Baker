@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { acceptTermsAction } from "@/app/bienvenida/actions";
+import { Button } from "@/ui/action/Button";
+import { Alert } from "@/ui/feedback/Alert";
+import { Checkbox } from "@/ui/form/Choice";
 import { useT } from "@/i18n/client";
 
 export function GateForm({ next, minAge }: { next: string; minAge: number }) {
@@ -11,28 +14,28 @@ export function GateForm({ next, minAge }: { next: string; minAge: number }) {
   return (
     <form action={action} className="space-y-4" data-testid="gate-form">
       <input type="hidden" name="next" value={next} />
-      <label className="flex items-start gap-3 text-sm">
-        <input type="checkbox" name="age" required className="mt-1" />
-        <span>{t.age(minAge)}</span>
-      </label>
-      <label className="flex items-start gap-3 text-sm">
-        <input type="checkbox" name="terms" required className="mt-1" />
-        <span>
-          {t.termsBefore}{" "}
-          <Link href="/legal/terms" target="_blank" className="underline">
-            {t.termsLink}
-          </Link>{" "}
-          {t.and}{" "}
-          <Link href="/legal/privacy" target="_blank" className="underline">
-            {t.privacyLink}
-          </Link>
-          .
-        </span>
-      </label>
-      <button disabled={pending} className="w-full btn rounded-md bg-ui-accent hover:bg-ui-accent-hover py-3 font-semibold text-ui-on-accent disabled:opacity-50">
+      <Checkbox name="age" required label={t.age(minAge)} />
+      <Checkbox
+        name="terms"
+        required
+        label={
+          <>
+            {t.termsBefore}{" "}
+            <Link href="/legal/terms" target="_blank" className="text-ui-accent-text underline">
+              {t.termsLink}
+            </Link>{" "}
+            {t.and}{" "}
+            <Link href="/legal/privacy" target="_blank" className="text-ui-accent-text underline">
+              {t.privacyLink}
+            </Link>
+            .
+          </>
+        }
+      />
+      <Button type="submit" size="lg" width="full" loading={pending}>
         {t.submit}
-      </button>
-      {state?.error && <p className="text-sm text-red-300">{state.error}</p>}
+      </Button>
+      {state?.error && <Alert tone="danger">{state.error}</Alert>}
     </form>
   );
 }

@@ -10,6 +10,7 @@ import { formatDate, formatDateTime } from "@/i18n/format";
 import { now } from "@/server/clock";
 import { rewardsForAdmin } from "@/server/services/rewards";
 import { CookiesForm } from "./cookies-form";
+import { Badge } from "@/ui/content/Badge";
 import { GiftForm } from "./gift-form";
 
 const pad = (n: number) => String(n).padStart(3, "0");
@@ -33,18 +34,18 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-4xl space-y-8">
       <div className="space-y-2">
-        <Link href="/admin/users" className="text-sm text-ui-text-3 hover:text-white">
+        <Link href="/admin/users" className="text-sm text-ui-text-3 hover:text-ui-text">
           {t.back}
         </Link>
         <h1 className="text-2xl font-bold">{user.displayName || tt.admin.noName}</h1>
         <p className="text-sm text-ui-text-2">
           {t.patreon} <span className="font-mono">{user.patreonUserId}</span> · {user.role === "admin" ? t.admin : t.user} · {t.ageVerifiedLabel}{" "}
           {verified ? t.yesLower : t.noLower}
-          {user.deletedAt && <span className="text-red-300">{t.accountDeleted}</span>}
+          {user.deletedAt && <Badge tone="danger">{t.accountDeleted}</Badge>}
         </p>
       </div>
 
-      <section className="space-y-2 rounded-xl border border-ui-line p-4" data-testid="patreon-state">
+      <section className="space-y-2 rounded-l border border-ui-line p-4" data-testid="patreon-state">
         <h2 className="font-semibold">{t.patreonState.title}</h2>
         {!patreon ? (
           <p className="text-sm text-ui-text-3">{t.patreonState.none}</p>
@@ -66,7 +67,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         )}
       </section>
 
-      <section className="space-y-3 rounded-xl border border-ui-line p-4" data-testid="user-rewards">
+      <section className="space-y-3 rounded-l border border-ui-line p-4" data-testid="user-rewards">
         <h2 className="font-semibold">{t.rewards.title}</h2>
         <ul className="space-y-1 text-sm text-ui-text-2">
           <li>{t.rewards.charges(rw.free.charges, rw.free.max)}</li>
@@ -74,11 +75,11 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
           <li data-testid="user-cookies">{t.rewards.cookies(rw.cookies)}</li>
         </ul>
         {rw.history.length > 0 && (
-          <ul className="divide-y divide-ui-line rounded-lg border border-ui-line text-sm">
+          <ul className="divide-y divide-ui-line rounded-m border border-ui-line text-sm">
             {rw.history.map((m) => (
               <li key={m.id} className="flex justify-between gap-4 px-3 py-1.5">
                 <span>{tt.rewards.cookies.reason(m.reason)}</span>
-                <span className={`tabular-nums ${m.amount < 0 ? "text-red-300" : "text-emerald-300"}`}>
+                <span className={`tabular-nums ${m.amount < 0 ? "text-ui-danger-text" : "text-ui-success-text"}`}>
                   {m.amount > 0 ? "+" : ""}
                   {m.amount} · {formatDateTime(locale, m.createdAt)}
                 </span>
@@ -89,7 +90,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         {!user.deletedAt && <CookiesForm userId={user.id} />}
       </section>
 
-      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
+      <section className="space-y-3 rounded-l border border-ui-line bg-ui-raised p-4">
         <h2 className="font-semibold">{t.gift}</h2>
         {user.deletedAt ? <p className="text-sm text-ui-text-3">{t.cannotGiftDeleted}</p> : <GiftForm userId={user.id} sets={giftable} />}
       </section>
@@ -105,7 +106,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
                 .map(([code, n]) => `${code}: ${n}`)
                 .join(" · ")}
             </p>
-            <ul className="divide-y divide-ui-line rounded-xl border border-ui-line text-sm">
+            <ul className="divide-y divide-ui-line rounded-l border border-ui-line text-sm">
               {sealedPacks.slice(0, 20).map((p) => (
                 <li key={p.id} className="flex justify-between gap-4 px-4 py-2">
                   <span>
@@ -125,7 +126,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         {packHistory.length === 0 ? (
           <p className="text-sm text-ui-text-3">{t.packHistory.empty}</p>
         ) : (
-          <ul className="divide-y divide-ui-line rounded-xl border border-ui-line text-sm">
+          <ul className="divide-y divide-ui-line rounded-l border border-ui-line text-sm">
             {packHistory.map((p) => (
               <li key={p.id} className="flex flex-wrap justify-between gap-x-4 gap-y-1 px-4 py-2" data-status={p.status}>
                 <span>
@@ -133,7 +134,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
                   {p.cycleKey && <span className="text-ui-text-3"> · {t.packHistory.cycle(p.cycleKey)}</span>}
                   {p.reason && <span className="text-ui-text-3"> · {p.reason}</span>}
                 </span>
-                <span className={p.status === "void" ? "text-red-300" : "text-ui-text-3"}>
+                <span className={p.status === "void" ? "text-ui-danger-text" : "text-ui-text-3"}>
                   {t.packHistory.status[p.status] ?? p.status} · {formatDateTime(locale, p.grantedAt)}
                 </span>
               </li>
@@ -149,7 +150,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         ) : (
           <ul className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
             {collection.map((c) => (
-              <li key={`${c.cardId}-${c.holo}`} className="rounded-lg border border-ui-line px-3 py-2">
+              <li key={`${c.cardId}-${c.holo}`} className="rounded-m border border-ui-line px-3 py-2">
                 <span className="font-mono text-ui-text-3">
                   {c.setCode} · {pad(c.number)}
                 </span>{" "}
@@ -166,7 +167,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         {openings.length === 0 ? (
           <p className="text-sm text-ui-text-3">{t.noHistory}</p>
         ) : (
-          <ul className="divide-y divide-ui-line rounded-xl border border-ui-line text-sm">
+          <ul className="divide-y divide-ui-line rounded-l border border-ui-line text-sm">
             {openings.map((o) => (
               <li key={o.id} className="flex justify-between px-4 py-2">
                 <span>

@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { db } from "@/db/client";
 import { searchUsers } from "@/server/services/users-admin";
-import { inputCls } from "@/features/admin/ui";
+import { Button } from "@/ui/action/Button";
+import { Badge } from "@/ui/content/Badge";
+import { Table } from "@/ui/content/Table";
+import { EmptyState } from "@/ui/feedback/EmptyState";
+import { TextField } from "@/ui/form/TextField";
 import { getDict, getLocale } from "@/i18n/server";
 import { formatDate } from "@/i18n/format";
 
@@ -15,42 +19,39 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
   return (
     <div className="max-w-4xl space-y-6">
       <h1 className="text-2xl font-bold">{t.title}</h1>
-      <form className="flex gap-3" role="search">
-        <input name="q" defaultValue={q} placeholder={t.searchPlaceholder} className={inputCls} aria-label={t.searchAria} />
-        <button className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-5 text-sm font-semibold text-ui-on-accent">{t.search}</button>
+      <form className="flex items-end gap-3" role="search">
+        <TextField name="q" defaultValue={q} placeholder={t.searchPlaceholder} label={t.searchAria} hideLabel fieldClassName="flex-1" />
+        <Button type="submit">{t.search}</Button>
       </form>
       {rows.length === 0 ? (
-        <p className="text-sm text-ui-text-3">{q ? t.noMatch(q) : t.empty}</p>
+        <EmptyState title={q ? t.noMatch(q) : t.empty} />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-ui-line">
-          <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
-              <tr>
-                <th className="px-4 py-3">{t.th.name}</th>
-                <th className="px-4 py-3">{t.th.patreon}</th>
-                <th className="px-4 py-3">{t.th.role}</th>
-                <th className="px-4 py-3">{t.th.ageVerified}</th>
-                <th className="px-4 py-3">{t.th.joined}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((u) => (
-                <tr key={u.id} className="border-t border-ui-line hover:bg-ui-raised">
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/users/${u.id}`} className="underline decoration-white/20 underline-offset-4 hover:decoration-white">
-                      {u.displayName || tt.admin.noName}
-                    </Link>
-                    {u.deletedAt && <span className="ml-2 text-xs text-red-300">{t.deletedBadge}</span>}
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-ui-text-2">{u.patreonUserId}</td>
-                  <td className="px-4 py-3">{u.role === "admin" ? t.admin : t.user}</td>
-                  <td className="px-4 py-3">{u.isAdultDeclared && u.adultVerifiedAt ? t.yes : t.no}</td>
-                  <td className="px-4 py-3 text-ui-text-2">{formatDate(locale, u.createdAt, "medium")}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          caption={t.title}
+          columns={[
+            {
+              key: "displayName",
+              header: t.th.name,
+              render: (u) => (
+                <>
+                  <Link href={`/admin/users/${u.id}`} className="underline decoration-ui-line underline-offset-4 hover:decoration-ui-text">
+                    {u.displayName || tt.admin.noName}
+                  </Link>
+                  {u.deletedAt && (
+                    <Badge tone="danger" className="ml-2">
+                      {t.deletedBadge}
+                    </Badge>
+                  )}
+                </>
+              ),
+            },
+            { key: "patreonUserId", header: t.th.patreon, render: (u) => <span className="font-mono text-xs text-ui-text-2">{u.patreonUserId}</span> },
+            { key: "role", header: t.th.role, render: (u) => (u.role === "admin" ? t.admin : t.user) },
+            { key: "adultVerifiedAt", header: t.th.ageVerified, render: (u) => (u.isAdultDeclared && u.adultVerifiedAt ? t.yes : t.no) },
+            { key: "createdAt", header: t.th.joined, render: (u) => <span className="text-ui-text-2">{formatDate(locale, u.createdAt, "medium")}</span> },
+          ]}
+          rows={rows}
+        />
       )}
     </div>
   );

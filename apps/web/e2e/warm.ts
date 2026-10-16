@@ -20,6 +20,7 @@ export const ROUTES = [
   "/recompensas",
   "/bienvenida",
   "/legal/terms",
+  "/sistema",
   "/admin",
   "/admin/sets",
   `/admin/sets/${ID}`,

@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 import { auth, devLoginEnabled, patreonLoginEnabled, signIn } from "@/auth";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+import { Button } from "@/ui/action/Button";
+import { Card } from "@/ui/content/Card";
+import { Checkbox } from "@/ui/form/Choice";
+import { TextField } from "@/ui/form/TextField";
 import { getDict } from "@/i18n/server";
 
 export async function generateMetadata() {
@@ -18,7 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <main className="min-h-dvh grid place-items-center bg-ui-bg text-ui-text px-4">
       <LocaleToggle className="fixed right-4 top-4 z-50" />
-      <div className="w-full max-w-sm space-y-6 rounded-2xl border border-ui-line bg-ui-raised p-6">
+      <Card as="div" className="w-full max-w-sm space-y-6 p-6">
         <h1 className="text-xl font-bold">{t.site.login.title}</h1>
         {patreonLoginEnabled && (
           <form
@@ -27,7 +31,9 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               await signIn("patreon", { redirectTo: target });
             }}
           >
-            <button className="btn w-full bg-[#f96854] py-3 text-[#141414] hover:brightness-110">{t.site.login.withPatreon}</button>
+            <Button type="submit" variant="patreon" size="lg" width="full">
+              {t.site.login.withPatreon}
+            </Button>
           </form>
         )}
         {!patreonLoginEnabled && <p className="text-sm text-ui-text-2">{t.site.login.patreonMissing}</p>}
@@ -40,14 +46,14 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             }}
           >
             <p className="text-xs uppercase tracking-wider text-ui-text-3">{t.site.login.devLogin}</p>
-            <input name="name" required placeholder={t.site.login.namePlaceholder} className="w-full rounded-lg border border-ui-line bg-transparent px-3 py-2" />
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="admin" defaultChecked /> {t.site.login.asAdmin}
-            </label>
-            <button className="w-full btn rounded-md bg-ui-accent hover:bg-ui-accent-hover py-2.5 font-semibold text-ui-on-accent">{t.site.login.devSubmit}</button>
+            <TextField name="name" required label={t.site.login.namePlaceholder} hideLabel placeholder={t.site.login.namePlaceholder} />
+            <Checkbox name="admin" defaultChecked label={t.site.login.asAdmin} />
+            <Button type="submit" width="full">
+              {t.site.login.devSubmit}
+            </Button>
           </form>
         )}
-      </div>
+      </Card>
     </main>
   );
 }

@@ -16,6 +16,10 @@ import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
 import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
 import { getDict } from "@/i18n/server";
+import { Button } from "@/ui/action/Button";
+import { Badge } from "@/ui/content/Badge";
+import { Card } from "@/ui/content/Card";
+import { Alert } from "@/ui/feedback/Alert";
 import { EditSetForm } from "../forms";
 
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -60,7 +64,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <Link href="/admin/sets" className="text-sm text-ui-text-3 hover:text-white">
+        <Link href="/admin/sets" className="text-sm text-ui-text-3 hover:text-ui-text">
           {t.back}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
@@ -72,27 +76,29 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         </div>
       </div>
 
-      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
-        <h2 className="font-semibold">{t.details}</h2>
+      <Card className="space-y-3" title={t.details}>
         <EditSetForm set={set} lockedForUsers={!perms.canEditRarity} />
-      </section>
+      </Card>
 
-      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-semibold">{t.publishing}</h2>
-          {cards.some((c) => c.rarity) && (
-            <Link href={`/admin/sets/${set.id}/simulate`} className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover" data-testid="simulate-link">
-              {t.simulate}
-            </Link>
-          )}
-        </div>
+      <Card
+        className="space-y-3"
+        title={t.publishing}
+        aside={
+          cards.some((c) => c.rarity) && (
+            <Button size="sm" variant="secondary" asChild>
+              <Link href={`/admin/sets/${set.id}/simulate`} data-testid="simulate-link">
+                {t.simulate}
+              </Link>
+            </Button>
+          )
+        }
+      >
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
-      </section>
+      </Card>
 
-      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
-        <h2 className="font-semibold">{t.welcome.title}</h2>
+      <Card className="space-y-3" title={t.welcome.title}>
         <WelcomeToggle setId={set.id} isWelcome={set.isWelcome} eligible={set.status === "published" && !set.isAdult} />
-      </section>
+      </Card>
 
       {overview.odds && (
         <section className="space-y-3">
@@ -117,19 +123,23 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           </div>
           <div className="flex flex-wrap gap-2 text-xs" data-testid="rarity-counts">
             {RARITIES.map((r) => (
-              <span key={r} className={`rounded-md border px-2 py-1 ${gaps.includes(r) ? "border-amber-400/50 text-amber-300" : "border-ui-line text-ui-text-2"}`}>
+              <Badge key={r} tone={gaps.includes(r) ? "warning" : "neutral"}>
                 {tt.common.rarity[r]} <b className="tabular-nums">{counts[r]}</b>
-              </span>
+              </Badge>
             ))}
-            {counts.none > 0 && <span className="rounded-md border border-ui-line px-2 py-1 text-ui-text-3">{t.noRarityCount(counts.none)}</span>}
+            {counts.none > 0 && <Badge>{t.noRarityCount(counts.none)}</Badge>}
           </div>
         </div>
         {(gaps.length > 0 || incomplete > 0 || unreviewed > 0) && cards.length > 0 && (
-          <ul className="space-y-1 rounded-xl border border-amber-400/30 bg-amber-400/5 p-3 text-sm text-amber-200" data-testid="set-warnings">
-            {gaps.length > 0 && <li>{t.gaps(gaps.map((g) => tt.common.rarity[g]).join(", "))}</li>}
-            {incomplete > 0 && <li>{t.incomplete(incomplete)}</li>}
-            {unreviewed > 0 && <li>{t.unreviewed(unreviewed)}</li>}
-          </ul>
+          <div data-testid="set-warnings">
+            <Alert tone="warning">
+              <ul className="space-y-1">
+                {gaps.length > 0 && <li>{t.gaps(gaps.map((g) => tt.common.rarity[g]).join(", "))}</li>}
+                {incomplete > 0 && <li>{t.incomplete(incomplete)}</li>}
+                {unreviewed > 0 && <li>{t.unreviewed(unreviewed)}</li>}
+              </ul>
+            </Alert>
+          </div>
         )}
         <Dropzone setId={set.id} disabled={!perms.canAdd} />
         <CardWorkspace setId={set.id} cards={cards} characters={characters.map((c) => ({ id: c.id, name: c.name }))} perms={perms} />

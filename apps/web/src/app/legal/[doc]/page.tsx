@@ -32,7 +32,7 @@ export default async function LegalPage({ params }: { params: Promise<{ doc: str
     <main className="min-h-dvh bg-ui-bg px-4 py-10 text-ui-text">
       <LocaleToggle className="fixed right-4 top-4" />
       <article className="mx-auto max-w-3xl space-y-6" data-testid={`legal-${doc}`}>
-        <Link href="/" className="text-sm text-ui-text-3 hover:text-white">
+        <Link href="/" className="text-sm text-ui-text-3 hover:text-ui-text">
           ← {t.footer.rights.replace("© ", "")}
         </Link>
         <header className="space-y-1">

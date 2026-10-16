@@ -2,7 +2,9 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { giftPacksAction } from "../actions";
-import { Field, FormMessage, inputCls, SubmitButton } from "@/features/admin/ui";
+import { FormMessage, SubmitButton } from "@/features/admin/ui";
+import { Select } from "@/ui/form/Select";
+import { TextField } from "@/ui/form/TextField";
 import { useT } from "@/i18n/client";
 
 export function GiftForm({ userId, sets }: { userId: string; sets: { id: string; code: string; name: string; isAdult: boolean; blocked: boolean }[] }) {
@@ -16,26 +18,16 @@ export function GiftForm({ userId, sets }: { userId: string; sets: { id: string;
   return (
     <form ref={form} action={action} className="grid gap-4 md:grid-cols-[1fr_120px] md:items-end">
       <input type="hidden" name="userId" value={userId} />
-      <Field label={t.giftSet}>
-        <select name="setId" className={inputCls}>
-          {sets.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.code} · {s.name}
-              {s.isAdult ? " (18+)" : ""}
-              {s.blocked ? t.requiresAge : ""}
-            </option>
-          ))}
-        </select>
-      </Field>
-      <Field label={t.giftCount}>
-        <input name="count" type="number" min={1} max={20} defaultValue={1} className={inputCls} />
-      </Field>
-      <div className="md:col-span-2">
-        <Field label={t.reason} hint={t.reasonHint}>
-          <input name="reason" required minLength={3} maxLength={200} className={inputCls} />
-        </Field>
-      </div>
-      <div className="flex items-center gap-4 md:col-span-2">
+      <Select
+        label={t.giftSet}
+        name="setId"
+        defaultValue={sets[0].id}
+        searchable={sets.length > 8}
+        options={sets.map((s) => ({ value: s.id, label: `${s.code} · ${s.name}${s.isAdult ? " (18+)" : ""}${s.blocked ? t.requiresAge : ""}` }))}
+      />
+      <TextField label={t.giftCount} name="count" type="number" min={1} max={20} defaultValue={1} />
+      <TextField label={t.reason} hint={t.reasonHint} name="reason" required minLength={3} maxLength={200} fieldClassName="md:col-span-2" />
+      <div className="flex flex-wrap items-center gap-4 md:col-span-2">
         <SubmitButton>{t.gift}</SubmitButton>
         <FormMessage state={state} />
       </div>
