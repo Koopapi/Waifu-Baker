@@ -13,8 +13,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-24.04
-    # El E2E de escritorio tarda ~20 min en los ejecutores de GitHub (más lentos que un Mac).
-    timeout-minutes: 45
+    # El E2E de escritorio tarda ~30 min en los ejecutores de GitHub (más lentos que un Mac).
+    timeout-minutes: 60
     services:
       postgres:
         image: postgres:16
