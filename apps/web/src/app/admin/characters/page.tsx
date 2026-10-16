@@ -11,7 +11,7 @@ export default async function CharactersPage() {
       <h1 className="text-2xl font-bold">{t.title}</h1>
       <CreateCharacterForm />
       <div className="space-y-2">
-        {rows.length === 0 && <p className="text-sm text-white/50">{t.empty}</p>}
+        {rows.length === 0 && <p className="text-sm text-ui-text-3">{t.empty}</p>}
         {rows.map((c) => (
           <CharacterRow key={c.id} c={c} />
         ))}

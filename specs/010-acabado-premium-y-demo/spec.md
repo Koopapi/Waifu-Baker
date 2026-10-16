@@ -24,6 +24,7 @@ administrador sin preparar nada a mano. La funcionalidad no cambia: esta spec es
 - RF-3: EL SISTEMA mostrará el contenido de la sección en la zona central, sin recargar la página completa al cambiar de sección.
 - RF-4: MIENTRAS la pantalla sea de móvil, EL SISTEMA ocultará la barra y el panel de navegación en un menú deslizable que se abre con un botón y con un gesto desde el borde.
 - RF-5: EL SISTEMA aplicará la misma estructura al panel de administración, con sus propias secciones.
+- RF-16: MIENTRAS la pantalla sea de móvil, EL SISTEMA mostrará además una barra inferior con pestañas a Mis sobres, Mi colección, Recompensas y Mi cuenta, con la actual resaltada.
 
 ### Acabado
 - RF-6: EL SISTEMA usará una única paleta de colores, tipografía y radios de borde en toda la web, elegidos entre las opciones que se presenten en maquetas.
@@ -33,8 +34,13 @@ administrador sin preparar nada a mano. La funcionalidad no cambia: esta spec es
 - RF-10: EL SISTEMA animará los cambios de sección y la aparición de tarjetas solo con transformaciones y opacidad, y sin animaciones cuando el usuario pida movimiento reducido.
 - RF-11: EL SISTEMA mantendrá el contraste de texto de al menos 4,5:1 y el uso completo con teclado.
 
+### Edad mínima configurable
+- RF-17: EL SISTEMA permitirá al administrador elegir desde el panel la edad mínima de la web, 16 o 18 años, pidiendo confirmación y guardando el cambio en el historial.
+- RF-18: CUANDO la edad mínima sube, EL SISTEMA pedirá a cada usuario que confirmó una edad menor que confirme la nueva antes de seguir usando la web.
+- RF-19: EL SISTEMA mostrará la edad mínima vigente en la bienvenida, en los términos y en la política de privacidad.
+
 ### Demo local
-- RF-12: CUANDO el usuario ejecuta el comando de la demo, EL SISTEMA creará una base de datos de demo con la colección de fan art (30 cartas con rarezas y marcos), probabilidades publicadas, un coleccionista con sobres sin abrir, cartas, galletas y una racha empezada, y un administrador.
+- RF-12: CUANDO el usuario ejecuta el comando de la demo, EL SISTEMA creará una base de datos de demo con la colección de fan art (30 cartas con rarezas y marcos, con nombres propios y sin los nombres reales de los personajes), probabilidades publicadas, un coleccionista con sobres sin abrir, cartas, galletas y una racha empezada, y un administrador.
 - RF-13: MIENTRAS la web corra en modo demo, EL SISTEMA mostrará una portada con «Entrar como coleccionista» y «Entrar como administrador» que inician sesión sin Patreon.
 - RF-14: MIENTRAS la web corra en modo demo, EL SISTEMA mostrará una franja que lo indica y un botón para cambiar de papel.
 - RF-15: EL SISTEMA no permitirá el modo demo en producción.
@@ -61,6 +67,10 @@ móvil → cambia a administrador y recorre el panel → los avisos y esqueletos
 movimiento reducido no hay animaciones.
 
 ## Dudas abiertas
-- Paleta: se presentarán 2 o 3 opciones en maquetas de Pencil y el usuario elegirá (RF-6).
+- Paleta: elegida la B «Cereza» (16 oct 2026).
+- Ampliación del 16 oct 2026, a petición del usuario: barra de pestañas en móvil (RF-16), edad mínima
+  configurable 16/18 para cuando se suba contenido más subido de tono (RF-17 a RF-19) y nombres propios
+  en las cartas de fan art (RF-12). El fan art no se marca como «solo gratis»: el principio 8 de la
+  constitución (nada con licencia en contenido de pago) se sigue cumpliendo a mano al configurar tiers.
 - Decisiones de la entrevista (16 oct 2026): demo en local con un comando; contenido de la demo, las
   30 imágenes de fan art; diseño validado primero con maquetas en Pencil. Spec aprobada el 16 oct 2026.

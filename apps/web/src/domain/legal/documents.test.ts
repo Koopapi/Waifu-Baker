@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { LEGAL_DOCS, MIN_AGE, TERMS_VERSION, needsAcceptance, safeNext } from "./documents";
+import { LEGAL_DOCS, MIN_AGE, MIN_AGE_OPTIONS, TERMS_VERSION, isMinAge, needsAcceptance, safeNext } from "./documents";
 
 describe("spec 007 — aceptación de términos", () => {
   it("test_s007_rf1_un_usuario_nuevo_debe_confirmar_edad_y_aceptar", () => {
@@ -26,5 +26,28 @@ describe("spec 007 — aceptación de términos", () => {
     expect(safeNext("https://malo.example")).toBe("/sobres");
     expect(safeNext("//malo.example")).toBe("/sobres");
     expect(safeNext(null)).toBe("/sobres");
+  });
+});
+
+describe("spec 010 — edad mínima configurable", () => {
+  const ok = { ageConfirmedAt: new Date(), termsVersion: TERMS_VERSION };
+
+  it("test_s010_rf17_solo_se_puede_elegir_16_o_18", () => {
+    expect(MIN_AGE_OPTIONS).toEqual([16, 18]);
+    expect(isMinAge(16)).toBe(true);
+    expect(isMinAge(18)).toBe(true);
+    expect(isMinAge(17)).toBe(false);
+  });
+
+  it("test_s010_rf18_al_subir_la_edad_se_vuelve_a_pedir_a_quien_confirmo_una_menor", () => {
+    expect(needsAcceptance({ ...ok, ageConfirmedMin: 16 }, TERMS_VERSION, 18)).toBe(true);
+    expect(needsAcceptance({ ...ok, ageConfirmedMin: 18 }, TERMS_VERSION, 18)).toBe(false);
+    // Cuentas anteriores a la spec 010: confirmaron la edad de entonces, 16.
+    expect(needsAcceptance({ ...ok, ageConfirmedMin: null }, TERMS_VERSION, 18)).toBe(true);
+    expect(needsAcceptance({ ...ok, ageConfirmedMin: null }, TERMS_VERSION, 16)).toBe(false);
+  });
+
+  it("test_s010_rf18_bajar_la_edad_no_pide_nada", () => {
+    expect(needsAcceptance({ ...ok, ageConfirmedMin: 18 }, TERMS_VERSION, 16)).toBe(false);
   });
 });

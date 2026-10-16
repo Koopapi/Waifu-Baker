@@ -38,7 +38,7 @@ function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { owned: 
     ref.current?.showModal();
   }, []);
   return (
-    <dialog ref={ref} onClose={onClose} className="m-auto w-[min(94vw,820px)] rounded-2xl border border-white/10 bg-[#15121f] p-0 text-[#f1eef8] backdrop:bg-black/75" data-testid="card-sheet">
+    <dialog ref={ref} onClose={onClose} className="m-auto w-[min(94vw,820px)] rounded-2xl border border-ui-line bg-ui-nav p-0 text-ui-text backdrop:bg-black/75" data-testid="card-sheet">
       <div className="grid gap-6 p-6 md:grid-cols-[320px_1fr]">
         <div
           className="grid place-items-center rounded-xl bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_70%)] p-4"
@@ -58,39 +58,39 @@ function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { owned: 
         <div className="space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="font-mono text-sm text-white/50">
+              <p className="font-mono text-sm text-ui-text-3">
                 {setCode} · {pad(slot.number)}
               </p>
               <h2 className="text-2xl font-bold">{o.name || t.collection.binder.cardFallbackName(pad(slot.number))}</h2>
-              <p className="text-white/70">{o.rarity ? t.common.rarity[o.rarity] : "—"}</p>
+              <p className="text-ui-text-2">{o.rarity ? t.common.rarity[o.rarity] : "—"}</p>
             </div>
-            <button type="button" onClick={onClose} className="text-white/50 hover:text-white" aria-label={t.common.close}>
+            <button type="button" onClick={onClose} className="text-ui-text-3 hover:text-white" aria-label={t.common.close}>
               ✕
             </button>
           </div>
-          {o.flavorText && <p className="italic text-white/80">{t.collection.binder.flavorQuote(o.flavorText)}</p>}
+          {o.flavorText && <p className="italic text-ui-text-2">{t.collection.binder.flavorQuote(o.flavorText)}</p>}
           <dl className="grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg border border-white/10 p-3">
-              <dt className="text-white/50">{t.collection.binder.normal}</dt>
+            <div className="rounded-lg border border-ui-line p-3">
+              <dt className="text-ui-text-3">{t.collection.binder.normal}</dt>
               <dd className="text-xl font-semibold tabular-nums">x{o.qty}</dd>
             </div>
-            <div className="rounded-lg border border-white/10 p-3">
-              <dt className="text-white/50">{t.collection.binder.holo}</dt>
+            <div className="rounded-lg border border-ui-line p-3">
+              <dt className="text-ui-text-3">{t.collection.binder.holo}</dt>
               <dd className="text-xl font-semibold tabular-nums">x{o.holoQty}</dd>
             </div>
           </dl>
-          <p className="text-sm text-white/50">{t.collection.binder.firstObtained(formatDate(locale, o.firstObtainedAt, "long"))}</p>
+          <p className="text-sm text-ui-text-3">{t.collection.binder.firstObtained(formatDate(locale, o.firstObtainedAt, "long"))}</p>
           {o.holoQty > 0 && (
             <div className="flex gap-2 text-sm" role="group" aria-label={t.collection.binder.version}>
-              <button type="button" aria-pressed={!holo} onClick={() => setHolo(false)} className={`rounded-full px-4 py-1.5 ${!holo ? "bg-white/15" : "border border-white/15"}`}>
+              <button type="button" aria-pressed={!holo} onClick={() => setHolo(false)} className={`rounded-full px-4 py-1.5 ${!holo ? "bg-ui-hover" : "border border-ui-line"}`}>
                 {t.collection.binder.normal}
               </button>
-              <button type="button" aria-pressed={holo} onClick={() => setHolo(true)} className={`rounded-full px-4 py-1.5 ${holo ? "bg-white/15" : "border border-white/15"}`}>
+              <button type="button" aria-pressed={holo} onClick={() => setHolo(true)} className={`rounded-full px-4 py-1.5 ${holo ? "bg-ui-hover" : "border border-ui-line"}`}>
                 {t.collection.binder.holo}
               </button>
             </div>
           )}
-          <p className="text-xs text-white/40">{t.collection.binder.aiHint}</p>
+          <p className="text-xs text-ui-text-3">{t.collection.binder.aiHint}</p>
         </div>
       </div>
     </dialog>
@@ -122,7 +122,7 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
             type="button"
             onClick={() => setMode(m)}
             aria-pressed={mode === m}
-            className={`rounded-full px-4 py-1.5 text-sm ${mode === m ? "bg-[#d6b370] font-semibold text-[#0b0c0e]" : "border border-white/15 text-white/80"}`}
+            className={`rounded-full px-4 py-1.5 text-sm ${mode === m ? "bg-ui-accent font-semibold text-ui-on-accent" : "border border-ui-line text-ui-text-2"}`}
           >
             {t.collection.binder.modes[m]}
           </button>
@@ -131,17 +131,17 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
           value={rarity}
           onChange={(e) => setRarity(e.target.value as Rarity | "")}
           aria-label={t.collection.binder.filterByRarity}
-          className="rounded-full border border-white/15 bg-transparent px-3 py-1.5 text-sm"
+          className="rounded-full border border-ui-line bg-transparent px-3 py-1.5 text-sm"
         >
           <option value="">{t.collection.binder.allRarities}</option>
           {RARITIES.map((r) => (
-            <option key={r} value={r} className="bg-[#15121f]">
+            <option key={r} value={r} className="bg-ui-nav">
               {t.common.rarity[r]}
             </option>
           ))}
         </select>
       </div>
-      {visible.length === 0 && <p className="text-white/50">{t.collection.binder.noMatches}</p>}
+      {visible.length === 0 && <p className="text-ui-text-3">{t.collection.binder.noMatches}</p>}
       <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6" data-testid="binder-grid">
         {visible.map((s) =>
           s.owned ? (
@@ -160,8 +160,8 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
             </li>
           ) : (
             <li key={s.number} data-slot={s.number} data-missing="true">
-              <div className="grid aspect-[63/88] w-full place-items-center rounded-xl border-2 border-dashed border-white/10 bg-white/[0.02]">
-                <span className="font-mono text-lg text-white/25">{pad(s.number)}</span>
+              <div className="grid aspect-[63/88] w-full place-items-center rounded-xl border-2 border-dashed border-ui-line bg-ui-raised">
+                <span className="font-mono text-lg text-ui-text-3">{pad(s.number)}</span>
               </div>
             </li>
           ),

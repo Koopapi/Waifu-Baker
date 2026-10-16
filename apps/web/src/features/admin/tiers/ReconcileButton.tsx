@@ -16,7 +16,7 @@ export function ReconcileButton() {
         type="button"
         disabled={pending}
         onClick={() => start(async () => setState(await reconcileNowAction()))}
-        className="rounded-full border border-white/20 px-4 py-1.5 text-sm disabled:opacity-50"
+        className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm disabled:opacity-50 hover:bg-ui-hover"
         data-testid="reconcile-now"
       >
         {pending ? t.syncing : t.sync}

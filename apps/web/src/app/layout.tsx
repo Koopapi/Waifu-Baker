@@ -5,6 +5,7 @@ import { I18nProvider } from "@/i18n/client";
 import { getDict, getLocale } from "@/i18n/server";
 import { SiteFooter } from "@/features/legal/SiteFooter";
 import { TimeZoneCookie } from "@/features/rewards/TimeZoneCookie";
+import { ToastProvider } from "@/features/ui/Toast";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -22,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const viewport: Viewport = { themeColor: "#0b0912", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#241b29", colorScheme: "dark" };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
@@ -30,9 +31,11 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <I18nProvider locale={locale}>
-          <TimeZoneCookie />
-          {children}
-          <SiteFooter />
+          <ToastProvider>
+            <TimeZoneCookie />
+            {children}
+            <SiteFooter />
+          </ToastProvider>
         </I18nProvider>
       </body>
     </html>

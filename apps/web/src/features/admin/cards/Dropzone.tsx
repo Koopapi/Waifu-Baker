@@ -63,7 +63,7 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
   }
 
   if (disabled) {
-    return <p className="rounded-xl border border-white/10 p-4 text-sm text-white/50">{t.upload.locked}</p>;
+    return <p className="rounded-xl border border-ui-line p-4 text-sm text-ui-text-3">{t.upload.locked}</p>;
   }
 
   const done = items.filter((i) => i.status === "ok").length;
@@ -86,10 +86,10 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         role="button"
         tabIndex={0}
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && input.current?.click()}
-        className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition ${over ? "border-[#d6b370] bg-[#d6b370]/10" : "border-white/15 hover:border-white/30"}`}
+        className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition ${over ? "border-ui-accent bg-ui-accent/10" : "border-ui-line hover:border-ui-line"}`}
       >
         <p className="font-semibold">{t.upload.dropHere}</p>
-        <p className="mt-1 text-sm text-white/50">{t.upload.hint}</p>
+        <p className="mt-1 text-sm text-ui-text-3">{t.upload.hint}</p>
         <input
           ref={input}
           type="file"
@@ -104,8 +104,8 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         />
       </div>
       {items.length > 0 && (
-        <div className="rounded-xl border border-white/10">
-          <div className="flex items-center justify-between border-b border-white/10 px-4 py-2 text-xs text-white/60">
+        <div className="rounded-xl border border-ui-line">
+          <div className="flex items-center justify-between border-b border-ui-line px-4 py-2 text-xs text-ui-text-2">
             <span>
               {busy ? t.upload.uploading : t.upload.finished} · {t.upload.summary(done, failed)}
             </span>
@@ -115,17 +115,17 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
               </button>
             )}
           </div>
-          <ul className="max-h-56 divide-y divide-white/5 overflow-y-auto text-sm" data-testid="upload-list">
+          <ul className="max-h-56 divide-y divide-ui-line overflow-y-auto text-sm" data-testid="upload-list">
             {items.map((i) => (
               <li key={i.id} className="flex items-center gap-3 px-4 py-2">
                 <span className="w-5 text-center">{i.status === "ok" ? "✓" : i.status === "error" ? "✕" : "…"}</span>
                 <span className="min-w-0 flex-1 truncate">{i.name}</span>
                 {i.status === "uploading" && (
-                  <span className="h-1.5 w-28 overflow-hidden rounded bg-white/10">
-                    <span className="block h-full bg-[#d6b370]" style={{ width: `${i.progress}%` }} />
+                  <span className="h-1.5 w-28 overflow-hidden rounded bg-ui-hover">
+                    <span className="block h-full bg-ui-accent" style={{ width: `${i.progress}%` }} />
                   </span>
                 )}
-                {i.message && <span className={`text-xs ${i.status === "error" ? "text-red-300" : "text-white/50"}`}>{i.message}</span>}
+                {i.message && <span className={`text-xs ${i.status === "error" ? "text-red-300" : "text-ui-text-3"}`}>{i.message}</span>}
               </li>
             ))}
           </ul>

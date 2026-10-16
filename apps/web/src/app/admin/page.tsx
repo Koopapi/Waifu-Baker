@@ -35,9 +35,9 @@ export default async function AdminHome() {
       <h1 className="text-2xl font-bold">{t.title}</h1>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map((x) => (
-          <div key={x.label} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div key={x.label} className="rounded-xl border border-ui-line bg-ui-raised p-4">
             <div className="text-2xl font-bold tabular-nums">{x.value}</div>
-            <div className="text-sm text-white/60">{x.label}</div>
+            <div className="text-sm text-ui-text-2">{x.label}</div>
           </div>
         ))}
       </div>
@@ -51,22 +51,22 @@ export default async function AdminHome() {
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">{t.drafts}</h2>
-          <Link href="/admin/sets" className="text-sm text-white/60 underline underline-offset-4 hover:text-white">
+          <Link href="/admin/sets" className="text-sm text-ui-text-2 underline underline-offset-4 hover:text-white">
             {t.allSets}
           </Link>
         </div>
         {drafts.length === 0 ? (
-          <p className="text-sm text-white/50">{t.noDrafts}</p>
+          <p className="text-sm text-ui-text-3">{t.noDrafts}</p>
         ) : (
-          <ul className="divide-y divide-white/5 rounded-xl border border-white/10">
+          <ul className="divide-y divide-ui-line rounded-xl border border-ui-line">
             {drafts.map((d) => (
               <li key={d.id}>
-                <Link href={`/admin/sets/${d.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-white/[0.03]">
+                <Link href={`/admin/sets/${d.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-ui-raised">
                   <span className="font-mono">{d.code}</span>
                   <span className="flex-1">{d.name}</span>
                   <AdultBadge adult={d.isAdult} />
                   <StatusBadge status={d.status} />
-                  <span className="w-20 text-right text-sm tabular-nums text-white/60">{t.cardCount(d.cardCount)}</span>
+                  <span className="w-20 text-right text-sm tabular-nums text-ui-text-2">{t.cardCount(d.cardCount)}</span>
                 </Link>
               </li>
             ))}

@@ -48,7 +48,7 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/sobres" className="text-sm text-white/50 hover:text-white">
+          <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-white">
             {t.packs.openAll.backToMine}
           </Link>
           <h1 className="text-3xl font-bold">{t.packs.openAll.title(setName)}</h1>
@@ -58,7 +58,7 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
             type="button"
             onClick={openAll}
             disabled={pending || sealed === 0}
-            className="rounded-full bg-[#d6b370] px-6 py-2.5 font-semibold text-[#0b0c0e] disabled:opacity-50"
+            className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-6 py-2.5 font-semibold text-ui-on-accent disabled:opacity-50"
             data-testid="open-all"
           >
             {pending ? t.packs.openAll.opening : sealed === 0 ? t.packs.openAll.noneLeft : t.packs.openAll.openN(sealed)}
@@ -72,7 +72,7 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
       )}
       {cards && (
         <>
-          <p className="text-white/70" data-testid="open-all-summary">
+          <p className="text-ui-text-2" data-testid="open-all-summary">
             {t.packs.openAll.summary({ packs: opened, total: stats.total, fresh: stats.nuevas, holo: stats.holo })}
             {stats.pity > 0 && t.packs.openAll.summaryPity(stats.pity)}
           </p>
@@ -93,12 +93,12 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
                     {t.common.rarity[c.rarity]}
                     {c.holo ? t.packs.openAll.holoSuffix : ""}
                   </span>
-                  <span className={c.isNew ? "text-emerald-300" : "text-white/50"}>{c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(finalQty.get(`${c.number}-${c.holo}`) ?? c.qtyAfter)}</span>
+                  <span className={c.isNew ? "text-emerald-300" : "text-ui-text-3"}>{c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(finalQty.get(`${c.number}-${c.holo}`) ?? c.qtyAfter)}</span>
                 </div>
               </li>
             ))}
           </ul>
-          <Link href="/sobres" className="inline-block rounded-full border border-white/20 px-5 py-2 text-sm">
+          <Link href="/sobres" className="inline-block btn rounded-md border border-ui-line px-5 py-2 text-sm hover:bg-ui-hover">
             {t.packs.openAll.backToMineButton}
           </Link>
         </>

@@ -18,20 +18,20 @@ export default async function DropRatesPage() {
   const [t, locale] = await Promise.all([getDict(), getLocale()]);
   const pct = (x: number) => formatPercent(locale, x);
   return (
-    <main className="min-h-dvh bg-[#0b0912] px-4 py-12 text-[#f1eef8]">
+    <main className="min-h-dvh bg-ui-bg px-4 py-12 text-ui-text">
       <LocaleToggle className="fixed right-4 top-4 z-50" />
       <div className="mx-auto max-w-4xl space-y-10">
         <header className="space-y-3">
           <h1 className="text-3xl font-bold">{t.site.dropRates.heading}</h1>
-          <p className="text-white/70">{t.site.dropRates.intro}</p>
+          <p className="text-ui-text-2">{t.site.dropRates.intro}</p>
         </header>
-        {rows.length === 0 && <p className="text-white/50">{t.site.dropRates.empty}</p>}
+        {rows.length === 0 && <p className="text-ui-text-3">{t.site.dropRates.empty}</p>}
         {rows.map(({ set, odds }) => (
           <section key={set.id} className="space-y-3">
             <h2 className="text-xl font-semibold">
-              {set.name} <span className="font-mono text-sm text-white/50">{set.code}</span>
+              {set.name} <span className="font-mono text-sm text-ui-text-3">{set.code}</span>
             </h2>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-ui-text-3">
               {t.site.dropRates.published({
                 date: odds.publishedAt ? formatDate(locale, odds.publishedAt) : "",
                 version: odds.version,
@@ -39,14 +39,14 @@ export default async function DropRatesPage() {
                 holo: pct(odds.holoChance * 100),
               })}
             </p>
-            <p className="text-sm text-white/70" data-testid={`pity-${set.code}`}>
+            <p className="text-sm text-ui-text-2" data-testid={`pity-${set.code}`}>
               {odds.pityThreshold > 0
                 ? t.site.dropRates.pity(odds.pityThreshold - 1)
                 : t.site.dropRates.noPity}
             </p>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto rounded-xl border border-ui-line">
               <table className="w-full text-sm">
-                <thead className="bg-white/[0.03] text-xs uppercase tracking-wider text-white/50">
+                <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
                   <tr>
                     <th className="px-3 py-2 text-left">{t.site.dropRates.slot}</th>
                     {RARITIES.map((r) => (
@@ -58,7 +58,7 @@ export default async function DropRatesPage() {
                 </thead>
                 <tbody>
                   {odds.slots.map((s, i) => (
-                    <tr key={i} className="border-t border-white/5">
+                    <tr key={i} className="border-t border-ui-line">
                       <td className="px-3 py-2">{i + 1}</td>
                       {RARITIES.map((r) => (
                         <td key={r} className="px-3 py-2 text-right tabular-nums">

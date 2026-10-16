@@ -12,7 +12,21 @@ export const admin = {
     tiers: "Patreon tiers",
     users: "Users",
     metrics: "Metrics & backups",
+    settings: "Settings",
     publicOdds: "Public drop rates ↗",
+  },
+  settings: {
+    title: "Settings",
+    minAge: {
+      heading: "Minimum age",
+      help: "Who can use the website. Raise it to 18 before publishing more suggestive content: everyone who confirmed a lower age will be asked to confirm the new one before continuing.",
+      option: (n: number) => `${n}+`,
+      current: (n: number) => `Current minimum age: ${n}.`,
+      save: "Save minimum age",
+      confirmRaise: (n: number) => `Raise the minimum age to ${n}? Everyone who confirmed a lower age will have to confirm it again.`,
+      confirmLower: (n: number) => `Lower the minimum age to ${n}?`,
+      saved: (n: number) => `Minimum age set to ${n}.`,
+    },
   },
   status: {
     draft: "Draft",

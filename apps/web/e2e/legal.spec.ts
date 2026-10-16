@@ -18,7 +18,7 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
     await page.click("text=Entrar (desarrollo)");
     await page.waitForURL(/\/bienvenida\?next=%2Fsobres/);
     await expect(page.locator("h1")).toHaveText(es.gate.title);
-    await expect(page.locator(`text=${es.gate.age}`)).toBeVisible();
+    await expect(page.locator(`text=${es.gate.age(16)}`)).toBeVisible();
   });
 
   await test.step("RF-2: sin aceptar no ve su colección ni su cuenta, pero sí las páginas públicas", async () => {

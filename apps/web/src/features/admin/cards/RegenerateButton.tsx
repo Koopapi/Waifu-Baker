@@ -24,11 +24,11 @@ export function RegenerateButton({ setId, count }: { setId: string; count: numbe
             router.refresh();
           })
         }
-        className="rounded-full border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5 disabled:opacity-60"
+        className="btn rounded-md border border-ui-line px-3 py-1.5 text-xs text-ui-text-2 hover:bg-ui-hover disabled:opacity-60"
       >
         {pending ? t.regenerating(count) : t.regenerate}
       </button>
-      {msg && <span className="text-xs text-white/50">{msg}</span>}
+      {msg && <span className="text-xs text-ui-text-3">{msg}</span>}
     </span>
   );
 }

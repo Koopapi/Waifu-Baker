@@ -54,15 +54,15 @@ export function OddsEditor({
 
   return (
     <div className="space-y-4" id="probabilidades">
-      <div className="overflow-x-auto rounded-xl border border-white/10">
+      <div className="overflow-x-auto rounded-xl border border-ui-line">
         <table className="w-full min-w-[720px] text-sm">
-          <thead className="bg-white/[0.03] text-xs uppercase tracking-wider text-white/50">
+          <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
             <tr>
               <th className="px-3 py-2 text-left">{t.slot}</th>
               {RARITIES.map((r) => (
                 <th key={r} className="px-2 py-2 text-right">
                   {tt.common.rarity[r]}
-                  <span className="block font-normal normal-case tracking-normal text-white/30">{t.cardCount(cardCounts[r])}</span>
+                  <span className="block font-normal normal-case tracking-normal text-ui-text-3">{t.cardCount(cardCounts[r])}</span>
                 </th>
               ))}
               <th className="px-3 py-2 text-right">{t.sum}</th>
@@ -70,10 +70,10 @@ export function OddsEditor({
           </thead>
           <tbody>
             {slots.map((s, i) => (
-              <tr key={i} id={`ranura-${i + 1}`} className="border-t border-white/5">
-                <td className="px-3 py-2 text-white/70">
+              <tr key={i} id={`ranura-${i + 1}`} className="border-t border-ui-line">
+                <td className="px-3 py-2 text-ui-text-2">
                   {i + 1}
-                  {i === slots.length - 1 && <span className="ml-2 text-xs text-white/40">{t.guaranteed}</span>}
+                  {i === slots.length - 1 && <span className="ml-2 text-xs text-ui-text-3">{t.guaranteed}</span>}
                 </td>
                 {RARITIES.map((r) => (
                   <td key={r} className="px-2 py-1.5 text-right">
@@ -86,7 +86,7 @@ export function OddsEditor({
                       disabled={locked}
                       aria-label={t.slotAria(i + 1, tt.common.rarity[r])}
                       onChange={(e) => set(i, r, e.target.value)}
-                      className={`w-20 rounded-md border bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60 ${s[r] > 0 && cardCounts[r] === 0 ? "border-amber-400/60" : "border-white/10"}`}
+                      className={`w-20 rounded-md border bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60 ${s[r] > 0 && cardCounts[r] === 0 ? "border-amber-400/60" : "border-ui-line"}`}
                     />
                   </td>
                 ))}
@@ -96,7 +96,7 @@ export function OddsEditor({
               </tr>
             ))}
           </tbody>
-          <tfoot className="border-t border-white/10 text-xs text-white/50">
+          <tfoot className="border-t border-ui-line text-xs text-ui-text-3">
             <tr>
               <td className="px-3 py-2">{t.expected}</td>
               {expected.map(([r, e]) => (
@@ -120,7 +120,7 @@ export function OddsEditor({
             value={holo}
             disabled={locked}
             onChange={(e) => setHolo(Number(e.target.value))}
-            className="w-20 rounded-md border border-white/10 bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
+            className="w-20 rounded-md border border-ui-line bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
           />
           %
         </label>
@@ -135,9 +135,9 @@ export function OddsEditor({
             disabled={locked}
             aria-label={t.pityAria}
             onChange={(e) => setPity(Number(e.target.value))}
-            className="w-16 rounded-md border border-white/10 bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
+            className="w-16 rounded-md border border-ui-line bg-black/20 px-2 py-1 text-right tabular-nums disabled:opacity-60"
           />
-          {t.packs} {pity === 0 && <span className="text-white/40">{t.disabled}</span>}
+          {t.packs} {pity === 0 && <span className="text-ui-text-3">{t.disabled}</span>}
         </label>
         {!locked && (
           <button
@@ -150,12 +150,12 @@ export function OddsEditor({
                 if (r.ok) router.refresh();
               })
             }
-            className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50"
+            className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-50"
           >
             {pending ? tt.common.saving : t.save}
           </button>
         )}
-        {locked && <span className="text-xs text-white/40">{t.locked}</span>}
+        {locked && <span className="text-xs text-ui-text-3">{t.locked}</span>}
         {state && <span className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>{state.error ?? state.message}</span>}
       </div>
     </div>

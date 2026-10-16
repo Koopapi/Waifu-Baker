@@ -9,7 +9,7 @@ import {
   regenerateAlbumLinkAction,
   saveFeaturedAction,
   type AlbumActionState,
-} from "@/app/coleccion/album/actions";
+} from "@/app/(app)/coleccion/album/actions";
 import { useT } from "@/i18n/client";
 
 interface FeaturableCard {
@@ -49,31 +49,31 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
       return n;
     });
 
-  if (cards.length === 0) return <p className="text-white/50">{t.collection.album.featuredEmpty(MAX_FEATURED)}</p>;
+  if (cards.length === 0) return <p className="text-ui-text-3">{t.collection.album.featuredEmpty(MAX_FEATURED)}</p>;
   return (
     <div className="space-y-4" data-testid="featured-picker">
       <div>
-        <p className="mb-2 text-sm text-white/60">
+        <p className="mb-2 text-sm text-ui-text-2">
           {t.collection.album.featuredOrder(picked.length, MAX_FEATURED)}
         </p>
         {picked.length === 0 ? (
-          <p className="text-sm text-white/40">{t.collection.album.featuredNone}</p>
+          <p className="text-sm text-ui-text-3">{t.collection.album.featuredNone}</p>
         ) : (
           <ol className="flex flex-wrap gap-2" data-testid="featured-order">
             {picked.map((id, i) => {
               const c = byId.get(id)!;
               return (
-                <li key={id} className="flex items-center gap-1 rounded-full border border-white/15 py-1 pl-3 pr-1 text-sm">
+                <li key={id} className="flex items-center gap-1 rounded-full border border-ui-line py-1 pl-3 pr-1 text-sm">
                   <span>
                     {i + 1}. {c.name || t.collection.binder.cardFallbackName(pad(c.number))}
                   </span>
-                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="px-1.5 text-white/60 disabled:opacity-30" aria-label={t.collection.album.moveUp(c.name)}>
+                  <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="px-1.5 text-ui-text-2 disabled:opacity-30" aria-label={t.collection.album.moveUp(c.name)}>
                     ↑
                   </button>
-                  <button type="button" onClick={() => move(i, 1)} disabled={i === picked.length - 1} className="px-1.5 text-white/60 disabled:opacity-30" aria-label={t.collection.album.moveDown(c.name)}>
+                  <button type="button" onClick={() => move(i, 1)} disabled={i === picked.length - 1} className="px-1.5 text-ui-text-2 disabled:opacity-30" aria-label={t.collection.album.moveDown(c.name)}>
                     ↓
                   </button>
-                  <button type="button" onClick={() => toggle(id)} className="px-1.5 text-white/60" aria-label={t.collection.album.remove(c.name)}>
+                  <button type="button" onClick={() => toggle(id)} className="px-1.5 text-ui-text-2" aria-label={t.collection.album.remove(c.name)}>
                     ✕
                   </button>
                 </li>
@@ -94,12 +94,12 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
                 disabled={full}
                 aria-pressed={on}
                 aria-label={t.collection.album.feature(c.setCode, pad(c.number))}
-                className={`relative block w-full overflow-hidden rounded-lg ring-2 transition disabled:opacity-40 ${on ? "ring-[#d6b370]" : "ring-transparent"}`}
+                className={`relative block w-full overflow-hidden rounded-lg ring-2 transition disabled:opacity-40 ${on ? "ring-ui-accent" : "ring-transparent"}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
                 <img src={c.thumb} alt={c.name} loading="lazy" className="aspect-[63/88] w-full object-cover" />
                 {on && (
-                  <span className="absolute right-1 top-1 grid h-6 w-6 place-items-center rounded-full bg-[#d6b370] text-xs font-bold text-black">
+                  <span className="absolute right-1 top-1 grid h-6 w-6 place-items-center btn rounded-md bg-ui-accent hover:bg-ui-accent-hover text-xs font-bold text-black">
                     {picked.indexOf(c.cardId) + 1}
                   </span>
                 )}
@@ -113,7 +113,7 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
           type="button"
           disabled={pending}
           onClick={() => start(async () => setState(await saveFeaturedAction(picked)))}
-          className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50"
+          className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-50"
         >
           {pending ? t.common.saving : t.collection.album.saveFeatured}
         </button>
@@ -144,22 +144,22 @@ export function AlbumSettings({
 
   return (
     <div className="space-y-6">
-      <section className="space-y-4 rounded-2xl border border-white/10 p-5" data-testid="album-status">
+      <section className="space-y-4 rounded-2xl border border-ui-line p-5" data-testid="album-status">
         <div className="flex items-center gap-3">
           <span className={`h-2.5 w-2.5 rounded-full ${active ? "bg-emerald-400" : "bg-white/30"}`} />
           <h2 className="text-lg font-semibold">{active ? t.collection.album.isPublic : t.collection.album.isPrivate}</h2>
         </div>
         {active && album && (
           <div className="flex flex-wrap items-center gap-2">
-            <input readOnly value={album.url} aria-label={t.collection.album.linkLabel} className="min-w-0 basis-full rounded-lg border border-white/10 bg-black/30 px-3 py-2 font-mono text-sm sm:basis-auto sm:flex-1" data-testid="album-url" />
+            <input readOnly value={album.url} aria-label={t.collection.album.linkLabel} className="min-w-0 basis-full rounded-lg border border-ui-line bg-black/30 px-3 py-2 font-mono text-sm sm:basis-auto sm:flex-1" data-testid="album-url" />
             <button
               type="button"
               onClick={() => void navigator.clipboard?.writeText(album.url).then(() => setCopied(true))}
-              className="rounded-full border border-white/20 px-4 py-2 text-sm"
+              className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover"
             >
               {copied ? t.collection.album.copied : t.collection.album.copy}
             </button>
-            <a href={album.url} target="_blank" rel="noreferrer" className="rounded-full border border-white/20 px-4 py-2 text-sm">
+            <a href={album.url} target="_blank" rel="noreferrer" className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover">
               {t.collection.album.view}
             </a>
           </div>
@@ -173,21 +173,21 @@ export function AlbumSettings({
               minLength={2}
               maxLength={30}
               required
-              className="rounded-lg border border-white/10 bg-black/30 px-3 py-2"
+              className="rounded-lg border border-ui-line bg-black/30 px-3 py-2"
             />
           </label>
-          <button disabled={activating} className="rounded-full bg-[#d6b370] px-4 py-2 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50">
+          <button disabled={activating} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-50">
             {active ? t.collection.album.saveAlias : t.collection.album.activate}
           </button>
         </form>
         <Status state={aliasState} />
         {active && (
-          <div className="flex flex-wrap gap-3 border-t border-white/10 pt-4">
+          <div className="flex flex-wrap gap-3 border-t border-ui-line pt-4">
             <button
               type="button"
               disabled={pending}
               onClick={() => start(async () => setState(await deactivateAlbumAction()))}
-              className="rounded-full border border-white/20 px-4 py-1.5 text-sm"
+              className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover"
             >
               {t.collection.album.deactivate}
             </button>
@@ -197,7 +197,7 @@ export function AlbumSettings({
               onClick={() => {
                 if (window.confirm(t.collection.album.regenerateConfirm)) start(async () => setState(await regenerateAlbumLinkAction()));
               }}
-              className="rounded-full border border-white/20 px-4 py-1.5 text-sm"
+              className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover"
             >
               {t.collection.album.regenerate}
             </button>
@@ -206,7 +206,7 @@ export function AlbumSettings({
         <Status state={state} />
       </section>
       {album && (
-        <section className="space-y-4 rounded-2xl border border-white/10 p-5">
+        <section className="space-y-4 rounded-2xl border border-ui-line p-5">
           <h2 className="text-lg font-semibold">{t.collection.album.featuredTitle}</h2>
           <FeaturedPicker cards={cards} initial={album.featured} />
         </section>

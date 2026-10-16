@@ -14,13 +14,13 @@ export default async function AlbumSettingsPage() {
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
   return (
-    <main className="mx-auto max-w-4xl space-y-6 px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-4xl space-y-6 px-4 py-6 md:px-8">
       <div>
-        <Link href="/coleccion" className="text-sm text-white/50 hover:text-white">
+        <Link href="/coleccion" className="text-sm text-ui-text-3 hover:text-white">
           {t.collection.backToCollection}
         </Link>
         <h1 className="text-3xl font-bold">{t.collection.album.pageTitle}</h1>
-        <p className="mt-1 max-w-prose text-white/60">
+        <p className="mt-1 max-w-prose text-ui-text-2">
           {t.collection.album.intro}
         </p>
       </div>

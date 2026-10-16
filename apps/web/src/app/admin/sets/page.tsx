@@ -14,11 +14,11 @@ export default async function SetsPage() {
       <h1 className="text-2xl font-bold">{t.title}</h1>
       <CreateSetForm />
       {rows.length === 0 ? (
-        <p className="text-sm text-white/50">{t.empty}</p>
+        <p className="text-sm text-ui-text-3">{t.empty}</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/10">
+        <div className="overflow-x-auto rounded-xl border border-ui-line">
           <table className="w-full min-w-[560px] text-left text-sm">
-            <thead className="bg-white/[0.03] text-xs uppercase tracking-wider text-white/50">
+            <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
               <tr>
                 <th className="px-4 py-3">{t.th.code}</th>
                 <th className="px-4 py-3">{t.th.name}</th>
@@ -30,7 +30,7 @@ export default async function SetsPage() {
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} className="border-t border-white/5 hover:bg-white/[0.02]">
+                <tr key={r.id} className="border-t border-ui-line hover:bg-ui-raised">
                   <td className="px-4 py-3 font-mono">
                     <Link className="underline decoration-white/20 underline-offset-4 hover:decoration-white" href={`/admin/sets/${r.id}`}>
                       {r.code}

@@ -5,7 +5,7 @@ import { getDict } from "@/i18n/server";
 export async function SiteFooter() {
   const t = (await getDict()).legal.footer;
   return (
-    <footer className="border-t border-white/10 bg-[#0b0912] px-4 py-6 text-xs text-white/50 sm:px-6" data-testid="site-footer">
+    <footer className="border-t border-ui-line bg-ui-bg px-4 py-6 text-xs text-ui-text-3 sm:px-6" data-testid="site-footer">
       <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-2">
         <span>{t.rights}</span>
         <Link href="/legal/terms" className="hover:text-white">

@@ -12,7 +12,7 @@ export function GiftForm({ userId, sets }: { userId: string; sets: { id: string;
   useEffect(() => {
     if (state?.ok) form.current?.reset();
   }, [state]);
-  if (sets.length === 0) return <p className="text-sm text-white/50">{t.giftNoSets}</p>;
+  if (sets.length === 0) return <p className="text-sm text-ui-text-3">{t.giftNoSets}</p>;
   return (
     <form ref={form} action={action} className="grid gap-4 md:grid-cols-[1fr_120px] md:items-end">
       <input type="hidden" name="userId" value={userId} />

@@ -31,6 +31,7 @@ export const errors: Record<string, Msg> = {
   welcome_not_allowed: "Only a published SFW set can be the welcome set.",
   choose_set: "Choose a set.",
   set_not_claimable: "That set is not available for free packs. Choose another one.",
+  invalid_min_age: "The minimum age can only be 16 or 18.",
   no_free_charges: "You don't have free packs yet: wait for the next one to charge.",
   already_claimed_today: "You already claimed today's reward. Come back tomorrow.",
   tz_change_too_soon: "You changed time zone recently: you can claim once 20 hours have passed since your last reward.",

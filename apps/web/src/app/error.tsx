@@ -17,13 +17,13 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <LocaleToggle className="fixed right-4 top-4 z-50" />
       <div className="max-w-md space-y-5">
         <h1 className="text-3xl font-bold">{t.site.error.heading}</h1>
-        <p className="text-white/60">{t.site.error.body}</p>
-        {error.digest && <p className="font-mono text-xs text-white/30">{t.site.error.code(error.digest)}</p>}
+        <p className="text-ui-text-2">{t.site.error.body}</p>
+        {error.digest && <p className="font-mono text-xs text-ui-text-3">{t.site.error.code(error.digest)}</p>}
         <div className="flex flex-wrap justify-center gap-3">
-          <button type="button" onClick={reset} className="rounded-full bg-[#d6b370] px-6 py-3 font-semibold text-[#0b0c0e]">
+          <button type="button" onClick={reset} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-6 py-3 font-semibold text-ui-on-accent">
             {t.common.retry}
           </button>
-          <Link href="/" className="rounded-full border border-white/20 px-6 py-3">
+          <Link href="/" className="btn rounded-md border border-ui-line px-6 py-3 hover:bg-ui-hover">
             {t.site.error.home}
           </Link>
         </div>

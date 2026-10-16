@@ -12,7 +12,7 @@ export default async function SobresLayout({ children }: { children: React.React
   const path = (await headers()).get("x-pathname") ?? "/sobres";
   const user = await requireUser(path);
   return (
-    <div className="min-h-dvh bg-[#0b0912] text-[#f1eef8]">
+    <div className="min-h-dvh bg-ui-bg text-ui-text">
       <UserHeader name={user.displayName} isAdmin={user.role === "admin"} />
       {children}
     </div>

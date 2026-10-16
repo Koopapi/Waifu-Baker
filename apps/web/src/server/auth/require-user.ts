@@ -8,6 +8,7 @@ import { getPatreonClient } from "@/server/patreon/client-instance";
 import { refreshIfStale } from "@/server/services/membership";
 import { needsAcceptance } from "@/domain/legal/documents";
 import { trackActivity } from "@/server/services/legal";
+import { getMinAge } from "@/server/services/settings";
 import { now } from "@/server/clock";
 import * as Sentry from "@sentry/nextjs";
 
@@ -19,7 +20,8 @@ export async function requireUser(next: string) {
     const [u] = await db.select().from(users).where(and(eq(users.id, id), isNull(users.deletedAt)));
     if (u) {
       // Spec 007, RF-1 a RF-3: sin edad confirmada o con términos antiguos, primero la bienvenida.
-      if (needsAcceptance(u)) redirect(`/bienvenida?next=${encodeURIComponent(next)}`);
+      // Spec 010, RF-18: también si la edad mínima subió después de confirmar.
+      if (needsAcceptance(u, undefined, await getMinAge(db))) redirect(`/bienvenida?next=${encodeURIComponent(next)}`);
       // Spec 001, RF-3: membresía al día si la última lectura tiene más de 15 minutos.
       await refreshIfStale(db, getPatreonClient().client, u.id);
       await trackActivity(db, u.id, now());

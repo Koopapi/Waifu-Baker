@@ -13,7 +13,7 @@ export function RuleRow({ tierId, tierName, rule }: { tierId: string; tierName: 
   const [delState, delAction] = useActionState(deleteTierRuleAction, null);
   const t = useT();
   return (
-    <div className="flex flex-wrap items-center gap-3 border-t border-white/5 px-4 py-3 text-sm">
+    <div className="flex flex-wrap items-center gap-3 border-t border-ui-line px-4 py-3 text-sm">
       <form action={action} className="flex flex-1 flex-wrap items-center gap-3">
         <input type="hidden" name="patreonTierId" value={tierId} />
         <input type="hidden" name="tierName" value={tierName} />
@@ -44,13 +44,13 @@ export function AddRuleForm({ tierId, tierName, sets, anyPublished }: { tierId: 
   const t = useT().admin.tiers;
   if (sets.length === 0) {
     return (
-      <p className="border-t border-white/5 px-4 py-3 text-xs text-white/40">
+      <p className="border-t border-ui-line px-4 py-3 text-xs text-ui-text-3">
         {anyPublished ? t.allAssigned : t.publishFirst}
       </p>
     );
   }
   return (
-    <form action={action} className="flex flex-wrap items-center gap-3 border-t border-white/5 bg-white/[0.02] px-4 py-3 text-sm">
+    <form action={action} className="flex flex-wrap items-center gap-3 border-t border-ui-line bg-ui-raised px-4 py-3 text-sm">
       <input type="hidden" name="patreonTierId" value={tierId} />
       <input type="hidden" name="tierName" value={tierName} />
       <input type="hidden" name="active" value="on" />

@@ -60,28 +60,28 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <Link href="/admin/sets" className="text-sm text-white/50 hover:text-white">
+        <Link href="/admin/sets" className="text-sm text-ui-text-3 hover:text-white">
           {t.back}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-bold">
-            <span className="font-mono text-white/60">{set.code}</span> · {set.name}
+            <span className="font-mono text-ui-text-2">{set.code}</span> · {set.name}
           </h1>
           <StatusBadge status={set.status} />
           <AdultBadge adult={set.isAdult} />
         </div>
       </div>
 
-      <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
         <h2 className="font-semibold">{t.details}</h2>
         <EditSetForm set={set} lockedForUsers={!perms.canEditRarity} />
       </section>
 
-      <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-semibold">{t.publishing}</h2>
           {cards.some((c) => c.rarity) && (
-            <Link href={`/admin/sets/${set.id}/simulate`} className="rounded-full border border-white/15 px-4 py-1.5 text-sm hover:bg-white/5" data-testid="simulate-link">
+            <Link href={`/admin/sets/${set.id}/simulate`} className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover" data-testid="simulate-link">
               {t.simulate}
             </Link>
           )}
@@ -89,7 +89,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
       </section>
 
-      <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
         <h2 className="font-semibold">{t.welcome.title}</h2>
         <WelcomeToggle setId={set.id} isWelcome={set.isWelcome} eligible={set.status === "published" && !set.isAdult} />
       </section>
@@ -117,11 +117,11 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           </div>
           <div className="flex flex-wrap gap-2 text-xs" data-testid="rarity-counts">
             {RARITIES.map((r) => (
-              <span key={r} className={`rounded-md border px-2 py-1 ${gaps.includes(r) ? "border-amber-400/50 text-amber-300" : "border-white/10 text-white/70"}`}>
+              <span key={r} className={`rounded-md border px-2 py-1 ${gaps.includes(r) ? "border-amber-400/50 text-amber-300" : "border-ui-line text-ui-text-2"}`}>
                 {tt.common.rarity[r]} <b className="tabular-nums">{counts[r]}</b>
               </span>
             ))}
-            {counts.none > 0 && <span className="rounded-md border border-white/10 px-2 py-1 text-white/50">{t.noRarityCount(counts.none)}</span>}
+            {counts.none > 0 && <span className="rounded-md border border-ui-line px-2 py-1 text-ui-text-3">{t.noRarityCount(counts.none)}</span>}
           </div>
         </div>
         {(gaps.length > 0 || incomplete > 0 || unreviewed > 0) && cards.length > 0 && (

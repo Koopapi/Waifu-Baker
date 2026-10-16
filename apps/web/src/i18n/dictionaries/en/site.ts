@@ -44,4 +44,17 @@ export const site = {
     metaTitle: "Opening lab",
     metaDescription: "Local prototype of the pack opening with fake data.",
   },
+  demo: {
+    tag: "Local demo",
+    roles: { collector: "collector", admin: "admin" },
+    banner: (role: string) => `Demo mode · you are viewing as ${role === "admin" ? "an admin" : "a collector"}`,
+    bannerShort: (role: string) => `Demo · ${role}`,
+    switchTo: (role: string) => `Switch to ${role}`,
+    enterCollector: "Enter as a collector",
+    enterCollectorDetail: "Sealed packs, a collection in progress, cookies and a 4-day streak.",
+    enterAdmin: "Enter as an admin",
+    enterAdminDetail: "Sets, cards, users, metrics, backups and settings.",
+    note: "Demo data is recreated every time you run pnpm demo. Never available in production.",
+    notSeeded: "The demo has no data yet. Run pnpm demo to create it.",
+  },
 };

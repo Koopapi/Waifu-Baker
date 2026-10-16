@@ -1,0 +1,163 @@
+{
+  "_comment": "Spec 010, RF-12: colección de la demo. Las imágenes se leen de ART_DIR (taller de arte) y no van a git. Nombres propios, nunca los reales.",
+  "code": "FA01",
+  "name": "Fan Art · Vol. 1",
+  "cards": [
+    {
+      "file": "output/fanart-08-rondaA/makima-04-cama_s1447668235_PsLHcXIvet.webp",
+      "character": "Mira Vance",
+      "title": "Silk Sheets",
+      "rarity": "epic"
+    },
+    {
+      "file": "output/fanart-08-rondaA/makima-05-espaldas_s1852131490_HpwSVaZRbn.webp",
+      "character": "Mira Vance",
+      "title": "Over the Shoulder",
+      "rarity": "rare"
+    },
+    {
+      "file": "output/fanart-08-rondaA/makima-01-quitandose_s2018955832_Ue3q33ftdh.webp",
+      "character": "Mira Vance",
+      "title": "Off the Clock",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "output/fanart-07-control/makima-02-sentada-repetida_s1310313105_LMgk2e9Lxx.webp",
+      "character": "Mira Vance",
+      "title": "Composed",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-08-rondaA/makima-03-inclinada_s567459480_C2lyEYMmge.webp",
+      "character": "Mira Vance",
+      "title": "Leaning In",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-13-yor-i2i/yor-01-cama-i2i_s1643855523_Jjztft5d6l.webp",
+      "character": "Rosa Noir",
+      "title": "Moonlit Rest",
+      "rarity": "epic"
+    },
+    {
+      "file": "output/fanart-12-yor-03c-rodillas/yor-03c-rodillas_s1179337095_V4gBgLNoJ1.webp",
+      "character": "Rosa Noir",
+      "title": "Kneeling Grace",
+      "rarity": "rare"
+    },
+    {
+      "file": "output/fanart-12-yor-02b-espaldas/yor-02b-espaldas_s1712793819_k9N966nFjR.webp",
+      "character": "Rosa Noir",
+      "title": "Backstage",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "output/fanart-13-yor-i2i/yor-04-sentada-i2i_s870680092_DwBMgf1i8y.webp",
+      "character": "Rosa Noir",
+      "title": "Tea Break",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-13-yor-i2i/yor-05-pared-i2i_s1523703875_vePFMeRmqp.webp",
+      "character": "Rosa Noir",
+      "title": "Against the Wall",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-17-rias-final/rias-03-borde-cama_s1377131670_UHfezWu-jU.webp",
+      "character": "Ruby Ashcroft",
+      "title": "Bedside",
+      "rarity": "legendary"
+    },
+    {
+      "file": "output/fanart-17-rias-final/rias-01-arqueada_s1250518765_Fc6HbiVzEc.webp",
+      "character": "Ruby Ashcroft",
+      "title": "Crimson Arch",
+      "rarity": "rare"
+    },
+    {
+      "file": "output/fanart-17-rias-final/rias-02-guino_s1951615679_3vEQoR-JRY.webp",
+      "character": "Ruby Ashcroft",
+      "title": "Wink",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "output/fanart-17-rias-final/rias-04-beso_s1275774191_xagPDgB9Ur.webp",
+      "character": "Ruby Ashcroft",
+      "title": "Blown Kiss",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-17-rias-final/rias-05-bata_s2141211016_m5alwm3WLa.webp",
+      "character": "Ruby Ashcroft",
+      "title": "Silk Robe",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-19-mitsuri-final/mitsuri-01b-boca-abajo_s768539365_QgU5Q2g-2W.webp",
+      "character": "Momo Haruka",
+      "title": "Sweet Daydream",
+      "rarity": "legendary"
+    },
+    {
+      "file": "output/fanart-23-albedo/albedo-02-arqueada_s1478501440_mLqNrDj2qI.webp",
+      "character": "Lady Ivoire",
+      "title": "Arched",
+      "rarity": "epic"
+    },
+    {
+      "file": "output/fanart-23-albedo/albedo-01-de-lado_s149811619_47A8KYZ_yW.webp",
+      "character": "Lady Ivoire",
+      "title": "Repose",
+      "rarity": "rare"
+    },
+    {
+      "file": "output/fanart-23-albedo/albedo-03-medias_s533167489_CFn7mB5nAC.webp",
+      "character": "Lady Ivoire",
+      "title": "Stockings",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "output/fanart-23-albedo/albedo-04-tirante_s150588890_NWeJJ6QfrO.webp",
+      "character": "Lady Ivoire",
+      "title": "Slipping Strap",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-23-albedo/albedo-05-sentada-lado_s1361746348_Ai28u7ssnQ.webp",
+      "character": "Lady Ivoire",
+      "title": "Poised",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-24-tifa/tifa-01b-barra_s771034395_QcZME1Twqp.webp",
+      "character": "Kira Steel",
+      "title": "Last Call",
+      "rarity": "legendary"
+    },
+    {
+      "file": "output/fanart-24-tifa/tifa-02-silla_s371225908_SA5J0tRsNB.webp",
+      "character": "Kira Steel",
+      "title": "Backwards Chair",
+      "rarity": "rare"
+    },
+    {
+      "file": "output/fanart-24-tifa/tifa-03-nuca_s1782827004_vKxjACoLvQ.webp",
+      "character": "Kira Steel",
+      "title": "Stretch",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "output/fanart-24-tifa/tifa-04-silencio_s326587006_bFa8I_UbxN.webp",
+      "character": "Kira Steel",
+      "title": "Our Secret",
+      "rarity": "common"
+    },
+    {
+      "file": "output/fanart-24-tifa/tifa-05-rodillas_s261928887_yzpmjPUr6_.webp",
+      "character": "Kira Steel",
+      "title": "Curled Up",
+      "rarity": "common"
+    }
+  ]
+}

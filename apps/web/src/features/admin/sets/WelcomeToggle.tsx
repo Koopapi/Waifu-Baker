@@ -23,16 +23,16 @@ export function WelcomeToggle({ setId, isWelcome, eligible }: { setId: string; i
       {isWelcome ? (
         <>
           <p className="text-sm text-emerald-300">{t.isWelcome}</p>
-          <button type="button" disabled={pending} onClick={() => run(false)} className="rounded-full border border-white/20 px-4 py-1.5 text-sm disabled:opacity-50">
+          <button type="button" disabled={pending} onClick={() => run(false)} className="btn rounded-md border border-ui-line px-4 py-1.5 text-sm disabled:opacity-50 hover:bg-ui-hover">
             {t.remove}
           </button>
         </>
       ) : eligible ? (
-        <button type="button" disabled={pending} onClick={() => run(true)} className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50">
+        <button type="button" disabled={pending} onClick={() => run(true)} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-50">
           {t.make}
         </button>
       ) : (
-        <p className="text-sm text-white/50">{t.onlyPublishedSfw}</p>
+        <p className="text-sm text-ui-text-3">{t.onlyPublishedSfw}</p>
       )}
       {state && <p className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>{state.error ?? state.message}</p>}
     </div>

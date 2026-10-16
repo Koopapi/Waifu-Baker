@@ -13,7 +13,21 @@ export const admin: typeof en = {
     tiers: "Tiers de Patreon",
     users: "Usuarios",
     metrics: "Métricas y copias",
+    settings: "Ajustes",
     publicOdds: "Probabilidades públicas ↗",
+  },
+  settings: {
+    title: "Ajustes",
+    minAge: {
+      heading: "Edad mínima",
+      help: "Quién puede usar la web. Súbela a 18 antes de publicar contenido más subido de tono: a quien confirmó una edad menor se le pedirá confirmar la nueva antes de seguir.",
+      option: (n) => `${n}+`,
+      current: (n) => `Edad mínima actual: ${n} años.`,
+      save: "Guardar edad mínima",
+      confirmRaise: (n) => `¿Subir la edad mínima a ${n} años? Quien confirmó una edad menor tendrá que volver a confirmarla.`,
+      confirmLower: (n) => `¿Bajar la edad mínima a ${n} años?`,
+      saved: (n) => `Edad mínima fijada en ${n} años.`,
+    },
   },
   status: {
     draft: "Borrador",

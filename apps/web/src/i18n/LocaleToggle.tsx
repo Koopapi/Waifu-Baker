@@ -13,7 +13,7 @@ export function LocaleToggle({ className = "" }: { className?: string }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   return (
-    <div role="group" aria-label={t.common.language} className={`inline-flex overflow-hidden rounded-full border border-white/20 text-xs ${className}`} data-testid="locale-toggle">
+    <div role="group" aria-label={t.common.language} className={`inline-flex overflow-hidden rounded-full border border-ui-line text-xs ${className}`} data-testid="locale-toggle">
       {LOCALES.map((l) => (
         <button
           key={l}
@@ -29,7 +29,7 @@ export function LocaleToggle({ className = "" }: { className?: string }) {
               router.refresh();
             });
           }}
-          className={`px-2.5 py-1 font-semibold uppercase ${locale === l ? "bg-white/15 text-white" : "text-white/60 hover:text-white"}`}
+          className={`px-2.5 py-1 font-semibold uppercase ${locale === l ? "bg-ui-hover text-white" : "text-ui-text-2 hover:text-white"}`}
         >
           {l}
         </button>

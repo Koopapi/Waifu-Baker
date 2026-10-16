@@ -26,7 +26,7 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
   const t = tt.admin.publish;
 
   if (status === "archived") {
-    return <p className="text-sm text-white/50">{t.archivedNote}</p>;
+    return <p className="text-sm text-ui-text-3">{t.archivedNote}</p>;
   }
 
   return (
@@ -49,7 +49,7 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
               if (r.ok) router.refresh();
             })
           }
-          className="rounded-full bg-emerald-400 px-5 py-2 text-sm font-semibold text-black disabled:opacity-60"
+          className="btn btn-success px-5 py-2 text-sm"
         >
           {pending ? t.checking : t.checkAndPublish}
         </button>
@@ -70,7 +70,7 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
               if (r.ok) router.refresh();
             })
           }
-          className="rounded-full border border-white/20 px-5 py-2 text-sm disabled:opacity-60"
+          className="btn rounded-md border border-ui-line px-5 py-2 text-sm disabled:opacity-60 hover:bg-ui-hover"
         >
           {t.archive}
         </button>

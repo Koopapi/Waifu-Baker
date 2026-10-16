@@ -12,7 +12,7 @@ export function CardPreview({ card }: { card: CardDTO }) {
   const tilt = useTiltSource();
   const [holo, setHolo] = useState(card.variant === "holo");
   const t = useT().admin.cards;
-  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-xl bg-white/5 text-xs text-white/40">{t.processing}</div>;
+  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-xl bg-ui-raised text-xs text-ui-text-3">{t.processing}</div>;
   return (
     <div className="space-y-2">
       <div
@@ -30,7 +30,7 @@ export function CardPreview({ card }: { card: CardDTO }) {
           style={{ width: "100%" }}
         />
       </div>
-      <label className="flex items-center gap-2 text-xs text-white/60">
+      <label className="flex items-center gap-2 text-xs text-ui-text-2">
         <input type="checkbox" checked={holo} onChange={(e) => setHolo(e.target.checked)} /> {t.previewHolo}
       </label>
     </div>

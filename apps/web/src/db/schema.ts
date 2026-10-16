@@ -50,6 +50,8 @@ export const users = pgTable("users", {
   ageConfirmedAt: timestamp("age_confirmed_at", { withTimezone: true }),
   termsVersion: integer("terms_version"),
   termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
+  /** Spec 010, RF-18: la edad mínima que confirmó (si sube la de la web, se le vuelve a pedir). */
+  ageConfirmedMin: integer("age_confirmed_min"),
 });
 
 export const characters = pgTable("characters", {
@@ -346,4 +348,12 @@ export const backupRuns = pgTable("backup_runs", {
   file: text("file"),
   bytes: bigint("bytes", { mode: "number" }),
   error: text("error"),
+});
+
+/** Spec 010, RF-17: ajustes de la web que cambia el administrador (p. ej. la edad mínima). */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedBy: uuid("updated_by").references(() => users.id),
 });

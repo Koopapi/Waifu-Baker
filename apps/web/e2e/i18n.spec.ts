@@ -83,12 +83,12 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
   await test.step("RF-5 y RF-3: el panel y sus errores en inglés; al cambiar, sigue en la misma página", async () => {
     const admin = await fresh(browser, DESKTOP);
     await loginEnglish(admin, "admin-i18n-en", true, "/admin/characters");
-    await expect(admin.locator("aside")).toContainText(en.admin.nav.characters);
+    await expect(admin.locator('[data-testid="app-nav"]')).toContainText(en.admin.nav.characters);
     await admin.fill(`form:has-text("${en.admin.characters.new}") input[name="name"]`, "!!!");
     await admin.click(`text=${en.admin.characters.create}`);
     await expect(admin.locator(`text=${translateError(en, { code: "invalid_name", params: { reason: "no_alnum" } })}`)).toBeVisible();
     await toggle(admin, "es").click();
-    await expect(admin.locator("aside")).toContainText(es.admin.nav.characters);
+    await expect(admin.locator('[data-testid="app-nav"]')).toContainText(es.admin.nav.characters);
     await expect(admin).toHaveURL(/\/admin\/characters$/);
     await expect(admin.locator("html")).toHaveAttribute("lang", "es");
   });

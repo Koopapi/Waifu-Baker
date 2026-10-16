@@ -1,0 +1,67 @@
+{
+  "_comment": "Spec 010: colección de la demo para el E2E, con las imágenes de public/lab.",
+  "code": "FA01",
+  "name": "Fan Art · Vol. 1",
+  "cards": [
+    {
+      "file": "01.webp",
+      "character": "Test Alpha",
+      "title": "Pose 1",
+      "rarity": "common"
+    },
+    {
+      "file": "02.webp",
+      "character": "Test Alpha",
+      "title": "Pose 2",
+      "rarity": "common"
+    },
+    {
+      "file": "03.webp",
+      "character": "Test Alpha",
+      "title": "Pose 3",
+      "rarity": "common"
+    },
+    {
+      "file": "04.webp",
+      "character": "Test Alpha",
+      "title": "Pose 4",
+      "rarity": "common"
+    },
+    {
+      "file": "05.webp",
+      "character": "Test Alpha",
+      "title": "Pose 5",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "06.webp",
+      "character": "Test Beta",
+      "title": "Pose 6",
+      "rarity": "uncommon"
+    },
+    {
+      "file": "07.webp",
+      "character": "Test Beta",
+      "title": "Pose 7",
+      "rarity": "rare"
+    },
+    {
+      "file": "08.webp",
+      "character": "Test Beta",
+      "title": "Pose 8",
+      "rarity": "rare"
+    },
+    {
+      "file": "09.webp",
+      "character": "Test Beta",
+      "title": "Pose 9",
+      "rarity": "epic"
+    },
+    {
+      "file": "11.webp",
+      "character": "Test Beta",
+      "title": "Pose 10",
+      "rarity": "legendary"
+    }
+  ]
+}

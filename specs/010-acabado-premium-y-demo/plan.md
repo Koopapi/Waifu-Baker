@@ -14,10 +14,15 @@ componentes «Carta mini» e «Item de navegación»).
 | `features/shell/AppShell.tsx` | Estructura de tres zonas: barra de colecciones, panel de navegación y contenido; recibe las secciones por props | RF-1 a RF-3, RF-5 |
 | `features/shell/CollectionRail.tsx` | Inicio + un icono por colección del usuario (portada de la colección), indicador de la activa, desplazamiento con la activa siempre visible | RF-1, casos límite |
 | `features/shell/NavPanel.tsx` | Cabecera de la colección, secciones agrupadas con la actual resaltada y contadores, panel de usuario (galletas, idioma) | RF-2 |
+| `features/shell/MobileTabBar.tsx` | Barra inferior de pestañas en móvil con la actual resaltada | RF-16 |
 | `features/shell/MobileDrawer.tsx` | Menú deslizable con botón y gesto desde el borde (`@use-gesture`, ya instalado), velo, foco atrapado y cierre con Escape | RF-4, RF-11 |
 | `features/ui/{Button,Card,Skeleton,Toast}.tsx` | Primitivas con estados hover/pulsado/foco; avisos emergentes con cola, cierre automático y `aria-live` | RF-7 a RF-9 |
 | `app/(app)/layout.tsx` y `app/admin/layout.tsx` | Montan el `AppShell` con las secciones de coleccionista o de administración | RF-3, RF-5 |
 | `app/**/loading.tsx` | Esqueletos por sección | RF-9 |
+| `domain/legal/documents.ts` | `needsAcceptance` compara también la edad confirmada con la vigente | RF-18 |
+| `server/services/settings.ts` + tabla `app_settings` | Leer y cambiar la edad mínima (16/18) con historial | RF-17 |
+| Panel, `/admin/ajustes` | Selector de edad mínima con confirmación | RF-17 |
+| Bienvenida y textos legales | `{minAge}` sustituido por la edad vigente | RF-19 |
 | `domain/demo/mode.ts` | `isDemoEnabled(env)`: `DEMO_MODE=1` y nunca con `NODE_ENV=production` | RF-13 a RF-15 |
 | `scripts/demo.mts` (`pnpm demo`) | Recrea la BD `waifu_baker_demo`, migra, siembra y arranca `next dev` en modo demo | RF-12 |
 | `server/services/demo-seed.ts` | Colección de fan art, probabilidades, coleccionista y administrador, con los servicios reales | RF-12 |
@@ -25,10 +30,15 @@ componentes «Carta mini» e «Item de navegación»).
 
 ## 2. Decisiones
 
+- **Dependencia nueva** (principio 1): `lucide-react`, los iconos de las maquetas. Licencia ISC, cada icono
+  se importa por separado (solo viajan los usados) y evita mantener SVG a mano.
+
 - **Rutas**: las URLs no cambian. Las secciones del coleccionista pasan a un grupo `(app)` con un
   layout común; así el `AppShell` persiste entre secciones y la navegación con `<Link>` solo cambia
   el contenido (RF-3).
-- **Paleta**: una sola, la que elija el usuario entre A Noche, B Cereza y C Oro (RF-6). Los colores
+- **Paleta**: B «Cereza», elegida por el usuario (RF-6).
+- **Modo foco**: la apertura (`/sobres/[setId]` y `/todos`) queda fuera de la estructura y ocupa la pantalla con
+  su cabecera propia; al terminar se vuelve a la estructura. Los colores
   viven solo en los tokens; ningún componente usa un color fijo. Contrastes verificados en las
   maquetas: el acento de cada paleta se ajustó para que el texto del botón llegue a 4,5:1 (RF-11) y
   los enlaces usan una variante clara del acento.
@@ -37,11 +47,20 @@ componentes «Carta mini» e «Item de navegación»).
   reduce)` las quita y `MotionConfig reducedMotion="user"` hace lo mismo en `motion`.
 - **Avisos** (RF-8): proveedor propio de ~80 líneas, sin dependencia nueva. Las server actions ya
   devuelven `{ ok | error }`; los formularios llaman a `toast()` con el texto traducido.
+- **Edad mínima** (RF-17 a RF-19): migración `0007` con `app_settings (key text pk, value jsonb,
+  updated_at, updated_by)` y `users.age_confirmed_min int` (las cuentas que ya confirmaron quedan con 16).
+  `needsAcceptance` pide de nuevo la bienvenida si `age_confirmed_min < edad vigente`. Bajar de 18 a 16
+  no pide nada. El cambio se guarda en `audit_log`. La bienvenida muestra «Tengo {minAge} años o más».
+  Los términos y la privacidad sustituyen `{minAge}`. La versión de los términos no cambia: lo que se
+  vuelve a pedir es la confirmación de edad.
 - **Demo** (RF-12 a RF-15):
   - Entorno: `DEMO_MODE=1`, `DEV_LOGIN=1`, BD `waifu_baker_demo`, puerto 3300 y carpeta de cartas
     propia, para no tocar los datos de desarrollo.
   - Arte: el guion lee `demo/fanart.json` (archivo, personaje, rareza) y toma las imágenes de
     `ART_DIR` (el taller de arte). Las imágenes no se suben a git.
+  - Nombres (RF-12): sin los nombres reales. Cada personaje lleva un nombre propio, editable después en
+    el panel: Makima → Mira Vance, Yor → Rosa Noir, Rias → Ruby Ashcroft, Mitsuri → Momo Haruka,
+    Albedo → Lady Ivoire, Tifa → Kira Steel. Las cartas llevan títulos por pose («Off Duty», «Silk Robe»…).
   - Reparto de rarezas de las 30: por personaje, 2 comunes, 1 infrecuente, 1 rara y 1 épica o
     legendaria (3 y 3).
   - Datos: coleccionista `dev:demo-collector` con 3 sobres sellados, unas 18 cartas abiertas con la
@@ -50,9 +69,9 @@ componentes «Carta mini» e «Item de navegación»).
   - Entrar como un papel: una server action inicia sesión con el login de desarrollo (sin Patreon).
     La franja y la portada solo existen si `isDemoEnabled`.
   - Producción (RF-15): en producción el modo demo se ignora y `/api/demo/*` responde 404.
-- **Pendiente del usuario** (no bloquea el plan): la paleta, la barra inferior de pestañas en móvil
-  (está en la maqueta, pero no en la spec), y el nivel 16/18 de la colección de fan art, que decide si
-  la demo la marca como SFW.
+- **Colección de fan art en la demo**: SFW, sin marca de «solo gratis» (decisión del usuario). Con la
+  edad mínima en 16 contiene imágenes muy subidas de tono: la demo es local; antes de publicarla
+  conviene subir la edad a 18 con el ajuste nuevo.
 
 ## 3. Pruebas
 

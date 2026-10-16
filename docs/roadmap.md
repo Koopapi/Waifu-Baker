@@ -16,6 +16,8 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 006 ✓ | Colección y álbum público | Binder, filtros, álbum con slug, imagen OG, renders públicos con marca | experiencia (prototipo primero) |
 | 008 ✓ | Idiomas | Inglés por defecto y español con selector en toda la web, panel incluido | motor |
 | 009 ✓ | Sobres gratis y recompensa diaria | Sobre gratis cada 12 h (hasta 2), racha de 7 días con galletas y sobre, galletas en el panel | motor |
+| 010 ✓ | Acabado premium y demo | Estructura estilo Discord (barra de colecciones, panel, cajón y pestañas en móvil), paleta «Cereza», avisos, esqueletos, edad mínima configurable y `pnpm demo` | experiencia |
+| 011 ◐ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
 | 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 Cambio del 14 oct 2026: se añade el panel de administración (003) a petición del usuario y se
@@ -52,3 +54,6 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
 - 16 oct 2026: spec 007, parte para la beta, terminada (18/18 RF): edad mínima 16 y aceptación de términos,
   páginas legales, Sentry, métricas propias, copias cifradas con restauración y CI en GitHub. Queda la
   parte 2: servidor, dominio, CSP/HSTS y cola de trabajos.
+- 16 oct 2026: spec 010 terminada y validada (19/19 RF): estructura estilo Discord con barra de colecciones, panel,
+  cajón y pestañas en móvil, paleta «Cereza», avisos, esqueletos, edad mínima configurable (16/18) y `pnpm demo` con la
+  colección de fan art (26 cartas con nombres propios). Spec 011 (sistema de diseño) aprobada.

@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { acceptTermsAction } from "@/app/bienvenida/actions";
 import { useT } from "@/i18n/client";
 
-export function GateForm({ next }: { next: string }) {
+export function GateForm({ next, minAge }: { next: string; minAge: number }) {
   const t = useT().legal.gate;
   const [state, action, pending] = useActionState(acceptTermsAction, null);
   return (
@@ -13,7 +13,7 @@ export function GateForm({ next }: { next: string }) {
       <input type="hidden" name="next" value={next} />
       <label className="flex items-start gap-3 text-sm">
         <input type="checkbox" name="age" required className="mt-1" />
-        <span>{t.age}</span>
+        <span>{t.age(minAge)}</span>
       </label>
       <label className="flex items-start gap-3 text-sm">
         <input type="checkbox" name="terms" required className="mt-1" />
@@ -29,7 +29,7 @@ export function GateForm({ next }: { next: string }) {
           .
         </span>
       </label>
-      <button disabled={pending} className="w-full rounded-full bg-[#d6b370] py-3 font-semibold text-[#0b0c0e] disabled:opacity-50">
+      <button disabled={pending} className="w-full btn rounded-md bg-ui-accent hover:bg-ui-accent-hover py-3 font-semibold text-ui-on-accent disabled:opacity-50">
         {t.submit}
       </button>
       {state?.error && <p className="text-sm text-red-300">{state.error}</p>}

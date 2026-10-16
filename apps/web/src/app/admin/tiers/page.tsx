@@ -15,7 +15,7 @@ export default async function TiersPage() {
     return (
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">{t.title}</h1>
-        <p className="text-sm text-white/60">{t.notConfigured}</p>
+        <p className="text-sm text-ui-text-2">{t.notConfigured}</p>
       </div>
     );
   }
@@ -35,17 +35,17 @@ export default async function TiersPage() {
     <div className="max-w-4xl space-y-6">
       <div className="space-y-1">
         <h1 className="text-2xl font-bold">{t.title}</h1>
-        <p className="text-sm text-white/60">{t.intro}</p>
+        <p className="text-sm text-ui-text-2">{t.intro}</p>
         <ReconcileButton />
         {mode === "fake" && (
           <p className="text-xs text-amber-300">{t.fakeMode}</p>
         )}
       </div>
       {overview.tiers.map((tier) => (
-        <section key={tier.id} className="overflow-hidden rounded-xl border border-white/10" data-testid={`tier-${tier.id}`}>
-          <header className="flex items-center justify-between bg-white/[0.03] px-4 py-3">
+        <section key={tier.id} className="overflow-hidden rounded-xl border border-ui-line" data-testid={`tier-${tier.id}`}>
+          <header className="flex items-center justify-between bg-ui-raised px-4 py-3">
             <span className="font-semibold">{tier.title}</span>
-            <span className="text-sm text-white/50">
+            <span className="text-sm text-ui-text-3">
               {formatMoney(locale, tier.amountCents)} {t.perMonth}
               {!tier.published && t.notPublished}
             </span>

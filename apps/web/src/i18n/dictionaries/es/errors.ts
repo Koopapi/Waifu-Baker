@@ -30,6 +30,7 @@ export const errors: Record<string, Msg> = {
   welcome_not_allowed: "Solo una colección SFW publicada puede ser la de bienvenida.",
   choose_set: "Elige una colección.",
   set_not_claimable: "Esa colección no está disponible para sobres gratis. Elige otra.",
+  invalid_min_age: "La edad mínima solo puede ser 16 o 18 años.",
   no_free_charges: "Todavía no tienes sobres gratis: espera a que se cargue el siguiente.",
   already_claimed_today: "Ya reclamaste la recompensa de hoy. Vuelve mañana.",
   tz_change_too_soon: "Cambiaste de zona horaria hace poco: podrás reclamar cuando pasen 20 horas desde la última recompensa.",

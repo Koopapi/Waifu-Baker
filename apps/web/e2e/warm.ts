@@ -17,6 +17,7 @@ export const ROUTES = [
   `/coleccion/${ID}`,
   "/coleccion/album",
   "/cuenta",
+  "/recompensas",
   "/bienvenida",
   "/legal/terms",
   "/admin",
@@ -27,6 +28,7 @@ export const ROUTES = [
   "/admin/tiers",
   "/admin/users",
   "/admin/metricas",
+  "/admin/ajustes",
   `/admin/users/${ID}`,
 ];
 
@@ -38,4 +40,5 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   { method: "POST", path: "/api/dev/seed", body: "{}" },
   { method: "GET", path: `/api/album/AAAAAAAAAAAA/img?c=${ID}` },
   { method: "GET", path: "/api/cards/img" },
+  { method: "GET", path: "/api/demo/card/1" },
 ];

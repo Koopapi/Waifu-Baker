@@ -29,15 +29,15 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
       : { number: s.number, owned: null },
   );
   return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
+    <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-8">
       <div>
-        <Link href="/coleccion" className="text-sm text-white/50 hover:text-white">
+        <Link href="/coleccion" className="text-sm text-ui-text-3 hover:text-white">
           {t.collection.backToCollection}
         </Link>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h1 className="text-3xl font-bold">{b.set.name}</h1>
           {!b.locked && (
-            <span className="text-white/70 tabular-nums" data-testid="binder-progress">
+            <span className="text-ui-text-2 tabular-nums" data-testid="binder-progress">
               {t.collection.progress(b.progress.owned, b.progress.total)}
             </span>
           )}

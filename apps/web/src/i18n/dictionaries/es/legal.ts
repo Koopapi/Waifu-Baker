@@ -15,7 +15,8 @@ export const legal: typeof en = {
     title: "Antes de empezar",
     intro: "Waifu Baker es una colección de cartas digitales. Para continuar, confirma lo siguiente.",
     updated: "Hemos actualizado los términos. Revísalos y acéptalos para continuar.",
-    age: "Tengo 16 años o más.",
+    age: (n) => `Tengo ${n} años o más.`,
+    ageRaised: (n) => `La edad mínima ahora es de ${n} años. Confírmala para continuar.`,
     termsBefore: "He leído y acepto los",
     termsLink: "Términos de uso",
     and: "y la",
@@ -32,7 +33,7 @@ export const legal: typeof en = {
         {
           h: "Quién puede usar Waifu Baker",
           p: [
-            "Debes tener al menos 16 años para usar la web. Al continuar, confirmas que los tienes.",
+            "Debes tener al menos {minAge} años para usar la web. Al continuar, confirmas que los tienes.",
             "Las colecciones 18+ solo están disponibles para quien declara ser mayor de edad y tiene un tier adulto activo en Patreon. Una vez verificado, el acceso se conserva.",
             "Podemos suspender o cerrar las cuentas que incumplan estos términos.",
           ],
@@ -127,7 +128,7 @@ export const legal: typeof en = {
           h: "Tus derechos",
           p: ["Puedes ver la mayoría de tus datos en Mi cuenta y borrar tu cuenta desde allí. Para pedir una copia de tus datos, corregirlos o cualquier duda, escríbenos a {contact}."],
         },
-        { h: "Edad mínima", p: ["La web es para personas de 16 años o más. Si sabemos que una cuenta es de alguien menor, la borraremos."] },
+        { h: "Edad mínima", p: ["La web es para personas de {minAge} años o más. Si sabemos que una cuenta es de alguien menor, la borraremos."] },
         { h: "Cambios", p: ["Podemos actualizar esta política. La versión y la fecha de arriba indican cuándo cambió por última vez."] },
       ] as LegalSection[],
     },

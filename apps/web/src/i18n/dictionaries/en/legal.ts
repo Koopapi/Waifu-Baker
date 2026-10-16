@@ -20,7 +20,8 @@ export const legal = {
     title: "Before you start",
     intro: "Waifu Baker is a digital trading card collection. To continue, please confirm the following.",
     updated: "We updated our terms. Please review and accept them to continue.",
-    age: "I am 16 years old or older.",
+    age: (n: number) => `I am ${n} years old or older.`,
+    ageRaised: (n: number) => `The minimum age is now ${n}. Please confirm it to continue.`,
     termsBefore: "I have read and accept the",
     termsLink: "Terms of use",
     and: "and the",
@@ -37,7 +38,7 @@ export const legal = {
         {
           h: "Who can use Waifu Baker",
           p: [
-            "You must be at least 16 years old to use the website. By continuing, you confirm that you are.",
+            "You must be at least {minAge} years old to use the website. By continuing, you confirm that you are.",
             "18+ sets are only available to people who declare they are adults and hold an active adult membership tier on Patreon. Once verified, access is kept.",
             "We may suspend or close accounts that break these terms.",
           ],
@@ -132,7 +133,7 @@ export const legal = {
           h: "Your rights",
           p: ["You can see most of your data in My account and delete your account there. For a copy of your data, corrections or any question, contact us at {contact}."],
         },
-        { h: "Minimum age", p: ["The website is for people aged 16 or older. If we learn that an account belongs to someone younger, we will delete it."] },
+        { h: "Minimum age", p: ["The website is for people aged {minAge} or older. If we learn that an account belongs to someone younger, we will delete it."] },
         { h: "Changes", p: ["We may update this policy. The version and date at the top tell you when it last changed."] },
       ] as LegalSection[],
     },

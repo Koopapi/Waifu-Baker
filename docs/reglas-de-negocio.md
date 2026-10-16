@@ -145,13 +145,23 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 
 | # | Regla | Estado | Spec |
 |---|---|---|---|
-| RN-120 | Edad mínima para usar la web: 16 años. Al entrar por primera vez hay que confirmarla y aceptar los términos; sin eso solo se ven las páginas públicas. | Vigente | 007 RF-1, RF-2 |
+| RN-120 | Edad mínima para usar la web: 16 años por defecto (ver RN-127). Al entrar por primera vez hay que confirmarla y aceptar los términos; sin eso solo se ven las páginas públicas. | Vigente | 007 RF-1, RF-2 |
 | RN-121 | Una versión nueva de los términos se vuelve a pedir en la siguiente visita. | Vigente | 007 RF-3 |
 | RN-122 | Términos, privacidad y la página de contenido e IA son públicos, en inglés y español, con versión y fecha, y enlazados desde el pie de todas las páginas. El operador figura como «Waifu Baker». | Vigente | 007 RF-4 a RF-8 |
 | RN-123 | Contacto legal: el correo configurado del proyecto o, si no lo hay, la página de Patreon. | Vigente | 007 RF-7 |
 | RN-124 | Solo se usan cookies esenciales (sesión, idioma y zona horaria): no hay aviso de cookies ni analítica externa. | Vigente | 007 RF-6, RF-12 |
 | RN-125 | Los errores se envían a Sentry solo con el identificador interno del usuario; sin Sentry configurado no se envía nada. | Vigente | 007 RF-9, RF-10 |
 | RN-126 | Copia de seguridad diaria, cifrada, de la base de datos y de las imágenes; se conservan 30 días y se puede restaurar en una base aparte para comprobarla. | Vigente | 007 RF-13 a RF-15 |
+| RN-127 | El administrador elige la edad mínima de la web, 16 o 18 años, con confirmación y registro en el historial. Hay que subirla a 18 antes de publicar contenido más subido de tono. | Vigente | 010 RF-17 |
+| RN-128 | Si la edad mínima sube, cada usuario que confirmó una edad menor debe confirmar la nueva antes de seguir. Bajarla no pide nada. La bienvenida, los términos y la privacidad muestran siempre la edad vigente. | Vigente | 010 RF-18, RF-19 |
+
+## 12. Demo local
+
+| Regla | Descripción | Estado | Origen |
+|---|---|---|---|
+| RN-130 | `pnpm demo` crea desde cero una base de datos aparte (`waifu_baker_demo`) con la colección de fan art, un coleccionista (3 sobres sin abrir, cartas, 240 galletas, racha en el día 4 y álbum público) y un administrador. No toca los datos de desarrollo ni habla con Patreon. | Vigente | 010 RF-12 |
+| RN-131 | Las cartas de fan art llevan nombres propios, nunca los nombres reales de los personajes. | Vigente | 010 RF-12 |
+| RN-132 | En la demo se entra con un botón por papel (coleccionista o administrador), con una franja visible y un botón para cambiar de papel. El modo demo no existe en producción. | Vigente | 010 RF-13 a RF-15 |
 
 ---
 
@@ -179,5 +189,5 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |
 | Racha diaria | 10, 10, 15, 15, 20, 20 galletas y un sobre el día 7; 1 día de gracia |
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
-| Edad mínima de la web | 16 años (18+ y tier adulto para el contenido adulto) |
+| Edad mínima de la web | 16 o 18 años, la elige el administrador (16 por defecto); 18+ y tier adulto para el contenido adulto |
 | Copias de seguridad | diarias, cifradas, 30 días |

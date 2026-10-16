@@ -13,7 +13,7 @@ export function CreateSetForm() {
     if (state?.ok) form.current?.reset();
   }, [state]);
   return (
-    <form ref={form} action={action} className="grid gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:grid-cols-2 lg:grid-cols-[140px_minmax(0,1fr)_120px_auto_auto] lg:items-end">
+    <form ref={form} action={action} className="grid gap-4 rounded-xl border border-ui-line bg-ui-raised p-4 sm:grid-cols-2 lg:grid-cols-[140px_minmax(0,1fr)_120px_auto_auto] lg:items-end">
       <Field label={t.code} hint={t.codeHint}>
         <input name="code" required maxLength={8} placeholder="WB01" className={`${inputCls} uppercase`} />
       </Field>
@@ -65,7 +65,7 @@ export function EditSetForm({
       </div>
       <div className="sm:col-span-2 lg:col-span-4">
         <FormMessage state={state} />
-        {lockedForUsers && <p className="text-xs text-white/40">{t.lockedHint}</p>}
+        {lockedForUsers && <p className="text-xs text-ui-text-3">{t.lockedHint}</p>}
       </div>
     </form>
   );

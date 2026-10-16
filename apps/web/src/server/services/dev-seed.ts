@@ -21,7 +21,8 @@ export interface SeedSetInput {
   characterName: string;
   packSize: number;
   isAdult: boolean;
-  cards: { file: UploadFile; name: string; rarity: Rarity }[];
+  /** `character`: personaje de la carta; si falta, el de la colección (`characterName`). */
+  cards: { file: UploadFile; name: string; rarity: Rarity; character?: string }[];
   slots: Partial<Slot>[];
   /** Porcentaje 0-100, como en el formulario del panel. */
   holoPercent?: number;
@@ -31,11 +32,19 @@ const setVersion = async (db: DbLike, setId: string) => (await db.select({ v: se
 
 /** Crea personaje y colección, sube las cartas, las completa (y revisa si es 18+), guarda probabilidades y publica. */
 export async function seedPublishedSet(db: DbLike, store: CardStore, actorUserId: string, input: SeedSetInput) {
-  const character = await createCharacter(db, actorUserId, { name: input.characterName });
+  const characters = new Map<string, string>();
+  const characterId = async (name: string) => {
+    if (!characters.has(name)) characters.set(name, (await createCharacter(db, actorUserId, { name })).id);
+    return characters.get(name)!;
+  };
   const set = await createSet(db, actorUserId, { code: input.code, name: input.name, isAdult: input.isAdult, packSize: input.packSize });
   for (const c of input.cards) {
     const uploaded = await uploadCardImage(db, store, actorUserId, set.id, c.file);
-    const updated = await updateCard(db, store, actorUserId, uploaded.id, uploaded.version, { name: c.name, characterId: character.id, rarity: c.rarity });
+    const updated = await updateCard(db, store, actorUserId, uploaded.id, uploaded.version, {
+      name: c.name,
+      characterId: await characterId(c.character ?? input.characterName),
+      rarity: c.rarity,
+    });
     // RF-18 de la spec 003: en una colección 18+ cada carta pasa la revisión de personaje adulto.
     if (input.isAdult) await reviewCard(db, store, actorUserId, updated.id, updated.version, true);
   }

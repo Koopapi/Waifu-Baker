@@ -17,14 +17,14 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
       <h1 className="text-2xl font-bold">{t.title}</h1>
       <form className="flex gap-3" role="search">
         <input name="q" defaultValue={q} placeholder={t.searchPlaceholder} className={inputCls} aria-label={t.searchAria} />
-        <button className="rounded-full bg-[#d6b370] px-5 text-sm font-semibold text-[#0b0c0e]">{t.search}</button>
+        <button className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-5 text-sm font-semibold text-ui-on-accent">{t.search}</button>
       </form>
       {rows.length === 0 ? (
-        <p className="text-sm text-white/50">{q ? t.noMatch(q) : t.empty}</p>
+        <p className="text-sm text-ui-text-3">{q ? t.noMatch(q) : t.empty}</p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-white/10">
+        <div className="overflow-x-auto rounded-xl border border-ui-line">
           <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-white/[0.03] text-xs uppercase tracking-wider text-white/50">
+            <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
               <tr>
                 <th className="px-4 py-3">{t.th.name}</th>
                 <th className="px-4 py-3">{t.th.patreon}</th>
@@ -35,17 +35,17 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
             </thead>
             <tbody>
               {rows.map((u) => (
-                <tr key={u.id} className="border-t border-white/5 hover:bg-white/[0.02]">
+                <tr key={u.id} className="border-t border-ui-line hover:bg-ui-raised">
                   <td className="px-4 py-3">
                     <Link href={`/admin/users/${u.id}`} className="underline decoration-white/20 underline-offset-4 hover:decoration-white">
                       {u.displayName || tt.admin.noName}
                     </Link>
                     {u.deletedAt && <span className="ml-2 text-xs text-red-300">{t.deletedBadge}</span>}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs text-white/60">{u.patreonUserId}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-ui-text-2">{u.patreonUserId}</td>
                   <td className="px-4 py-3">{u.role === "admin" ? t.admin : t.user}</td>
                   <td className="px-4 py-3">{u.isAdultDeclared && u.adultVerifiedAt ? t.yes : t.no}</td>
-                  <td className="px-4 py-3 text-white/60">{formatDate(locale, u.createdAt, "medium")}</td>
+                  <td className="px-4 py-3 text-ui-text-2">{formatDate(locale, u.createdAt, "medium")}</td>
                 </tr>
               ))}
             </tbody>

@@ -68,7 +68,7 @@ function Tile({
       style={style}
       data-card-tile={card.number}
       id={`carta-${pad(card.number)}`}
-      className={`group relative overflow-hidden rounded-xl border bg-white/[0.03] ${selected ? "border-[#d6b370] ring-2 ring-[#d6b370]/60" : "border-white/10"} ${isDragging ? "opacity-80 shadow-2xl" : ""}`}
+      className={`group relative overflow-hidden rounded-xl border bg-ui-raised ${selected ? "border-ui-accent ring-2 ring-ui-accent/60" : "border-ui-line"} ${isDragging ? "opacity-80 shadow-2xl" : ""}`}
       {...(sortable ? { ...attributes, ...listeners } : {})}
     >
       <button type="button" onClick={sortable ? undefined : onOpen} className={`block w-full ${sortable ? "cursor-grab" : "cursor-pointer"}`} aria-label={t.editAria(pad(card.number))}>
@@ -76,7 +76,7 @@ function Tile({
           // eslint-disable-next-line @next/next/no-img-element -- recurso privado servido por la API del panel
           <img src={card.thumbUrl} alt="" className="aspect-[63/88] w-full object-cover" draggable={false} />
         ) : (
-          <div className="grid aspect-[63/88] place-items-center text-xs text-white/40">{t.processing}</div>
+          <div className="grid aspect-[63/88] place-items-center text-xs text-ui-text-3">{t.processing}</div>
         )}
       </button>
       {!sortable && (
@@ -87,13 +87,13 @@ function Tile({
             onChange={() => {}}
             onClick={onToggle}
             aria-label={t.selectAria(pad(card.number))}
-            className="h-4 w-4 accent-[#d6b370]"
+            className="h-4 w-4 accent-ui-accent"
           />
         </label>
       )}
       <div className="space-y-1 p-2 text-xs">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-mono text-white/50">{pad(card.number)}</span>
+          <span className="font-mono text-ui-text-3">{pad(card.number)}</span>
           {card.rarity ? (
             <span className="flex items-center gap-1">
               <span className={`h-2 w-2 rounded-full ${RARITY_DOT[card.rarity]}`} />
@@ -103,12 +103,12 @@ function Tile({
             <span className="text-amber-300">{t.noRarity}</span>
           )}
         </div>
-        <div className="truncate font-medium">{card.name || <span className="text-white/40">{tt.admin.noName}</span>}</div>
-        <div className="flex items-center justify-between gap-2 text-white/50">
+        <div className="truncate font-medium">{card.name || <span className="text-ui-text-3">{tt.admin.noName}</span>}</div>
+        <div className="flex items-center justify-between gap-2 text-ui-text-3">
           <span className="truncate">{card.characterName ?? t.noCharacter}</span>
           {card.status === "ready" ? <span className="text-emerald-300">{t.ready}</span> : <span className="text-amber-300">{t.incomplete}</span>}
         </div>
-        <div className="flex items-center justify-between gap-2 text-white/40">
+        <div className="flex items-center justify-between gap-2 text-ui-text-3">
           <span title={t.chanceTitle}>{t.perPack(pct(locale, card.chance))}</span>
           {isAdult && <ReviewBadge card={card} />}
         </div>
@@ -201,12 +201,12 @@ function CardEditor({
     <dialog
       ref={dialog}
       onClose={onClose}
-      className="m-auto w-[min(92vw,860px)] rounded-2xl border border-white/10 bg-[#15121f] p-0 text-[#ece9f5] backdrop:bg-black/70"
+      className="m-auto w-[min(92vw,860px)] rounded-2xl border border-ui-line bg-ui-nav p-0 text-ui-text backdrop:bg-black/70"
     >
       <form action={save} className="grid gap-6 p-6 md:grid-cols-[300px_1fr]">
         <div>
           <CardPreview card={card} />
-          <p className="mt-2 text-xs text-white/40">{t.tiltHint}</p>
+          <p className="mt-2 text-xs text-ui-text-3">{t.tiltHint}</p>
           {card.pendingArtUrl && (
             <div className="mt-3 space-y-1 rounded-lg border border-sky-400/30 p-2">
               <p className="text-xs text-sky-300">{t.pendingArtNote}</p>
@@ -215,10 +215,10 @@ function CardEditor({
             </div>
           )}
           <div className="mt-3 space-y-2">
-            <span className="text-xs uppercase tracking-wider text-white/60">{t.replaceArt}</span>
+            <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.replaceArt}</span>
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs" data-testid="replace-art" />
             {file && (
-              <button type="button" onClick={replaceArt} disabled={pending} className="rounded-full border border-white/15 px-3 py-1.5 text-xs">
+              <button type="button" onClick={replaceArt} disabled={pending} className="btn rounded-md border border-ui-line px-3 py-1.5 text-xs hover:bg-ui-hover">
                 {t.uploadNewArt}
               </button>
             )}
@@ -227,21 +227,21 @@ function CardEditor({
         <div className="space-y-4">
           <div className="flex items-start justify-between">
             <h2 className="text-lg font-bold">{t.cardN(pad(card.number))}</h2>
-            <button type="button" onClick={onClose} className="text-white/50 hover:text-white" aria-label={tt.common.close}>
+            <button type="button" onClick={onClose} className="text-ui-text-3 hover:text-white" aria-label={tt.common.close}>
               ✕
             </button>
           </div>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wider text-white/60">{t.name}</span>
+            <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.name}</span>
             <input name="name" defaultValue={card.name} maxLength={60} className={inputCls} autoFocus />
           </label>
           <label className="block space-y-1">
-            <span className="text-xs uppercase tracking-wider text-white/60">{t.flavorText}</span>
+            <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.flavorText}</span>
             <textarea name="flavorText" defaultValue={card.flavorText} rows={2} className={inputCls} />
           </label>
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-white/60">{t.character}</span>
+              <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.character}</span>
               <select name="characterId" defaultValue={card.characterId ?? ""} className={inputCls}>
                 <option value="">{t.noCharacter}</option>
                 {characters.map((c) => (
@@ -252,7 +252,7 @@ function CardEditor({
               </select>
             </label>
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-white/60">{t.rarity}</span>
+              <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.rarity}</span>
               <select name="rarity" defaultValue={card.rarity ?? "__none"} disabled={!perms.canEditRarity} className={inputCls}>
                 <option value="__none">{t.noRarity}</option>
                 {RARITIES.map((r) => (
@@ -263,7 +263,7 @@ function CardEditor({
               </select>
             </label>
             <label className="block space-y-1">
-              <span className="text-xs uppercase tracking-wider text-white/60">{t.variant}</span>
+              <span className="text-xs uppercase tracking-wider text-ui-text-2">{t.variant}</span>
               <select name="variant" defaultValue={card.variant} disabled={!perms.canEditRarity} className={inputCls}>
                 <option value="normal">{t.variants.normal}</option>
                 <option value="holo">{t.variants.holo}</option>
@@ -271,33 +271,33 @@ function CardEditor({
               </select>
             </label>
           </div>
-          <p className="text-xs text-white/50">{t.chance(pct(locale, card.chance))}</p>
+          <p className="text-xs text-ui-text-3">{t.chance(pct(locale, card.chance))}</p>
           {perms.isAdultSet && (
             <div className="space-y-2 rounded-lg border border-rose-400/30 bg-rose-400/5 p-3" data-testid="review-box">
               <p className="text-sm">
                 {t.review18} <ReviewBadge card={card} />
               </p>
               {card.adultReviewedAt && !card.pendingArtUrl ? (
-                <button type="button" onClick={() => review(false)} disabled={pending} className="rounded-full border border-white/15 px-3 py-1.5 text-xs">
+                <button type="button" onClick={() => review(false)} disabled={pending} className="btn rounded-md border border-ui-line px-3 py-1.5 text-xs hover:bg-ui-hover">
                   {t.removeReview}
                 </button>
               ) : (
-                <button type="button" onClick={() => review(true)} disabled={pending} className="rounded-full bg-rose-300 px-3 py-1.5 text-xs font-semibold text-black">
+                <button type="button" onClick={() => review(true)} disabled={pending} className="btn bg-rose-300 px-3 py-1.5 text-xs text-black hover:bg-rose-200">
                   {card.pendingArtUrl ? t.approveNewArt : t.confirmAdult}
                 </button>
               )}
             </div>
           )}
           <Notice state={state} />
-          <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-4">
-            <button disabled={pending} className="rounded-full bg-[#d6b370] px-5 py-2 text-sm font-semibold text-[#0b0c0e] disabled:opacity-60">
+          <div className="flex flex-wrap items-center gap-3 border-t border-ui-line pt-4">
+            <button disabled={pending} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-5 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-60">
               {pending ? tt.common.saving : tt.common.save}
             </button>
-            <button type="button" onClick={onClose} className="rounded-full border border-white/15 px-4 py-2 text-sm">
+            <button type="button" onClick={onClose} className="btn rounded-md border border-ui-line px-4 py-2 text-sm hover:bg-ui-hover">
               {tt.common.cancel}
             </button>
             {perms.canRemove && (
-              <button type="button" onClick={remove} disabled={pending} className="ml-auto rounded-full border border-red-400/40 px-4 py-2 text-sm text-red-300">
+              <button type="button" onClick={remove} disabled={pending} className="btn ml-auto border border-red-400/40 px-4 py-2 text-sm text-red-300 hover:bg-red-400/10">
                 {t.deleteCard}
               </button>
             )}
@@ -386,17 +386,17 @@ export function CardWorkspace({
     });
   };
 
-  if (cards.length === 0) return <p className="text-sm text-white/50">{t.empty}</p>;
+  if (cards.length === 0) return <p className="text-sm text-ui-text-3">{t.empty}</p>;
 
   const shown = sorting ? order.map((id) => byId.get(id)!).filter(Boolean) : cards;
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-0 z-20 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-[#0f0d16]/95 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-20 -mx-2 flex flex-wrap items-center gap-3 rounded-xl border border-ui-line bg-ui-bg/95 px-4 py-3 backdrop-blur">
         {sorting ? (
           <>
             <span className="text-sm">{t.dragHint}</span>
-            <button onClick={() => setSorting(false)} className="ml-auto rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e]">
+            <button onClick={() => setSorting(false)} className="ml-auto btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent">
               {t.done}
             </button>
           </>
@@ -437,13 +437,13 @@ export function CardWorkspace({
                     </select>
                   </>
                 )}
-                <button onClick={applyBulk} disabled={pending} className="rounded-full bg-[#d6b370] px-4 py-1.5 text-sm font-semibold text-[#0b0c0e] disabled:opacity-60">
+                <button onClick={applyBulk} disabled={pending} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-1.5 text-sm font-semibold text-ui-on-accent disabled:opacity-60">
                   {pending ? t.applying : t.apply}
                 </button>
               </>
             )}
             {perms.canReorder && selected.size === 0 && (
-              <button onClick={() => setSorting(true)} className="ml-auto rounded-full border border-white/15 px-4 py-1.5 text-sm">
+              <button onClick={() => setSorting(true)} className="ml-auto btn rounded-md border border-ui-line px-4 py-1.5 text-sm hover:bg-ui-hover">
                 {t.reorder}
               </button>
             )}

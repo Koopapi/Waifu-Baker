@@ -3,15 +3,26 @@ import { userDays, users } from "@/db/schema";
 import { TERMS_VERSION } from "@/domain/legal/documents";
 import type { DbLike } from "@/server/db-types";
 import { recordAudit } from "./audit";
+import { getMinAge } from "./settings";
 
-/** Spec 007, RF-1 y RF-3: confirma la edad mínima y acepta la versión vigente de los términos. */
+/**
+ * Spec 007, RF-1 y RF-3: confirma la edad mínima y acepta la versión vigente de los términos. Spec 010,
+ * RF-18: guarda qué edad confirmó, para volver a pedirla si la de la web sube.
+ */
 export async function acceptTerms(db: DbLike, userId: string, now = new Date()) {
+  const minAge = await getMinAge(db);
   const [row] = await db
     .update(users)
-    .set({ ageConfirmedAt: sql`coalesce(${users.ageConfirmedAt}, ${now.toISOString()}::timestamptz)`, termsVersion: TERMS_VERSION, termsAcceptedAt: now, updatedAt: sql`now()` })
+    .set({
+      ageConfirmedAt: sql`coalesce(${users.ageConfirmedAt}, ${now.toISOString()}::timestamptz)`,
+      ageConfirmedMin: minAge,
+      termsVersion: TERMS_VERSION,
+      termsAcceptedAt: now,
+      updatedAt: sql`now()`,
+    })
     .where(eq(users.id, userId))
     .returning();
-  await recordAudit(db, { actorUserId: userId, action: "terms_accepted", entityType: "user", entityId: userId, meta: { version: TERMS_VERSION } });
+  await recordAudit(db, { actorUserId: userId, action: "terms_accepted", entityType: "user", entityId: userId, meta: { version: TERMS_VERSION, minAge } });
   return row;
 }
 

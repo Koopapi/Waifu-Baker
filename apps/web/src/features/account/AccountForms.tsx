@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useTransition } from "react";
-import { declareAdultAction, deactivateAccountAction } from "@/app/cuenta/actions";
+import { declareAdultAction, deactivateAccountAction } from "@/app/(app)/cuenta/actions";
 import { useT } from "@/i18n/client";
 
 export function DeclareAdultForm() {
@@ -13,7 +13,7 @@ export function DeclareAdultForm() {
         <input type="checkbox" name="confirm" required />
         {t.confirm}
       </label>
-      <button disabled={pending} className="rounded-full bg-[#d6b370] px-4 py-2 text-sm font-semibold text-[#0b0c0e] disabled:opacity-50">
+      <button disabled={pending} className="btn rounded-md bg-ui-accent hover:bg-ui-accent-hover px-4 py-2 text-sm font-semibold text-ui-on-accent disabled:opacity-50">
         {t.submit}
       </button>
       {state && <p role="status" className={`text-sm ${state.error ? "text-red-300" : "text-emerald-300"}`}>{state.error ?? state.message}</p>}

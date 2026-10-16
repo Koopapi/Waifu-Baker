@@ -17,6 +17,10 @@ const env = {
   SENTRY_DSN: "",
   NEXT_PUBLIC_SENTRY_DSN: "",
   SCHEDULER: "",
+  // Spec 010: modo demo con una colección pequeña hecha con las imágenes de public/lab.
+  DEMO_MODE: "1",
+  DEMO_MANIFEST: "e2e/demo-manifest.json",
+  ART_DIR: "public/lab",
   // `next dev` retiene memoria por cada página servida y se reinicia solo al pasar del 80 % del montón:
   // montón amplio y `--expose-gc` para que `/api/dev/memory` recoja la basura y, si hace falta, lo
   // reinicie entre dos tests (`e2e/fixtures.ts`) en vez de en mitad de uno.

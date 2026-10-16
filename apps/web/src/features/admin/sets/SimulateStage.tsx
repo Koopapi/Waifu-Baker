@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { OpeningStage } from "@/features/opening/OpeningStage";
 import { simulatePackAction } from "@/app/admin/sets/card-actions";
 import { useT } from "@/i18n/client";
@@ -27,15 +28,23 @@ export function SimulateStage({ setId, label }: { setId: string; label: string }
     return r.cards;
   }, [setId, failed]);
 
-  return (
-    <OpeningStage
-      draw={draw}
-      packLabel={label}
-      extraHud={
-        <Link href={`/admin/sets/${setId}`} className="hud__btn">
-          {t.back}
-        </Link>
-      }
-    />
+  // La apertura ocupa la pantalla entera, por encima de la estructura del panel (modo foco): se monta en
+  // <body> para no depender de los contenedores de la estructura.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-50 overflow-hidden bg-ui-rail" data-testid="simulate-focus">
+      <OpeningStage
+        draw={draw}
+        packLabel={label}
+        extraHud={
+          <Link href={`/admin/sets/${setId}`} className="hud__btn">
+            {t.back}
+          </Link>
+        }
+      />
+    </div>,
+    document.body,
   );
 }

@@ -32,13 +32,13 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
   const img = (cardId: string) => `/api/album/${a.slug}/img?c=${cardId}`;
   const pct = a.totals.total ? Math.round((a.totals.owned / a.totals.total) * 100) : 0;
   return (
-    <div className="min-h-dvh bg-[radial-gradient(120%_60%_at_50%_0%,#2a1350_0%,#0b0912_60%)] text-[#f1eef8]">
+    <div className="min-h-dvh bg-[radial-gradient(120%_60%_at_50%_0%,#2a1350_0%,#0b0912_60%)] text-ui-text">
       <header className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link href="/" className="font-extrabold tracking-[0.14em]">
           {t.common.brand}
         </Link>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-white/50">{t.collection.publicAlbum.badge}</span>
+          <span className="text-xs text-ui-text-3">{t.collection.publicAlbum.badge}</span>
           <LocaleToggle />
         </div>
       </header>
@@ -47,21 +47,21 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
           <h1 className="text-4xl font-extrabold" data-testid="album-alias">
             {a.alias}
           </h1>
-          <p className="text-white/70" data-testid="album-totals">
+          <p className="text-ui-text-2" data-testid="album-totals">
             {t.collection.publicAlbum.totals(a.totals.owned, a.totals.total, pct)}
           </p>
         </section>
 
         {a.featured.length > 0 && (
           <section className="space-y-4" data-testid="album-featured">
-            <h2 className="text-center text-sm font-semibold uppercase tracking-[0.2em] text-white/50">{t.collection.publicAlbum.featured}</h2>
+            <h2 className="text-center text-sm font-semibold uppercase tracking-[0.2em] text-ui-text-3">{t.collection.publicAlbum.featured}</h2>
             <ul className="flex flex-wrap justify-center gap-4">
               {a.featured.map((c) => (
                 <li key={c.cardId} className={`w-[min(40vw,200px)] rarity-${c.rarity ?? "common"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- imagen pública con marca de agua */}
                   <img src={img(c.cardId)} alt={c.name} className="aspect-[63/88] w-full rounded-xl object-cover shadow-[0_20px_50px_rgba(0,0,0,0.6)]" />
                   <p className="mt-2 text-center text-sm">{c.name}</p>
-                  <p className="text-center text-xs text-white/50">
+                  <p className="text-center text-xs text-ui-text-3">
                     {c.setCode} · {pad(c.number)} · {c.rarity ? t.common.rarity[c.rarity] : ""}
                   </p>
                 </li>
@@ -70,15 +70,15 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
           </section>
         )}
 
-        {a.collections.length === 0 && <p className="text-center text-white/50">{t.collection.publicAlbum.noCollections}</p>}
+        {a.collections.length === 0 && <p className="text-center text-ui-text-3">{t.collection.publicAlbum.noCollections}</p>}
         {a.collections.map((col) => (
           <section key={col.setId} className="space-y-4" data-testid={`album-collection-${col.code}`}>
             <div className="flex flex-wrap items-baseline justify-between gap-3">
               <h2 className="text-2xl font-bold">
-                <span className="mr-2 font-mono text-sm text-white/50">{col.code}</span>
+                <span className="mr-2 font-mono text-sm text-ui-text-3">{col.code}</span>
                 {col.name}
               </h2>
-              <span className="tabular-nums text-white/70">
+              <span className="tabular-nums text-ui-text-2">
                 {col.progress.owned}/{col.progress.total}
               </span>
             </div>
@@ -91,8 +91,8 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
                   </li>
                 ) : (
                   <li key={s.number} data-slot={s.number} data-missing="true">
-                    <div className="grid aspect-[63/88] w-full place-items-center rounded-lg border-2 border-dashed border-white/10">
-                      <span className="font-mono text-sm text-white/25">{pad(s.number)}</span>
+                    <div className="grid aspect-[63/88] w-full place-items-center rounded-lg border-2 border-dashed border-ui-line">
+                      <span className="font-mono text-sm text-ui-text-3">{pad(s.number)}</span>
                     </div>
                   </li>
                 ),
@@ -100,7 +100,7 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
             </ul>
           </section>
         ))}
-        <p className="text-center text-xs text-white/40">{t.collection.publicAlbum.footer}</p>
+        <p className="text-center text-xs text-ui-text-3">{t.collection.publicAlbum.footer}</p>
       </main>
     </div>
   );

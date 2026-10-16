@@ -33,48 +33,48 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="max-w-4xl space-y-8">
       <div className="space-y-2">
-        <Link href="/admin/users" className="text-sm text-white/50 hover:text-white">
+        <Link href="/admin/users" className="text-sm text-ui-text-3 hover:text-white">
           {t.back}
         </Link>
         <h1 className="text-2xl font-bold">{user.displayName || tt.admin.noName}</h1>
-        <p className="text-sm text-white/60">
+        <p className="text-sm text-ui-text-2">
           {t.patreon} <span className="font-mono">{user.patreonUserId}</span> · {user.role === "admin" ? t.admin : t.user} · {t.ageVerifiedLabel}{" "}
           {verified ? t.yesLower : t.noLower}
           {user.deletedAt && <span className="text-red-300">{t.accountDeleted}</span>}
         </p>
       </div>
 
-      <section className="space-y-2 rounded-xl border border-white/10 p-4" data-testid="patreon-state">
+      <section className="space-y-2 rounded-xl border border-ui-line p-4" data-testid="patreon-state">
         <h2 className="font-semibold">{t.patreonState.title}</h2>
         {!patreon ? (
-          <p className="text-sm text-white/50">{t.patreonState.none}</p>
+          <p className="text-sm text-ui-text-3">{t.patreonState.none}</p>
         ) : (
           <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-sm">
-            <dt className="text-white/50">{t.patreonState.member}</dt>
+            <dt className="text-ui-text-3">{t.patreonState.member}</dt>
             <dd className="font-mono">{patreon.memberId ?? "—"}</dd>
-            <dt className="text-white/50">{t.patreonState.status}</dt>
+            <dt className="text-ui-text-3">{t.patreonState.status}</dt>
             <dd>{patreon.patronStatus ?? "—"}</dd>
-            <dt className="text-white/50">{t.patreonState.tiers}</dt>
+            <dt className="text-ui-text-3">{t.patreonState.tiers}</dt>
             <dd className="font-mono">{patreon.entitledTierIds.join(", ") || "—"}</dd>
-            <dt className="text-white/50">{t.patreonState.lastCharge}</dt>
+            <dt className="text-ui-text-3">{t.patreonState.lastCharge}</dt>
             <dd>{patreon.lastChargeDate ? `${formatDate(locale, patreon.lastChargeDate, "medium")} · ${patreon.lastChargeStatus ?? ""}` : "—"}</dd>
-            <dt className="text-white/50">{t.patreonState.nextCharge}</dt>
+            <dt className="text-ui-text-3">{t.patreonState.nextCharge}</dt>
             <dd>{patreon.nextChargeDate ? formatDate(locale, patreon.nextChargeDate, "medium") : "—"}</dd>
-            <dt className="text-white/50">{t.patreonState.synced}</dt>
+            <dt className="text-ui-text-3">{t.patreonState.synced}</dt>
             <dd>{formatDateTime(locale, patreon.syncedAt)}</dd>
           </dl>
         )}
       </section>
 
-      <section className="space-y-3 rounded-xl border border-white/10 p-4" data-testid="user-rewards">
+      <section className="space-y-3 rounded-xl border border-ui-line p-4" data-testid="user-rewards">
         <h2 className="font-semibold">{t.rewards.title}</h2>
-        <ul className="space-y-1 text-sm text-white/70">
+        <ul className="space-y-1 text-sm text-ui-text-2">
           <li>{t.rewards.charges(rw.free.charges, rw.free.max)}</li>
           <li>{t.rewards.streak(rw.daily.day, rw.daily.claimedToday)}</li>
           <li data-testid="user-cookies">{t.rewards.cookies(rw.cookies)}</li>
         </ul>
         {rw.history.length > 0 && (
-          <ul className="divide-y divide-white/5 rounded-lg border border-white/10 text-sm">
+          <ul className="divide-y divide-ui-line rounded-lg border border-ui-line text-sm">
             {rw.history.map((m) => (
               <li key={m.id} className="flex justify-between gap-4 px-3 py-1.5">
                 <span>{tt.rewards.cookies.reason(m.reason)}</span>
@@ -89,30 +89,30 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
         {!user.deletedAt && <CookiesForm userId={user.id} />}
       </section>
 
-      <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <section className="space-y-3 rounded-xl border border-ui-line bg-ui-raised p-4">
         <h2 className="font-semibold">{t.gift}</h2>
-        {user.deletedAt ? <p className="text-sm text-white/50">{t.cannotGiftDeleted}</p> : <GiftForm userId={user.id} sets={giftable} />}
+        {user.deletedAt ? <p className="text-sm text-ui-text-3">{t.cannotGiftDeleted}</p> : <GiftForm userId={user.id} sets={giftable} />}
       </section>
 
       <section className="space-y-2" data-testid="sealed-packs">
         <h2 className="font-semibold">{t.sealed(sealedPacks.length)}</h2>
         {sealedPacks.length === 0 ? (
-          <p className="text-sm text-white/50">{t.none}</p>
+          <p className="text-sm text-ui-text-3">{t.none}</p>
         ) : (
           <>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-ui-text-2">
               {Object.entries(bySet)
                 .map(([code, n]) => `${code}: ${n}`)
                 .join(" · ")}
             </p>
-            <ul className="divide-y divide-white/5 rounded-xl border border-white/10 text-sm">
+            <ul className="divide-y divide-ui-line rounded-xl border border-ui-line text-sm">
               {sealedPacks.slice(0, 20).map((p) => (
                 <li key={p.id} className="flex justify-between gap-4 px-4 py-2">
                   <span>
                     <span className="font-mono">{p.setCode}</span> · {p.source === "manual" ? t.source.manual : p.source === "promo" ? t.source.promo : t.source.tier}
-                    {p.reason && <span className="text-white/50"> · {p.reason}</span>}
+                    {p.reason && <span className="text-ui-text-3"> · {p.reason}</span>}
                   </span>
-                  <span className="text-white/40">{formatDateTime(locale, p.grantedAt)}</span>
+                  <span className="text-ui-text-3">{formatDateTime(locale, p.grantedAt)}</span>
                 </li>
               ))}
             </ul>
@@ -123,17 +123,17 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
       <section className="space-y-2" data-testid="pack-history">
         <h2 className="font-semibold">{t.packHistory.title}</h2>
         {packHistory.length === 0 ? (
-          <p className="text-sm text-white/50">{t.packHistory.empty}</p>
+          <p className="text-sm text-ui-text-3">{t.packHistory.empty}</p>
         ) : (
-          <ul className="divide-y divide-white/5 rounded-xl border border-white/10 text-sm">
+          <ul className="divide-y divide-ui-line rounded-xl border border-ui-line text-sm">
             {packHistory.map((p) => (
               <li key={p.id} className="flex flex-wrap justify-between gap-x-4 gap-y-1 px-4 py-2" data-status={p.status}>
                 <span>
                   <span className="font-mono">{p.setCode}</span> · {p.source === "manual" ? t.source.manual : p.source === "promo" ? t.source.promo : t.source.tier}
-                  {p.cycleKey && <span className="text-white/50"> · {t.packHistory.cycle(p.cycleKey)}</span>}
-                  {p.reason && <span className="text-white/50"> · {p.reason}</span>}
+                  {p.cycleKey && <span className="text-ui-text-3"> · {t.packHistory.cycle(p.cycleKey)}</span>}
+                  {p.reason && <span className="text-ui-text-3"> · {p.reason}</span>}
                 </span>
-                <span className={p.status === "void" ? "text-red-300" : "text-white/50"}>
+                <span className={p.status === "void" ? "text-red-300" : "text-ui-text-3"}>
                   {t.packHistory.status[p.status] ?? p.status} · {formatDateTime(locale, p.grantedAt)}
                 </span>
               </li>
@@ -145,12 +145,12 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
       <section className="space-y-2">
         <h2 className="font-semibold">{t.collection(collection.length, collection.reduce((a, c) => a + c.qty, 0))}</h2>
         {collection.length === 0 ? (
-          <p className="text-sm text-white/50">{t.noOpenings}</p>
+          <p className="text-sm text-ui-text-3">{t.noOpenings}</p>
         ) : (
           <ul className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
             {collection.map((c) => (
-              <li key={`${c.cardId}-${c.holo}`} className="rounded-lg border border-white/10 px-3 py-2">
-                <span className="font-mono text-white/50">
+              <li key={`${c.cardId}-${c.holo}`} className="rounded-lg border border-ui-line px-3 py-2">
+                <span className="font-mono text-ui-text-3">
                   {c.setCode} · {pad(c.number)}
                 </span>{" "}
                 {c.name} · {c.rarity ? tt.common.rarity[c.rarity] : "—"}
@@ -164,15 +164,15 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
       <section className="space-y-2">
         <h2 className="font-semibold">{t.history}</h2>
         {openings.length === 0 ? (
-          <p className="text-sm text-white/50">{t.noHistory}</p>
+          <p className="text-sm text-ui-text-3">{t.noHistory}</p>
         ) : (
-          <ul className="divide-y divide-white/5 rounded-xl border border-white/10 text-sm">
+          <ul className="divide-y divide-ui-line rounded-xl border border-ui-line text-sm">
             {openings.map((o) => (
               <li key={o.id} className="flex justify-between px-4 py-2">
                 <span>
                   {o.setCode} · {t.cardCount(o.cardIds.length)}
                 </span>
-                <span className="text-white/40">{formatDateTime(locale, o.openedAt)}</span>
+                <span className="text-ui-text-3">{formatDateTime(locale, o.openedAt)}</span>
               </li>
             ))}
           </ul>

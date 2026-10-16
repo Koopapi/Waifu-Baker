@@ -44,4 +44,17 @@ export const site: typeof en = {
     metaTitle: "Laboratorio de apertura",
     metaDescription: "Prototipo local de la apertura de sobres con datos falsos.",
   },
+  demo: {
+    tag: "Demo local",
+    roles: { collector: "coleccionista", admin: "administrador" },
+    banner: (role) => `Modo demo · estás viendo la web como ${role === "admin" ? "administrador" : "coleccionista"}`,
+    bannerShort: (role) => `Demo · ${role}`,
+    switchTo: (role) => `Cambiar a ${role}`,
+    enterCollector: "Entrar como coleccionista",
+    enterCollectorDetail: "Sobres sin abrir, una colección empezada, galletas y una racha de 4 días.",
+    enterAdmin: "Entrar como administrador",
+    enterAdminDetail: "Colecciones, cartas, usuarios, métricas, copias y ajustes.",
+    note: "Los datos de la demo se recrean cada vez que ejecutas pnpm demo. Nunca disponible en producción.",
+    notSeeded: "La demo aún no tiene datos. Ejecuta pnpm demo para crearlos.",
+  },
 };
