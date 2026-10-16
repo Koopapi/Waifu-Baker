@@ -25,7 +25,21 @@ export default async function AlbumSettingsPage() {
         </p>
       </div>
       <AlbumSettings
-        album={album ? { isPublic: album.isPublic, alias: album.alias, url: `${origin}/album/${album.slug}`, featured: album.featuredCardIds } : null}
+        album={
+          album
+            ? {
+                isPublic: album.isPublic,
+                alias: album.alias,
+                url: `${origin}/album/${album.slug}`,
+                featured: album.featuredCardIds,
+                moderation: album.moderation,
+                hiddenReason: album.hiddenReason,
+                hiddenNote: album.hiddenNote,
+                reviewAlias: album.reviewAlias,
+                reviewNote: album.reviewNote,
+              }
+            : null
+        }
         cards={cards.map((c) => ({ ...c, rarity: c.rarity ?? "common", thumb: cardImageUrl(c.cardId, "thumb", user.id) }))}
       />
     </main>

@@ -1,4 +1,4 @@
-import { count, eq, sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import { albums } from "@/db/schema";
 import type { DbLike } from "@/server/db-types";
 
@@ -32,7 +32,8 @@ export async function dailyMetrics(db: DbLike, now = new Date(), days = 30) {
     from d
     order by d.day desc
   `)) as unknown as DayMetrics[];
-  const [{ n }] = await db.select({ n: count() }).from(albums).where(eq(albums.isPublic, true));
+  // Spec 012, RF-5: los álbumes ocultos por moderación no cuentan como activos.
+  const [{ n }] = await db.select({ n: count() }).from(albums).where(and(eq(albums.isPublic, true), eq(albums.moderation, "none")));
   const totals = rows.reduce(
     (a, r) => ({
       newUsers: a.newUsers + r.newUsers,

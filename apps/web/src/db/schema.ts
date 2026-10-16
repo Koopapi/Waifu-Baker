@@ -23,6 +23,7 @@ export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]
 export const rarity = pgEnum("rarity", ["common", "uncommon", "rare", "epic", "legendary", "secret"]);
 export const cardVariant = pgEnum("card_variant", ["normal", "holo", "alt"]);
 export const cardStatus = pgEnum("card_status", ["draft", "ready"]);
+export const albumModeration = pgEnum("album_moderation", ["none", "hidden", "review_requested", "review_rejected"]);
 export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo", "free", "daily"]);
 export const packStatus = pgEnum("pack_status", ["sealed", "opened", "void"]);
 
@@ -262,6 +263,18 @@ export const albums = pgTable("albums", {
   isPublic: boolean("is_public").notNull().default(false),
   alias: text("alias").notNull().default("Coleccionista"),
   featuredCardIds: uuid("featured_card_ids").array().notNull().default(sql`'{}'::uuid[]`),
+  /** Spec 012: primera activación (para la lista de moderación). */
+  activatedAt: timestamp("activated_at", { withTimezone: true }),
+  /** Spec 012: estado de moderación; solo `none` se ve en público. */
+  moderation: albumModeration("moderation").notNull().default("none"),
+  hiddenReason: text("hidden_reason"),
+  hiddenNote: text("hidden_note"),
+  hiddenAt: timestamp("hidden_at", { withTimezone: true }),
+  hiddenBy: uuid("hidden_by").references(() => users.id),
+  /** Alias que propone el dueño al pedir revisión, y nota del administrador si la rechaza. */
+  reviewAlias: text("review_alias"),
+  reviewRequestedAt: timestamp("review_requested_at", { withTimezone: true }),
+  reviewNote: text("review_note"),
   ...timestamps,
 });
 

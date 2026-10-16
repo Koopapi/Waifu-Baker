@@ -23,6 +23,19 @@ export const collection = {
     aiHint: "AI-generated illustration. Move your mouse or tilt your phone to see the shine.",
   },
   album: {
+    moderation: {
+      reasons: { offensive_alias: "Offensive alias", impersonation: "Impersonation", spam: "Spam", other: "Other" },
+      hiddenTitle: "Your album is hidden",
+      hiddenBody: (reason: string) => `An administrator hid it. Reason: ${reason}.`,
+      adminNote: (note: string) => `Note from the team: ${note}`,
+      requestIntro: "Choose a new alias and request a review. While it is hidden, nobody can see your album.",
+      newAlias: "New alias",
+      request: "Request review",
+      requested: "Review requested",
+      requestedBody: (alias: string) => `You proposed “${alias}”. We will review it soon.`,
+      rejectedTitle: "Review rejected",
+      requestSent: "Review requested. We will let you know here.",
+    },
     pageTitle: "Public album",
     intro:
       "Share your collections with a link. Visitors only see your alias and your SFW cards, scaled down and watermarked. 18+ sets and your Patreon name are never shown.",
@@ -54,6 +67,8 @@ export const collection = {
     featuredSaved: "Featured cards saved.",
   },
   publicAlbum: {
+    unavailable: "This album is not available",
+    unavailableBody: "It may be private, or its link may have changed. Ask its owner for the current link.",
     notFoundTitle: "Album not found",
     title: (alias: string) => `${alias}'s album`,
     description: (owned: number, total: number) => `${owned} of ${total} cards collected.`,

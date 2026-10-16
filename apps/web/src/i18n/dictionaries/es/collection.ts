@@ -24,6 +24,19 @@ export const collection: typeof en = {
     aiHint: "Ilustración generada con IA. Mueve el ratón o inclina el móvil para ver el brillo.",
   },
   album: {
+    moderation: {
+      reasons: { offensive_alias: "Alias ofensivo", impersonation: "Suplantación", spam: "Spam", other: "Otro" },
+      hiddenTitle: "Tu álbum está oculto",
+      hiddenBody: (reason) => `Un administrador lo ocultó. Motivo: ${reason}.`,
+      adminNote: (note) => `Nota del equipo: ${note}`,
+      requestIntro: "Elige un alias nuevo y pide una revisión. Mientras esté oculto, nadie puede ver tu álbum.",
+      newAlias: "Alias nuevo",
+      request: "Pedir revisión",
+      requested: "Revisión pedida",
+      requestedBody: (alias) => `Propusiste «${alias}». La revisaremos pronto.`,
+      rejectedTitle: "Revisión rechazada",
+      requestSent: "Revisión pedida. Te avisaremos aquí.",
+    },
     pageTitle: "Álbum público",
     intro:
       "Comparte tus colecciones con un enlace. Solo se ven tu alias y tus cartas SFW, en tamaño reducido y con marca de agua. Nunca se muestran colecciones 18+ ni tu nombre de Patreon.",
@@ -55,6 +68,8 @@ export const collection: typeof en = {
     featuredSaved: "Destacadas guardadas.",
   },
   publicAlbum: {
+    unavailable: "Este álbum no está disponible",
+    unavailableBody: "Puede que sea privado o que su enlace haya cambiado. Pide el enlace actual a su dueño.",
     notFoundTitle: "Álbum no encontrado",
     title: (alias) => `Álbum de ${alias}`,
     description: (owned, total) => `${owned} de ${total} cartas coleccionadas.`,

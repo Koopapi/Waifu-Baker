@@ -26,6 +26,7 @@ export const ROUTES = [
   `/admin/sets/${ID}`,
   `/admin/sets/${ID}/simulate`,
   "/admin/characters",
+  "/admin/albumes",
   "/admin/tiers",
   "/admin/users",
   "/admin/metricas",

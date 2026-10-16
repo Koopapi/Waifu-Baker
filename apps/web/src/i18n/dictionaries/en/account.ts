@@ -11,6 +11,8 @@ export const account = {
   noCharge: "None yet",
   syncedAt: (when: string) => `Updated from Patreon: ${when}`,
   joinPatreon: "Become a patron to get packs every month.",
+  albumHidden: "Your public album is hidden. See why and request a review.",
+  albumHiddenLink: "Go to album settings",
   adult: {
     title: "18+ content",
     verified: "Verified: you can see and open 18+ sets.",

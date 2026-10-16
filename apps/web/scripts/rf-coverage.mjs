@@ -7,7 +7,7 @@ import path from "node:path";
 const specDir = path.resolve(process.argv[2] ?? "../../specs/003-panel-admin");
 // Los tests de cada spec se nombran `test_s<NNN>_rfN_*`; los de la 003 (la primera) pueden omitir el prefijo.
 const specNum = path.basename(specDir).slice(0, 3);
-const testRe = new RegExp(`test_(?:s(\\d{3})_)?rf(\\d+)_`, "g");
+const testRe = /^test_(?:s(\d{3})_)?rf(\d+)_/;
 const spec = readFileSync(path.join(specDir, "spec.md"), "utf8");
 const rfs = [...spec.matchAll(/^- RF-(\d+): (.+)$/gm)].map((m) => ({ n: Number(m[1]), text: m[2] }));
 
@@ -21,9 +21,11 @@ const report = JSON.parse(readFileSync(json, "utf8"));
 const unit = new Map();
 for (const file of report.testResults) {
   for (const t of file.assertionResults) {
-    for (const m of t.title.matchAll(testRe)) {
-      if ((m[1] ?? "003") !== specNum) continue;
-      const n = Number(m[2]);
+    // Un test puede cubrir varios RF: `test_s012_rf3_rf13_…` o `test_s012_rf12_…_y_rf10_…`.
+    const head = t.title.match(testRe);
+    if (!head || (head[1] ?? "003") !== specNum) continue;
+    for (const m of t.title.matchAll(/(?<=_)rf(\d+)(?=_)/g)) {
+      const n = Number(m[1]);
       unit.set(n, [...(unit.get(n) ?? []), { name: t.title.replace(/^test_(?:s\d{3}_)?rf\d+_/, ""), ok: t.status === "passed" }]);
     }
   }

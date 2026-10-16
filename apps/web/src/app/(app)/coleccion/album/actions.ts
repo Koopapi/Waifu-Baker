@@ -6,8 +6,10 @@ import { db } from "@/db/client";
 import type { Dict } from "@/i18n";
 import { translateError } from "@/i18n/errors";
 import { getDict } from "@/i18n/server";
+import { now } from "@/server/clock";
 import { isAdminError } from "@/server/errors";
 import { activateAlbum, deactivateAlbum, regenerateAlbumLink, setFeatured } from "@/server/services/album";
+import { requestReview } from "@/server/services/moderation";
 
 export type AlbumActionState = { ok: boolean; message?: string; error?: string } | null;
 
@@ -44,4 +46,9 @@ export async function regenerateAlbumLinkAction() {
 /** RF-12 */
 export async function saveFeaturedAction(cardIds: string[]) {
   return run((u) => setFeatured(db, u, cardIds), (t) => t.collection.album.featuredSaved);
+}
+
+/** Spec 012, RF-8 a RF-10: un álbum oculto propone un alias nuevo y pide revisión. */
+export async function requestReviewAction(_: AlbumActionState, form: FormData) {
+  return run((u) => requestReview(db, u, String(form.get("alias") ?? ""), now()), (t) => t.collection.album.moderation.requestSent);
 }
