@@ -57,6 +57,13 @@
       "when": 1792162194511,
       "tag": "0007_app_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792183708758,
+      "tag": "0008_album_moderation",
+      "breakpoints": true
     }
   ]
 }

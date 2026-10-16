@@ -3,10 +3,12 @@
 import { useActionState, useEffect, useState, useTransition } from "react";
 import { MAX_FEATURED } from "@/domain/collection/album-rules";
 import type { Rarity } from "@/domain/catalog/card-rules";
+import type { ModerationState } from "@/domain/collection/moderation";
 import {
   activateAlbumAction,
   deactivateAlbumAction,
   regenerateAlbumLinkAction,
+  requestReviewAction,
   saveFeaturedAction,
   type AlbumActionState,
 } from "@/app/(app)/coleccion/album/actions";
@@ -121,11 +123,53 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
   );
 }
 
+interface ModerationInfo {
+  moderation: ModerationState;
+  hiddenReason: string | null;
+  hiddenNote: string | null;
+  reviewAlias: string | null;
+  reviewNote: string | null;
+}
+
+/** Spec 012, RF-7 a RF-10 y RF-12: aviso al dueño de un álbum oculto y petición de revisión. */
+function ModerationNotice({ m }: { m: ModerationInfo }) {
+  const t = useT().collection.album.moderation;
+  const [state, request, requesting] = useActionState(requestReviewAction, null);
+  const reason = t.reasons[m.hiddenReason as keyof typeof t.reasons] ?? m.hiddenReason ?? "";
+  return (
+    <Card className="space-y-4" data-testid="album-moderation">
+      <Alert tone="danger" title={t.hiddenTitle}>
+        <p>{t.hiddenBody(reason)}</p>
+        {m.hiddenNote && <p>{t.adminNote(m.hiddenNote)}</p>}
+      </Alert>
+      {m.moderation === "review_requested" ? (
+        <Alert tone="warning" title={t.requested}>
+          {t.requestedBody(m.reviewAlias ?? "")}
+        </Alert>
+      ) : (
+        <>
+          {m.moderation === "review_rejected" && (
+            <Alert tone="warning" title={t.rejectedTitle}>
+              {m.reviewNote && t.adminNote(m.reviewNote)}
+            </Alert>
+          )}
+          <p className="text-sm text-ui-text-2">{t.requestIntro}</p>
+          <form action={request} className="flex flex-wrap items-end gap-3">
+            <TextField label={t.newAlias} name="alias" minLength={2} maxLength={30} required fieldClassName="min-w-0 flex-1" />
+            <Button loading={requesting}>{t.request}</Button>
+          </form>
+        </>
+      )}
+      <Status state={state} />
+    </Card>
+  );
+}
+
 export function AlbumSettings({
   album,
   cards,
 }: {
-  album: { isPublic: boolean; alias: string; url: string; featured: string[] } | null;
+  album: ({ isPublic: boolean; alias: string; url: string; featured: string[] } & ModerationInfo) | null;
   cards: FeaturableCard[];
 }) {
   const t = useT();
@@ -143,6 +187,9 @@ export function AlbumSettings({
 
   return (
     <div className="space-y-6">
+      {album && album.moderation !== "none" ? (
+        <ModerationNotice m={album} />
+      ) : (
       <Card className="space-y-4" data-testid="album-status">
         <div className="flex items-center gap-3">
           <span aria-hidden className={`size-2.5 rounded-full ${active ? "bg-ui-success" : "bg-ui-hover"}`} />
@@ -193,6 +240,7 @@ export function AlbumSettings({
         )}
         <Status state={state} />
       </Card>
+      )}
       {album && (
         <Card className="space-y-4" title={t.collection.album.featuredTitle}>
           <FeaturedPicker cards={cards} initial={album.featured} />

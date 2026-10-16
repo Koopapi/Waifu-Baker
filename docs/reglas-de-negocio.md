@@ -172,6 +172,17 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-140 | Las acciones irreversibles o importantes (borrar la cuenta o una carta, publicar o archivar una colección, regenerar el enlace del álbum, subir la edad mínima) se confirman en un modal que explica qué pasará. | Vigente | 011 RF-12 |
 | RN-141 | Las acciones reversibles se aplican al momento; si el servidor las rechaza se deshacen solas y se avisa. Mientras dura el aviso de éxito se pueden deshacer. | Vigente | 011 RF-10, RF-11 |
 
+## 14. Moderación de álbumes
+
+| Regla | Descripción | Estado | Origen |
+|---|---|---|---|
+| RN-150 | El administrador puede ocultar un álbum público con un motivo (alias ofensivo, suplantación, spam u otro) y una nota opcional de hasta 300 caracteres, tras confirmarlo. | Vigente | 012 RF-4 |
+| RN-151 | Un álbum oculto se ve igual que uno inexistente («Este álbum no está disponible», sin vista previa para redes) y no cuenta como álbum activo. No se borra nada: alias, enlace y destacadas se conservan. | Vigente | 012 RF-5, RF-6 |
+| RN-152 | El dueño de un álbum oculto ve el motivo y la nota en «Mi cuenta» y en los ajustes del álbum. No puede volver a publicarlo por su cuenta, ni desactivándolo y activándolo: tiene que pedir una revisión con un alias distinto. | Vigente | 012 RF-7, RF-8, RF-14 |
+| RN-153 | Solo hay una revisión pendiente a la vez y entre dos peticiones pasan al menos 7 días. | Vigente | 012 RF-9, RF-10 |
+| RN-154 | Aprobar aplica el alias propuesto y vuelve a publicar el álbum con el mismo enlace; rechazar lo deja oculto con una nota opcional para el dueño. | Vigente | 012 RF-11, RF-12 |
+| RN-155 | Cada ocultación, petición, aprobación y rechazo queda en el historial con quién, cuándo, motivo, nota y alias antes y después. | Vigente | 012 RF-3, RF-13 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -183,6 +194,8 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Probabilidad de holo (rara o mejor) | 20 % por defecto, configurable |
 | Protección de mala suerte | N de 0 a 100, 10 por defecto |
 | «Abrir todos» | hasta 50 sobres |
+| Nota de moderación | hasta 300 caracteres |
+| Espera entre revisiones de un álbum oculto | 7 días |
 | Aperturas por minuto | 10 por usuario |
 | Caducidad de los sobres | ninguna |
 | Enlaces de imagen privados | 10 minutos |

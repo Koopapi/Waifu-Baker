@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { db } from "@/db/client";
 import { formatDate, formatDateTime } from "@/i18n/format";
 import { Card } from "@/ui/content/Card";
+import { Alert } from "@/ui/feedback/Alert";
+import { getMyAlbum } from "@/server/services/album";
 import { getDict, getLocale } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { accountSummary } from "@/server/services/account";
@@ -15,12 +18,20 @@ export default async function CuentaPage() {
   const all = await getDict();
   const t = all.account;
   const tc = all.rewards.cookies;
-  const [rw, history] = await Promise.all([rewardsSummary(db, user.id, { now: now() }), cookieHistory(db, user.id, 30)]);
+  const [rw, history, album] = await Promise.all([rewardsSummary(db, user.id, { now: now() }), cookieHistory(db, user.id, 30), getMyAlbum(db, user.id)]);
   const locale = await getLocale();
   const status = t.statusLabel[s.patronStatus ?? "none"] ?? t.statusLabel.none;
   return (
     <main className="mx-auto max-w-2xl space-y-8 px-4 py-6 md:px-8">
       <h1 className="text-3xl font-bold">{t.title}</h1>
+
+      {album && album.moderation !== "none" && (
+        <div data-testid="account-album-hidden">
+          <Alert tone="danger" actions={<Link href="/coleccion/album" className="font-semibold underline underline-offset-4">{t.albumHiddenLink}</Link>}>
+            {t.albumHidden}
+          </Alert>
+        </div>
+      )}
 
       <Card className="space-y-3" data-testid="account-subscription" title={t.subscription}>
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">

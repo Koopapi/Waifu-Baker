@@ -12,6 +12,8 @@ export const account: typeof en = {
   noCharge: "Todavía ninguno",
   syncedAt: (when) => `Actualizado desde Patreon: ${when}`,
   joinPatreon: "Hazte patron para recibir sobres cada mes.",
+  albumHidden: "Tu álbum público está oculto. Mira por qué y pide una revisión.",
+  albumHiddenLink: "Ir a los ajustes del álbum",
   adult: {
     title: "Contenido 18+",
     verified: "Verificado: puedes ver y abrir las colecciones 18+.",

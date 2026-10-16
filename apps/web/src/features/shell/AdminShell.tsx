@@ -50,6 +50,7 @@ export async function AdminShell({ userId, children }: { userId: string; childre
           label: sh.groups.players,
           items: [
             { href: "/admin/users", label: n.users, icon: "users" },
+            { href: "/admin/albumes", label: n.albums, icon: "album" },
             { href: "/admin/tiers", label: n.tiers, icon: "tiers" },
           ],
         },

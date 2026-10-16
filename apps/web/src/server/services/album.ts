@@ -19,14 +19,22 @@ export async function getMyAlbum(db: DbLike, userId: string) {
   return a ?? null;
 }
 
-/** RF-8 y RF-9: activa el álbum con un alias; si ya existía, conserva su enlace. */
-export async function activateAlbum(db: DbLike, userId: string, rawAlias: string) {
+/**
+ * RF-8 y RF-9: activa el álbum con un alias; si ya existía, conserva su enlace. Spec 012, RF-8 y RF-14: un
+ * álbum oculto no se puede volver a activar así (hay que pedir revisión).
+ */
+export async function activateAlbum(db: DbLike, userId: string, rawAlias: string, now = new Date()) {
   const alias = validateAlias(rawAlias);
   if (!alias.ok) throw new AppError("invalid_alias", alias.message, alias.params);
+  const [current] = await db.select({ moderation: albums.moderation }).from(albums).where(eq(albums.userId, userId));
+  if (current && current.moderation !== "none") throw new AppError("album_hidden", "Tu álbum está oculto: cambia el alias y pide una revisión.");
   const [row] = await db
     .insert(albums)
-    .values({ userId, slug: newSlug(), alias: alias.value, isPublic: true })
-    .onConflictDoUpdate({ target: albums.userId, set: { alias: alias.value, isPublic: true, updatedAt: sql`now()` } })
+    .values({ userId, slug: newSlug(), alias: alias.value, isPublic: true, activatedAt: now })
+    .onConflictDoUpdate({
+      target: albums.userId,
+      set: { alias: alias.value, isPublic: true, activatedAt: sql`coalesce(${albums.activatedAt}, ${now.toISOString()}::timestamptz)`, updatedAt: sql`now()` },
+    })
     .returning();
   return row;
 }
@@ -83,7 +91,7 @@ export async function publicAlbum(db: DbLike, slug: string) {
     .select({ album: albums })
     .from(albums)
     .innerJoin(users, eq(users.id, albums.userId))
-    .where(and(eq(albums.slug, slug), eq(albums.isPublic, true), isNull(users.deletedAt)));
+    .where(and(eq(albums.slug, slug), eq(albums.isPublic, true), eq(albums.moderation, "none"), isNull(users.deletedAt)));
   if (!row) return null;
   const userId = row.album.userId;
   const owned = await db
@@ -130,7 +138,7 @@ export async function publicCardImageKey(db: DbLike, slug: string, cardId: strin
     .innerJoin(userCards, eq(userCards.userId, albums.userId))
     .innerJoin(cards, eq(cards.id, userCards.cardId))
     .innerJoin(sets, eq(sets.id, cards.setId))
-    .where(and(eq(albums.slug, slug), eq(albums.isPublic, true), isNull(users.deletedAt), eq(cards.id, cardId), eq(sets.isAdult, false), inArray(sets.status, ["published", "archived"])))
+    .where(and(eq(albums.slug, slug), eq(albums.isPublic, true), eq(albums.moderation, "none"), isNull(users.deletedAt), eq(cards.id, cardId), eq(sets.isAdult, false), inArray(sets.status, ["published", "archived"])))
     .limit(1);
   return row?.key ?? null;
 }
