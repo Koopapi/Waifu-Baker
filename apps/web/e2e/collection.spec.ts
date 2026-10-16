@@ -29,7 +29,13 @@ test("colección y álbum público", async ({ browser }) => {
   });
 
   await test.step("RF-2 y RF-3: el álbum muestra las que tengo y las que faltan como silueta", async () => {
-    await fan.click('[data-testid="collection-ALB1"] a');
+    // En un ejecutor lento, un clic justo al terminar la navegación anterior puede perderse: se repite
+    // hasta que cambia la URL (el enlace es el mismo, repetirlo no tiene efecto).
+    await fan.waitForLoadState("networkidle");
+    await expect(async () => {
+      await fan.click('[data-testid="collection-ALB1"] a');
+      await expect(fan).toHaveURL(/\/coleccion\/[0-9a-f-]{36}$/, { timeout: 10_000 });
+    }).toPass({ timeout: 60_000 });
     await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText("2 de 3 cartas");
     const grid = fan.locator('[data-testid="binder-grid"]');
     await expect(grid.locator("li")).toHaveCount(3);
