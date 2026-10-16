@@ -4,7 +4,10 @@ name: CI
 on:
   push:
     branches: [main]
+    # Solo documentación: no hace falta repetir la batería (tarda ~35 min).
+    paths-ignore: ["docs/**", "specs/**", "art/**", "**/*.md"]
   pull_request:
+    paths-ignore: ["docs/**", "specs/**", "art/**", "**/*.md"]
 
 concurrency:
   group: ci-${{ github.ref }}
