@@ -150,7 +150,7 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.goto("/admin/users?q=fan-e2e");
     await page.click("a:text-is('fan-e2e')");
     await page.selectOption('select[name="setId"]', { label: "E2E1 · Colección E2E" });
-    await page.fill('input[name="reason"]', "Regalo del test E2E");
+    await page.fill('form:has(select[name="setId"]) input[name="reason"]', "Regalo del test E2E");
     await page.click("button:has-text('Regalar sobres')");
     await expect(page.locator("text=1 sobre(s) regalado(s).")).toBeVisible();
     await expect(page.locator('[data-testid="sealed-packs"] h2')).toHaveText("Sobres sin abrir (1)");

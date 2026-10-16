@@ -15,6 +15,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 005 | Experiencia de apertura | Rasgado, abanico, volteo, holo (puntero y giroscopio), reveal por rareza, audio, reduced motion, presupuesto de rendimiento | experiencia (prototipo primero) |
 | 006 ✓ | Colección y álbum público | Binder, filtros, álbum con slug, imagen OG, renders públicos con marca | experiencia (prototipo primero) |
 | 008 ✓ | Idiomas | Inglés por defecto y español con selector en toda la web, panel incluido | motor |
+| 009 ✓ | Sobres gratis y recompensa diaria | Sobre gratis cada 12 h (hasta 2), racha de 7 días con galletas y sobre, galletas en el panel | motor |
 | 007 | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 Cambio del 14 oct 2026: se añade el panel de administración (003) a petición del usuario y se
@@ -46,3 +47,5 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   sobre de bienvenida, sobres por cobro idempotentes, subida de tier, reembolsos, avisos firmados,
   revisión cada 6 h, verificación 18+, «Mi cuenta» y borrado con 30 días. Faltan los tiers reales
   en Patreon y una dirección pública para los avisos.
+- 15 oct 2026: spec 009 terminada y validada (21/21 RF): sobre gratis cada 12 h acumulable hasta 2,
+  racha diaria de 7 días con un día de gracia, galletas con historial y ajustes desde el panel.

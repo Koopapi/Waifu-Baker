@@ -93,8 +93,8 @@ export async function giftPacks(page: Page, userName: string, code: string, coun
   await page.goto(`/admin/users?q=${encodeURIComponent(userName)}`);
   await page.click(`a:text-is('${userName}')`);
   await page.selectOption('select[name="setId"]', { label: `${code} · Colección ${code}` });
-  await page.fill('input[name="count"]', String(count));
-  await page.fill('input[name="reason"]', "Regalo del test E2E");
+  await page.fill('form:has(select[name="setId"]) input[name="count"]', String(count));
+  await page.fill('form:has(select[name="setId"]) input[name="reason"]', "Regalo del test E2E");
   await page.click("button:has-text('Regalar sobres')");
   await expect(page.locator(`text=${count} sobre(s) regalado(s).`)).toBeVisible();
 }

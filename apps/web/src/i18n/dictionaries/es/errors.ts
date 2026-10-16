@@ -28,6 +28,13 @@ function oddsProblems(raw: string | number): string {
 export const errors: Record<string, Msg> = {
   unknown: "Algo ha fallado. Inténtalo de nuevo.",
   welcome_not_allowed: "Solo una colección SFW publicada puede ser la de bienvenida.",
+  choose_set: "Elige una colección.",
+  set_not_claimable: "Esa colección no está disponible para sobres gratis. Elige otra.",
+  no_free_charges: "Todavía no tienes sobres gratis: espera a que se cargue el siguiente.",
+  already_claimed_today: "Ya reclamaste la recompensa de hoy. Vuelve mañana.",
+  tz_change_too_soon: "Cambiaste de zona horaria hace poco: podrás reclamar cuando pasen 20 horas desde la última recompensa.",
+  invalid_cookie_amount: (p) => `La cantidad debe ser un número entero distinto de cero (máximo ${p.max === 100000 ? "100 000" : p.max ?? "100 000"}).`,
+  insufficient_cookies: "El saldo no puede quedar por debajo de cero.",
   adult_tier_required: "Para ver contenido 18+ necesitas un tier adulto activo en Patreon.",
   patreon_unavailable: "Patreon no está configurado o no respondió. Inténtalo más tarde.",
 

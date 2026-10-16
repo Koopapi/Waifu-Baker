@@ -29,6 +29,13 @@ function oddsProblems(raw: string | number): string {
 export const errors: Record<string, Msg> = {
   unknown: "Something went wrong. Please try again.",
   welcome_not_allowed: "Only a published SFW set can be the welcome set.",
+  choose_set: "Choose a set.",
+  set_not_claimable: "That set is not available for free packs. Choose another one.",
+  no_free_charges: "You don't have free packs yet: wait for the next one to charge.",
+  already_claimed_today: "You already claimed today's reward. Come back tomorrow.",
+  tz_change_too_soon: "You changed time zone recently: you can claim once 20 hours have passed since your last reward.",
+  invalid_cookie_amount: (p) => `The amount must be a whole number other than zero (up to ${p.max ?? 100000}).`,
+  insufficient_cookies: "The balance cannot go below zero.",
   adult_tier_required: "To see 18+ content you need an active adult tier on Patreon.",
   patreon_unavailable: "Patreon is not configured or did not respond. Please try again later.",
 

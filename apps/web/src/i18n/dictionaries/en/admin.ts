@@ -226,6 +226,16 @@ export const admin = {
     deleted: "Rule removed.",
   },
   users: {
+    rewards: {
+      title: "Free packs, streak and cookies",
+      charges: (n: number, max: number) => `Free packs ready: ${n} of ${max}`,
+      streak: (day: number, today: boolean) => `Streak: day ${day}${today ? " (claimed today)" : ""}`,
+      cookies: (n: number) => `Cookies: ${n}`,
+      amount: "Amount (negative to remove)",
+      reason: "Reason",
+      submit: "Adjust cookies",
+      adjusted: (balance: number) => `Cookies adjusted. New balance: ${balance}.`,
+    },
     patreonState: {
       title: "Patreon",
       none: "No membership data yet (the person is not a member or has not signed in since spec 001).",

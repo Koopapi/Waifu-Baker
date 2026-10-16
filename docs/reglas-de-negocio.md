@@ -6,7 +6,7 @@ regla cita la suya. Si una regla cambia, se cambia primero la spec y después es
 Estado de cada regla: **Vigente** (construida y con tests) o **Aprobada** (en una spec aprobada,
 pendiente de construir).
 
-Última actualización: 15 de octubre de 2026. Todas las reglas de las specs 001, 003, 004, 006 y 008 están vigentes.
+Última actualización: 15 de octubre de 2026. Todas las reglas de las specs 001, 003, 004, 006, 008 y 009 están vigentes.
 
 ---
 
@@ -125,6 +125,22 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-90 | La web está en inglés por defecto, y en español con el selector de cada página. La elección se recuerda un año en ese navegador. | Vigente | 008 |
 | RN-91 | No se traduce el contenido creado por el administrador (nombres y textos de cartas, colecciones y personajes) ni el alias de un álbum. | Vigente | 008 RF-9 |
 
+## 10. Sobres gratis, recompensa diaria y galletas
+
+| # | Regla | Estado | Spec |
+|---|---|---|---|
+| RN-100 | Cada usuario recibe una carga de sobre gratis cada 12 horas, hasta 2 acumuladas. Al máximo, la siguiente no empieza a cargarse hasta gastar una. | Vigente | 009 RF-1, RF-2 |
+| RN-101 | Un usuario nuevo empieza con 1 sobre gratis listo. | Vigente | 009 RF-3 |
+| RN-102 | Al reclamar un sobre gratis, el usuario elige de qué colección SFW publicada lo quiere. Sin colecciones disponibles no se reclama y las cargas se conservan. | Vigente | 009 RF-4, RF-7 |
+| RN-103 | Los sobres gratis y el del día 7 se abren con las probabilidades publicadas y la protección de su colección, como cualquier otro. | Vigente | 009 RF-8 |
+| RN-104 | Recompensa diaria con racha de 7 días: 10, 10, 15, 15, 20 y 20 galletas los días 1 a 6, y un sobre de la colección SFW que se elija el día 7. Después empieza otra racha. | Vigente | 009 RF-9, RF-14 |
+| RN-105 | Una recompensa por día; el día cambia a la medianoche de la zona horaria del navegador del usuario. Se reclama con un botón. | Vigente | 009 RF-10 |
+| RN-106 | Cambiar de zona horaria no permite dos recompensas en menos de 20 horas. | Vigente | 009 RF-11 |
+| RN-107 | Se puede fallar un día sin perder la racha; dos días seguidos sin reclamar la reinician al día 1. Las galletas ganadas se conservan. | Vigente | 009 RF-12, RF-13 |
+| RN-108 | Las galletas no tienen valor monetario: no se compran, venden, transfieren ni cambian por dinero. Cada movimiento queda registrado y el saldo nunca baja de cero. | Vigente | 009 RF-17 a RF-19 |
+| RN-109 | El administrador puede dar o quitar galletas con un motivo de 3 a 200 caracteres. | Vigente | 009 RF-21 |
+| RN-110 | Al borrar una cuenta de forma definitiva se borran también sus cargas, su racha y sus galletas. | Vigente | 009 |
+
 ---
 
 ## Parámetros en un vistazo
@@ -148,3 +164,6 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Imágenes subidas | PNG, JPEG o WebP; hasta 20 MB; mínimo 600 px de ancho |
 | Código de colección | 2 a 8 letras o números |
 | Idioma por defecto | inglés |
+| Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |
+| Racha diaria | 10, 10, 15, 15, 20, 20 galletas y un sobre el día 7; 1 día de gracia |
+| Cambio de zona horaria | mínimo 20 h entre recompensas |

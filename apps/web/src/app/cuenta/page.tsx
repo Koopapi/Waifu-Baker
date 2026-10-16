@@ -3,13 +3,18 @@ import { formatDate, formatDateTime } from "@/i18n/format";
 import { getDict, getLocale } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { accountSummary } from "@/server/services/account";
+import { now } from "@/server/clock";
+import { cookieHistory, rewardsSummary } from "@/server/services/rewards";
 import { DeclareAdultForm, DeleteAccountButton } from "@/features/account/AccountForms";
 
 /** Spec 001: RF-21 (suscripción), RF-18 a RF-20 (edad) y RF-22 (borrar cuenta). */
 export default async function CuentaPage() {
   const user = await requireUser("/cuenta");
   const s = (await accountSummary(db, user.id))!;
-  const t = (await getDict()).account;
+  const all = await getDict();
+  const t = all.account;
+  const tc = all.rewards.cookies;
+  const [rw, history] = await Promise.all([rewardsSummary(db, user.id, { now: now() }), cookieHistory(db, user.id, 30)]);
   const locale = await getLocale();
   const status = t.statusLabel[s.patronStatus ?? "none"] ?? t.statusLabel.none;
   return (
@@ -45,6 +50,30 @@ export default async function CuentaPage() {
           </>
         ) : (
           <p className="text-sm text-white/60">{t.adult.needTier}</p>
+        )}
+      </section>
+
+      <section className="space-y-3 rounded-2xl border border-white/10 p-5" data-testid="account-cookies">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="text-lg font-semibold">{tc.title}</h2>
+          <span className="tabular-nums text-white/80">{tc.balance(rw.cookies)}</span>
+        </div>
+        <p className="text-sm text-white/60">{tc.about}</p>
+        <h3 className="text-sm font-semibold text-white/70">{tc.history}</h3>
+        {history.length === 0 ? (
+          <p className="text-sm text-white/50">{tc.empty}</p>
+        ) : (
+          <ul className="divide-y divide-white/5 rounded-lg border border-white/10 text-sm">
+            {history.map((m) => (
+              <li key={m.id} className="flex justify-between gap-4 px-3 py-1.5">
+                <span>{tc.reason(m.reason)}</span>
+                <span className={`tabular-nums ${m.amount < 0 ? "text-red-300" : "text-emerald-300"}`}>
+                  {m.amount > 0 ? "+" : ""}
+                  {m.amount} · {formatDateTime(locale, m.createdAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
 

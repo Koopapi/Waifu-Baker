@@ -36,6 +36,9 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
   (el inglés manda y el tipo obliga al español a tener las mismas claves). Errores de negocio: código +
   `params` en `AdminError`, traducción en `dictionaries/*/errors.ts`. `src/i18n/i18n.test.ts` falla si queda
   texto en español fuera de los diccionarios o un código de error sin traducir.
+- Reloj de pruebas (spec 009): en desarrollo, `POST /api/dev/clock {"advanceHours": 24}` adelanta la hora del
+  servidor y `DELETE` la devuelve a la real (los E2E la reinician en cada test). Usa `now()` de `server/clock.ts`
+  en vez de `new Date()` en todo lo que dependa de esperas o días.
 - Compilación de producción: `NEXT_DIST_DIR=.next-prod pnpm build` (no pisa `pnpm dev`).
 - Validación RF por RF: `node scripts/rf-coverage.mjs ../../specs/<spec>` (escribe `validation.md`; los tests
   se nombran `test_s<NNN>_rfN_*` —la 003 puede omitir `s003_`— y cada E2E declara su spec en la

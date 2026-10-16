@@ -18,6 +18,8 @@ async function resetData() {
   rmSync(STORE, { recursive: true, force: true });
   // Miembros simulados de Patreon (spec 001): viven en la memoria del servidor de pruebas.
   await fetch("http://localhost:3200/api/dev/patreon-member", { method: "DELETE" }).catch(() => undefined);
+  // Reloj de pruebas de la spec 009: cada test empieza en la hora real.
+  await fetch("http://localhost:3200/api/dev/clock", { method: "DELETE" }).catch(() => undefined);
 }
 
 export const test = base.extend<{ cleanDb: void; closeContexts: void }>({

@@ -23,4 +23,5 @@ Estado (15 oct 2026):
 - **Spec 008 — Idiomas: terminada.** 10 de 10 RF. Inglés por defecto y español con el selector EN/ES de cada página.
 - **Spec 001 — Cuentas y vínculo con Patreon: terminada.** 26 de 26 RF. Login real, bienvenida, sobres por cobro, 18+, «Mi cuenta» en `/cuenta` y borrado de cuenta.
 - Reglas de negocio en un solo sitio: `docs/reglas-de-negocio.md`.
-- Siguiente: spec 009 (sobres gratis con espera y recompensas diarias). Todo en local hasta la beta.
+- **Spec 009 — Sobres gratis y recompensa diaria: terminada.** 21 de 21 RF. Tarjetas en «Mis sobres», galletas en «Mi cuenta» y en el panel.
+- Siguiente: lo previo a la beta (páginas legales y copias de seguridad, parte de la spec 007). Todo en local hasta la beta.

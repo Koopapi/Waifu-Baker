@@ -36,6 +36,13 @@
       "when": 1792104240408,
       "tag": "0004_patreon_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1792122147815,
+      "tag": "0005_rewards",
+      "breakpoints": true
     }
   ]
 }

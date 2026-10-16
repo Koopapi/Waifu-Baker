@@ -37,6 +37,7 @@ test("calentar rutas", async ({ browser }) => {
   // Rutas de API que los tests llaman a mitad de una página abierta (spec 001).
   await page.request.post("/api/webhooks/patreon", { data: "{}" });
   await page.request.delete("/api/dev/patreon-member");
+  await page.request.delete("/api/dev/clock");
   await page.request.get(`/api/album/AAAAAAAAAAAA/img?c=${ID}`);
   await page.request.get("/api/cards/img");
 });

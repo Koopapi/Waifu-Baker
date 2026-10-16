@@ -227,6 +227,16 @@ export const admin: typeof en = {
     deleted: "Regla eliminada.",
   },
   users: {
+    rewards: {
+      title: "Sobres gratis, racha y galletas",
+      charges: (n: number, max: number) => `Sobres gratis listos: ${n} de ${max}`,
+      streak: (day: number, today: boolean) => `Racha: día ${day}${today ? " (reclamado hoy)" : ""}`,
+      cookies: (n: number) => `Galletas: ${n}`,
+      amount: "Cantidad (negativa para quitar)",
+      reason: "Motivo",
+      submit: "Ajustar galletas",
+      adjusted: (balance: number) => `Galletas ajustadas. Nuevo saldo: ${balance}.`,
+    },
     patreonState: {
       title: "Patreon",
       none: "Aún no hay datos de membresía (no es miembro o no ha entrado desde la spec 001).",

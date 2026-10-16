@@ -3,6 +3,7 @@ import {
   bigint,
   bigserial,
   boolean,
+  check,
   doublePrecision,
   index,
   integer,
@@ -21,7 +22,7 @@ export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]
 export const rarity = pgEnum("rarity", ["common", "uncommon", "rare", "epic", "legendary", "secret"]);
 export const cardVariant = pgEnum("card_variant", ["normal", "holo", "alt"]);
 export const cardStatus = pgEnum("card_status", ["draft", "ready"]);
-export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo"]);
+export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo", "free", "daily"]);
 export const packStatus = pgEnum("pack_status", ["sealed", "opened", "void"]);
 
 const timestamps = {
@@ -283,3 +284,38 @@ export const webhookEvents = pgTable("webhook_events", {
   processedAt: timestamp("processed_at", { withTimezone: true }),
   error: text("error"),
 });
+
+/** Spec 009: sobres gratis con espera, racha diaria y saldo de galletas de cada usuario. */
+export const userRewards = pgTable(
+  "user_rewards",
+  {
+    userId: uuid("user_id")
+      .primaryKey()
+      .references(() => users.id),
+    freeCharges: integer("free_charges").notNull().default(1),
+    freeAnchor: timestamp("free_anchor", { withTimezone: true }).notNull().defaultNow(),
+    streakDay: integer("streak_day").notNull().default(0),
+    lastDailyDay: text("last_daily_day"),
+    lastDailyAt: timestamp("last_daily_at", { withTimezone: true }),
+    lastTimeZone: text("last_time_zone"),
+    cookies: integer("cookies").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [check("user_rewards_cookies_non_negative", sql`${t.cookies} >= 0`)],
+);
+
+/** Spec 009, RF-18: cada movimiento de galletas; solo se insertan filas. */
+export const cookieLedger = pgTable(
+  "cookie_ledger",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    amount: integer("amount").notNull(),
+    reason: text("reason").notNull(),
+    actorUserId: uuid("actor_user_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("cookie_ledger_user_idx").on(t.userId, t.createdAt)],
+);

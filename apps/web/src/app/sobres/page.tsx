@@ -1,13 +1,24 @@
 import Link from "next/link";
 import { db } from "@/db/client";
 import { requireUser } from "@/server/auth/require-user";
+import { cookies } from "next/headers";
+import { now } from "@/server/clock";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
+import { claimableSets, rewardsSummary } from "@/server/services/rewards";
+import { RewardsPanel } from "@/features/rewards/RewardsPanel";
 import { getDict } from "@/i18n/server";
 
 /** RF-1, RF-3 y RF-17: sobres sin abrir por colección y aviso de apertura sin terminar. */
 export default async function MisSobresPage() {
   const user = await requireUser("/sobres");
-  const [groups, pending] = await Promise.all([listMyPacks(db, user.id), pendingOpening(db, user.id)]);
+  const tz = (await cookies()).get("wb_tz")?.value ?? null;
+  const at = now();
+  const [groups, pending, rw, sets] = await Promise.all([
+    listMyPacks(db, user.id),
+    pendingOpening(db, user.id),
+    rewardsSummary(db, user.id, { now: at, timeZone: tz }),
+    claimableSets(db),
+  ]);
   const total = groups.reduce((a, g) => a + g.sealed, 0);
   const t = await getDict();
 
@@ -17,6 +28,17 @@ export default async function MisSobresPage() {
         <h1 className="text-3xl font-bold">{t.packs.mine.heading}</h1>
         <p className="text-white/60">{total === 0 ? t.packs.mine.none : t.packs.mine.sealed(total)}</p>
       </div>
+
+      <RewardsPanel
+        data={{
+          serverNow: at.toISOString(),
+          free: { ...rw.free, nextAt: rw.free.nextAt?.toISOString() ?? null },
+          daily: rw.daily,
+          cookies: rw.cookies,
+          sets,
+          timeZoneCookie: tz,
+        }}
+      />
 
       {pending && (
         <Link

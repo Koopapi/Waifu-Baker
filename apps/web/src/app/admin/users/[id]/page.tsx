@@ -7,6 +7,9 @@ import { sets } from "@/db/schema";
 import { getUserDetail } from "@/server/services/users-admin";
 import { getDict, getLocale } from "@/i18n/server";
 import { formatDate, formatDateTime } from "@/i18n/format";
+import { now } from "@/server/clock";
+import { rewardsForAdmin } from "@/server/services/rewards";
+import { CookiesForm } from "./cookies-form";
 import { GiftForm } from "./gift-form";
 
 const pad = (n: number) => String(n).padStart(3, "0");
@@ -23,6 +26,7 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
   const giftable = published.map((s) => ({ id: s.id, code: s.code, name: s.name, isAdult: s.isAdult, blocked: s.isAdult && !verified }));
   const tt = await getDict();
   const t = tt.admin.users;
+  const rw = await rewardsForAdmin(db, user.id, now());
   const locale = await getLocale();
   const bySet = sealedPacks.reduce<Record<string, number>>((acc, p) => ({ ...acc, [p.setCode]: (acc[p.setCode] ?? 0) + 1 }), {});
 
@@ -60,6 +64,29 @@ export default async function UserDetailPage({ params }: { params: Promise<{ id:
             <dd>{formatDateTime(locale, patreon.syncedAt)}</dd>
           </dl>
         )}
+      </section>
+
+      <section className="space-y-3 rounded-xl border border-white/10 p-4" data-testid="user-rewards">
+        <h2 className="font-semibold">{t.rewards.title}</h2>
+        <ul className="space-y-1 text-sm text-white/70">
+          <li>{t.rewards.charges(rw.free.charges, rw.free.max)}</li>
+          <li>{t.rewards.streak(rw.daily.day, rw.daily.claimedToday)}</li>
+          <li data-testid="user-cookies">{t.rewards.cookies(rw.cookies)}</li>
+        </ul>
+        {rw.history.length > 0 && (
+          <ul className="divide-y divide-white/5 rounded-lg border border-white/10 text-sm">
+            {rw.history.map((m) => (
+              <li key={m.id} className="flex justify-between gap-4 px-3 py-1.5">
+                <span>{tt.rewards.cookies.reason(m.reason)}</span>
+                <span className={`tabular-nums ${m.amount < 0 ? "text-red-300" : "text-emerald-300"}`}>
+                  {m.amount > 0 ? "+" : ""}
+                  {m.amount} · {formatDateTime(locale, m.createdAt)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {!user.deletedAt && <CookiesForm userId={user.id} />}
       </section>
 
       <section className="space-y-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">

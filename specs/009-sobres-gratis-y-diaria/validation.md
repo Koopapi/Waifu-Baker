@@ -1,0 +1,29 @@
+# Validación — Spec 009
+
+Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-16. Vitest: 243 de 243 tests en verde. E2E: `pnpm e2e`.
+
+**Veredicto: spec cumplida** (21 de 21 RF con al menos un test en verde).
+
+| RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
+|---|---|---|---|---|
+| RF-1 | EL SISTEMA dará a cada usuario una carga de sobre gratis cada 12 horas, hasta un máximo de 2 cargas acumuladas. | ✓ se_recarga_cada_12_horas_hasta_2<br>✓ una_carga_cada_12_horas_hasta_2 | RF-1: a las 12 horas hay otro listo | Cumplido |
+| RF-2 | MIENTRAS el usuario tenga 2 cargas, EL SISTEMA no empezará a cargar la siguiente hasta que gaste una. | ✓ al_maximo_la_siguiente_empieza_al_gastar<br>✓ con_2_cargas_no_empieza_la_siguiente_hasta_gastar_una | — | Cumplido |
+| RF-3 | CUANDO un usuario entra por primera vez, EL SISTEMA le dará 1 carga disponible. | ✓ un_usuario_nuevo_empieza_con_1_carga | RF-3 y RF-5: un usuario nuevo tiene 1 sobre gratis listo | Cumplido |
+| RF-4 | CUANDO el usuario reclama un sobre gratis con una carga disponible, EL SISTEMA le pedirá elegir una colección SFW publicada y le concederá 1 sobre sellado de ella. | ✓ reclamar_concede_un_sobre_de_la_coleccion_elegida | RF-4 y RF-8: lo reclama eligiendo colección y lo abre | Cumplido |
+| RF-5 | EL SISTEMA mostrará en «Mis sobres» las cargas disponibles y la cuenta atrás hasta la siguiente. | ✓ el_resumen_trae_cargas_y_cuenta_atras | RF-3 y RF-5: un usuario nuevo tiene 1 sobre gratis listo<br>RF-5 y RF-6: sin cargas, se ve la cuenta atrás y no se puede reclamar | Cumplido |
+| RF-6 | SI el usuario reclama sin cargas disponibles, o hace dos reclamos a la vez, ENTONCES EL SISTEMA no concederá más sobres de los que le correspondan. | ✓ sin_cargas_o_a_la_vez_no_concede_de_mas<br>✓ sin_cargas_no_se_puede_gastar_y_gastar_conserva_el_progreso | RF-5 y RF-6: sin cargas, se ve la cuenta atrás y no se puede reclamar | Cumplido |
+| RF-7 | SI no hay ninguna colección SFW publicada, ENTONCES EL SISTEMA no permitirá reclamar y conservará las cargas. | ✓ solo_colecciones_sfw_publicadas_y_si_no_hay_se_conservan_las_cargas | — | Cumplido |
+| RF-8 | EL SISTEMA abrirá los sobres gratis con las mismas probabilidades publicadas y la misma protección de mala suerte que el resto de sobres de esa colección. | ✓ un_sobre_gratis_se_abre_con_las_probabilidades_y_la_proteccion_de_su_coleccion | RF-4 y RF-8: lo reclama eligiendo colección y lo abre | Cumplido |
+| RF-9 | CUANDO el usuario reclama la recompensa del día, EL SISTEMA le dará la del día de racha en que está: 10, 10, 15, 15, 20 y 20 galletas los días 1 a 6, y un sobre de la colección SFW publicada que elija el día 7. | ✓ dias_1_a_6_suman_galletas_y_el_7_da_un_sobre_elegido<br>✓ dias_1_a_6_dan_galletas_y_el_7_un_sobre | RF-9 y RF-10: la recompensa del día da 10 galletas y solo una vez | Cumplido |
+| RF-10 | EL SISTEMA permitirá reclamar una sola recompensa por día, y el día cambiará a la medianoche de la zona horaria del navegador del usuario. | ✓ una_sola_recompensa_por_dia_local<br>✓ el_dia_cambia_a_la_medianoche_de_cada_usuario | RF-9 y RF-10: la recompensa del día da 10 galletas y solo una vez | Cumplido |
+| RF-11 | SI el usuario cambia de zona horaria, ENTONCES EL SISTEMA no concederá dos recompensas diarias con menos de 20 horas de diferencia. | ✓ cambiar_de_zona_no_da_dos_premios_en_menos_de_20_horas<br>✓ cambiar_de_zona_no_da_dos_premios_en_menos_de_20_horas | — | Cumplido |
+| RF-12 | CUANDO el usuario reclama al día siguiente de su último reclamo, o dejando un solo día sin reclamar, EL SISTEMA avanzará su racha al día siguiente. | ✓ con_un_dia_de_hueco_la_racha_sigue<br>✓ al_dia_siguiente_o_con_un_dia_de_hueco_la_racha_avanza | RF-12, RF-14 y RF-15: la racha avanza cada día hasta el sobre del día 7 | Cumplido |
+| RF-13 | SI pasan dos o más días seguidos sin reclamar, ENTONCES EL SISTEMA reiniciará la racha al día 1 y conservará las galletas ganadas. | ✓ dos_dias_sin_reclamar_reinician_y_se_conservan_las_galletas<br>✓ dos_dias_seguidos_sin_reclamar_reinician_la_racha | RF-13: dos días sin reclamar reinician la racha | Cumplido |
+| RF-14 | CUANDO el usuario reclama el día 7, EL SISTEMA empezará una nueva racha en el día 1 para el siguiente reclamo. | ✓ tras_el_dia_7_vuelve_al_1<br>✓ tras_el_dia_7_empieza_una_racha_nueva | RF-12, RF-14 y RF-15: la racha avanza cada día hasta el sobre del día 7 | Cumplido |
+| RF-15 | EL SISTEMA mostrará los 7 días de la racha con lo que da cada uno, el día en que está el usuario y si ya reclamó hoy. | ✓ el_resumen_trae_la_racha_y_si_ya_se_reclamo_hoy | RF-12, RF-14 y RF-15: la racha avanza cada día hasta el sobre del día 7 | Cumplido |
+| RF-16 | EL SISTEMA mostrará el saldo de galletas del usuario y su historial de movimientos. | ✓ saldo_e_historial_de_galletas | RF-16: «Mi cuenta» muestra el saldo y el historial de galletas | Cumplido |
+| RF-17 | EL SISTEMA no permitirá comprar, vender, transferir ni cambiar galletas por dinero. | ✓ no_hay_forma_de_comprar_ni_transferir_galletas | — | Cumplido |
+| RF-18 | EL SISTEMA registrará cada movimiento de galletas con cantidad, motivo y fecha, sin permitir modificarlo después. | ✓ cada_movimiento_queda_registrado | — | Cumplido |
+| RF-19 | SI un ajuste dejaría el saldo por debajo de cero, ENTONCES EL SISTEMA lo rechazará. | ✓ el_saldo_nunca_baja_de_cero | — | Cumplido |
+| RF-20 | EL SISTEMA mostrará al administrador, en la ficha de cada usuario, sus cargas de sobre gratis, su racha y su saldo y movimientos de galletas. | ✓ el_panel_ve_cargas_racha_saldo_y_movimientos | RF-20 y RF-21: el administrador ve y ajusta las galletas | Cumplido |
+| RF-21 | EL SISTEMA permitirá al administrador dar o quitar galletas a un usuario con un motivo obligatorio. | ✓ dar_o_quitar_galletas_exige_motivo | RF-20 y RF-21: el administrador ve y ajusta las galletas | Cumplido |
