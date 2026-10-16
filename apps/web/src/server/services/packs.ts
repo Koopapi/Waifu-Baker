@@ -115,7 +115,12 @@ export async function openPack(
       .orderBy(desc(dropTables.version))
       .limit(1);
     if (!odds) throw new AppError("not_published", "Esta colección aún no tiene probabilidades publicadas.");
-    const pool = await tx.select().from(cards).where(and(eq(cards.setId, set.id), isNotNull(cards.rarity)));
+    // Orden fijo: con la misma semilla, la apertura debe dar siempre las mismas cartas (auditoría, spec 004).
+    const pool = await tx
+      .select()
+      .from(cards)
+      .where(and(eq(cards.setId, set.id), isNotNull(cards.rarity)))
+      .orderBy(asc(cards.number), asc(cards.variant), asc(cards.id));
     const byId = new Map(pool.map((c) => [c.id, c]));
 
     await tx.insert(pityCounters).values({ userId: user.id, setId: set.id }).onConflictDoNothing();
