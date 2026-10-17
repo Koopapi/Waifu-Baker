@@ -67,8 +67,7 @@ await go("/login");
 await shot("login", "Entrar (Patreon o desarrollo)", "Entrada");
 await step("bienvenida", async () => {
   await page.fill('input[name="name"]', `visita-${device}`);
-  const box = page.locator('form:has(input[name="name"]) button[role="checkbox"]');
-  if ((await box.getAttribute("aria-checked")) === "true") await box.click();
+  await page.locator('form:has(input[name="name"]) input[type="checkbox"]').setChecked(false);
   await page.click('form:has(input[name="name"]) button[type="submit"]');
   await page.waitForURL(/bienvenida/, { timeout: 30_000 });
   await shot("bienvenida", "Bienvenida: edad y términos", "Entrada");

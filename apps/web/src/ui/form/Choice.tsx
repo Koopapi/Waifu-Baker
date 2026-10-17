@@ -1,31 +1,45 @@
 "use client";
 
 import { useId } from "react";
-import { Checkbox as RCheckbox, RadioGroup as RRadioGroup, Switch as RSwitch } from "radix-ui";
+import { RadioGroup as RRadioGroup, Switch as RSwitch } from "radix-ui";
 import { Check } from "lucide-react";
 import { focusRing } from "../focus";
 import { cx } from "../variants";
 
+/** Casilla nativa con el aspecto del sistema: la marca se pinta encima y la casilla se ve a través de ella. */
 const box = cx(
-  "grid size-[18px] shrink-0 place-items-center rounded-s border border-ui-line bg-ui-rail transition-colors duration-[var(--duration-fast)]",
-  "hover:border-ui-hover data-[state=checked]:border-ui-accent data-[state=checked]:bg-ui-accent disabled:opacity-50",
+  "peer size-[18px] shrink-0 cursor-pointer appearance-none rounded-s border border-ui-line bg-ui-rail transition-colors duration-[var(--duration-fast)]",
+  "hover:border-ui-hover checked:border-ui-accent checked:bg-ui-accent disabled:cursor-not-allowed disabled:opacity-50",
   focusRing,
 );
 
-export interface CheckboxProps extends Omit<React.ComponentProps<typeof RCheckbox.Root>, "children"> {
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "children"> {
   label: React.ReactNode;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
-/** Spec 011, RF-4: casilla. Con `name` se envía en el formulario como un campo normal («on»). */
-export function Checkbox({ label, className, ...rest }: CheckboxProps) {
-  const id = useId();
+/**
+ * Spec 011, RF-4: casilla. Es un `<input type="checkbox">` nativo: responde al toque aunque la página aún no
+ * haya cargado su JavaScript, y con `name` se envía en el formulario como un campo normal («on»).
+ */
+export function Checkbox({ label, className, onCheckedChange, onChange, id: idProp, ...rest }: CheckboxProps) {
+  const autoId = useId();
+  const id = idProp ?? autoId;
   return (
     <div className={cx("relative flex items-start gap-3", className)}>
-      <RCheckbox.Root id={id} className={cx(box, "mt-0.5")} {...rest}>
-        <RCheckbox.Indicator>
-          <Check aria-hidden className="size-3.5 text-ui-on-accent" strokeWidth={3} />
-        </RCheckbox.Indicator>
-      </RCheckbox.Root>
+      <span className="relative mt-0.5 grid size-[18px] shrink-0">
+        <input
+          type="checkbox"
+          id={id}
+          className={box}
+          onChange={(e) => {
+            onChange?.(e);
+            onCheckedChange?.(e.target.checked);
+          }}
+          {...rest}
+        />
+        <Check aria-hidden className="pointer-events-none absolute inset-0 m-auto size-3.5 text-ui-on-accent opacity-0 peer-checked:opacity-100" strokeWidth={3} />
+      </span>
       <label htmlFor={id} className="text-sm text-ui-text">
         {label}
       </label>
