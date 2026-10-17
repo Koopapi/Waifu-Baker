@@ -19,7 +19,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 010 ✓ | Acabado premium y demo | Estructura estilo Discord (barra de colecciones, panel, cajón y pestañas en móvil), paleta «Cereza», avisos, esqueletos, edad mínima configurable y `pnpm demo` | experiencia |
 | 011 ✓ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
 | 012 ✓ | Moderación de álbumes públicos | Ocultar con motivo y nota, aviso al dueño, petición de revisión con alias nuevo (7 días entre peticiones), aprobar o rechazar, historial | motor |
-| 013 ◐ | Rendimiento y sonido de la apertura | Sonidos CC0 por rareza, botón de silencio, vibración, 250 kB por página comprobados en la CI; falta la comprobación en un teléfono real | experiencia |
+| 013 ✓ | Rendimiento y sonido de la apertura | Sonidos CC0 por rareza, botón de silencio, vibración, 250 kB por página comprobados en la CI; comprobada en un iPhone | experiencia |
 | 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 ## Camino al lanzamiento (orden acordado el 16 oct 2026)
@@ -31,9 +31,9 @@ el CI en verde.
 
 | Etapa | Qué | Necesita del usuario |
 |---|---|---|
-| 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012 ✓**: moderación de álbumes públicos (los términos ya la prometen); **spec 013**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos) | entrevistas cortas |
+| 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012 ✓**: moderación de álbumes públicos (los términos ya la prometen); **spec 013 ✓**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos). **Etapa cerrada el 16 oct 2026.** | entrevistas cortas |
 | 2. Contenido de pago | Pista de arte: elegir las 5 OCs, prueba A0 de consistencia, set SFW de ~30 cartas y set 18+; cargarlos con el panel | aprobar OCs y créditos |
-| 3. Salir a internet (**spec 014**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac | proveedor, dominio y presupuesto |
+| 3. Salir a internet (**spec 014**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
 | 4. Piloto de pago (**spec 015**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
 | 5. Beta cerrada | Pocos patrons invitados, métricas y correcciones antes de abrir | lista de invitados |
 | Después | Tienda de galletas, juegos (una spec por juego), temas por colección, Storybook | — |
