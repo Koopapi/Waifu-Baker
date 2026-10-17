@@ -15,7 +15,7 @@
 - [x] **T8 — Sobre compuesto en «Mis sobres», apertura y «Abrir todos»** · RF-5, RF-8
 
 ## Entrega 4 — Apertura
-- [ ] **T9 — Escena: destellos, dorso, nitidez, holo y foco** · RF-9, RF-10, RF-15
+- [x] **T9 — Escena: destellos, dorso, nitidez, holo y foco** · RF-9, RF-10, RF-15
 - [ ] **T10 — Suspense: agitado, brillo de rareza, confeti, celebración y resumen** · RF-11 a RF-14
 
 ## Entrega 5 — Pantallas

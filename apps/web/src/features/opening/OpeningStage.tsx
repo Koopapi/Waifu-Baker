@@ -16,6 +16,12 @@ import "./opening.css";
 type Phase = "idle" | "torn" | "fanned" | "summary";
 
 const TRAY_SCALE = 0.3;
+/** Spec 014, RF-9: destellos del fondo (posición en %, tamaño, color y retardo). */
+const SPARKLES: [number, number, number, string, number][] = [
+  [10, 14, 10, "#ffe27a", 0], [84, 19, 14, "#ff9ecb", 0.6], [15, 74, 12, "#7ef0c9", 1.1], [82, 66, 10, "#ffffff", 0.3],
+  [51, 11, 8, "#7cc8ff", 1.6], [90, 83, 12, "#b79cff", 0.9], [7, 45, 8, "#ffffff", 1.9], [91, 39, 9, "#ffe27a", 0.4],
+  [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
+];
 const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "secret"];
 
 function usePrefersReducedMotion() {
@@ -212,6 +218,11 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
 
   return (
     <div ref={stage} className="stage" data-phase={phase} data-revealed={revealed} onPointerMove={tilt.onPointerMove} onPointerLeave={tilt.onPointerLeave}>
+      <div className="stage__sparkles" aria-hidden>
+        {SPARKLES.map(([x, y, size, color, delay], i) => (
+          <span key={i} className="sparkle" style={{ left: `${x}%`, top: `${y}%`, "--s": `${size}px`, "--c": color, "--d": `${delay}s` } as React.CSSProperties} />
+        ))}
+      </div>
       <p className="hint" aria-live="polite">
         {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>

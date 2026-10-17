@@ -107,7 +107,10 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
       <div className="card3d__tilt">
         <div className="card3d__inner">
           <div className="card3d__face card3d__back">
-            <div className="card3d__backart">WB</div>
+            <div className="card3d__backart">
+              <b>WB</b>
+              <small>WAIFU BAKER</small>
+            </div>
           </div>
           <div className="card3d__face card3d__front">
             {/* eslint-disable-next-line @next/next/no-img-element -- la carta real irá por URL firmada, sin optimizador */}
