@@ -272,7 +272,7 @@ function RailLink(p: { href: string; label: string; active: boolean; badge?: num
           p.image
             ? ""
             : p.tone === "success"
-              ? "bg-ui-raised text-ui-success hover:bg-ui-success hover:text-white"
+              ? "bg-ui-raised text-ui-success-text hover:bg-ui-success hover:text-ui-on-accent"
               : p.active
                 ? "bg-ui-accent text-ui-on-accent"
                 : "bg-ui-raised text-ui-text hover:bg-ui-accent hover:text-ui-on-accent"

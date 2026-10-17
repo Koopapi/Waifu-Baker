@@ -1,12 +1,12 @@
 # Tareas 014 — Demo pulida con estilo kawaii
 
 ## Entrega 1 — Maquetas (aprobación del usuario)
-- [ ] **T1 — Paleta, tokens y pegatinas en Pencil** · RF-1 a RF-3
-- [ ] **T2 — Sobre compuesto y dorso de carta en Pencil** · RF-5, RF-9
-- [ ] **T3 — Pantallas en Pencil (móvil y escritorio)**: «Mis sobres», apertura con sus estados, «Recompensas» y «Mi colección» · RF-9 a RF-18 · Hecho cuando: el usuario las aprueba.
+- [x] **T1 — Paleta, tokens y pegatinas en Pencil** · RF-1 a RF-3
+- [x] **T2 — Sobre compuesto y dorso de carta en Pencil** · RF-5, RF-9
+- [x] **T3 — Pantallas en Pencil (móvil y escritorio)**: «Mis sobres», apertura con sus estados, «Recompensas» y «Mi colección» · RF-9 a RF-18 · Hecho cuando: el usuario las aprueba (aprobadas el 16 oct 2026).
 
 ## Entrega 2 — Base
-- [ ] **T4 — Tokens kawaii y profundidad en los componentes** · RF-1, RF-2
+- [x] **T4 — Tokens kawaii y profundidad en los componentes** · RF-1, RF-2
 - [ ] **T5 — Pegatinas y biblioteca de doble tono** · RF-3, RF-4, RF-24
 - [ ] **T6 — Plurales correctos** · RF-19
 

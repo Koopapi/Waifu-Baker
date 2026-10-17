@@ -14,8 +14,9 @@ export function Card({ title, aside, interactive, as: As = "section", className,
   return (
     <As
       className={cx(
-        "rounded-l bg-ui-nav p-5",
-        interactive && "transition-[background-color,transform] duration-[var(--duration-fast)] hover:-translate-y-0.5 hover:bg-ui-raised",
+        // Spec 014, RF-2: superficie con degradado sutil, borde luminoso y sombra.
+        "rounded-xl border border-k-lavanda/15 bg-ui-nav bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]",
+        interactive && "transition-[border-color,transform] duration-[var(--duration-fast)] hover:-translate-y-0.5 hover:border-k-lavanda/40",
         className,
       )}
       {...rest}

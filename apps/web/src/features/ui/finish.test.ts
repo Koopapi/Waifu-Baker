@@ -62,8 +62,9 @@ describe("acabado", () => {
         expect(contrast(token(fg), token(bg)), `${fg} sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
       }
     }
+    // Spec 014: los colores sólidos son pastel vivos; su texto es la tinta oscura `ui-on-accent`.
     for (const bg of ["ui-accent", "ui-accent-hover", "ui-success", "ui-warning", "ui-danger", "ui-info"]) {
-      expect(contrast("#ffffff", token(bg)), `blanco sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(token("ui-on-accent"), token(bg)), `ui-on-accent sobre ${bg}`).toBeGreaterThanOrEqual(4.5);
     }
   });
 });
