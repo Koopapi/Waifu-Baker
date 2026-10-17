@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: t.common.siteTitle, template: "%s · Waifu Baker" },
     description: t.common.siteDescription,
     applicationName: "Waifu Baker",
-    // Safari en iPhone convierte fechas, horas y teléfonos en enlaces antes de hidratar y rompe la hidratación.
+    // Safari en iPhone convierte fechas, horas y teléfonos en enlaces (con atributos propios) antes de hidratar.
     formatDetection: { telephone: false, date: false, email: false, address: false },
   };
 }
@@ -31,8 +31,9 @@ export const viewport: Viewport = { themeColor: "#241b29", colorScheme: "dark" }
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const locale = await getLocale();
   return (
-    <html lang={locale}>
-      <body className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
+    // Los navegadores y sus extensiones añaden atributos a <html> y <body> antes de hidratar (p. ej. Chrome en iPhone).
+    <html lang={locale} suppressHydrationWarning>
+      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <I18nProvider locale={locale}>
           <ToastProvider>
             <ConfirmProvider>
