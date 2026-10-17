@@ -1,4 +1,6 @@
 // Textos del área «packs» (spec 008). La versión en español vive en ../es/packs.ts con la misma forma.
+import { plural } from "../../plural";
+
 export const packs = {
   meta: {
     myPacks: "My packs",
@@ -8,7 +10,7 @@ export const packs = {
   mine: {
     heading: "My packs",
     none: "You have no unopened packs.",
-    sealed: (n: number) => `You have ${n} unopened pack(s).`,
+    sealed: (n: number) => `You have ${n} unopened ${plural(n, "pack", "packs")}.`,
     pending: "You have an opening you haven't finished watching.",
     pendingLink: "Watch it again",
     empty: "Packs you receive from your subscription or as gifts will show up here.",
@@ -34,9 +36,9 @@ export const packs = {
     title: (set: string) => `Open all · ${set}`,
     opening: "Opening…",
     noneLeft: "No packs left",
-    openN: (n: number) => `Open ${n} pack(s)`,
+    openN: (n: number) => `Open ${n} ${plural(n, "pack", "packs")}`,
     summary: (s: { packs: number; total: number; fresh: number; holo: number }) =>
-      `${s.packs} pack(s) opened · ${s.total} cards · ${s.fresh} new · ${s.holo} holo`,
+      `${s.packs} ${plural(s.packs, "pack", "packs")} opened · ${s.total} cards · ${s.fresh} new · ${s.holo} holo`,
     summaryPity: (n: number) => ` · ${n} guaranteed by the protection`,
     holoSuffix: " · holo",
     backToMineButton: "Back to my packs",

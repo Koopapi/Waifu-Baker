@@ -1,5 +1,6 @@
 import type { Msg, MsgParams } from "../../types";
 import { common } from "./common";
+import { plural } from "../../plural";
 
 // Mensajes de error y de validación por código (servicios y dominio). Spec 008, RF-5 y RF-10.
 // Reproducen al carácter los mensajes originales de los servicios: los E2E comprueban algunos.
@@ -114,7 +115,7 @@ export const errors: Record<string, Msg> = {
   invalid_pack_size: (p) => `El sobre debe tener entre ${p.min ?? 1} y ${p.max ?? 10} cartas.`,
   duplicate_code: (p) => `Ya existe una colección con el código ${p.code}.`,
   duplicate_slug: (p) => `Ya existe un personaje con el identificador «${p.slug}».`,
-  character_in_use: (p) => `Este personaje tiene ${p.count} carta(s). Reasígnalas antes de borrarlo.`,
+  character_in_use: (p) => `Este personaje tiene ${p.count} ${plural(Number(p.count), "carta", "cartas")}. Reasígnalas antes de borrarlo.`,
   invalid_order: "El orden enviado no coincide con las cartas actuales. Recarga la página.",
   not_adult: "Solo las cartas de colecciones 18+ necesitan revisión.",
 
@@ -137,7 +138,7 @@ export const errors: Record<string, Msg> = {
   unreadable: "No se pudo leer la imagen: el archivo parece dañado.",
 
   // Probabilidades y comprobaciones antes de publicar.
-  slot_count: (p) => `El sobre tiene ${p.packSize} carta(s) pero hay ${p.slots} ranura(s) de probabilidad.`,
+  slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
   negative_weight: (p) => `La ranura ${p.slot} tiene pesos negativos o no válidos.`,
   slot_sum: (p) => `La ranura ${p.slot} suma ${p.sum} % en vez de 100 %.`,
   holo_range: "La probabilidad de holo debe estar entre 0 % y 100 %.",

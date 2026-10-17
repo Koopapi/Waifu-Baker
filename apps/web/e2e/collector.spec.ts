@@ -75,7 +75,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-18: «Abrir todos» abre el resto y muestra todas las cartas", async () => {
     await fan.click('[data-testid="group-COL1"] >> text=Abrir todos (2)');
     await fan.click('[data-testid="open-all"]');
-    await expect(fan.locator('[data-testid="open-all-summary"]')).toContainText("2 sobre(s) abiertos · 4 cartas");
+    await expect(fan.locator('[data-testid="open-all-summary"]')).toContainText("2 sobres abiertos · 4 cartas");
     await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(4);
     await expect(fan.locator('[data-testid="open-all-grid"] li').first()).toContainText("Rara");
     await fan.waitForTimeout(800);
