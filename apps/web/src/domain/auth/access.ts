@@ -1,9 +1,11 @@
 // RF-1: quién puede entrar al panel. Reglas puras; el entorno se pasa como argumento.
+import { isLocalDemoBuild, type DemoEnv } from "../demo/mode";
 
 export type Role = "user" | "admin";
 
-export function isDevLoginEnabled(env: { DEV_LOGIN?: string; NODE_ENV?: string }): boolean {
-  return env.DEV_LOGIN === "1" && env.NODE_ENV !== "production";
+/** Login de desarrollo: nunca en producción, salvo en el build local de la demo (spec 014, RF-23). */
+export function isDevLoginEnabled(env: { DEV_LOGIN?: string; NODE_ENV?: string } & DemoEnv): boolean {
+  return env.DEV_LOGIN === "1" && (env.NODE_ENV !== "production" || isLocalDemoBuild(env));
 }
 
 export function parseAdminIds(raw: string | undefined): Set<string> {

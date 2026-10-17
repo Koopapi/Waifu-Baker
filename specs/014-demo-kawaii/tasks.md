@@ -24,7 +24,7 @@
 
 ## Entrega 6 — Sorteo y demo
 - [x] **T13 — Sorteo sin repetidas (v2) y página de probabilidades** · RF-21, RF-22
-- [ ] **T14 — Demo optimizada** · RF-23
+- [x] **T14 — Demo optimizada** · RF-23
 
 ## Entrega 7 — Cierre
 - [ ] **T15 — E2E en los cuatro proyectos** · Todos
