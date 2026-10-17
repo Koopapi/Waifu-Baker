@@ -193,6 +193,16 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-163 | El sonido está activado por defecto. El botón de silencio de la apertura y de «Abrir todos» corta sonido y vibración, y se recuerda en ese dispositivo. | Vigente | 013 RF-7, RF-8, RF-10 |
 | RN-164 | Ninguna página del coleccionista ni pública carga más de 250 kB de JavaScript comprimido al abrirse; la integración continua falla si alguna se pasa. | Vigente | 013 RF-11, RF-12 |
 
+## 16. Sobres, sorteo y demo (estilo kawaii)
+
+| Regla | Descripción | Estado | Origen |
+|---|---|---|---|
+| RN-170 | Un sobre no repite carta: si en una ranura sale una que ya está en el sobre, se elige otra de la misma rareza; solo se repite si esa rareza no tiene más cartas distintas. Las probabilidades por rareza no cambian y la página de probabilidades lo explica. | Vigente | 014 RF-21 |
+| RN-171 | Cada apertura guarda la versión del sorteo con que se hizo (v1 antes de la spec 014, v2 sin repetidas), para poder auditarla. | Vigente | 014 RF-22 |
+| RN-172 | Cada colección tiene su sobre: el compuesto, con la carta de portada que elige el administrador (o la de mayor rareza), o un sobre hecho a mano subido en el panel, que lo sustituye mientras exista. Es el mismo en «Mis sobres», la apertura y «Abrir todos». | Vigente | 014 RF-5 a RF-8 |
+| RN-173 | El arte del sobre solo se sirve con sesión; el de una colección 18+, solo con la edad verificada o al administrador. | Vigente | 014 RF-8 |
+| RN-174 | La demo local arranca en versión optimizada. En producción, la demo y la entrada sin Patreon solo existen en ese build local (`DEMO_LOCAL=1`, sin `SITE_URL`); nunca en la web publicada. | Vigente | 014 RF-23 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -208,6 +218,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Espera entre revisiones de un álbum oculto | 7 días |
 | JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
 | Sonidos de la apertura | 6, hasta 200 kB en total |
+| Sobre hecho a mano | se recorta a 600 × 900 (2:3) en WebP |
 | Aperturas por minuto | 10 por usuario |
 | Caducidad de los sobres | ninguna |
 | Enlaces de imagen privados | 10 minutos |
