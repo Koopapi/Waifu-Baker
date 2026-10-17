@@ -8,7 +8,8 @@ import { hmacRng } from "@/domain/random";
 import type { DbLike } from "@/server/db-types";
 import { AppError } from "@/server/errors";
 
-export const RNG_VERSION = "hmac-sha256-v1";
+/** v2 (spec 014, RF-21): sin cartas repetidas dentro del sobre. Las aperturas guardan su versión (RF-22). */
+export const RNG_VERSION = "hmac-sha256-v2";
 const OPEN_ALL_MAX = 50;
 
 export interface OpenedCard {
@@ -132,7 +133,7 @@ export async function openPack(
     const active = pityActive(counter.packsSinceEpic, odds.pityThreshold);
 
     const seed = input.seed ?? randomBytes(32);
-    const result = drawPackWithPity({ cards: pool, slots: odds.slots, holoChance: odds.holoChance }, hmacRng(seed), active);
+    const result = drawPackWithPity({ cards: pool, slots: odds.slots, holoChance: odds.holoChance }, hmacRng(seed), active, { unique: true });
 
     const draws: StoredRoll[] = [];
     for (const d of result.draws) {
