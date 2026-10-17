@@ -135,22 +135,18 @@ export async function choose(scope: Page | Locator, label: string | RegExp, opti
   await page.getByRole("option", { name: option }).first().click();
 }
 
-/** Spec 011: marca o desmarca una casilla del sistema de diseño (botón con role=checkbox). */
+/** Spec 011: marca o desmarca una casilla del sistema de diseño (casilla nativa con su etiqueta). */
 export async function tick(scope: Page | Locator, label: string | RegExp, on = true) {
-  const box = scope.getByRole("checkbox", { name: label });
-  if ((await box.getAttribute("aria-checked")) !== String(on)) await box.click();
+  await scope.getByRole("checkbox", { name: label }).setChecked(on);
 }
 
 /** Spec 011: en el login de desarrollo, entrar sin el papel de administrador (casilla del sistema de diseño). */
 export async function untickAdmin(page: Page) {
-  const box = page.locator('form:has(input[name="name"]) button[role="checkbox"]');
-  if ((await box.getAttribute("aria-checked")) === "true") await box.click();
+  await page.locator('form:has(input[name="name"]) input[type="checkbox"]').setChecked(false);
 }
 
 /** Spec 011: marca todas las casillas de un formulario (p. ej. la bienvenida: edad y términos). */
 export async function tickAll(scope: Locator) {
-  const boxes = scope.locator('button[role="checkbox"]');
-  for (let i = 0; i < (await boxes.count()); i++) {
-    if ((await boxes.nth(i).getAttribute("aria-checked")) !== "true") await boxes.nth(i).click();
-  }
+  const boxes = scope.locator('input[type="checkbox"]');
+  for (let i = 0; i < (await boxes.count()); i++) await boxes.nth(i).setChecked(true);
 }

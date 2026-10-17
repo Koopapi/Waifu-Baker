@@ -27,10 +27,23 @@ describe("formularios", () => {
   });
 
   it("test_s011_rf4_casilla_interruptor_y_grupo_de_opciones_accesibles", () => {
-    expect(html(<Checkbox label="Acepto" name="terms" />)).toMatch(/role="checkbox"/);
+    expect(html(<Checkbox label="Acepto" name="terms" />)).toMatch(/<input[^>]*type="checkbox"/);
     expect(html(<Switch label="Álbum público" name="public" />)).toMatch(/role="switch"/);
     const radios = html(<RadioGroup label="Edad mínima" name="age" defaultValue="16" options={[{ value: "16", label: "16+" }, { value: "18", label: "18+" }]} />);
     expect(radios).toMatch(/role="radiogroup"/);
     expect((radios.match(/role="radio"/g) ?? []).length).toBe(2);
+  });
+
+  it("la casilla es nativa: responde aunque la página aún no haya cargado su JavaScript", () => {
+    const out = html(<Checkbox label="Tengo la edad mínima" name="age" required defaultChecked />);
+    const input = out.match(/<input[^>]*>/)![0];
+    expect(input).toContain('type="checkbox"');
+    expect(input).toContain('name="age"');
+    expect(input).toContain("required");
+    expect(input).toContain("checked");
+    const id = input.match(/id="([^"]+)"/)![1];
+    expect(out).toContain(`<label for="${id}"`);
+    // Nada de botones que imitan una casilla: esos solo funcionan tras hidratar.
+    expect(out).not.toMatch(/<button[^>]*role="checkbox"/);
   });
 });

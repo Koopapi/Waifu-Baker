@@ -31,7 +31,7 @@ export function CardPreview({ card }: { card: CardDTO }) {
           style={{ width: "100%" }}
         />
       </div>
-      <Checkbox checked={holo} onCheckedChange={(v) => setHolo(v === true)} label={t.previewHolo} />
+      <Checkbox checked={holo} onCheckedChange={setHolo} label={t.previewHolo} />
     </div>
   );
 }
