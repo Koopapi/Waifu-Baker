@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { RadioGroup as RRadioGroup, Switch as RSwitch } from "radix-ui";
-import { Check } from "lucide-react";
+import { Check } from "@/ui/icons/glyphs";
 import { focusRing } from "../focus";
 import { cx } from "../variants";
 

@@ -1,4 +1,4 @@
-import { FlaskConical, Repeat } from "lucide-react";
+import { FlaskConical, Repeat } from "@/ui/icons/glyphs";
 import { enterDemoAction } from "@/app/demo/actions";
 import { DEMO_USERS, isDemoEnabled, type DemoRole } from "@/domain/demo/mode";
 import { getDict } from "@/i18n/server";

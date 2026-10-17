@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useReducer } from "react";
-import { X } from "lucide-react";
+import { X } from "@/ui/icons/glyphs";
 import { useT } from "@/i18n/client";
 import { dismissToast, expireToasts, pushToast, type ToastInput, type ToastState } from "./toast-queue";
 

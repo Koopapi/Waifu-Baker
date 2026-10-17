@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { Slot } from "radix-ui";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "@/ui/icons/glyphs";
 import { cx, type VariantProps } from "../variants";
 import { buttonClasses, iconButtonClasses } from "./classes";
 

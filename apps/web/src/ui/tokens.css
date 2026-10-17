@@ -43,6 +43,18 @@
   --ui-k-limon: #ffe27a;
   --ui-k-melocoton: #ffb38a;
   --ui-k-tinta: #3b1f35;
+  /* Tonos de las pegatinas (spec 014, RF-3). */
+  --ui-k-blanco: #ffffff;
+  --ui-k-rubor: #ff9ec6;
+  --ui-k-chicle-claro: #ffb3d4;
+  --ui-k-lavanda-claro: #e9e1ff;
+  --ui-k-menta-claro: #b5fae3;
+  --ui-k-celeste-claro: #e3f3ff;
+  --ui-k-limon-oscuro: #ffc94a;
+  --ui-k-rosa-claro: #ffc4dd;
+  --ui-k-galleta: #f2c27b;
+  --ui-k-chocolate: #7a4a2e;
+  --ui-k-llama: #ff9a62;
 
   /* Capas (de abajo arriba). */
   --z-nav: 20;
@@ -104,6 +116,7 @@
   /* Spec 014, RF-2: relieve de los botones (borde inferior sólido) y brillo suave de las superficies. */
   --shadow-relief: 0 4px 0 var(--ui-accent-deep);
   --shadow-relief-soft: 0 4px 0 rgb(20 12 40 / 0.9);
+  --shadow-sticker: 0 3px 3px rgb(10 4 24 / 0.45);
   --shadow-glow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 10px 28px rgb(10 4 24 / 0.5);
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);

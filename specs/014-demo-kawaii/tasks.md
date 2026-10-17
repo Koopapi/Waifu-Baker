@@ -7,7 +7,7 @@
 
 ## Entrega 2 — Base
 - [x] **T4 — Tokens kawaii y profundidad en los componentes** · RF-1, RF-2
-- [ ] **T5 — Pegatinas y biblioteca de doble tono** · RF-3, RF-4, RF-24
+- [x] **T5 — Pegatinas y biblioteca de doble tono** · RF-3, RF-4, RF-24
 - [ ] **T6 — Plurales correctos** · RF-19
 
 ## Entrega 3 — Sobres

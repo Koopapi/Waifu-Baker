@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X } from "@/ui/icons/glyphs";
 import { useT } from "@/i18n/client";
 import { Avatar } from "../content/Avatar";
 import { Badge } from "../content/Badge";

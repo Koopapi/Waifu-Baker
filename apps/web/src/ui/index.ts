@@ -9,5 +9,6 @@ export * from "./game";
 export * from "./hooks";
 export { AppShell, type NavGroup, type NavItem, type RailItem } from "./shell/AppShell";
 export { Banner } from "./shell/Banner";
+export { Sticker, STICKERS, type StickerName } from "./icons/Sticker";
 export { focusRing } from "./focus";
 export { cx, variants } from "./variants";

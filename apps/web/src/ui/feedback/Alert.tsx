@@ -1,4 +1,4 @@
-import { CircleAlert, CircleCheck, Info, TriangleAlert } from "lucide-react";
+import { CircleAlert, CircleCheck, Info, TriangleAlert } from "@/ui/icons/glyphs";
 import { cx, variants } from "../variants";
 
 const alertClasses = variants({

@@ -1,4 +1,4 @@
-import { ArrowRight, FlaskConical, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, FlaskConical, ShieldCheck, Sparkles } from "@/ui/icons/glyphs";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import { cards, sets } from "@/db/schema";

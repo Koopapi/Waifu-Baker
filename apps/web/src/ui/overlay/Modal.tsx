@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Dialog } from "radix-ui";
-import { X } from "lucide-react";
+import { X } from "@/ui/icons/glyphs";
 import { cx, variants } from "../variants";
 
 const contentClasses = variants({

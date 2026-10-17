@@ -12,7 +12,7 @@ import {
   saveFeaturedAction,
   type AlbumActionState,
 } from "@/app/(app)/coleccion/album/actions";
-import { ArrowDown, ArrowUp, X } from "lucide-react";
+import { ArrowDown, ArrowUp, X } from "@/ui/icons/glyphs";
 import { useT } from "@/i18n/client";
 import { Button, IconButton } from "@/ui/action/Button";
 import { Card } from "@/ui/content/Card";
