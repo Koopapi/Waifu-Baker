@@ -1,10 +1,10 @@
 # Comprobación en un teléfono real — Spec 013 (RF-14)
 
-La hace el usuario antes de cerrar la spec. Cómo abrir la web en el teléfono: con el Mac y el teléfono en la
-misma red wifi, `pnpm dev` y abrir `http://<IP del Mac>:3000` (la IP sale en Ajustes → Wi-Fi del Mac). Hace
-falta tener sobres: regalarlos desde el panel a la cuenta con la que se entra. El giroscopio del iPhone solo
-funciona con HTTPS: para el punto 1, `pnpm dev --experimental-https` y aceptar el aviso del certificado en el
-teléfono (`https://<IP del Mac>:3000`); el resto de puntos se pueden hacer con HTTP.
+La hace el usuario antes de cerrar la spec. Lo más sencillo es la demo: en el Mac, `pnpm demo` (deja la base
+de la demo como nueva, con 3 sobres para el coleccionista); en el teléfono, conectado a la misma wifi, abrir
+`http://<IP del Mac>:3300` (la IP sale en Ajustes del sistema → Wi-Fi → Detalles) y pulsar «Coleccionista».
+Para más sobres: entrar como «Administrador» → Usuarios → Demo Collector → regalar sobres. El giroscopio solo
+funciona con HTTPS; el resto de puntos se hacen con HTTP.
 
 Teléfono usado: ____________________ · Fecha: __________
 
