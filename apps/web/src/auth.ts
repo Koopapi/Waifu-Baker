@@ -9,6 +9,7 @@ import { prepareLogin } from "@/server/services/account";
 import { syncOnLogin } from "@/server/services/membership";
 import { upsertUserFromLogin } from "@/server/services/users";
 import { grantWelcomePack } from "@/server/services/welcome";
+import { authLogger } from "@/server/auth/logger";
 
 declare module "next-auth" {
   interface Session {
@@ -45,6 +46,7 @@ if (devLoginEnabled) {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   session: { strategy: "jwt" },
+  logger: authLogger,
   pages: { signIn: "/login" },
   callbacks: {
     async jwt({ token, user, account }) {
