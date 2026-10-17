@@ -79,6 +79,19 @@ export const admin = {
     archived: "Set archived: it is no longer granted in new packs.",
   },
   set: {
+    pack: {
+      title: "Pack",
+      intro: "The pack collectors see in “My packs” and when opening. It uses the cover card you choose, or the rarest one.",
+      cover: "Cover card",
+      coverAuto: "Automatic (the rarest card)",
+      upload: "Upload hand-made pack",
+      uploadHint: "PNG, JPG or WebP. It is cropped to 2:3 without distortion and replaces the composed pack.",
+      remove: "Remove hand-made pack",
+      coverSaved: "Cover saved.",
+      uploaded: "Hand-made pack uploaded.",
+      removed: "Hand-made pack removed: the composed pack is back.",
+      uploadFailed: "The image could not be uploaded.",
+    },
     welcome: {
       title: "Welcome pack",
       isWelcome: "This is the welcome set: everyone gets 1 pack of it the first time they sign in.",

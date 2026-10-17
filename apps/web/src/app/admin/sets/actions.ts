@@ -6,6 +6,8 @@ import type { Problem } from "@/domain/catalog/odds";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { getDict } from "@/i18n/server";
 import { setWelcomeSet } from "@/server/services/welcome";
+import { removePackImage, setCoverCard } from "@/server/services/pack-art";
+import { getCardStore } from "@/server/cards/store-instance";
 
 export async function createSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
   return adminAction("createSet", ["/admin/sets", "/admin"], async ({ db, actorId }) => {
@@ -68,5 +70,21 @@ export async function setWelcomeSetAction(setId: string, makeWelcome: boolean): 
   return adminAction("setWelcomeSet", ["/admin/sets", `/admin/sets/${setId}`], async ({ db, actorId }) => {
     await setWelcomeSet(db, actorId, makeWelcome ? setId : null);
     return (await getDict()).admin.set.welcome.made;
+  });
+}
+
+/** Spec 014, RF-6: elige (o vuelve a la automática, con `null`) la carta de portada del sobre. */
+export async function setCoverAction(setId: string, cardId: string | null): Promise<ActionState> {
+  return adminAction("setCover", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
+    await setCoverCard(db, actorId, setId, cardId);
+    return (await getDict()).admin.set.pack.coverSaved;
+  });
+}
+
+/** Spec 014, RF-7: quita el sobre hecho a mano. */
+export async function removePackImageAction(setId: string): Promise<ActionState> {
+  return adminAction("removePackImage", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
+    await removePackImage(db, getCardStore(), actorId, setId);
+    return (await getDict()).admin.set.pack.removed;
   });
 }

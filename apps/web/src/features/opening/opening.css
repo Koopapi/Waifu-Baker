@@ -107,6 +107,32 @@
   opacity: 0.8;
 }
 
+/* Spec 014: con el sobre de la colección, la tira va sobre los dientes de arriba, en píldora kawaii. */
+.pack--art {
+  aspect-ratio: 2 / 3;
+}
+.pack__art {
+  position: absolute;
+  inset: 0;
+}
+.pack__art .pack-art {
+  width: 100%;
+}
+.pack--art .pack__strip {
+  left: 6%;
+  right: 6%;
+  top: -62px;
+  height: 44px;
+  border-radius: 999px;
+  border: 3px solid #ffffff;
+  background: linear-gradient(90deg, #ffe27a, #ff9ecb);
+  box-shadow: 0 4px 0 #c2337a;
+  color: #3b1f35;
+  font-size: 14px;
+  font-weight: 900;
+  z-index: 2;
+}
+
 .pack__strip {
   position: absolute;
   left: -2px;

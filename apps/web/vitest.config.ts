@@ -5,6 +5,8 @@ export default defineConfig({
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
   // tsconfig deja el JSX sin transformar (lo hace Next); los tests de componentes (spec 011) lo necesitan.
   oxc: { jsx: { runtime: "automatic" } },
+  // Los componentes importan su CSS; en los tests no hace falta Tailwind (sin esto, se carga postcss.config.mjs).
+  css: { postcss: { plugins: [] } },
   test: {
     environment: "node",
     projects: [

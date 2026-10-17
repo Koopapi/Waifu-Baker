@@ -88,7 +88,7 @@ export interface UploadFile {
 }
 
 /** RF-12: lee las dimensiones y aplica las reglas de subida. */
-async function inspectUpload(file: UploadFile) {
+export async function inspectUpload(file: UploadFile) {
   let meta: { width: number | null; height: number | null } = { width: null, height: null };
   try {
     const m = await sharp(file.body).metadata();

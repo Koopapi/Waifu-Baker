@@ -10,12 +10,13 @@ import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";
 import { SoundToggle } from "@/ui/game/SoundToggle";
+import { PackArt, type PackArtData } from "./PackArt";
 import "./open-all.css";
 
 const rank = (r: OpenAllCard["rarity"]) => RARITIES.indexOf(r);
 
 /** RF-18: abre todos los sobres de la colección y muestra las cartas, nuevas y raras primero. */
-export function OpenAllView({ setId, setName, sealed }: { setId: string; setName: string; sealed: number }) {
+export function OpenAllView({ setId, setCode, setName, art, sealed }: { setId: string; setCode: string; setName: string; art: PackArtData; sealed: number }) {
   const [cards, setCards] = useState<OpenAllCard[] | null>(null);
   const [opened, setOpened] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -65,11 +66,15 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-ui-text">
-            {t.packs.openAll.backToMine}
-          </Link>
-          <h1 className="text-3xl font-bold">{t.packs.openAll.title(setName)}</h1>
+        <div className="flex items-end gap-4">
+          {/* Spec 014, RF-8: el mismo sobre de la colección. */}
+          {!cards && <PackArt setId={setId} code={setCode} name={setName} art={art} className="w-[96px] sm:w-[120px]" />}
+          <div>
+            <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-ui-text">
+              {t.packs.openAll.backToMine}
+            </Link>
+            <h1 className="font-display text-3xl font-semibold">{t.packs.openAll.title(setName)}</h1>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} variant="ghost" data-testid="sound-toggle" />

@@ -79,6 +79,19 @@ export const admin: typeof en = {
     archived: "Colección archivada: ya no se concede en sobres nuevos.",
   },
   set: {
+    pack: {
+      title: "Sobre",
+      intro: "El sobre que ven los coleccionistas en «Mis sobres» y al abrir. Usa la carta de portada que elijas, o la de mayor rareza.",
+      cover: "Carta de portada",
+      coverAuto: "Automática (la de mayor rareza)",
+      upload: "Subir sobre hecho a mano",
+      uploadHint: "PNG, JPG o WebP. Se recorta a 2:3 sin deformarlo y sustituye al sobre compuesto.",
+      remove: "Quitar el sobre hecho a mano",
+      coverSaved: "Portada guardada.",
+      uploaded: "Sobre hecho a mano subido.",
+      removed: "Sobre hecho a mano quitado: vuelve el sobre compuesto.",
+      uploadFailed: "No se pudo subir la imagen.",
+    },
     welcome: {
       title: "Sobre de bienvenida",
       isWelcome: "Es la colección de bienvenida: todos reciben 1 sobre de ella la primera vez que entran.",

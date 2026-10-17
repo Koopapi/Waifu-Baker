@@ -17,6 +17,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 
 export const userRole = pgEnum("user_role", ["user", "admin"]);
 export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]);
@@ -78,6 +79,10 @@ export const sets = pgTable("sets", {
   version: integer("version").notNull().default(1),
   /** Spec 001, RF-5: colección de la que sale el sobre de bienvenida (solo una). */
   isWelcome: boolean("is_welcome").notNull().default(false),
+  /** Spec 014, RF-6: carta de portada del sobre (si no hay, la de mayor rareza). */
+  coverCardId: uuid("cover_card_id").references((): AnyPgColumn => cards.id, { onDelete: "set null" }),
+  /** Spec 014, RF-7: sobre diseñado a mano; mientras exista, sustituye al compuesto. */
+  packImageKey: text("pack_image_key"),
   ...timestamps,
 }, (t) => [uniqueIndex("sets_single_welcome_uq").on(t.isWelcome).where(sql`${t.isWelcome}`)]);
 

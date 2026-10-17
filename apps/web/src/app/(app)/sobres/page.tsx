@@ -4,6 +4,8 @@ import { requireUser } from "@/server/auth/require-user";
 import { cookies } from "next/headers";
 import { now } from "@/server/clock";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
+import { packArtForSets } from "@/server/services/pack-art";
+import { PackArt } from "@/features/packs/PackArt";
 import { claimableSets, rewardsSummary } from "@/server/services/rewards";
 import { RewardsPanel } from "@/features/rewards/RewardsPanel";
 import { getDict } from "@/i18n/server";
@@ -26,6 +28,7 @@ export default async function MisSobresPage() {
     rewardsSummary(db, user.id, { now: at, timeZone: tz }),
     claimableSets(db),
   ]);
+  const art = await packArtForSets(db, groups.map((g) => g.setId));
   const total = groups.reduce((a, g) => a + g.sealed, 0);
   const t = await getDict();
 
@@ -62,27 +65,31 @@ export default async function MisSobresPage() {
               <li
                 key={g.setId}
                 style={{ "--i": i } as React.CSSProperties}
-                className="card-in flex gap-5 rounded-l bg-ui-nav bg-[radial-gradient(120%_120%_at_0%_50%,color-mix(in_srgb,var(--ui-accent)_18%,transparent),transparent_60%)] p-5"
+                className="card-in flex flex-col items-center gap-5 rounded-xl border border-k-lavanda/20 bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)] sm:flex-row sm:items-center"
                 data-testid={`group-${g.code}`}
               >
-                <PackArt code={g.code} count={g.sealed} />
-                <div className="flex min-w-0 flex-1 flex-col justify-between gap-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
+                <div className="relative">
+                  {/* Spec 014, RF-5 y RF-8: el sobre de la colección; detrás, la pila si hay más de uno. */}
+                  {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
+                  <PackArt setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} className="relative w-[200px] sm:w-[170px]" />
+                </div>
+                <div className="flex w-full min-w-0 flex-1 flex-col gap-4">
+                  <div className="flex items-start justify-center gap-3 sm:justify-between">
+                    <div className="hidden min-w-0 sm:block">
                       <p className="font-mono text-xs text-ui-text-3">{g.code}</p>
-                      <h2 className="truncate text-lg font-semibold">{g.name}</h2>
+                      <h2 className="truncate font-display text-xl font-semibold">{g.name}</h2>
                     </div>
-                    <Badge className="tabular-nums">x{g.sealed}</Badge>
+                    <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
                   </div>
                   {g.locked ? (
                     <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
                   ) : (
-                    <div className="flex flex-wrap gap-2">
-                      <Button asChild>
+                    <div className="flex flex-col gap-3">
+                      <Button size="lg" width="full" asChild>
                         <Link href={`/sobres/${g.setId}`}>{t.packs.mine.openOne}</Link>
                       </Button>
                       {g.sealed > 1 && (
-                        <Button variant="secondary" asChild>
+                        <Button size="lg" width="full" variant="secondary" asChild>
                           <Link href={`/sobres/${g.setId}/todos`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
                         </Button>
                       )}
@@ -110,19 +117,5 @@ export default async function MisSobresPage() {
         />
       </aside>
     </main>
-  );
-}
-
-/** Sobre en miniatura con su pila: ilustra cuántos quedan (spec 010, maqueta «Mis sobres»). */
-function PackArt({ code, count }: { code: string; count: number }) {
-  return (
-    <div aria-hidden className="relative h-[132px] w-[92px] shrink-0">
-      {count > 2 && <span className="absolute inset-0 translate-x-2 -rotate-6 rounded-m bg-ui-hover" />}
-      {count > 1 && <span className="absolute inset-0 translate-x-1 -rotate-3 rounded-m bg-ui-raised" />}
-      <span className="absolute inset-0 flex flex-col justify-between overflow-hidden rounded-m border-2 border-ui-warning-text bg-gradient-to-br from-ui-accent via-ui-accent-hover to-ui-rail p-2 shadow-2">
-        <span className="h-1 rounded-full bg-ui-text/40" />
-        <span className="font-display text-sm font-bold leading-tight text-ui-on-accent">{code}</span>
-      </span>
-    </div>
   );
 }

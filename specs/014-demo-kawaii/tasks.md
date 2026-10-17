@@ -11,8 +11,8 @@
 - [x] **T6 — Plurales correctos** · RF-19
 
 ## Entrega 3 — Sobres
-- [ ] **T7 — Portada y sobre a mano: datos y panel** · RF-6, RF-7
-- [ ] **T8 — Sobre compuesto en «Mis sobres», apertura y «Abrir todos»** · RF-5, RF-8
+- [x] **T7 — Portada y sobre a mano: datos y panel** · RF-6, RF-7
+- [x] **T8 — Sobre compuesto en «Mis sobres», apertura y «Abrir todos»** · RF-5, RF-8
 
 ## Entrega 4 — Apertura
 - [ ] **T9 — Escena: destellos, dorso, nitidez, holo y foco** · RF-9, RF-10, RF-15

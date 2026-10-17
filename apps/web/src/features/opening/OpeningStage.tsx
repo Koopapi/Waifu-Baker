@@ -34,6 +34,8 @@ interface StageProps {
   /** Fuente de cartas del sobre. Por defecto, datos falsos del laboratorio. */
   draw?: () => Promise<LabCard[]>;
   packLabel?: string;
+  /** Spec 014: el sobre de la colección ya dibujado (PackArt). */
+  packArt?: React.ReactNode;
   /** Contenido extra en la barra inferior (p. ej. «Volver al panel»). */
   extraHud?: React.ReactNode;
   /** Se llama una vez cuando se han revelado todas las cartas del sobre. */
@@ -44,7 +46,7 @@ interface StageProps {
   debug?: boolean;
 }
 
-export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
+export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
   const t = useT();
   const [phase, setPhase] = useState<Phase>("idle");
   const [cards, setCards] = useState<LabCard[]>([]);
@@ -214,7 +216,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
         {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>
 
-      <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} onCommit={onCommit} reducedMotion={reduced} label={packLabel} />}</div>
+      <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} onCommit={onCommit} art={packArt} reducedMotion={reduced} label={packLabel} />}</div>
 
       <div className="cards">
         {cards.map((c, i) => (

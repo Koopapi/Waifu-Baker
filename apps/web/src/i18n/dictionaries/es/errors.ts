@@ -41,6 +41,7 @@ export const errors: Record<string, Msg> = {
   review_pending: "Ya hay una revisión pendiente.",
   review_too_soon: (p) => `Ya pediste una revisión hace poco. Podrás pedir otra a partir del ${new Date(String(p.until)).toLocaleDateString("es", { day: "numeric", month: "long" })}.`,
   review_already_decided: "Esa revisión ya está decidida.",
+  card_not_in_set: "Esa carta no es de esta colección.",
   no_free_charges: "Todavía no tienes sobres gratis: espera a que se cargue el siguiente.",
   already_claimed_today: "Ya reclamaste la recompensa de hoy. Vuelve mañana.",
   tz_change_too_soon: "Cambiaste de zona horaria hace poco: podrás reclamar cuando pasen 20 horas desde la última recompensa.",

@@ -8,6 +8,7 @@ import { MIME, testImage } from "./images";
 import { tempStore } from "./store";
 import { upsertUserFromLogin } from "@/server/services/users";
 import type { DbLike } from "@/server/db-types";
+import type { CardStore } from "@/server/ports/card-store";
 
 export async function makeAdmin(db: DbLike, id = "admin-1") {
   return upsertUserFromLogin(db, { patreonUserId: id, displayName: "Admin", role: "admin" });
@@ -22,10 +23,10 @@ const ZERO = { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0
 export async function createPublishedSet(
   db: DbLike,
   adminId: string,
-  opts: { code: string; rarities: Rarity[]; slots: Partial<Record<Rarity, number>>[]; holoChance?: number; pity?: number; isAdult?: boolean },
+  opts: { code: string; rarities: Rarity[]; slots: Partial<Record<Rarity, number>>[]; holoChance?: number; pity?: number; isAdult?: boolean; store?: CardStore },
 ) {
   const set = await createSet(db, adminId, { code: opts.code, name: opts.code, isAdult: Boolean(opts.isAdult), packSize: opts.slots.length });
-  const store = tempStore();
+  const store = opts.store ?? tempStore();
   const ch = await createCharacter(db, adminId, { name: `Personaje ${opts.code}` });
   for (const [i, rarity] of opts.rarities.entries()) {
     const c = await uploadCardImage(db, store, adminId, set.id, { body: await testImage({ hue: (i * 47) % 360 }), mime: MIME.png, filename: `${i}.png` });

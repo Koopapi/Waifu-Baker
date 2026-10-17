@@ -8,6 +8,8 @@ import { cardChances } from "@/domain/catalog/odds";
 import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
+import { PackSettings } from "@/features/admin/sets/PackSettings";
+import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
 import { AdultBadge, StatusBadge } from "@/features/admin/ui";
@@ -25,7 +27,7 @@ import { EditSetForm } from "../forms";
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters] = await Promise.all([getSetOverview(db, id), listCharacters(db)]);
+  const [overview, characters, packArts] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id])]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -94,6 +96,17 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         }
       >
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
+      </Card>
+
+      <Card title={t.pack.title}>
+        <PackSettings
+          set={{ id: set.id, code: set.code, name: set.name }}
+          art={packArts.get(set.id) ?? { coverVersion: null, packImage: null }}
+          chosenCoverId={set.coverCardId}
+          cards={overview.cards
+            .filter((c) => c.rarity)
+            .map((c) => ({ id: c.id, label: `${String(c.number).padStart(3, "0")} · ${c.name || "—"} · ${tt.common.rarity[c.rarity!]}` }))}
+        />
       </Card>
 
       <Card className="space-y-3" title={t.welcome.title}>
