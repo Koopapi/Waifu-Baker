@@ -21,6 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: t.common.siteTitle, template: "%s · Waifu Baker" },
     description: t.common.siteDescription,
     applicationName: "Waifu Baker",
+    // Safari en iPhone convierte fechas, horas y teléfonos en enlaces antes de hidratar y rompe la hidratación.
+    formatDetection: { telephone: false, date: false, email: false, address: false },
   };
 }
 
