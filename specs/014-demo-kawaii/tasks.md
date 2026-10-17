@@ -20,7 +20,7 @@
 
 ## Entrega 5 — Pantallas
 - [x] **T11 — Temporizador en anillo y racha de pegatinas** · RF-16, RF-17
-- [ ] **T12 — «Mi colección» con portada y datos; contador sin tapar el símbolo** · RF-18, RF-20
+- [x] **T12 — «Mi colección» con portada y datos; contador sin tapar el símbolo** · RF-18, RF-20
 
 ## Entrega 6 — Sorteo y demo
 - [ ] **T13 — Sorteo sin repetidas (v2) y página de probabilidades** · RF-21, RF-22

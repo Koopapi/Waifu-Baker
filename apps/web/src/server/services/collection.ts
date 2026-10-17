@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { cards, sets, userCards, users } from "@/db/schema";
 import { buildBinder } from "@/domain/collection/binder";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import type { DbLike } from "@/server/db-types";
 
 const visibleStatus = ["published", "archived"] as const;
@@ -13,7 +14,7 @@ async function isVerified(db: DbLike, userId: string) {
 /** RF-1 y RF-4: colecciones con al menos una carta del usuario, con progreso; las 18+ sin verificar, bloqueadas. */
 export async function myCollections(db: DbLike, userId: string) {
   const owned = await db
-    .select({ setId: cards.setId, cardId: userCards.cardId })
+    .select({ setId: cards.setId, cardId: userCards.cardId, holo: userCards.holo, qty: userCards.qty, rarity: cards.rarity, number: cards.number })
     .from(userCards)
     .innerJoin(cards, eq(cards.id, userCards.cardId))
     .where(eq(userCards.userId, userId));
@@ -25,7 +26,12 @@ export async function myCollections(db: DbLike, userId: string) {
     db.select({ setId: cards.setId, id: cards.id }).from(cards).where(inArray(cards.setId, setIds)),
   ]);
   return setRows.map((s) => {
-    const distinct = new Set(owned.filter((o) => o.setId === s.id).map((o) => o.cardId)).size;
+    const mine = owned.filter((o) => o.setId === s.id);
+    const distinct = new Set(mine.map((o) => o.cardId)).size;
+    const rank = (r: Rarity | null) => (r ? RARITIES.indexOf(r) : -1);
+    // Spec 014, RF-18: mejores cartas primero (rareza y número), sin repetir la normal y la holo.
+    const ordered = [...mine].sort((a, b) => rank(b.rarity) - rank(a.rarity) || a.number - b.number);
+    const preview = [...new Set(ordered.map((o) => o.cardId))].slice(0, 4);
     return {
       setId: s.id,
       code: s.code,
@@ -33,6 +39,12 @@ export async function myCollections(db: DbLike, userId: string) {
       isAdult: s.isAdult,
       locked: s.isAdult && !verified,
       progress: { owned: distinct, total: totals.filter((t) => t.setId === s.id).length },
+      stats: {
+        copies: mine.reduce((n, o) => n + o.qty, 0),
+        holo: new Set(mine.filter((o) => o.holo).map((o) => o.cardId)).size,
+        best: ordered[0]?.rarity ?? null,
+      },
+      preview,
     };
   });
 }

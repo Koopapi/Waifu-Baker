@@ -37,6 +37,19 @@ describe("RF-1 a RF-6 Mi colección", () => {
     });
   });
 
+  it("test_s014_rf18_cada_coleccion_trae_sus_datos_y_una_vista_previa_de_las_mejores_cartas", async () => {
+    await inRollback(async (tx) => {
+      const { fan, sfw } = await world(tx);
+      const c = (await myCollections(tx, fan.id)).find((x) => x.setId === sfw.set.id)!;
+      // 2 sobres de 2 cartas (una común y la rara garantizada), sin holo.
+      expect(c.stats).toEqual({ copies: 4, holo: 0, best: "rare" });
+      const rare = sfw.cards.find((k) => k.rarity === "rare")!;
+      expect(c.preview[0]).toBe(rare.id);
+      expect(c.preview.length).toBeLessThanOrEqual(4);
+      expect(new Set(c.preview).size).toBe(c.preview.length);
+    });
+  });
+
   it("test_s006_rf2_el álbum de una colección tiene un hueco por carta", async () => {
     await inRollback(async (tx) => {
       const { fan, sfw } = await world(tx);

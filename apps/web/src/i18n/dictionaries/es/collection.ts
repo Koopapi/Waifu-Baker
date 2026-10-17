@@ -7,6 +7,12 @@ export const collection: typeof en = {
   publicAlbumLinkActive: "Álbum público: activo",
   emptyBefore: "Aún no tienes cartas. Abre tus sobres en",
   emptyAfter: "para empezar tu colección.",
+  stats: {
+    holo: "holo",
+    best: "mejor carta",
+    copies: "copias",
+  },
+  viewCollection: "Ver la colección",
   adultLocked: "Colección 18+: verifica tu edad con un tier adulto de Patreon para ver estas cartas.",
   progress: (owned, total) => `${owned} de ${total} cartas`,
   binder: {
