@@ -15,10 +15,13 @@ describe("spec 014 — iconos", () => {
     for (const name of STICKERS) {
       const svg = renderToStaticMarkup(<Sticker name={name} className="size-10" />);
       expect(svg, name).toMatch(/^<svg[^>]*aria-hidden="true"/);
-      expect(svg, name).toContain('class="size-10');
+      expect(svg, name).toContain("size-10");
       expect(svg, name).toContain('stroke="var(--ui-k-blanco)"');
     }
     expect(renderToStaticMarkup(<Sticker name="cookie" title="Galletas" />)).toContain("<title>Galletas</title>");
+    // Un tamaño pedido sustituye al de por defecto (no compiten dos clases size-*).
+    expect(renderToStaticMarkup(<Sticker name="cookie" className="size-4" />)).not.toContain("size-10");
+    expect(renderToStaticMarkup(<Sticker name="cookie" />)).toContain("size-10");
   });
 
   it("test_s014_rf3_los_iconos_clave_de_la_navegacion_son_pegatinas", () => {

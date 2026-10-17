@@ -45,6 +45,9 @@ export type IconName = keyof typeof ICONS;
 export function Icon({ name, className = "size-[18px]" }: { name: IconName; className?: string }) {
   const C = ICONS[name];
   // Las pegatinas tienen borde y sombra: se dibujan algo más grandes que el icono al que sustituyen.
-  if (typeof C === "string") return <Sticker name={C} className={cx("-m-1 size-[26px]", className && className.replace(/size-\[18px\]/, ""))} />;
+  if (typeof C === "string") {
+    const rest = className.replace(/size-\[18px\]/, "").trim();
+    return <Sticker name={C} className={cx("-m-1", /(^|\s)size-/.test(rest) ? rest : cx("size-[26px]", rest))} />;
+  }
   return <C aria-hidden className={className} />;
 }

@@ -19,7 +19,7 @@
 - [x] **T10 — Suspense: agitado, brillo de rareza, confeti, celebración y resumen** · RF-11 a RF-14
 
 ## Entrega 5 — Pantallas
-- [ ] **T11 — Temporizador en anillo y racha de pegatinas** · RF-16, RF-17
+- [x] **T11 — Temporizador en anillo y racha de pegatinas** · RF-16, RF-17
 - [ ] **T12 — «Mi colección» con portada y datos; contador sin tapar el símbolo** · RF-18, RF-20
 
 ## Entrega 6 — Sorteo y demo

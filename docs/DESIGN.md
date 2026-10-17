@@ -86,6 +86,7 @@ cualquier componente nuevo se añada a esta tabla.
 | AnimatedCounter | AnimatedCounter |
 | FocusView | FocusView |
 | SoundToggle | SoundToggle |
+| RingTimer | RingTimer (anillo de «Recompensas» y «Mis sobres», lámina «Kawaii (spec 014)») |
 | Sticker | Sobre, Carta, Galleta, Regalo, Reloj, Colección, Racha y Perfil (lámina «Kawaii (spec 014)») |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |

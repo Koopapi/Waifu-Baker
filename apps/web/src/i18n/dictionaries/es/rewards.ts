@@ -6,6 +6,7 @@ export const rewards: typeof en = {
     ready: (n, max) => `${n} de ${max} listos`,
     full: "Al máximo: reclama uno para que empiece a cargarse el siguiente.",
     nextIn: "El siguiente en",
+    nextShort: "para el siguiente",
     chooseSet: "Colección",
     claim: "Reclamar sobre gratis",
     claimed: "Sobre gratis añadido a tus sobres.",

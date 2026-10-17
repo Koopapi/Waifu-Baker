@@ -115,7 +115,8 @@ export function Sticker({ name, className, title }: StickerProps) {
       role={title ? "img" : undefined}
       viewBox="-4 -4 72 72"
       data-sticker={name}
-      className={cx("size-10 shrink-0 drop-shadow-[var(--shadow-sticker)]", className)}
+      // El tamaño por defecto solo si no se pide otro (dos clases `size-*` compiten y gana la del CSS, no la última).
+      className={cx("shrink-0 drop-shadow-[var(--shadow-sticker)]", /(^|\s)size-/.test(className ?? "") ? className : cx("size-10", className))}
     >
       {title && <title>{title}</title>}
       {DRAWINGS[name]()}
