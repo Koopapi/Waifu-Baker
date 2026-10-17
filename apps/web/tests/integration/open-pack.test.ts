@@ -40,7 +40,7 @@ describe("RF-5, RF-9 apertura en el servidor", () => {
       const [dt] = await tx.select().from(dropTables).where(eq(dropTables.setId, set.id));
       expect(o.dropTableId).toBe(dt.id);
       expect(o.serverSeed).toMatch(/^[0-9a-f]{64}$/);
-      expect(o.rngVersion).toBe("hmac-sha256-v1");
+      expect(o.rngVersion).toBe("hmac-sha256-v2");
       expect((await tx.select().from(packs).where(eq(packs.id, p.id)))[0].status).toBe("opened");
     });
   });

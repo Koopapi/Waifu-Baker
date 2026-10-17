@@ -1,4 +1,5 @@
 import type { packs as en } from "../en/packs";
+import { plural } from "../../plural";
 
 export const packs: typeof en = {
   meta: {
@@ -9,7 +10,7 @@ export const packs: typeof en = {
   mine: {
     heading: "Mis sobres",
     none: "No tienes sobres sin abrir.",
-    sealed: (n) => `Tienes ${n} sobre(s) sin abrir.`,
+    sealed: (n) => `Tienes ${n} ${plural(n, "sobre", "sobres")} sin abrir.`,
     pending: "Tienes una apertura sin terminar de ver.",
     pendingLink: "Volver a verla",
     empty: "Cuando recibas sobres por tu suscripción o como regalo aparecerán aquí.",
@@ -35,9 +36,9 @@ export const packs: typeof en = {
     title: (set) => `Abrir todos · ${set}`,
     opening: "Abriendo…",
     noneLeft: "No quedan sobres",
-    openN: (n) => `Abrir ${n} sobre(s)`,
-    summary: (s) => `${s.packs} sobre(s) abiertos · ${s.total} cartas · ${s.fresh} nuevas · ${s.holo} holo`,
-    summaryPity: (n) => ` · ${n} garantizada(s) por la protección`,
+    openN: (n) => `Abrir ${n} ${plural(n, "sobre", "sobres")}`,
+    summary: (s) => `${s.packs} ${plural(s.packs, "sobre abierto", "sobres abiertos")} · ${s.total} cartas · ${s.fresh} ${plural(s.fresh, "nueva", "nuevas")} · ${s.holo} holo`,
+    summaryPity: (n) => ` · ${n} ${plural(n, "garantizada", "garantizadas")} por la protección`,
     holoSuffix: " · holo",
     backToMineButton: "Volver a mis sobres",
   },
@@ -53,6 +54,7 @@ export const packs: typeof en = {
     hintSwipe: "Desliza la tira del sobre hacia la derecha",
     hintTap: (i, n) => `Toca la carta de arriba · ${i} de ${n}`,
     summaryTitle: "Sobre abierto",
+    celebrate: (rarity) => `¡${rarity}!`,
     holoSuffix: " · holo",
     openAnother: "Abrir otro sobre",
     enableGyro: "Activar giroscopio",

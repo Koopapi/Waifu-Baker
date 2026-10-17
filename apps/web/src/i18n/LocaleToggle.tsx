@@ -29,7 +29,7 @@ export function LocaleToggle({ className = "" }: { className?: string }) {
               router.refresh();
             });
           }}
-          className={`px-2.5 py-1 font-semibold uppercase ${locale === l ? "bg-ui-hover text-white" : "text-ui-text-2 hover:text-white"}`}
+          className={`px-2.5 py-1 font-semibold uppercase ${locale === l ? "bg-ui-accent text-ui-on-accent" : "text-ui-text-3 hover:text-ui-text"}`}
         >
           {l}
         </button>

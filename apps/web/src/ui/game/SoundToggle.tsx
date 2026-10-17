@@ -1,6 +1,6 @@
 "use client";
 
-import { Volume2, VolumeX } from "lucide-react";
+import { Volume2, VolumeX } from "@/ui/icons/glyphs";
 import { useT } from "@/i18n/client";
 import { IconButton, type IconButtonProps } from "../action/Button";
 

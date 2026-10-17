@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, lazy, useId } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "@/ui/icons/glyphs";
 import { cx } from "../variants";
 import { inputClasses } from "./Field";
 

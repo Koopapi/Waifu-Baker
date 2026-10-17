@@ -7,16 +7,19 @@ import { rmSync } from "node:fs";
 import path from "node:path";
 
 const PORT = Number(process.env.DEMO_PORT ?? 3300);
+/** `pnpm demo --dev`: modo desarrollo con recarga en caliente (para trabajar el arte); sin él, versión optimizada. */
+const DEV = process.argv.includes("--dev");
 const DB = "waifu_baker_demo";
 const base = `http://localhost:${PORT}`;
 const env: NodeJS.ProcessEnv = {
   ...process.env,
-  NODE_ENV: "development",
   DEMO_MODE: "1",
+  // Spec 014, RF-23: permiso para el build optimizado (nunca existe en la web publicada, que lleva SITE_URL).
+  DEMO_LOCAL: "1",
   DEV_LOGIN: "1",
   DATABASE_URL: `postgres://localhost:5432/${DB}`,
   CARD_STORE_DIR: path.resolve("var/demo-cards"),
-  NEXT_DIST_DIR: ".next-demo",
+  NEXT_DIST_DIR: DEV ? ".next-demo" : ".next-demo-build",
   ART_DIR: process.env.ART_DIR || "/Users/koopa/Documents/Waifu Baker",
   // Sesiones propias de esta ejecución; nada de Patreon, Sentry ni tareas periódicas.
   AUTH_SECRET: randomBytes(32).toString("hex"),
@@ -42,7 +45,13 @@ rmSync(env.CARD_STORE_DIR!, { recursive: true, force: true });
 execFileSync("pnpm", ["exec", "drizzle-kit", "migrate"], { stdio: "inherit", env });
 
 step(`Arrancando la web en modo demo (${base})`);
-const server = spawn("pnpm", ["exec", "next", "dev", "--turbopack", "--port", String(PORT)], { stdio: "inherit", env });
+if (!DEV) {
+  step("Compilando la versión optimizada (la primera vez tarda unos minutos)");
+  execFileSync("pnpm", ["exec", "next", "build", "--turbopack"], { stdio: "inherit", env: { ...env, NODE_ENV: "production" } });
+}
+const server = DEV
+  ? spawn("pnpm", ["exec", "next", "dev", "--turbopack", "--port", String(PORT)], { stdio: "inherit", env: { ...env, NODE_ENV: "development" } })
+  : spawn("pnpm", ["exec", "next", "start", "--port", String(PORT)], { stdio: "inherit", env: { ...env, NODE_ENV: "production" } });
 const stop = () => {
   server.kill("SIGINT");
   process.exit(0);
@@ -51,7 +60,7 @@ process.on("SIGINT", stop);
 process.on("SIGTERM", stop);
 server.on("exit", (code) => process.exit(code ?? 0));
 
-const deadline = Date.now() + 180_000;
+const deadline = Date.now() + 300_000;
 while (Date.now() < deadline) {
   try {
     if ((await fetch(`${base}/login`)).ok) break;

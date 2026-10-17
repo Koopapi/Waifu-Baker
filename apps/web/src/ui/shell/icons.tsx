@@ -2,30 +2,31 @@
 
 import {
   Activity,
-  BookOpen,
   ChartColumn,
-  Gift,
-  Image as ImageIcon,
-  LayoutGrid,
+  ImageIcon,
   Library,
   Link2,
-  Package,
   Percent,
   Plus,
   Settings,
   Shield,
   UserRound,
   UsersRound,
-  type LucideIcon,
-} from "lucide-react";
+  type Glyph,
+} from "../icons/glyphs";
+import { Sticker, type StickerName } from "../icons/Sticker";
+import { cx } from "../variants";
 
-/** Los iconos se nombran con texto para poder pasarlos desde componentes de servidor. */
+/**
+ * Los iconos se nombran con texto para poder pasarlos desde componentes de servidor. Spec 014: los iconos clave del
+ * coleccionista son pegatinas kawaii (RF-3); el resto, iconos de doble tono (RF-4).
+ */
 export const ICONS = {
-  packs: Package,
-  collection: LayoutGrid,
-  album: BookOpen,
-  rewards: Gift,
-  account: UserRound,
+  packs: "pack",
+  collection: "collection",
+  album: "card",
+  rewards: "gift",
+  account: "profile",
   odds: Percent,
   overview: ChartColumn,
   metrics: Activity,
@@ -37,11 +38,16 @@ export const ICONS = {
   settings: Settings,
   admin: Shield,
   plus: Plus,
-} satisfies Record<string, LucideIcon>;
+} satisfies Record<string, StickerName | Glyph>;
 
 export type IconName = keyof typeof ICONS;
 
 export function Icon({ name, className = "size-[18px]" }: { name: IconName; className?: string }) {
   const C = ICONS[name];
-  return <C aria-hidden className={className} strokeWidth={2} />;
+  // Las pegatinas tienen borde y sombra: se dibujan algo más grandes que el icono al que sustituyen.
+  if (typeof C === "string") {
+    const rest = className.replace(/size-\[18px\]/, "").trim();
+    return <Sticker name={C} className={cx("-m-1", /(^|\s)size-/.test(rest) ? rest : cx("size-[26px]", rest))} />;
+  }
+  return <C aria-hidden className={className} />;
 }

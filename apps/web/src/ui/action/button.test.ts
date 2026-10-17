@@ -4,7 +4,7 @@ import { buttonClasses, iconButtonClasses } from "./classes";
 describe("botones", () => {
   it("test_s011_rf3_cinco_variantes_con_su_color_de_token", () => {
     expect(buttonClasses()).toContain("bg-ui-accent");
-    expect(buttonClasses({ variant: "secondary" })).toContain("bg-ui-raised");
+    expect(buttonClasses({ variant: "secondary" })).toContain("bg-ui-hover");
     expect(buttonClasses({ variant: "danger" })).toContain("bg-ui-danger");
     expect(buttonClasses({ variant: "success" })).toContain("bg-ui-success");
     expect(buttonClasses({ variant: "ghost" })).toContain("text-ui-text-2");

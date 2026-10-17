@@ -1,38 +1,60 @@
 /*
- * Sistema de diseño (spec 011, RF-1 y RF-2): los únicos valores de la interfaz. Paleta «Cereza» (spec 010).
+ * Sistema de diseño (spec 011, RF-1 y RF-2): los únicos valores de la interfaz. Estilo kawaii sobre fondo oscuro
+ * (spec 014), que sustituye a la paleta «Cereza» (spec 010).
  * Un tema futuro (por colección o por juego) solo redefine estas variables bajo un selector, p. ej.
  * `[data-theme="…"]`; los componentes no cambian. Las cartas y el holo tienen sus colores por rareza aparte.
  * Contraste (RF-14): texto, texto-2, texto-3 y los textos de estado superan 4,5:1 sobre los fondos; el blanco
- * sobre acento, éxito, aviso, peligro e información también (lo comprueba features/ui/finish.test.ts).
+ * sobre acento, éxito, aviso, peligro e información va en tinta oscura (lo comprueba features/ui/finish.test.ts).
  */
 :root {
-  /* Fondos, de más oscuro a más claro. */
-  --ui-rail: #140f17;
-  --ui-nav: #1c1520;
-  --ui-bg: #241b29;
-  --ui-raised: #2e2333;
-  --ui-hover: #3a2c40;
-  --ui-line: #41324a;
+  /* Fondos (violeta oscuro), de más oscuro a más claro. */
+  --ui-rail: #150f22;
+  --ui-nav: #1a1229;
+  --ui-bg: #1e1630;
+  --ui-raised: #2b2142;
+  --ui-hover: #3a2d57;
+  --ui-line: #43345f;
   /* Texto. */
-  --ui-text: #f7f0f4;
-  --ui-text-2: #c9b9c4;
-  --ui-text-3: #9d8a98;
-  /* Acento. */
-  --ui-accent: #d6336c;
-  --ui-accent-hover: #bf2a5d;
-  --ui-accent-text: #ff8ab0;
-  --ui-on-accent: #ffffff;
-  /* Estados: fondo sólido (con texto blanco) y su versión para texto sobre fondo oscuro. */
-  --ui-success: #248046;
-  --ui-success-text: #6bd58f;
-  --ui-warning: #9a5b00;
-  --ui-warning-text: #f5b85a;
-  --ui-danger: #da373c;
-  --ui-danger-text: #ff8a8d;
-  --ui-info: #2f6fdb;
-  --ui-info-text: #8db5ff;
+  --ui-text: #fff6fb;
+  --ui-text-2: #d9c8e8;
+  --ui-text-3: #a99ac0;
+  /* Acento: rosa chicle. Sobre los colores sólidos pastel, el texto es tinta oscura (`--ui-on-accent`). */
+  --ui-accent: #ff6fae;
+  --ui-accent-hover: #ff5aa2;
+  --ui-accent-deep: #c2337a;
+  --ui-accent-text: #ff9ecb;
+  --ui-on-accent: #2a0e1f;
+  /* Estados: fondo sólido pastel (con texto `--ui-on-accent`) y su versión para texto sobre fondo oscuro. */
+  --ui-success: #3ccb8e;
+  --ui-success-text: #7ef0c9;
+  --ui-warning: #f2a93b;
+  --ui-warning-text: #ffd27a;
+  --ui-danger: #ff5c7a;
+  --ui-danger-text: #ff9aae;
+  --ui-info: #5aa9ff;
+  --ui-info-text: #9ccbff;
   /* Marca de terceros: el botón de entrar con Patreon (texto oscuro, 6,6:1). */
   --ui-patreon: #f96854;
+  /* Spec 014: tintas kawaii para pegatinas, degradados y decoración. */
+  --ui-k-chicle: #ff7eb6;
+  --ui-k-lavanda: #b79cff;
+  --ui-k-menta: #7ef0c9;
+  --ui-k-celeste: #7cc8ff;
+  --ui-k-limon: #ffe27a;
+  --ui-k-melocoton: #ffb38a;
+  --ui-k-tinta: #3b1f35;
+  /* Tonos de las pegatinas (spec 014, RF-3). */
+  --ui-k-blanco: #ffffff;
+  --ui-k-rubor: #ff9ec6;
+  --ui-k-chicle-claro: #ffb3d4;
+  --ui-k-lavanda-claro: #e9e1ff;
+  --ui-k-menta-claro: #b5fae3;
+  --ui-k-celeste-claro: #e3f3ff;
+  --ui-k-limon-oscuro: #ffc94a;
+  --ui-k-rosa-claro: #ffc4dd;
+  --ui-k-galleta: #f2c27b;
+  --ui-k-chocolate: #7a4a2e;
+  --ui-k-llama: #ff9a62;
 
   /* Capas (de abajo arriba). */
   --z-nav: 20;
@@ -70,19 +92,33 @@
   --color-ui-info: var(--ui-info);
   --color-ui-info-text: var(--ui-info-text);
   --color-ui-patreon: var(--ui-patreon);
+  --color-ui-accent-deep: var(--ui-accent-deep);
+  --color-k-chicle: var(--ui-k-chicle);
+  --color-k-lavanda: var(--ui-k-lavanda);
+  --color-k-menta: var(--ui-k-menta);
+  --color-k-celeste: var(--ui-k-celeste);
+  --color-k-limon: var(--ui-k-limon);
+  --color-k-melocoton: var(--ui-k-melocoton);
+  --color-k-tinta: var(--ui-k-tinta);
+  --color-k-blanco: var(--ui-k-blanco);
 
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-sans: var(--font-body), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-display: var(--font-display), var(--font-geist-sans), sans-serif;
+  --font-display: var(--font-display), var(--font-body), sans-serif;
 
-  --radius-s: 4px;
-  --radius-m: 6px;
-  --radius-l: 12px;
-  --radius-xl: 16px;
+  --radius-s: 8px;
+  --radius-m: 12px;
+  --radius-l: 20px;
+  --radius-xl: 28px;
 
   --shadow-1: 0 1px 0 rgb(0 0 0 / 0.2);
-  --shadow-2: 0 8px 24px rgb(0 0 0 / 0.4);
-  --shadow-3: 0 16px 48px rgb(0 0 0 / 0.55);
+  --shadow-2: 0 10px 28px rgb(10 4 24 / 0.55);
+  --shadow-3: 0 18px 48px rgb(10 4 24 / 0.65);
+  /* Spec 014, RF-2: relieve de los botones (borde inferior sólido) y brillo suave de las superficies. */
+  --shadow-relief: 0 4px 0 var(--ui-accent-deep);
+  --shadow-relief-soft: 0 4px 0 rgb(20 12 40 / 0.9);
+  --shadow-sticker: 0 3px 3px rgb(10 4 24 / 0.45);
+  --shadow-glow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 10px 28px rgb(10 4 24 / 0.5);
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 }

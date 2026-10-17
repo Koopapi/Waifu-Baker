@@ -6,6 +6,12 @@ export const collection = {
   publicAlbumLinkActive: "Public album: on",
   emptyBefore: "You don't have any cards yet. Open your packs in",
   emptyAfter: "to start your collection.",
+  stats: {
+    holo: "holo",
+    best: "best card",
+    copies: "copies",
+  },
+  viewCollection: "View collection",
   adultLocked: "18+ set: verify your age with an adult Patreon tier to see these cards.",
   progress: (owned: number, total: number) => `${owned} of ${total} cards`,
   binder: {

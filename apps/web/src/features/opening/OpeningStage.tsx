@@ -8,7 +8,9 @@ import { PackMesh } from "./PackMesh";
 import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
 import { useTiltSource } from "./useTiltSource";
-import { revealSound, vibrationPattern } from "@/domain/opening/feedback";
+import { celebrates, confettiCount, revealSound, teaseLevel, vibrationPattern } from "@/domain/opening/feedback";
+import { Confetti, type ConfettiBurst } from "./Confetti";
+import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
 import { sound, useSoundMuted } from "./sound";
 import "./opening.css";
@@ -16,6 +18,12 @@ import "./opening.css";
 type Phase = "idle" | "torn" | "fanned" | "summary";
 
 const TRAY_SCALE = 0.3;
+/** Spec 014, RF-9: destellos del fondo (posición en %, tamaño, color y retardo). */
+const SPARKLES: [number, number, number, string, number][] = [
+  [10, 14, 10, "#ffe27a", 0], [84, 19, 14, "#ff9ecb", 0.6], [15, 74, 12, "#7ef0c9", 1.1], [82, 66, 10, "#ffffff", 0.3],
+  [51, 11, 8, "#7cc8ff", 1.6], [90, 83, 12, "#b79cff", 0.9], [7, 45, 8, "#ffffff", 1.9], [91, 39, 9, "#ffe27a", 0.4],
+  [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
+];
 const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "secret"];
 
 function usePrefersReducedMotion() {
@@ -34,6 +42,8 @@ interface StageProps {
   /** Fuente de cartas del sobre. Por defecto, datos falsos del laboratorio. */
   draw?: () => Promise<LabCard[]>;
   packLabel?: string;
+  /** Spec 014: el sobre de la colección ya dibujado (PackArt). */
+  packArt?: React.ReactNode;
   /** Contenido extra en la barra inferior (p. ej. «Volver al panel»). */
   extraHud?: React.ReactNode;
   /** Se llama una vez cuando se han revelado todas las cartas del sobre. */
@@ -44,13 +54,16 @@ interface StageProps {
   debug?: boolean;
 }
 
-export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
+export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
   const t = useT();
   const [phase, setPhase] = useState<Phase>("idle");
   const [cards, setCards] = useState<LabCard[]>([]);
   const [revealed, setRevealed] = useState(0);
   const [packKey, setPackKey] = useState(0);
   const [flash, setFlash] = useState<Rarity | null>(null);
+  // Spec 014, RF-13: confeti y celebración al revelar una rara o mejor.
+  const [burst, setBurst] = useState<ConfettiBurst | null>(null);
+  const [party, setParty] = useState<Rarity | null>(null);
   const flipping = useRef(false);
   const reduced = usePrefersReducedMotion();
   const tilt = useTiltSource();
@@ -145,6 +158,11 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
       sound.vibrate(vibrationPattern(card.rarity));
       const r = el.getBoundingClientRect();
       particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
+      if (!reduced && confettiCount(card.rarity) > 0) setBurst({ key: Date.now(), count: confettiCount(card.rarity), x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      if (!reduced && celebrates(card.rarity)) {
+        setParty(card.rarity);
+        window.setTimeout(() => setParty(null), 1600);
+      }
       if (FLASH_RARITIES.includes(card.rarity) && !reduced) {
         setFlash(card.rarity);
         window.setTimeout(() => setFlash(null), 400);
@@ -210,11 +228,16 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
 
   return (
     <div ref={stage} className="stage" data-phase={phase} data-revealed={revealed} onPointerMove={tilt.onPointerMove} onPointerLeave={tilt.onPointerLeave}>
+      <div className="stage__sparkles" aria-hidden>
+        {SPARKLES.map(([x, y, size, color, delay], i) => (
+          <span key={i} className="sparkle" style={{ left: `${x}%`, top: `${y}%`, "--s": `${size}px`, "--c": color, "--d": `${delay}s` } as React.CSSProperties} />
+        ))}
+      </div>
       <p className="hint" aria-live="polite">
         {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>
 
-      <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} onCommit={onCommit} reducedMotion={reduced} label={packLabel} />}</div>
+      <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} onCommit={onCommit} art={packArt} reducedMotion={reduced} label={packLabel} />}</div>
 
       <div className="cards">
         {cards.map((c, i) => (
@@ -225,6 +248,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
             }}
             card={c}
             active={phase === "fanned" && i === revealed}
+            tease={phase === "fanned" && i === revealed ? teaseLevel(c.rarity) : 0}
             mode={tilt.mode}
             tiltTarget={tilt.target}
             style={{ zIndex: cards.length - i }}
@@ -235,23 +259,37 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
 
       <Particles ref={particles} disabled={reduced} />
       {flash && <div className={`flash rarity-${flash}`} aria-hidden="true" />}
+      <Confetti burst={burst} />
+      {party && (
+        <div className={`celebrate rarity-${party}`} aria-hidden data-testid="celebration">
+          <span className="celebrate__ribbon">{t.packs.stage.celebrate(t.common.rarity[party])}</span>
+        </div>
+      )}
 
       {phase === "summary" && (
         <div className="summary">
           <div className="summary__card">
-            <h2 className="summary__title">{t.packs.stage.summaryTitle}</h2>
-            {cards.map((c, i) => (
-              <div key={i} className={`summary__row rarity-${c.rarity}`}>
-                <span>
-                  {c.name}
+            <h2 className="summary__title">
+              <Sticker name="card" className="size-9" />
+              {t.packs.stage.summaryTitle}
+            </h2>
+            {/* Spec 014, RF-14: las cartas en miniatura con su rareza y la etiqueta «¡Nueva!». */}
+            <div className="summary__grid">
+              {cards.map((c, i) => (
+                <div key={i} className={`summary__row rarity-${c.rarity}`}>
+                  <span className="summary__thumb">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
+                    <img src={c.image} alt="" draggable={false} />
+                  </span>
+                  <span className="badge">
+                    {t.common.rarity[c.rarity]}
+                    {c.holo ? t.packs.stage.holoSuffix : ""}
+                  </span>
+                  <span className="summary__name">{c.name}</span>
                   {c.note && <small className="summary__note">{c.note}</small>}
-                </span>
-                <span className="badge">
-                  {t.common.rarity[c.rarity]}
-                  {c.holo ? t.packs.stage.holoSuffix : ""}
-                </span>
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
             {renderSummaryActions ? (
               <div className="summary__actions">{renderSummaryActions(reset)}</div>
             ) : (

@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { Popover } from "radix-ui";
 import { Command } from "cmdk";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Check, ChevronDown, Search } from "@/ui/icons/glyphs";
 import { focusRing } from "../focus";
 import { cx } from "../variants";
 import { inputClasses } from "./Field";

@@ -45,7 +45,9 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
   servidor y `DELETE` la devuelve a la real (los E2E la reinician en cada test). Usa `now()` de `server/clock.ts`
   en vez de `new Date()` en todo lo que dependa de esperas o días.
 - Demo local (spec 010): `pnpm demo` recrea la BD `waifu_baker_demo`, la llena con `apps/web/demo/fanart.json`
-  (imágenes de `ART_DIR`, fuera de git) y arranca en el puerto 3300 con `DEMO_MODE=1`. El E2E también corre en modo
+  (imágenes de `ART_DIR`, fuera de git) y arranca en el puerto 3300 con `DEMO_MODE=1`. Desde la spec 014 arranca la
+  versión optimizada (`next build` en `.next-demo-build` y `next start`, con `DEMO_LOCAL=1`); `pnpm demo --dev` la
+  arranca en modo desarrollo con recarga en caliente (para trabajar el arte). El E2E también corre en modo
   demo con `e2e/demo-manifest.json` (imágenes de `public/lab`).
 - Capturas para enseñar: con la demo recién creada, `pnpm showcase <carpeta> escritorio|movil` recorre todas las
   pantallas y deja las imágenes y un `manifest.json` (abre sobres: una pasada por demo).

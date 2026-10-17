@@ -1,5 +1,14 @@
 # Estilo visual — Waifu Baker TCG
 
+## Estilo de la interfaz: kawaii pop sobre fondo oscuro (spec 014, 16 oct 2026)
+
+Lámina «Kawaii (spec 014)» de `waifubaker.pen` (tema `paleta: kawaii`): fondo violeta oscuro con acentos pastel
+vivos (chicle, lavanda, menta, celeste, limón y melocotón), radios muy redondeados, sombras de color y relieve en
+los botones, tipografías Fredoka (títulos) y Nunito (texto). Los iconos clave son pegatinas propias (`Sticker`) y el
+resto, Phosphor en doble tono. El sobre de cada colección es `PackArt` (compuesto con la portada) o un sobre hecho a
+mano subido en el panel. En código, los tokens viven en `apps/web/src/ui/tokens.css`; el texto sobre los colores
+sólidos va en tinta oscura (`--ui-on-accent`). Sustituye a la paleta «Cereza» de la spec 010.
+
 ## Marco de carta (aprobado para el piloto, 14 oct 2026)
 
 Diseñado en Pencil: `/Users/koopa/Documents/Waifu Baker/waifubaker.pen`, lámina
@@ -86,6 +95,8 @@ cualquier componente nuevo se añada a esta tabla.
 | AnimatedCounter | AnimatedCounter |
 | FocusView | FocusView |
 | SoundToggle | SoundToggle |
+| RingTimer | RingTimer (anillo de «Recompensas» y «Mis sobres», lámina «Kawaii (spec 014)») |
+| Sticker | Sobre, Carta, Galleta, Regalo, Reloj, Colección, Racha y Perfil (lámina «Kawaii (spec 014)») |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
 

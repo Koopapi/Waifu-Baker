@@ -15,6 +15,8 @@ interface Props {
   style?: CSSProperties;
   /** Si existe, la carta es un botón (ratón, dedo o Intro/Espacio con teclado). */
   onClick?: () => void;
+  /** Spec 014, RF-12: intensidad del brillo de los bordes antes de voltear (0 = sin brillo). */
+  tease?: number;
 }
 
 const MAX_RX = 10; // grados
@@ -27,7 +29,7 @@ const MAX_RY = 14;
  *   .card3d__inner volteo rotationY (GSAP)
  */
 export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
-  { card, active, mode, tiltTarget, style, onClick },
+  { card, active, mode, tiltTarget, style, onClick, tease = 0 },
   ref,
 ) {
   const t = useT();
@@ -81,13 +83,13 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
     return () => cancelAnimationFrame(raf);
   }, [active, mode, tiltTarget]);
 
-  const classes = ["card3d", `rarity-${card.rarity}`, card.holo ? "card3d--holo" : "", card.framed ? "card3d--framed" : ""].join(" ");
+  const classes = ["card3d", `rarity-${card.rarity}`, card.holo ? "card3d--holo" : "", card.framed ? "card3d--framed" : "", tease > 0 ? "card3d--tease" : ""].join(" ");
 
   return (
     <div
       ref={setRefs}
       className={classes}
-      style={style}
+      style={tease > 0 ? ({ ...style, "--tease": tease } as CSSProperties) : style}
       onClick={onClick}
       data-card={card.id}
       role={onClick ? "button" : undefined}
@@ -107,7 +109,10 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
       <div className="card3d__tilt">
         <div className="card3d__inner">
           <div className="card3d__face card3d__back">
-            <div className="card3d__backart">WB</div>
+            <div className="card3d__backart">
+              <b>WB</b>
+              <small>WAIFU BAKER</small>
+            </div>
           </div>
           <div className="card3d__face card3d__front">
             {/* eslint-disable-next-line @next/next/no-img-element -- la carta real irá por URL firmada, sin optimizador */}

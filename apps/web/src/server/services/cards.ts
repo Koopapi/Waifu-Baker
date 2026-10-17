@@ -88,7 +88,7 @@ export interface UploadFile {
 }
 
 /** RF-12: lee las dimensiones y aplica las reglas de subida. */
-async function inspectUpload(file: UploadFile) {
+export async function inspectUpload(file: UploadFile) {
   let meta: { width: number | null; height: number | null } = { width: null, height: null };
   try {
     const m = await sharp(file.body).metadata();
@@ -446,7 +446,7 @@ export async function simulatePack(db: DbLike, setId: string) {
   if (withRarity.length === 0) {
     throw new AdminError("no_cards", "Asigna rareza al menos a una carta para simular un sobre.", { context: "simulate" });
   }
-  const drawn = drawPack({ cards: withRarity, slots: odds?.slots ?? [], holoChance: odds?.holoChance ?? 0 }, cryptoRng);
+  const drawn = drawPack({ cards: withRarity, slots: odds?.slots ?? [], holoChance: odds?.holoChance ?? 0 }, cryptoRng, { unique: true });
   const byId = new Map(rows.map((r) => [r.id, r]));
   return drawn.map((d) => ({ ...byId.get(d.cardId)!, holo: d.holo, substitutedFrom: d.substitutedFrom ?? null }));
 }

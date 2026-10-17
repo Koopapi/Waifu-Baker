@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/client";
 
 /** Cuenta atrás hasta `until`; al llegar a cero pide al servidor el estado nuevo. */
-export function Countdown({ until, serverNow }: { until: string; serverNow: string }) {
+export function Countdown({ until, serverNow, compact = false }: { until: string; serverNow: string; compact?: boolean }) {
   const t = useT();
   const router = useRouter();
   // El reloj del servidor puede ir adelantado en desarrollo: se calcula el desfase una vez.
@@ -25,7 +25,9 @@ export function Countdown({ until, serverNow }: { until: string; serverNow: stri
   const s = Math.max(0, Math.floor(left / 1000));
   return (
     <span className="tabular-nums" data-testid="countdown">
-      {t.rewards.countdown(Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60)}
+      {compact
+        ? `${Math.floor(s / 3600)}:${String(Math.floor((s % 3600) / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`
+        : t.rewards.countdown(Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60)}
     </span>
   );
 }

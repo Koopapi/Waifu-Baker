@@ -1,17 +1,18 @@
 import { focusRing } from "../focus";
 import { variants } from "../variants";
 
-const interactive = `inline-flex items-center justify-center select-none font-semibold transition-[color,background-color,border-color,transform] duration-[var(--duration-fast)] ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
+// Spec 014, RF-2: al pulsar, el botón se hunde en su relieve (rebote); con movimiento reducido no se mueve.
+const interactive = `inline-flex items-center justify-center select-none font-extrabold transition-[color,background-color,border-color,transform,box-shadow] duration-[var(--duration-fast)] ease-out active:translate-y-[3px] active:scale-[0.97] active:shadow-none motion-reduce:active:translate-y-0 motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50 ${focusRing}`;
 
 /** RF-3: principal, secundario, peligro, éxito y discreto; tres tamaños. */
 export const buttonClasses = variants({
-  base: `${interactive} gap-2 rounded-m`,
+  base: `${interactive} gap-2 rounded-full`,
   variants: {
     variant: {
-      primary: "bg-ui-accent text-ui-on-accent hover:bg-ui-accent-hover",
-      secondary: "bg-ui-raised text-ui-text hover:bg-ui-hover",
-      danger: "bg-ui-danger text-ui-on-accent hover:brightness-110",
-      success: "bg-ui-success text-ui-on-accent hover:brightness-110",
+      primary: "bg-ui-accent bg-linear-to-r from-k-chicle to-ui-accent-hover text-ui-on-accent shadow-[var(--shadow-relief)] hover:brightness-105",
+      secondary: "border border-k-lavanda/30 bg-ui-hover text-ui-text shadow-[var(--shadow-relief-soft)] hover:bg-ui-line",
+      danger: "bg-ui-danger text-ui-on-accent shadow-[var(--shadow-relief-soft)] hover:brightness-110",
+      success: "bg-ui-success text-ui-on-accent shadow-[var(--shadow-relief-soft)] hover:brightness-110",
       ghost: "text-ui-text-2 hover:bg-ui-hover hover:text-ui-text",
       patreon: "bg-ui-patreon text-ui-rail hover:brightness-110",
       /** Sobre el color de acento (franjas): borde y texto claros. */
@@ -31,7 +32,7 @@ export const buttonClasses = variants({
 });
 
 export const iconButtonClasses = variants({
-  base: `${interactive} shrink-0 rounded-m`,
+  base: `${interactive} shrink-0 rounded-full`,
   variants: {
     variant: {
       ghost: "text-ui-text-2 hover:bg-ui-hover hover:text-ui-text",

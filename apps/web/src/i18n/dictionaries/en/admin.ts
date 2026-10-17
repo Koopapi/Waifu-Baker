@@ -1,4 +1,6 @@
 // Textos del área «admin» (spec 008). La versión en español vive en ../es/admin.ts con la misma forma.
+import { plural } from "../../plural";
+
 export const admin = {
   metaTitle: "Admin",
   layout: {
@@ -45,7 +47,7 @@ export const admin = {
     characters: "Characters",
     users: "Users",
     sealedPacks: "Unopened packs",
-    unreviewed: (n: number) => `${n} card(s) from 18+ sets awaiting the "clearly adult character" review.`,
+    unreviewed: (n: number) => `${n} ${plural(n, "card", "cards")} from 18+ sets awaiting the "clearly adult character" review.`,
     drafts: "Drafts in progress",
     allSets: "All sets",
     noDrafts: "No drafts. Create a set to start loading cards.",
@@ -73,10 +75,23 @@ export const admin = {
     created: (code: string) => `Set ${code} created as a draft.`,
     oddsSaved: "Drop rates saved.",
     published: "Set published. Its drop rates are now public.",
-    cannotPublish: (n: number) => `Cannot publish: ${n} problem(s).`,
+    cannotPublish: (n: number) => `Cannot publish: ${n} ${plural(n, "problem", "problems")}.`,
     archived: "Set archived: it is no longer granted in new packs.",
   },
   set: {
+    pack: {
+      title: "Pack",
+      intro: "The pack collectors see in “My packs” and when opening. It uses the cover card you choose, or the rarest one.",
+      cover: "Cover card",
+      coverAuto: "Automatic (the rarest card)",
+      upload: "Upload hand-made pack",
+      uploadHint: "PNG, JPG or WebP. It is cropped to 2:3 without distortion and replaces the composed pack.",
+      remove: "Remove hand-made pack",
+      coverSaved: "Cover saved.",
+      uploaded: "Hand-made pack uploaded.",
+      removed: "Hand-made pack removed: the composed pack is back.",
+      uploadFailed: "The image could not be uploaded.",
+    },
     welcome: {
       title: "Welcome pack",
       isWelcome: "This is the welcome set: everyone gets 1 pack of it the first time they sign in.",
@@ -94,8 +109,8 @@ export const admin = {
     cards: (n: number) => `Cards (${n})`,
     noRarityCount: (n: number) => `No rarity ${n}`,
     gaps: (list: string) => `No cards for rarities that can appear in the pack: ${list}.`,
-    incomplete: (n: number) => `${n} incomplete card(s): missing character, name or rarity.`,
-    unreviewed: (n: number) => `${n} card(s) without the 18+ "clearly adult character" review.`,
+    incomplete: (n: number) => `${n} incomplete ${plural(n, "card", "cards")}: missing character, name or rarity.`,
+    unreviewed: (n: number) => `${n} ${plural(n, "card", "cards")} without the 18+ "clearly adult character" review.`,
   },
   publish: {
     archivedNote: "Set archived: it is not granted in new packs; owned cards and unopened packs are kept.",
@@ -109,7 +124,7 @@ export const admin = {
   },
   odds: {
     slot: "Slot",
-    cardCount: (n: number) => `${n} card(s)`,
+    cardCount: (n: number) => `${n} ${plural(n, "card", "cards")}`,
     sum: "Sum",
     guaranteed: "(guaranteed)",
     expected: "Expected cards per pack",
@@ -175,13 +190,13 @@ export const admin = {
     apply: "Apply to selection",
     reorder: "Reorder",
     previewHolo: "View with holo effect",
-    regenerating: (n: number) => `Regenerating ${n} card(s)…`,
+    regenerating: (n: number) => `Regenerating ${n} ${plural(n, "card", "cards")}…`,
     regenerate: "Regenerate images",
-    updated: (n: number) => `${n} card(s) updated.`,
+    updated: (n: number) => `${n} ${plural(n, "card", "cards")} updated.`,
     saved: "Card saved.",
     orderSaved: "Order saved.",
     deleted: "Card deleted.",
-    regenerated: (n: number) => `${n} card(s) regenerated with the current frame.`,
+    regenerated: (n: number) => `${n} ${plural(n, "card", "cards")} regenerated with the current frame.`,
     reviewedShort: "Reviewed.",
     reviewedAdult: "Card reviewed: clearly adult character.",
     reviewRemoved: "Review removed.",
@@ -213,7 +228,7 @@ export const admin = {
     identityTagsHint: "Fixed block of tags to generate their art: hair, eyes, accessory, outfit.",
     new: "New character",
     create: "Create character",
-    cardCount: (n: number) => `${n} card(s)`,
+    cardCount: (n: number) => `${n} ${plural(n, "card", "cards")}`,
     delete: "Delete character",
     created: (name: string) => `Character "${name}" created.`,
     deleted: "Character deleted.",
@@ -221,7 +236,7 @@ export const admin = {
   tiers: {
     sync: "Check all Patreon members now",
     syncing: "Checking…",
-    synced: (members: number, granted: number, voided: number) => `${members} member(s) checked · ${granted} pack(s) granted · ${voided} voided.`,
+    synced: (members: number, granted: number, voided: number) => `${members} ${plural(members, "member", "members")} checked · ${granted} ${plural(granted, "pack", "packs")} granted · ${voided} voided.`,
     title: "Patreon tiers",
     notConfigured: "Set PATREON_CREATOR_ACCESS_TOKEN and PATREON_CAMPAIGN_ID to read the campaign's tiers.",
     loadFailed: (msg: string) => `Could not read the tiers: ${msg}`,
@@ -354,7 +369,7 @@ export const admin = {
     giftCount: "Packs",
     reason: "Reason (required)",
     reasonHint: "Kept in the history: support, giveaway, compensation…",
-    gifted: (n: number) => `${n} pack(s) gifted.`,
+    gifted: (n: number) => `${n} ${plural(n, "pack", "packs")} gifted.`,
   },
   api: {
     missingSetOrFile: "The set or the file is missing.",

@@ -64,11 +64,11 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await choose(page, "Personaje para la selección", "Aiko Hoshino");
     await choose(page, "Rareza para la selección", /^Común$/);
     await page.click("text=Aplicar a la selección");
-    await expect(page.locator(`text=${IMAGES.length} carta(s) actualizada(s).`)).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator(`text=${IMAGES.length} cartas actualizadas.`)).toBeVisible({ timeout: 60_000 });
     await tick(page, "Seleccionar carta 010");
     await choose(page, "Rareza para la selección", /^Rara$/);
     await page.click("text=Aplicar a la selección");
-    await expect(page.locator("text=1 carta(s) actualizada(s).")).toBeVisible({ timeout: 30_000 });
+    await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
   });
 
   await test.step("Nombres de las cartas desde el editor", async () => {
@@ -155,7 +155,7 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await choose(page, "Colección", "E2E1 · Colección E2E");
     await page.fill('form:has(input[name="setId"]) input[name="reason"]', "Regalo del test E2E");
     await page.click("button:has-text('Regalar sobres')");
-    await expect(page.locator("text=1 sobre(s) regalado(s).")).toBeVisible();
+    await expect(page.locator("text=1 sobre regalado.")).toBeVisible();
     await expect(page.locator('[data-testid="sealed-packs"] h2')).toHaveText("Sobres sin abrir (1)");
   });
 });

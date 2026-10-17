@@ -1,0 +1,176 @@
+/*
+ * Spec 014: sobre compuesto (maqueta «Sobre compuesto» de la lámina Kawaii en Pencil). Todas las medidas van en
+ * `cqw` (porcentaje del ancho del sobre), así se ve igual a cualquier tamaño. Proporción 2:3.
+ */
+.pack-art {
+  container-type: inline-size;
+  position: relative;
+  width: 220px;
+  aspect-ratio: 2 / 3;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pack-art--custom img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8cqw;
+  border: 1.6cqw solid var(--ui-k-blanco);
+  box-shadow: var(--shadow-2);
+}
+.pack-art__halo {
+  position: absolute;
+  inset: 12% 4% 8%;
+  border-radius: 50%;
+  background: var(--ui-k-chicle);
+  opacity: 0.35;
+  filter: blur(14cqw);
+}
+.pack-art__body {
+  position: absolute;
+  inset: 4.5% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8.5cqw;
+  border: 1.6cqw solid var(--ui-k-blanco);
+  background: linear-gradient(160deg, var(--ui-k-chicle) 0%, var(--ui-k-lavanda) 55%, var(--ui-k-celeste) 100%);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+}
+.pack-art__brand {
+  margin-top: 4.5cqw;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 5.8cqw;
+  letter-spacing: 1.2cqw;
+  color: var(--ui-k-blanco);
+  text-shadow: 0 0.6cqw 1.6cqw rgb(59 31 53 / 0.35);
+  line-height: 1;
+}
+.pack-art__cover {
+  position: relative;
+  margin-top: 3.5cqw;
+  width: 83%;
+  height: 64%;
+  border-radius: 7cqw;
+  border: 1.6cqw solid var(--ui-k-blanco);
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--ui-k-lavanda-claro), var(--ui-k-chicle-claro));
+  display: grid;
+  place-items: center;
+}
+.pack-art__cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  /* La portada es la carta ya compuesta: se amplía un poco para que se vea la ilustración y no el marco. */
+  transform: scale(1.16);
+}
+.pack-art__placeholder {
+  width: 40%;
+  height: auto;
+}
+.pack-art__foil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 30%, rgb(255 255 255 / 0.4) 45%, rgb(183 156 255 / 0.2) 55%, transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.pack-art__band {
+  margin-top: auto;
+  margin-bottom: 5cqw;
+  width: 83%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2cqw;
+  padding: 3.4cqw 5cqw;
+  border-radius: 7cqw;
+  background: rgb(255 255 255 / 0.93);
+  box-shadow: 0 1.6cqw 4cqw rgb(59 31 53 / 0.2);
+}
+.pack-art__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 7cqw;
+  color: var(--ui-k-tinta);
+  line-height: 1.1;
+}
+.pack-art__code {
+  flex-shrink: 0;
+  padding: 1.2cqw 3.6cqw;
+  border-radius: 999px;
+  background: var(--ui-k-chicle);
+  color: var(--ui-k-blanco);
+  font-weight: 900;
+  font-size: 4.6cqw;
+  letter-spacing: 0.4cqw;
+}
+.pack-art__teeth {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 7cqw;
+  top: 0;
+  overflow: visible;
+}
+.pack-art__teeth path {
+  fill: var(--ui-k-chicle-claro);
+  stroke: var(--ui-k-blanco);
+  stroke-width: 3;
+  paint-order: stroke;
+  vector-effect: non-scaling-stroke;
+}
+.pack-art__teeth--bottom {
+  top: auto;
+  bottom: 0;
+  transform: scaleY(-1);
+}
+.pack-art__teeth--bottom path {
+  fill: var(--ui-k-celeste-claro);
+}
+.pack-art__deco {
+  position: absolute;
+  overflow: visible;
+}
+.pack-art__deco path {
+  stroke: var(--ui-k-blanco);
+  stroke-width: 2.5;
+  paint-order: stroke;
+  vector-effect: non-scaling-stroke;
+}
+.pack-art__deco--star {
+  top: 9%;
+  right: 3%;
+  width: 11cqw;
+}
+.pack-art__deco--star path {
+  fill: var(--ui-k-limon);
+}
+.pack-art__deco--mint {
+  bottom: 22%;
+  left: 3%;
+  width: 8cqw;
+}
+.pack-art__deco--mint path {
+  fill: var(--ui-k-menta);
+}
+.pack-art__deco--heart {
+  top: 10%;
+  left: 4%;
+  width: 11cqw;
+  transform: rotate(-14deg);
+}
+.pack-art__deco--heart path {
+  fill: var(--ui-accent-hover);
+}

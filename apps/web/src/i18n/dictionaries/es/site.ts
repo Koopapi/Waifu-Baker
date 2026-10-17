@@ -19,7 +19,7 @@ export const site: typeof en = {
     metaDescription: "Probabilidades publicadas de cada colección.",
     heading: "Probabilidades de los sobres",
     intro:
-      "Cada sobre tiene varias ranuras. En cada ranura sale una carta, y la rareza se sortea con los porcentajes de su fila. Dentro de una rareza, todas las cartas tienen la misma probabilidad. Estas tablas se fijan al publicar la colección y no cambian después. Las cartas no tienen valor monetario ni se pueden intercambiar. Las ilustraciones de las cartas están generadas con IA.",
+      "Cada sobre tiene varias ranuras. En cada ranura sale una carta, y la rareza se sortea con los porcentajes de su fila. Dentro de una rareza, todas las cartas tienen la misma probabilidad. Un mismo sobre no repite carta: si en una ranura sale una que ya está en ese sobre, se elige otra de la misma rareza (solo se repite si esa rareza no tiene más cartas distintas); los porcentajes por rareza no cambian. Estas tablas se fijan al publicar la colección y no cambian después. Las cartas no tienen valor monetario ni se pueden intercambiar. Las ilustraciones de las cartas están generadas con IA.",
     empty: "Aún no hay colecciones publicadas.",
     published: (p) =>
       `Publicada el ${p.date} · versión ${p.version} · ${p.packSize} cartas por sobre · holo en Rara o superior: ${p.holo}`,

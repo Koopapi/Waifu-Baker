@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { LogOut } from "lucide-react";
+import { LogOut } from "@/ui/icons/glyphs";
 import { signOut } from "@/auth";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/client";

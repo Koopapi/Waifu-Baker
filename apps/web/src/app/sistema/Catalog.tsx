@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { SOUNDS } from "@/domain/opening/feedback";
 import { sound, useSoundMuted } from "@/features/opening/sound";
-import { Bell, Gift, Package, Settings, Sparkles, Trash2 } from "lucide-react";
+import { Bell, Gift, Package, Settings, Sparkles, Trash2 } from "@/ui/icons/glyphs";
 import {
   Alert,
   AnimatedCounter,

@@ -1,0 +1,3 @@
+ALTER TABLE "sets" ADD COLUMN "cover_card_id" uuid;--> statement-breakpoint
+ALTER TABLE "sets" ADD COLUMN "pack_image_key" text;--> statement-breakpoint
+ALTER TABLE "sets" ADD CONSTRAINT "sets_cover_card_id_cards_id_fk" FOREIGN KEY ("cover_card_id") REFERENCES "public"."cards"("id") ON DELETE set null ON UPDATE no action;

@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import type { LabCard } from "@/features/opening/fakePack";
+import { PackArt, type PackArtData } from "@/features/packs/PackArt";
 import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/sobres/actions";
 import { useT } from "@/i18n/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
@@ -28,7 +29,7 @@ async function preload(cards: LabCard[]) {
 }
 
 /** Conecta la escena de apertura con los sobres reales del usuario. */
-export function PackOpener({ setId, setCode, sealed, resumePackId }: { setId: string; setCode: string; sealed: number; resumePackId: string | null }) {
+export function PackOpener({ setId, setCode, setName, art, sealed, resumePackId }: { setId: string; setCode: string; setName: string; art: PackArtData; sealed: number; resumePackId: string | null }) {
   const t = useT();
   const [remaining, setRemaining] = useState(sealed);
   const resume = useRef(resumePackId);
@@ -56,6 +57,7 @@ export function PackOpener({ setId, setCode, sealed, resumePackId }: { setId: st
       <OpeningStage
         draw={draw}
         packLabel={`BOOSTER · ${setCode}`}
+        packArt={<PackArt setId={setId} code={setCode} name={setName} art={art} />}
         onFinished={onFinished}
         renderSummaryActions={(reset) => (
           <>

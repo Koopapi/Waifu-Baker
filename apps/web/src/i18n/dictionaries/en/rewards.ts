@@ -6,6 +6,7 @@ export const rewards = {
     ready: (n: number, max: number) => `${n} of ${max} ready`,
     full: "Full: claim one so the next starts charging.",
     nextIn: "Next one in",
+    nextShort: "until the next",
     chooseSet: "Set",
     claim: "Claim free pack",
     claimed: "Free pack added to your packs.",

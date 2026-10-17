@@ -10,6 +10,8 @@ interface Props {
   onTorn: () => void;
   /** Spec 013, RF-2: se llama dentro del gesto que rasga (soltar o «Abrir»), donde el navegador deja sonar. */
   onCommit?: () => void;
+  /** Spec 014, RF-8: el sobre de la colección ya dibujado; sin él, el sobre genérico. */
+  art?: React.ReactNode;
   reducedMotion: boolean;
   /** Texto bajo el logo del sobre, p. ej. el código de la colección. */
   label?: string;
@@ -18,13 +20,15 @@ interface Props {
 const TEAR_DISTANCE = 180; // px de arrastre para completar el rasgado
 const COMMIT_AT = 0.55; // progreso a partir del cual, al soltar, se completa solo
 
-export function PackMesh({ onTorn, onCommit, reducedMotion, label = "BOOSTER · WB01" }: Props) {
+export function PackMesh({ onTorn, onCommit, art, reducedMotion, label = "BOOSTER · WB01" }: Props) {
   const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const tl = useRef<gsap.core.Timeline | null>(null);
   const done = useRef(false);
   const [dragging, setDragging] = useState(false);
+  // Spec 014, RF-11: al tocar el sobre (sin arrastrar la tira), se agita.
+  const [shaking, setShaking] = useState(false);
 
   useEffect(() => {
     const t = gsap.timeline({ paused: true });
@@ -78,14 +82,20 @@ export function PackMesh({ onTorn, onCommit, reducedMotion, label = "BOOSTER · 
   };
 
   return (
-    <div ref={root} className="pack">
-      <div className="pack__body">
-        <div className="pack__foil" />
-        <div className="pack__logo">
-          {t.common.brand}
-          <span>{label}</span>
+    <div ref={root} className={["pack", art ? "pack--art" : "", shaking ? "pack--shake" : ""].join(" ")} onAnimationEnd={() => setShaking(false)}>
+      {art ? (
+        <div className="pack__art" data-testid="pack-art" onClick={() => !reducedMotion && setShaking(true)}>
+          {art}
         </div>
-      </div>
+      ) : (
+        <div className="pack__body">
+          <div className="pack__foil" />
+          <div className="pack__logo">
+            {t.common.brand}
+            <span>{label}</span>
+          </div>
+        </div>
+      )}
       <div
         ref={strip}
         className={`pack__strip${dragging ? " pack__strip--dragging" : ""}`}

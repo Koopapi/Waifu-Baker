@@ -64,6 +64,13 @@
       "when": 1792183708758,
       "tag": "0008_album_moderation",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792214189605,
+      "tag": "0009_pack_art",
+      "breakpoints": true
     }
   ]
 }

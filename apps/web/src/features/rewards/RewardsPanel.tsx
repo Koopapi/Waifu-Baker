@@ -9,7 +9,11 @@ import { Card } from "@/ui/content/Card";
 import { Alert } from "@/ui/feedback/Alert";
 import { useToast } from "@/ui/feedback/Toast";
 import { Select } from "@/ui/form/Select";
+import { FREE_INTERVAL_MS } from "@/domain/rewards/free-packs";
+import { RingTimer } from "@/ui/game/RingTimer";
+import { Sticker } from "@/ui/icons/Sticker";
 import { Countdown } from "./Countdown";
+import { StreakRow } from "./StreakRow";
 
 type Reward = { kind: "cookies"; amount: number } | { kind: "pack" };
 
@@ -63,31 +67,44 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
 
   return (
     <section className={`grid gap-4 ${layout === "grid" ? "md:grid-cols-2" : ""}`} data-testid="rewards">
-      <Card
-        className="space-y-3"
-        data-testid="free-pack"
-        title={t.free.title}
-        aside={
-          <span className="tabular-nums" data-testid="free-charges">
-            {t.free.ready(data.free.charges, data.free.max)}
-          </span>
-        }
-      >
-        <p className="text-sm text-ui-text-2">
+      <Card className="space-y-4" data-testid="free-pack">
+        {/* Spec 014, RF-16: temporizador en anillo que se llena hasta el siguiente sobre gratis. */}
+        <div className="flex items-center gap-4">
           {data.free.nextAt ? (
-            <>
-              {t.free.nextIn} <Countdown until={data.free.nextAt} serverNow={data.serverNow} />
-            </>
+            <RingTimer until={data.free.nextAt} serverNow={data.serverNow} totalMs={FREE_INTERVAL_MS} label={t.free.nextIn}>
+              <span className="block font-display text-xl font-semibold">
+                <Countdown until={data.free.nextAt} serverNow={data.serverNow} compact />
+              </span>
+              <span className="block text-[11px] font-extrabold text-ui-text-3">{t.free.nextShort}</span>
+            </RingTimer>
           ) : (
-            t.free.full
+            <div className="grid size-32 shrink-0 place-items-center rounded-full border-[9px] border-k-menta">
+              <Sticker name="pack" className="size-14" />
+            </div>
           )}
-        </p>
+          <div className="min-w-0 flex-1 space-y-2">
+            <h2 className="flex items-center gap-1 font-display text-lg font-semibold">
+              <Sticker name="clock" className="size-8" />
+              {t.free.title}
+            </h2>
+            <div className="flex gap-1.5" aria-hidden>
+              {Array.from({ length: data.free.max }, (_, i) => (
+                <Sticker key={i} name="pack" className={i < data.free.charges ? "size-9" : "size-9 opacity-30 grayscale"} />
+              ))}
+            </div>
+            <p className="text-sm font-black text-ui-success-text tabular-nums" data-testid="free-charges">
+              {t.free.ready(data.free.charges, data.free.max)}
+            </p>
+            {!data.free.nextAt && <p className="text-xs text-ui-text-3">{t.free.full}</p>}
+          </div>
+        </div>
         {noSets ? (
           <p className="text-sm text-ui-text-3">{t.free.none}</p>
         ) : (
           <div className="flex flex-wrap items-end gap-3">
             <SetSelect sets={data.sets} value={freeSet} onChange={setFreeSet} label={t.free.chooseSet} />
             <Button
+              width="full"
               disabled={pending || data.free.charges < 1}
               onClick={() =>
                 start(async () => {
@@ -104,42 +121,26 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
         <Status state={freeState} />
       </Card>
 
-      <Card
-        className="space-y-3"
-        data-testid="daily"
-        title={t.daily.title}
-        aside={
-          <span className="tabular-nums" data-testid="cookie-balance">
-            {t.cookies.balance(data.cookies)}
+      <Card className="space-y-4" data-testid="daily">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="flex items-center gap-1 font-display text-lg font-semibold">
+            <Sticker name="streak" className="size-9" />
+            {t.daily.title}
+          </h2>
+          <span className="flex items-center gap-1 rounded-full border border-k-limon/40 bg-ui-raised py-1 pl-1 pr-3 text-sm font-black tabular-nums">
+            <Sticker name="cookie" className="size-7" />
+            <span data-testid="cookie-balance">{t.cookies.balance(data.cookies)}</span>
           </span>
-        }
-      >
-        <ol className={`grid gap-1.5 ${layout === "stack" ? "grid-cols-4" : "grid-cols-7"}`} data-testid="streak">
-          {data.daily.schedule.map((r, i) => {
-            const day = i + 1;
-            const done = data.daily.claimedToday ? day <= data.daily.day : day < data.daily.day;
-            const current = !data.daily.claimedToday && day === data.daily.day;
-            return (
-              <li
-                key={day}
-                data-day={day}
-                data-state={done ? "done" : current ? "current" : "next"}
-                className={`rounded-m border px-1 py-2 text-center text-[11px] leading-tight ${
-                  current ? "border-ui-accent bg-ui-accent/15" : done ? "border-ui-success/50 bg-ui-success/15" : "border-ui-line"
-                }`}
-              >
-                <span className="block font-semibold">{t.daily.day(day)}</span>
-                <span className="block text-ui-text-2">{r.kind === "cookies" ? t.daily.cookies(r.amount) : t.daily.pack}</span>
-              </li>
-            );
-          })}
-        </ol>
+        </div>
+        {/* Spec 014, RF-17: la racha como pegatinas por día, sin textos que se salgan. */}
+        <StreakRow schedule={data.daily.schedule} day={data.daily.day} claimedToday={data.daily.claimedToday} />
         {data.daily.claimedToday ? (
           <p className="text-sm text-ui-text-2">{t.daily.claimed}</p>
         ) : (
           <div className="flex flex-wrap items-end gap-3">
             {isPackDay && !noSets && <SetSelect sets={data.sets} value={dailySet} onChange={setDailySet} label={t.daily.chooseSetForPack} />}
             <Button
+              width="full"
               disabled={pending || (isPackDay && noSets)}
               onClick={() =>
                 start(async () => {

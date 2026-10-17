@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import localFont from "next/font/local";
+import { Fredoka, Geist_Mono, Nunito } from "next/font/google";
 import { I18nProvider } from "@/i18n/client";
 import { getDict, getLocale } from "@/i18n/server";
 import { SiteFooter } from "@/features/legal/SiteFooter";
@@ -9,10 +8,10 @@ import { ToastProvider } from "@/ui/feedback/Toast";
 import { ConfirmProvider } from "@/ui/overlay/Confirm";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+// Spec 014: tipografías redondeadas (licencia OFL). Nunito para el texto y Fredoka para títulos y logotipo.
+const body = Nunito({ variable: "--font-body", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-// Tipografía de la marca (docs/DESIGN.md): títulos y logotipo.
-const display = localFont({ src: "../../assets/fonts/SpaceGrotesk.ttf", variable: "--font-display", weight: "300 700" });
+const display = Fredoka({ variable: "--font-display", subsets: ["latin"] });
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getDict();
@@ -33,7 +32,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     // Los navegadores y sus extensiones añaden atributos a <html> y <body> antes de hidratar (p. ej. Chrome en iPhone).
     <html lang={locale} suppressHydrationWarning>
-      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${display.variable} antialiased`}>
+      <body suppressHydrationWarning className={`${body.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <I18nProvider locale={locale}>
           <ToastProvider>
             <ConfirmProvider>

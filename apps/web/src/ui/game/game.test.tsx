@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { counterAt, splitDuration } from "./time";
 import { FocusView } from "./FocusView";
 import { SoundToggle } from "./SoundToggle";
+import { RingTimer } from "./RingTimer";
 
 describe("piezas para juegos", () => {
   it("test_s011_rf8_la_cuenta_atras_parte_el_tiempo_y_no_baja_de_cero", () => {
@@ -37,5 +38,20 @@ describe("piezas para juegos", () => {
     const off = renderToStaticMarkup(<SoundToggle muted onToggle={() => {}} />);
     expect(off).toContain('aria-pressed="true"');
     expect(off).toContain('data-muted="true"');
+  });
+
+  it("test_s014_rf16_el_temporizador_en_anillo_se_llena_hasta_el_siguiente", () => {
+    const now = new Date("2026-10-16T12:00:00Z").getTime();
+    // Faltan 3 h de 12 h: el anillo va por el 75 %.
+    const out = renderToStaticMarkup(
+      <RingTimer until={new Date(now + 3 * 3600_000).toISOString()} serverNow={new Date(now).toISOString()} totalMs={12 * 3600_000} label="Siguiente sobre gratis">
+        <span>3:00:00</span>
+      </RingTimer>,
+    );
+    expect(out).toContain('role="progressbar"');
+    expect(out).toContain('aria-label="Siguiente sobre gratis"');
+    expect(out).toMatch(/aria-valuenow="7[45]"/);
+    expect(out).toContain("<circle");
+    expect(out).toContain("3:00:00");
   });
 });

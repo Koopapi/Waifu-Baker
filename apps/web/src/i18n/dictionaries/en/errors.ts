@@ -41,6 +41,7 @@ export const errors: Record<string, Msg> = {
   review_pending: "A review is already pending.",
   review_too_soon: (p: MsgParams) => `You requested a review recently. You can request another one from ${new Date(String(p.until)).toLocaleDateString("en", { day: "numeric", month: "long" })}.`,
   review_already_decided: "That review has already been decided.",
+  card_not_in_set: "That card is not in this set.",
   no_free_charges: "You don't have free packs yet: wait for the next one to charge.",
   already_claimed_today: "You already claimed today's reward. Come back tomorrow.",
   tz_change_too_soon: "You changed time zone recently: you can claim once 20 hours have passed since your last reward.",

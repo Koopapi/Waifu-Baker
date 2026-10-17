@@ -34,3 +34,20 @@ export function openAllFinale(rarities: readonly Rarity[]): { sound: SoundName; 
   if (best === null) return null;
   return { sound: revealSound(best) ?? "flip", vibration: vibrationPattern(best) };
 }
+
+const LEVEL: Partial<Record<Rarity, number>> = { rare: 1, epic: 2, legendary: 3, secret: 4 };
+
+/** Spec 014, RF-12: intensidad del brillo de los bordes antes de voltear (0 = sin brillo). */
+export function teaseLevel(rarity: Rarity): number {
+  return LEVEL[rarity] ?? 0;
+}
+
+/** Spec 014, RF-13: pegatinas de confeti al revelar (más cuanto más rara). */
+export function confettiCount(rarity: Rarity): number {
+  return [0, 14, 20, 28, 36][teaseLevel(rarity)];
+}
+
+/** Spec 014, RF-13: celebración breve a pantalla completa. */
+export function celebrates(rarity: Rarity): boolean {
+  return teaseLevel(rarity) >= 3;
+}
