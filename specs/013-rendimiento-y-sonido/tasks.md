@@ -14,7 +14,7 @@
 
 ## Entrega 3 — Cierre
 - [x] **T9 — E2E** · Todos · Hecho cuando: pasa en los cuatro proyectos.
-- [ ] **T10 — Solo `transform` y `opacity` y lista para el teléfono** · RF-14 · Hecho cuando: pasa su test (hecho) y el usuario firma `dispositivo.md` (pendiente).
+- [x] **T10 — Solo `transform` y `opacity` y lista para el teléfono** · RF-14 · Hecho cuando: pasa su test y el usuario firma `dispositivo.md` (firmada el 16 oct 2026; giroscopio, vibración en Android y carga en 4G se comprueban en la web publicada).
 - [x] **T11 — Validación RF por RF y reglas de negocio** · Todos · Hecho cuando: `validation.md` da 14 de 14.
 
 ## Cobertura
