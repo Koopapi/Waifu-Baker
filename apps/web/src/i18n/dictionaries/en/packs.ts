@@ -55,6 +55,7 @@ export const packs = {
     hintSwipe: "Swipe the pack's strip to the right",
     hintTap: (i: number, n: number) => `Tap the top card · ${i} of ${n}`,
     summaryTitle: "Pack opened",
+    celebrate: (rarity: string) => `${rarity}!`,
     holoSuffix: " · holo",
     openAnother: "Open another pack",
     enableGyro: "Enable gyroscope",

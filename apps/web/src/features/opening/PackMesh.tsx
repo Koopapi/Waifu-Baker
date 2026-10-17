@@ -27,6 +27,8 @@ export function PackMesh({ onTorn, onCommit, art, reducedMotion, label = "BOOSTE
   const tl = useRef<gsap.core.Timeline | null>(null);
   const done = useRef(false);
   const [dragging, setDragging] = useState(false);
+  // Spec 014, RF-11: al tocar el sobre (sin arrastrar la tira), se agita.
+  const [shaking, setShaking] = useState(false);
 
   useEffect(() => {
     const t = gsap.timeline({ paused: true });
@@ -80,9 +82,11 @@ export function PackMesh({ onTorn, onCommit, art, reducedMotion, label = "BOOSTE
   };
 
   return (
-    <div ref={root} className={art ? "pack pack--art" : "pack"}>
+    <div ref={root} className={["pack", art ? "pack--art" : "", shaking ? "pack--shake" : ""].join(" ")} onAnimationEnd={() => setShaking(false)}>
       {art ? (
-        <div className="pack__art">{art}</div>
+        <div className="pack__art" data-testid="pack-art" onClick={() => !reducedMotion && setShaking(true)}>
+          {art}
+        </div>
       ) : (
         <div className="pack__body">
           <div className="pack__foil" />

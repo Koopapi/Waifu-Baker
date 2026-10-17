@@ -8,7 +8,9 @@ import { PackMesh } from "./PackMesh";
 import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
 import { useTiltSource } from "./useTiltSource";
-import { revealSound, vibrationPattern } from "@/domain/opening/feedback";
+import { celebrates, confettiCount, revealSound, teaseLevel, vibrationPattern } from "@/domain/opening/feedback";
+import { Confetti, type ConfettiBurst } from "./Confetti";
+import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
 import { sound, useSoundMuted } from "./sound";
 import "./opening.css";
@@ -59,6 +61,9 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
   const [revealed, setRevealed] = useState(0);
   const [packKey, setPackKey] = useState(0);
   const [flash, setFlash] = useState<Rarity | null>(null);
+  // Spec 014, RF-13: confeti y celebración al revelar una rara o mejor.
+  const [burst, setBurst] = useState<ConfettiBurst | null>(null);
+  const [party, setParty] = useState<Rarity | null>(null);
   const flipping = useRef(false);
   const reduced = usePrefersReducedMotion();
   const tilt = useTiltSource();
@@ -153,6 +158,11 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
       sound.vibrate(vibrationPattern(card.rarity));
       const r = el.getBoundingClientRect();
       particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
+      if (!reduced && confettiCount(card.rarity) > 0) setBurst({ key: Date.now(), count: confettiCount(card.rarity), x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      if (!reduced && celebrates(card.rarity)) {
+        setParty(card.rarity);
+        window.setTimeout(() => setParty(null), 1600);
+      }
       if (FLASH_RARITIES.includes(card.rarity) && !reduced) {
         setFlash(card.rarity);
         window.setTimeout(() => setFlash(null), 400);
@@ -238,6 +248,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
             }}
             card={c}
             active={phase === "fanned" && i === revealed}
+            tease={phase === "fanned" && i === revealed ? teaseLevel(c.rarity) : 0}
             mode={tilt.mode}
             tiltTarget={tilt.target}
             style={{ zIndex: cards.length - i }}
@@ -248,23 +259,37 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
 
       <Particles ref={particles} disabled={reduced} />
       {flash && <div className={`flash rarity-${flash}`} aria-hidden="true" />}
+      <Confetti burst={burst} />
+      {party && (
+        <div className={`celebrate rarity-${party}`} aria-hidden data-testid="celebration">
+          <span className="celebrate__ribbon">{t.packs.stage.celebrate(t.common.rarity[party])}</span>
+        </div>
+      )}
 
       {phase === "summary" && (
         <div className="summary">
           <div className="summary__card">
-            <h2 className="summary__title">{t.packs.stage.summaryTitle}</h2>
-            {cards.map((c, i) => (
-              <div key={i} className={`summary__row rarity-${c.rarity}`}>
-                <span>
-                  {c.name}
+            <h2 className="summary__title">
+              <Sticker name="card" className="size-9" />
+              {t.packs.stage.summaryTitle}
+            </h2>
+            {/* Spec 014, RF-14: las cartas en miniatura con su rareza y la etiqueta «¡Nueva!». */}
+            <div className="summary__grid">
+              {cards.map((c, i) => (
+                <div key={i} className={`summary__row rarity-${c.rarity}`}>
+                  <span className="summary__thumb">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
+                    <img src={c.image} alt="" draggable={false} />
+                  </span>
+                  <span className="badge">
+                    {t.common.rarity[c.rarity]}
+                    {c.holo ? t.packs.stage.holoSuffix : ""}
+                  </span>
+                  <span className="summary__name">{c.name}</span>
                   {c.note && <small className="summary__note">{c.note}</small>}
-                </span>
-                <span className="badge">
-                  {t.common.rarity[c.rarity]}
-                  {c.holo ? t.packs.stage.holoSuffix : ""}
-                </span>
-              </div>
-            ))}
+                </div>
+              ))}
+            </div>
             {renderSummaryActions ? (
               <div className="summary__actions">{renderSummaryActions(reset)}</div>
             ) : (

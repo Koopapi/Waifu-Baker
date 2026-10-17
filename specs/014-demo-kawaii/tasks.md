@@ -16,7 +16,7 @@
 
 ## Entrega 4 — Apertura
 - [x] **T9 — Escena: destellos, dorso, nitidez, holo y foco** · RF-9, RF-10, RF-15
-- [ ] **T10 — Suspense: agitado, brillo de rareza, confeti, celebración y resumen** · RF-11 a RF-14
+- [x] **T10 — Suspense: agitado, brillo de rareza, confeti, celebración y resumen** · RF-11 a RF-14
 
 ## Entrega 5 — Pantallas
 - [ ] **T11 — Temporizador en anillo y racha de pegatinas** · RF-16, RF-17

@@ -54,6 +54,7 @@ export const packs: typeof en = {
     hintSwipe: "Desliza la tira del sobre hacia la derecha",
     hintTap: (i, n) => `Toca la carta de arriba · ${i} de ${n}`,
     summaryTitle: "Sobre abierto",
+    celebrate: (rarity) => `¡${rarity}!`,
     holoSuffix: " · holo",
     openAnother: "Abrir otro sobre",
     enableGyro: "Activar giroscopio",

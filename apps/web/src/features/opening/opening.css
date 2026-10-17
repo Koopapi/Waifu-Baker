@@ -25,12 +25,13 @@
   pointer-events: none;
 }
 
-/* Spec 014, RF-15: píldora centrada que, en móvil, va por debajo del selector de idioma (esquina superior). */
+/* Spec 014, RF-15: píldora centrada abajo, sobre los botones: no choca con el selector de idioma ni con la
+   bandeja de cartas reveladas (arriba). */
 .hint {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(max(14px, env(safe-area-inset-top)) + 52px);
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 66px);
   width: fit-content;
   max-width: calc(100% - 32px);
   margin: 0 auto;
@@ -495,27 +496,66 @@
   z-index: 30;
 }
 
+/* Spec 014, RF-14: resumen kawaii con las cartas en miniatura. */
 .summary__card {
-  background: #15121f;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 18px 20px;
-  width: min(92vw, 420px);
+  background: #2b2142;
+  border: 2px solid rgb(255 111 174 / 0.35);
+  border-radius: 30px;
+  padding: 20px;
+  width: min(92vw, 460px);
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.55);
 }
 
 .summary__title {
-  margin: 0 0 10px;
-  font-size: 18px;
-  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.summary__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 10px;
 }
 
 .summary__row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 14px;
+  gap: 5px;
+  min-width: 0;
+  text-align: center;
+  font-size: 12px;
+}
+
+.summary__thumb {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 63 / 88;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 3px solid var(--rarity-color, #c9cdd3);
+  box-shadow: 0 6px 14px rgb(0 0 0 / 0.5);
+}
+.summary__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.summary__name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 800;
 }
 
 .summary__again {
@@ -524,13 +564,13 @@
 }
 
 .badge {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
   text-transform: uppercase;
   background: var(--rarity-color, #777);
-  color: #000;
+  color: #2a0e1f;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -548,17 +588,20 @@
 }
 
 .summary__note {
-  display: block;
-  margin-top: 2px;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(255 111 174 / 0.2);
   font-size: 11px;
-  color: #fbbf24;
+  font-weight: 800;
+  color: #ff9ecb;
 }
 
 .summary__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 14px;
+  gap: 10px;
+  margin-top: 18px;
 }
 .summary__actions > * {
   flex: 1 1 auto;
@@ -602,6 +645,148 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .sparkle {
+    animation: none;
+  }
+}
+
+/* ---------- spec 014: suspense ---------- */
+
+/* RF-11: el sobre se agita al tocarlo. */
+.pack--shake {
+  animation: packShake 0.45s ease-in-out;
+}
+@keyframes packShake {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  20% {
+    transform: translateX(-8px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(8px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-5px) rotate(-1deg);
+  }
+  80% {
+    transform: translateX(4px) rotate(1deg);
+  }
+}
+
+/* RF-12: antes de voltear una rara o mejor, sus bordes brillan con el color de su rareza (late con opacidad). */
+.card3d--tease::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--tease, 1) * -4px - 6px);
+  border-radius: 24px;
+  background: var(--rarity-color, #ffd34d);
+  filter: blur(calc(var(--tease, 1) * 5px + 10px));
+  opacity: calc(0.35 + var(--tease, 1) * 0.12);
+  animation: teasePulse 1.1s ease-in-out infinite alternate;
+  pointer-events: none;
+  /* Detrás de la carta en el espacio 3D, para que no se cruce con las cartas giradas de debajo. */
+  transform: translateZ(-40px);
+}
+@keyframes teasePulse {
+  from {
+    opacity: calc(0.25 + var(--tease, 1) * 0.1);
+  }
+  to {
+    opacity: calc(0.55 + var(--tease, 1) * 0.1);
+  }
+}
+
+/* RF-13: confeti de pegatinas. */
+.confetti {
+  position: fixed;
+  width: 0;
+  height: 0;
+  z-index: 25;
+  pointer-events: none;
+}
+.confetti__piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px rgb(10 4 24 / 0.4));
+  animation: confettiFly 1.3s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+@keyframes confettiFly {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty) + 40px)) scale(1) rotate(var(--r));
+  }
+}
+
+/* RF-13: celebración a pantalla completa en legendaria y secreta. */
+.celebrate {
+  position: absolute;
+  inset: 0;
+  z-index: 24;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 18vh;
+  pointer-events: none;
+  animation: celebrateIn 1.6s ease-out both;
+}
+.celebrate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(60% 50% at 50% 45%, var(--rarity-color, #ffd34d), transparent 70%);
+  opacity: 0.45;
+}
+.celebrate__ribbon {
+  position: relative;
+  padding: 10px 26px;
+  border-radius: 999px;
+  border: 3px solid #ffffff;
+  background: linear-gradient(90deg, #ffe27a, var(--rarity-color, #ffb84d));
+  box-shadow: 0 5px 0 rgb(59 31 53 / 0.45);
+  color: #3b1f35;
+  font-family: var(--font-display), sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+@keyframes celebrateIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack--shake,
+  .confetti,
+  .celebrate {
+    animation: none;
+    display: none;
+  }
+  .card3d--tease::before {
     animation: none;
   }
 }
