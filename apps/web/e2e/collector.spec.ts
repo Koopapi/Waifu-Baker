@@ -57,6 +57,9 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     await fan.goto("/sobres");
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
     await fan.click('[data-testid="pending-opening"]');
+    // En WebKit, la navegación del enlace puede seguir en curso: se espera a que termine antes de seguir.
+    await fan.waitForURL(/\?pack=/);
+    await fan.waitForLoadState("networkidle");
     await tear(fan);
     await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
     for (let k = 0; k < 2; k++) {

@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { counterAt, splitDuration } from "./time";
 import { FocusView } from "./FocusView";
+import { SoundToggle } from "./SoundToggle";
 
 describe("piezas para juegos", () => {
   it("test_s011_rf8_la_cuenta_atras_parte_el_tiempo_y_no_baja_de_cero", () => {
@@ -27,5 +28,14 @@ describe("piezas para juegos", () => {
     expect(out).toMatch(/role="dialog"/);
     expect(out).toContain('aria-modal="true"');
     expect(out).toContain("fixed inset-0");
+  });
+
+  it("test_s013_rf7_el_boton_de_silencio_dice_su_estado_a_los_lectores_de_pantalla", () => {
+    const on = renderToStaticMarkup(<SoundToggle muted={false} onToggle={() => {}} />);
+    expect(on).toContain('aria-label="Mute sound"');
+    expect(on).toContain('aria-pressed="false"');
+    const off = renderToStaticMarkup(<SoundToggle muted onToggle={() => {}} />);
+    expect(off).toContain('aria-pressed="true"');
+    expect(off).toContain('data-muted="true"');
   });
 });

@@ -56,4 +56,5 @@ export const common = {
   confirm: "Confirm",
   retry: "Try again",
   undo: "Undo",
+  muteSound: "Mute sound",
 };

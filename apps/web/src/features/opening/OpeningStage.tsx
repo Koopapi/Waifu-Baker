@@ -8,6 +8,9 @@ import { PackMesh } from "./PackMesh";
 import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
 import { useTiltSource } from "./useTiltSource";
+import { revealSound, vibrationPattern } from "@/domain/opening/feedback";
+import { SoundToggle } from "@/ui/game/SoundToggle";
+import { sound, useSoundMuted } from "./sound";
 import "./opening.css";
 
 type Phase = "idle" | "torn" | "fanned" | "summary";
@@ -54,6 +57,16 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
   const stage = useRef<HTMLDivElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);
   const particles = useRef<ParticlesHandle>(null);
+
+  const muted = useSoundMuted();
+  // Spec 013, RF-6: los sonidos se descargan al entrar en la apertura, sin retrasar la animación.
+  useEffect(() => {
+    void sound.preload();
+  }, []);
+  const onCommit = useCallback(() => {
+    sound.unlock();
+    sound.play("tear");
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
   const onTorn = useCallback(() => {
@@ -124,7 +137,12 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
     flipping.current = true;
     const card = cards[i];
 
+    sound.play("flip");
     const reveal = () => {
+      // Spec 013, RF-4 y RF-9: las raras o mejores suenan y vibran según su nivel.
+      const extra = revealSound(card.rarity);
+      if (extra) sound.play(extra);
+      sound.vibrate(vibrationPattern(card.rarity));
       const r = el.getBoundingClientRect();
       particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
       if (FLASH_RARITIES.includes(card.rarity) && !reduced) {
@@ -196,7 +214,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
         {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>
 
-      <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} reducedMotion={reduced} label={packLabel} />}</div>
+      <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} onCommit={onCommit} reducedMotion={reduced} label={packLabel} />}</div>
 
       <div className="cards">
         {cards.map((c, i) => (
@@ -247,6 +265,7 @@ export function OpeningStage({ draw, packLabel, extraHud, onFinished, renderSumm
 
       <div className="hud">
         {extraHud}
+        <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} variant="ghost" className="hud__sound" data-testid="sound-toggle" />
         {tilt.gyroAvailable && tilt.mode !== "gyro" && (
           <button type="button" className="hud__btn" onClick={() => void tilt.requestGyro()}>
             {t.packs.stage.enableGyro}

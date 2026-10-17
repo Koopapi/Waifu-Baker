@@ -183,6 +183,16 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-154 | Aprobar aplica el alias propuesto y vuelve a publicar el álbum con el mismo enlace; rechazar lo deja oculto con una nota opcional para el dueño. | Vigente | 012 RF-11, RF-12 |
 | RN-155 | Cada ocultación, petición, aprobación y rechazo queda en el historial con quién, cuándo, motivo, nota y alias antes y después. | Vigente | 012 RF-3, RF-13 |
 
+## 15. Sonido y rendimiento de la apertura
+
+| Regla | Descripción | Estado | Origen |
+|---|---|---|---|
+| RN-160 | Los sonidos son de dominio público (CC0) y su origen, autor y licencia constan junto a ellos en el repositorio. | Vigente | 013 RF-1 |
+| RN-161 | Rasgar y voltear suenan igual para todas las cartas; una rara, épica, legendaria o secreta añade un sonido de su nivel. En «Abrir todos» suena una sola vez, con la mejor carta. | Vigente | 013 RF-2 a RF-5 |
+| RN-162 | En los móviles que lo permiten (Android), una rara o mejor vibra; más en legendaria y secreta. | Vigente | 013 RF-9 |
+| RN-163 | El sonido está activado por defecto. El botón de silencio de la apertura y de «Abrir todos» corta sonido y vibración, y se recuerda en ese dispositivo. | Vigente | 013 RF-7, RF-8, RF-10 |
+| RN-164 | Ninguna página del coleccionista ni pública carga más de 250 kB de JavaScript comprimido al abrirse; la integración continua falla si alguna se pasa. | Vigente | 013 RF-11, RF-12 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -196,6 +206,8 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | «Abrir todos» | hasta 50 sobres |
 | Nota de moderación | hasta 300 caracteres |
 | Espera entre revisiones de un álbum oculto | 7 días |
+| JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
+| Sonidos de la apertura | 6, hasta 200 kB en total |
 | Aperturas por minuto | 10 por usuario |
 | Caducidad de los sobres | ninguna |
 | Enlaces de imagen privados | 10 minutos |

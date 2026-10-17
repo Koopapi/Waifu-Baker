@@ -85,6 +85,7 @@ cualquier componente nuevo se añada a esta tabla.
 | Countdown | Countdown |
 | AnimatedCounter | AnimatedCounter |
 | FocusView | FocusView |
+| SoundToggle | SoundToggle |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
 

@@ -1,12 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
-import { OpeningStage } from "@/features/opening/OpeningStage";
 import type { LabCard } from "@/features/opening/fakePack";
 import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/sobres/actions";
 import { useT } from "@/i18n/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+
+// Spec 013, RF-13: la escena (GSAP, gestos y partículas) se descarga aparte, después de pintar la página.
+const OpeningStage = dynamic(() => import("@/features/opening/OpeningStage").then((m) => m.OpeningStage), {
+  ssr: false,
+  loading: () => <div aria-busy="true" data-testid="stage-loading" className="fixed inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_55%,#050408_100%)]" />,
+});
 
 async function preload(cards: LabCard[]) {
   await Promise.all(

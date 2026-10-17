@@ -60,18 +60,29 @@
 .pack__foil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.28) 45%, transparent 60%);
-  background-size: 250% 100%;
-  animation: packShimmer 3.5s ease-in-out infinite;
+  overflow: hidden;
   mix-blend-mode: screen;
+}
+
+/* Spec 013, RF-14: el brillo se desplaza con transform (sin repintar), no con background-position. */
+.pack__foil::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -75%;
+  width: 250%;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.28) 45%, transparent 60%);
+  animation: packShimmer 3.5s ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes packShimmer {
   0% {
-    background-position: 120% 0;
+    transform: translateX(-48%);
   }
   100% {
-    background-position: -120% 0;
+    transform: translateX(48%);
   }
 }
 
@@ -458,7 +469,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pack__foil {
+  .pack__foil::before {
     animation: none;
   }
 }
