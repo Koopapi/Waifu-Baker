@@ -27,9 +27,9 @@
 - [x] **T14 — Demo optimizada** · RF-23
 
 ## Entrega 7 — Cierre
-- [ ] **T15 — E2E en los cuatro proyectos** · Todos
+- [x] **T15 — E2E en los cuatro proyectos** · Todos
 - [ ] **T16 — Capturas de antes y después y prueba en el teléfono** · Todos
-- [ ] **T17 — Validación RF por RF y reglas de negocio** · Todos · Hecho cuando: `validation.md` da 24 de 24.
+- [x] **T17 — Validación RF por RF y reglas de negocio** · Todos · Hecho cuando: `validation.md` da 24 de 24.
 
 ## Cobertura
 RF-1 T1, T4 · RF-2 T4 · RF-3 T1, T5 · RF-4 T5 · RF-5 T2, T8 · RF-6 y RF-7 T7 · RF-8 T8 · RF-9 y RF-10 T2, T9 ·
