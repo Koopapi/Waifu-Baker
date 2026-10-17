@@ -19,6 +19,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 010 ✓ | Acabado premium y demo | Estructura estilo Discord (barra de colecciones, panel, cajón y pestañas en móvil), paleta «Cereza», avisos, esqueletos, edad mínima configurable y `pnpm demo` | experiencia |
 | 011 ✓ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
 | 012 ✓ | Moderación de álbumes públicos | Ocultar con motivo y nota, aviso al dueño, petición de revisión con alias nuevo (7 días entre peticiones), aprobar o rechazar, historial | motor |
+| 013 ◐ | Rendimiento y sonido de la apertura | Sonidos CC0 por rareza, botón de silencio, vibración, 250 kB por página comprobados en la CI; falta la comprobación en un teléfono real | experiencia |
 | 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 ## Camino al lanzamiento (orden acordado el 16 oct 2026)

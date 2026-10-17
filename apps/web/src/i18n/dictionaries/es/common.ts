@@ -57,4 +57,5 @@ export const common: typeof en = {
   confirm: "Confirmar",
   retry: "Reintentar",
   undo: "Deshacer",
+  muteSound: "Silenciar sonido",
 };

@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { RARITIES } from "@/domain/catalog/card-rules";
 import { openAllPacksAction, type OpenAllCard } from "@/app/sobres/actions";
+import { openAllFinale } from "@/domain/opening/feedback";
+import { sound, useSoundMuted } from "@/features/opening/sound";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";
+import { SoundToggle } from "@/ui/game/SoundToggle";
 import "./open-all.css";
 
 const rank = (r: OpenAllCard["rarity"]) => RARITIES.indexOf(r);
@@ -18,6 +21,10 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const t = useT();
+  const muted = useSoundMuted();
+  useEffect(() => {
+    void sound.preload();
+  }, []);
 
   const sorted = useMemo(
     () =>
@@ -37,14 +44,23 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
     return { total: c.length, nuevas: c.filter((x) => x.isNew).length, holo: c.filter((x) => x.holo).length, pity: c.filter((x) => x.pity).length };
   }, [cards]);
 
-  const openAll = () =>
+  const openAll = () => {
+    // El clic es el gesto que habilita el audio (spec 013, RF-2).
+    sound.unlock();
     start(async () => {
       setError(null);
       const r = await openAllPacksAction(setId);
       if (!r.ok) return setError(r.error);
       setOpened(r.packs);
       setCards(r.cards);
+      // Spec 013, RF-5 y RF-9: un solo sonido (y vibración) al final, el de la mejor carta.
+      const finale = openAllFinale(r.cards.map((c) => c.rarity));
+      if (finale) {
+        sound.play(finale.sound);
+        sound.vibrate(finale.vibration);
+      }
     });
+  };
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6">
@@ -55,11 +71,14 @@ export function OpenAllView({ setId, setName, sealed }: { setId: string; setName
           </Link>
           <h1 className="text-3xl font-bold">{t.packs.openAll.title(setName)}</h1>
         </div>
+        <div className="flex items-center gap-2">
+          <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} variant="ghost" data-testid="sound-toggle" />
         {!cards && (
           <Button size="lg" onClick={openAll} loading={pending} disabled={sealed === 0} data-testid="open-all">
             {pending ? t.packs.openAll.opening : sealed === 0 ? t.packs.openAll.noneLeft : t.packs.openAll.openN(sealed)}
           </Button>
         )}
+        </div>
       </div>
       {error && <Alert tone="danger">{error}</Alert>}
       {cards && (

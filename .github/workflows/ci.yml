@@ -1,4 +1,5 @@
-# Spec 007, RF-18: en cada cambio, revisión de código, tipos, Vitest (unidad e integración) y E2E de escritorio.
+# Spec 007, RF-18: en cada cambio, revisión de código, tipos, peso de las páginas (spec 013), Vitest (unidad e
+# integración) y E2E de escritorio.
 name: CI
 
 on:
@@ -51,6 +52,14 @@ jobs:
         run: pnpm lint
       - name: Tipos
         run: pnpm typecheck
+      # Spec 013, RF-11 y RF-12: el JavaScript de la primera carga de cada página del coleccionista y pública no
+      # pasa de 250 kB comprimidos. El build no se conecta a la base de datos; solo necesita las variables.
+      - name: Peso de las páginas
+        env:
+          DATABASE_URL: postgres://localhost:5432/waifu_baker_build
+          AUTH_SECRET: ci-build-secreto-solo-para-medir-0123456789
+          NEXT_DIST_DIR: .next-build
+        run: pnpm build && pnpm budget
       - name: Vitest (unidad e integración)
         run: pnpm test
       - name: Navegador de Playwright

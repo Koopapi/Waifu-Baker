@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { SOUNDS } from "@/domain/opening/feedback";
+import { sound, useSoundMuted } from "@/features/opening/sound";
 import { Bell, Gift, Package, Settings, Sparkles, Trash2 } from "lucide-react";
 import {
   Alert,
@@ -20,6 +22,7 @@ import {
   RadioGroup,
   Select,
   Skeleton,
+  SoundToggle,
   Switch,
   Table,
   Tabs,
@@ -207,6 +210,9 @@ export function Catalog() {
               </Button>
             </div>
           </Card>
+          <Card title="Sound toggle">
+            <SoundPreview />
+          </Card>
           <Button variant="secondary" onClick={() => setFocus(true)} data-testid="open-focus">
             Open focus view
           </Button>
@@ -231,5 +237,29 @@ export function Catalog() {
         </div>
       </Section>
     </main>
+  );
+}
+
+/** Spec 013: botón de silencio con el motor real y los sonidos de la apertura, para escucharlos. */
+function SoundPreview() {
+  const muted = useSoundMuted();
+  return (
+    <div className="flex flex-wrap items-center gap-2" data-testid="sound-preview">
+      <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} />
+      {SOUNDS.map((name) => (
+        <Button
+          key={name}
+          size="sm"
+          variant="ghost"
+          onClick={async () => {
+            await sound.preload();
+            sound.unlock();
+            sound.play(name);
+          }}
+        >
+          {name}
+        </Button>
+      ))}
+    </div>
   );
 }

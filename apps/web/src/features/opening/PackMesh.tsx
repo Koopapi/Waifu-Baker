@@ -8,6 +8,8 @@ import { useT } from "@/i18n/client";
 interface Props {
   /** Se llama una sola vez, cuando la tira termina de salir. */
   onTorn: () => void;
+  /** Spec 013, RF-2: se llama dentro del gesto que rasga (soltar o «Abrir»), donde el navegador deja sonar. */
+  onCommit?: () => void;
   reducedMotion: boolean;
   /** Texto bajo el logo del sobre, p. ej. el código de la colección. */
   label?: string;
@@ -16,7 +18,7 @@ interface Props {
 const TEAR_DISTANCE = 180; // px de arrastre para completar el rasgado
 const COMMIT_AT = 0.55; // progreso a partir del cual, al soltar, se completa solo
 
-export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: Props) {
+export function PackMesh({ onTorn, onCommit, reducedMotion, label = "BOOSTER · WB01" }: Props) {
   const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
@@ -60,8 +62,10 @@ export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: P
       }
       if (last) {
         setDragging(false);
-        if (scrub >= COMMIT_AT) t.play();
-        else t.reverse();
+        if (scrub >= COMMIT_AT) {
+          onCommit?.();
+          t.play();
+        } else t.reverse();
       }
     },
     { axis: "x", filterTaps: true, pointer: { touch: true } },
@@ -69,6 +73,7 @@ export function PackMesh({ onTorn, reducedMotion, label = "BOOSTER · WB01" }: P
 
   const openWithoutGesture = () => {
     if (done.current) return;
+    onCommit?.();
     tl.current?.play(0.6);
   };
 

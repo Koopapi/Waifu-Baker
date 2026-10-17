@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import * as Sentry from "@sentry/nextjs";
+import { captureClientError } from "@/lib/sentry-client";
 import { useEffect } from "react";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
@@ -11,7 +11,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
   const t = useT();
   useEffect(() => {
     console.error(error);
-    Sentry.captureException(error);
+    captureClientError(error);
   }, [error]);
   return (
     <main className="grid min-h-dvh place-items-center px-6 text-center">

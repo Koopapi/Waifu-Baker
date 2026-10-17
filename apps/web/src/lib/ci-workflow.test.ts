@@ -27,4 +27,11 @@ describe("integración continua", () => {
     // Ningún paso de comprobación se salta los fallos.
     expect(workflow).not.toMatch(/continue-on-error:\s*true/);
   });
+
+  it("test_s013_rf12_la_ci_construye_la_web_y_comprueba_el_peso_de_las_paginas", () => {
+    const step = workflow.slice(workflow.indexOf("name: Peso de las páginas"));
+    expect(step).toMatch(/^\s+run: pnpm build && pnpm budget$/m);
+    // Se mide antes de los tests largos: si una página se pasa, la CI falla pronto.
+    expect(workflow.indexOf("name: Peso de las páginas")).toBeLessThan(workflow.indexOf("run: pnpm test"));
+  });
 });
