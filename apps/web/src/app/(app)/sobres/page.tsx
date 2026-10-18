@@ -60,41 +60,45 @@ export default async function MisSobresPage() {
             }
           />
         ) : (
-          <ul className="grid gap-4 xl:grid-cols-2">
+          // Cada tarjeta se adapta a su propio ancho (no al de la pantalla): pone el sobre al lado de los botones solo
+          // si caben; si no, uno encima de otro. Así ningún botón se queda estrecho y con el texto fuera.
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,30rem),1fr))] gap-4">
             {groups.map((g, i) => (
               <li
                 key={g.setId}
                 style={{ "--i": i } as React.CSSProperties}
-                className="card-in flex flex-col items-center gap-5 rounded-xl border border-k-lavanda/20 bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)] sm:flex-row sm:items-center"
+                className="card-in @container rounded-xl border border-k-lavanda/20 bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]"
                 data-testid={`group-${g.code}`}
               >
-                <div className="relative">
-                  {/* Spec 014, RF-5 y RF-8: el sobre de la colección; detrás, la pila si hay más de uno. */}
-                  {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
-                  <PackArt setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} className="relative w-[200px] sm:w-[170px]" />
-                </div>
-                <div className="flex w-full min-w-0 flex-1 flex-col gap-4">
-                  <div className="flex items-start justify-center gap-3 sm:justify-between">
-                    <div className="hidden min-w-0 sm:block">
-                      <p className="font-mono text-xs text-ui-text-3">{g.code}</p>
-                      <h2 className="truncate font-display text-xl font-semibold">{g.name}</h2>
-                    </div>
-                    <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
+                <div className="flex flex-col items-center gap-5 @sm:flex-row">
+                  <div className="relative shrink-0">
+                    {/* Spec 014, RF-5 y RF-8: el sobre de la colección; detrás, la pila si hay más de uno. */}
+                    {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
+                    <PackArt setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} className="relative w-[200px] @sm:w-[170px]" />
                   </div>
-                  {g.locked ? (
-                    <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
-                  ) : (
-                    <div className="flex flex-col gap-3">
-                      <Button size="lg" width="full" asChild>
-                        <Link href={`/sobres/${g.setId}`}>{t.packs.mine.openOne}</Link>
-                      </Button>
-                      {g.sealed > 1 && (
-                        <Button size="lg" width="full" variant="secondary" asChild>
-                          <Link href={`/sobres/${g.setId}/todos`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
-                        </Button>
-                      )}
+                  <div className="flex w-full max-w-xs min-w-0 flex-1 flex-col gap-4 @sm:max-w-none">
+                    <div className="flex items-start justify-center gap-3 @sm:justify-between">
+                      <div className="hidden min-w-0 @sm:block">
+                        <p className="font-mono text-xs text-ui-text-3">{g.code}</p>
+                        <h2 className="line-clamp-2 font-display text-xl font-semibold">{g.name}</h2>
+                      </div>
+                      <Badge tone="accent" className="shrink-0 tabular-nums">x{g.sealed}</Badge>
                     </div>
-                  )}
+                    {g.locked ? (
+                      <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        <Button size="lg" width="full" asChild>
+                          <Link href={`/sobres/${g.setId}`}>{t.packs.mine.openOne}</Link>
+                        </Button>
+                        {g.sealed > 1 && (
+                          <Button size="lg" width="full" variant="secondary" asChild>
+                            <Link href={`/sobres/${g.setId}/todos`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </li>
             ))}

@@ -40,7 +40,20 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await expect(art.locator('img[src*="k=cover"]')).toBeVisible();
     await expect.poll(() => art.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
     await expect(art.locator(".pack-art__teeth")).toHaveCount(2);
+    // El texto de los botones de apertura cabe en el botón, también en pantalla ancha (dos columnas de tarjetas).
+    const fits = async () => {
+      const buttons = await fan.locator('[data-testid="group-KAW1"] a').all();
+      expect(buttons).toHaveLength(2);
+      for (const b of buttons) expect(await b.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
+    };
+    await fits();
     await shot(fan, "1-mis-sobres");
+    if (!test.info().project.use.isMobile) {
+      const size = fan.viewportSize();
+      await fan.setViewportSize({ width: 1440, height: 900 });
+      await fits();
+      if (size) await fan.setViewportSize(size);
+    }
   });
 
   await test.step("RF-7: un sobre hecho a mano sustituye al compuesto y se puede quitar", async () => {
