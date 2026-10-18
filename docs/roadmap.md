@@ -20,6 +20,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 | 011 ✓ | Sistema de diseño | Componentes reutilizables (acción, formulario, respuesta, superposiciones, contenido, juego y estructura), catálogo `/sistema`, Pencil, acciones optimistas y confirmaciones | experiencia |
 | 012 ✓ | Moderación de álbumes públicos | Ocultar con motivo y nota, aviso al dueño, petición de revisión con alias nuevo (7 días entre peticiones), aprobar o rechazar, historial | motor |
 | 013 ✓ | Rendimiento y sonido de la apertura | Sonidos CC0 por rareza, botón de silencio, vibración, 250 kB por página comprobados en la CI; comprobada en un iPhone | experiencia |
+| 014 ✓ | Demo pulida con estilo kawaii | Paleta pastel sobre oscuro, pegatinas e iconos de doble tono, sobres compuestos con portada elegible o hechos a mano, apertura con agitado, brillo de rareza, confeti y resumen, anillo y racha de pegatinas, colección con portada y datos, sin cartas repetidas por sobre, `pnpm demo` optimizada | experiencia |
 | 007 ◐ | Operación y cumplimiento | Páginas legales y de probabilidades, divulgación IA, backups y restore, Sentry, CI, checklist de lanzamiento | motor |
 
 ## Camino al lanzamiento (orden acordado el 16 oct 2026)
@@ -32,7 +33,7 @@ el CI en verde.
 | Etapa | Qué | Necesita del usuario |
 |---|---|---|
 | 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012 ✓**: moderación de álbumes públicos (los términos ya la prometen); **spec 013 ✓**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos). **Etapa cerrada el 16 oct 2026.** | entrevistas cortas |
-| 1b. Demo pulida (**spec 014**) | Estilo kawaii sobre oscuro: iconos tipo pegatina, sobres compuestos con el arte de la colección (o subidos a mano), apertura con suspense, recompensas y colección con más vida, sin cartas repetidas por sobre, demo optimizada | maquetas aprobadas |
+| 1b. Demo pulida (**spec 014**) | Estilo kawaii sobre oscuro: iconos tipo pegatina, sobres compuestos con el arte de la colección (o subidos a mano), apertura con suspense, recompensas y colección con más vida, sin cartas repetidas por sobre, demo optimizada. **Spec 014 ✓, cerrada el 18 oct 2026** tras la prueba del usuario en su teléfono. | maquetas aprobadas |
 | 2. Contenido de pago | Pista de arte: elegir las 5 OCs, prueba A0 de consistencia, set SFW de ~30 cartas y set 18+; cargarlos con el panel | aprobar OCs y créditos |
 | 3. Salir a internet (**spec 015**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
 | 4. Piloto de pago (**spec 016**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
@@ -86,3 +87,6 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   Falta la lámina de Pencil (RF-16): Pencil no dibujaba elementos nuevos.
 - 16 oct 2026: spec 011 terminada y validada (17/17 RF): lámina «Sistema de diseño» en Pencil con un componente
   por cada uno del código, y tableros «Pantallas · Escritorio/Móvil» con las capturas reales (`pnpm showcase`).
+- 18 oct 2026: spec 014 terminada y validada (24/24 RF): demo pulida con estilo kawaii, probada y aprobada por el
+  usuario en su teléfono y en su ordenador. Siguiente, a decidir por el usuario: etapa 2 (OCs propias, con una prueba
+  de consistencia con una sola OC) o etapa 3 (spec 015, publicar la web).
