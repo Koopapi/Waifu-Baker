@@ -4,6 +4,10 @@ Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-17. Vitest: 424 de 42
 
 **Veredicto: spec cumplida** (24 de 24 RF con al menos un test en verde).
 
+Cierre: el usuario probó la demo en su teléfono y en su ordenador y la aprobó el 18 oct 2026. El único fallo que
+encontró (los botones de «Mis sobres» se salían de la tarjeta en pantalla ancha) se arregló en el PR #9, con su
+comprobación en el E2E de esta spec.
+
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
 | RF-1 | EL SISTEMA usará una paleta kawaii sobre fondo oscuro (rosa chicle, lavanda, menta, celeste y amarillo pastel) con radios más redondeados, sombras de color y brillos suaves, definida solo como tokens del sistema de diseño; los componentes adoptan el estilo sin cambiar cómo se usan y el texto mantiene un contraste de al menos 4,5:1. | ✓ paleta_pastel_viva_sobre_fondo_oscuro_como_tokens<br>✓ formas_mas_redondeadas_y_tipografia_redondeada | RF-1 a RF-4 y RF-24: estilo kawaii con pegatinas y botones con relieve | Cumplido |

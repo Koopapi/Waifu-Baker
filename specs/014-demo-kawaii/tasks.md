@@ -28,7 +28,10 @@
 
 ## Entrega 7 — Cierre
 - [x] **T15 — E2E en los cuatro proyectos** · Todos
-- [ ] **T16 — Capturas de antes y después y prueba en el teléfono** · Todos
+- [x] **T16 — Capturas de antes y después y prueba en el teléfono** · Todos · Hecho cuando: capturas de todas las
+  pantallas del coleccionista en móvil y escritorio (`pnpm showcase`, en el taller de arte, `presentacion-kawaii/`) y el
+  usuario la prueba en su teléfono y en su ordenador (aprobada el 18 oct 2026). De esa prueba salió un arreglo:
+  los botones de «Mis sobres» se salían de la tarjeta en pantalla ancha (PR #9).
 - [x] **T17 — Validación RF por RF y reglas de negocio** · Todos · Hecho cuando: `validation.md` da 24 de 24.
 
 ## Cobertura
