@@ -7,7 +7,7 @@ import { translateError } from "../src/i18n/errors";
 import { formatDate } from "../src/i18n/format";
 import { dictionaries } from "../src/i18n/index";
 import { DESKTOP, expect, test } from "./fixtures";
-import { acceptGate, createPublishedSet, giftPacks, LAB, login, untickAdmin } from "./helpers";
+import { LAB, acceptGate, createPublishedSet, dismissCelebration, giftPacks, login, untickAdmin } from "./helpers";
 
 const en = dictionaries.en;
 const es = dictionaries.es;
@@ -97,6 +97,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
   const fan = await login(browser, "fan-i18n", false, "/sobres");
   await giftPacks(adminEs, "fan-i18n", "I18N", 1);
   await fan.goto("/sobres");
+  await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-I18N"] >> text=Abrir un sobre').getAttribute("href");
   await fan.goto(`${href}/todos`);
   await fan.click('[data-testid="open-all"]');

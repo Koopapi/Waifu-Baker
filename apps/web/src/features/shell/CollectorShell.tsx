@@ -14,6 +14,10 @@ import { IconButton } from "@/ui/action/Button";
 import { FlightLayer } from "@/ui/game/FlightLayer";
 import { DemoBanner, demoRoleOf } from "@/features/demo/DemoBanner";
 import { CelebrationsProvider } from "@/features/rewards/celebrations";
+import { ArrivalsCelebration } from "@/features/rewards/ArrivalsCelebration";
+import { groupArrivals } from "@/domain/rewards/arrivals";
+import { pendingArrivals } from "@/server/services/arrivals";
+import { packArtForSets } from "@/server/services/pack-art";
 import { CookiesDetail } from "./CookiesDetail";
 import { HeaderSoundToggle } from "./HeaderSoundToggle";
 
@@ -33,6 +37,10 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
   const [t, jar] = await Promise.all([getDict(), cookies()]);
   const s = await shellSummary(db, user.id, { now: now(), timeZone: jar.get("wb_tz")?.value ?? null });
   const sh = t.common.shell;
+  // Spec 015, RF-6: llegadas sin celebrar, con el sobre de cada colección; la cola las muestra cuando toca.
+  const arrivals = groupArrivals(await pendingArrivals(db, user.id));
+  const arrivalsArt = arrivals ? await packArtForSets(db, arrivals.sets.map((x) => x.setId)) : null;
+  const arrivalsGroup = arrivals && arrivalsArt ? { ...arrivals, sets: arrivals.sets.map((x) => ({ ...x, art: arrivalsArt.get(x.setId) ?? { coverVersion: null, packImage: null } })) } : null;
   const packs: NavItem = { href: "/sobres", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed, flyTarget: "packs" };
   const collection: NavItem = { href: "/coleccion", label: t.common.nav.myCollection, icon: "collection" };
   const rewards: NavItem = { href: "/recompensas", label: sh.rewards, icon: "rewards", badge: s.rewardsReady };
@@ -79,7 +87,10 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
       }
     >
       {/* Spec 015: las celebraciones salen de una en una y los premios que vuelan se pintan por encima de todo. */}
-      <CelebrationsProvider>{children}</CelebrationsProvider>
+      <CelebrationsProvider>
+        {children}
+        <ArrivalsCelebration group={arrivalsGroup} />
+      </CelebrationsProvider>
       <FlightLayer />
     </AppShell>
   );

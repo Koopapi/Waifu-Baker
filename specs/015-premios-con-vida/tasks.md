@@ -29,11 +29,11 @@
   tests del dominio y de la fila.
 
 ## Entrega 4 — Llegadas
-- [ ] **T10 — Datos de llegadas**: migración `0010`, `domain/rewards/arrivals.ts` y `server/services/arrivals.ts` ·
+- [x] **T10 — Datos de llegadas**: migración `0010`, `domain/rewards/arrivals.ts` y `server/services/arrivals.ts` ·
   RF-6, RF-7, RF-8 · Hecho cuando: pasan los tests de dominio e integración.
-- [ ] **T11 — Celebración de llegadas al entrar**: en el shell, nunca en la apertura, una sola vez, marcada al
+- [x] **T11 — Celebración de llegadas al entrar**: en el shell, nunca en la apertura, una sola vez, marcada al
   mostrarse · RF-6, RF-7, RF-9 · Depende de T5 y T10.
-- [ ] **T12 — Etiqueta «¡Nuevo!» en «Mis sobres»** y marcar vistos al visitar · RF-8 · Depende de T10.
+- [x] **T12 — Etiqueta «¡Nuevo!» en «Mis sobres»** y marcar vistos al visitar · RF-8 · Depende de T10.
 
 ## Entrega 5 — Cierre
 - [ ] **T13 — El panel conserva sus avisos; textos, reglas de negocio y `DESIGN.md`** · RF-17 y todos · Hecho

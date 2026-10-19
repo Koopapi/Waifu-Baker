@@ -11,13 +11,15 @@ const badgeClasses = variants({
       warning: "bg-ui-warning/25 text-ui-warning-text",
       danger: "bg-ui-danger/20 text-ui-danger-text",
       info: "bg-ui-info/20 text-ui-info-text",
+      /** Spec 015, RF-8: «¡Nuevo!», amarillo limón con borde blanco, como una pegatina. */
+      new: "rounded-full border-2 border-k-blanco bg-k-limon font-display text-[13px] font-bold text-k-tinta shadow-[var(--shadow-sticker)]",
     },
   },
   defaults: { tone: "neutral" },
 });
 
 export interface BadgeProps {
-  tone?: "neutral" | "accent" | "success" | "warning" | "danger" | "info";
+  tone?: "neutral" | "accent" | "success" | "warning" | "danger" | "info" | "new";
   /** Contador redondo (avisos sin leer, sobres sin abrir): 99+ a partir de 100. */
   count?: number;
   children?: React.ReactNode;
