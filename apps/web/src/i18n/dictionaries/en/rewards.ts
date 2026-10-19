@@ -33,4 +33,30 @@ export const rewards = {
     reason: (r: string) => (r.startsWith("daily:") ? `Daily reward · day ${r.slice(6)}` : r.startsWith("admin:") ? `Adjustment · ${r.slice(6).trim()}` : r),
   },
   countdown: (h: number, m: number, s: number) => `${h}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`,
+  // Spec 015: premios con vida (celebraciones, vuelos, racha en peligro, errores junto al botón).
+  fx: {
+    close: "Awesome!",
+    goToPacks: "See my packs",
+    arrivals: {
+      title: (n: number) => (n === 1 ? "A pack arrived!" : `${n} packs arrived!`),
+      welcome: "Welcome!",
+      gift: "A gift for you",
+      tier: "Your subscription this month",
+      mixed: "New packs",
+    },
+    streak: {
+      kicker: "Day 7 of your streak",
+      title: "Streak complete!",
+      detail: (set: string) => `Your ${set} pack is now in My packs. A new streak starts tomorrow.`,
+      atRisk: "Claim today or you lose your streak!",
+    },
+    sr: {
+      gotCookies: (n: number, total: number) => `You got ${n} cookies. You have ${total}.`,
+      gotPack: "You got a pack. It is in My packs.",
+    },
+    failed: "Something went wrong",
+    failedDetail: "Check your connection and try again.",
+    retry: "Retry",
+    newPacks: (n: number) => (n === 1 ? "New!" : `${n} new`),
+  },
 };

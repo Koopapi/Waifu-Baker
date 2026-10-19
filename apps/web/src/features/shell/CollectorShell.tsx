@@ -13,6 +13,7 @@ import { AppShell, type NavItem } from "@/ui/shell/AppShell";
 import { IconButton } from "@/ui/action/Button";
 import { FlightLayer } from "@/ui/game/FlightLayer";
 import { DemoBanner, demoRoleOf } from "@/features/demo/DemoBanner";
+import { CelebrationsProvider } from "@/features/rewards/celebrations";
 import { CookiesDetail } from "./CookiesDetail";
 import { HeaderSoundToggle } from "./HeaderSoundToggle";
 
@@ -77,8 +78,8 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
         </>
       }
     >
-      {children}
-      {/* Spec 015: los premios que vuelan se pintan por encima de todo el coleccionista. */}
+      {/* Spec 015: las celebraciones salen de una en una y los premios que vuelan se pintan por encima de todo. */}
+      <CelebrationsProvider>{children}</CelebrationsProvider>
       <FlightLayer />
     </AppShell>
   );

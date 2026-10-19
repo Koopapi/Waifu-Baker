@@ -1,4 +1,6 @@
 export { AnimatedCounter } from "./AnimatedCounter";
+export { Celebration } from "./Celebration";
+export { Confetti } from "./Confetti";
 export { Countdown } from "./Countdown";
 export { FlightLayer } from "./FlightLayer";
 export { flights, useFlights } from "./flight";

@@ -33,4 +33,29 @@ export const rewards: typeof en = {
     reason: (r) => (r.startsWith("daily:") ? `Recompensa diaria · día ${r.slice(6)}` : r.startsWith("admin:") ? `Ajuste · ${r.slice(6).trim()}` : r),
   },
   countdown: (h, m, s) => `${h} h ${String(m).padStart(2, "0")} min ${String(s).padStart(2, "0")} s`,
+  fx: {
+    close: "¡Genial!",
+    goToPacks: "Ver mis sobres",
+    arrivals: {
+      title: (n) => (n === 1 ? "¡Te ha llegado un sobre!" : `¡Te han llegado ${n} sobres!`),
+      welcome: "¡Te damos la bienvenida!",
+      gift: "Un regalo para ti",
+      tier: "Tu suscripción de este mes",
+      mixed: "Sobres nuevos",
+    },
+    streak: {
+      kicker: "Día 7 de la racha",
+      title: "¡Racha completa!",
+      detail: (set) => `Tu sobre de ${set} ya está en Mis sobres. Mañana empieza una racha nueva.`,
+      atRisk: "¡Reclama hoy o pierdes la racha!",
+    },
+    sr: {
+      gotCookies: (n, total) => `Has recibido ${n} galletas. Tienes ${total}.`,
+      gotPack: "Has recibido un sobre. Está en Mis sobres.",
+    },
+    failed: "No ha funcionado",
+    failedDetail: "Comprueba tu conexión e inténtalo otra vez.",
+    retry: "Reintentar",
+    newPacks: (n) => (n === 1 ? "¡Nuevo!" : `${n} nuevos`),
+  },
 };

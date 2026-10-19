@@ -1,8 +1,10 @@
 "use client";
 
-// Spec 014, RF-13: confeti de pegatinas (estrellas y corazones con borde blanco) que sale de la carta revelada.
+// Spec 014, RF-13 y spec 015, RF-5 y RF-6: confeti de pegatinas (estrellas y corazones con borde blanco) que sale
+// de la carta revelada o de una celebración.
 // Solo `transform` y `opacity`; se quita solo al terminar.
 import { useEffect, useMemo, useState } from "react";
+import "./confetti.css";
 
 const STAR = "M7 0 L9 5 L14 7 L9 9 L7 14 L5 9 L0 7 L5 5 Z";
 const HEART = "M7 12 C1 8 0 5 0 3.5 C0 1.5 1.6 0 3.5 0 C5 0 6.3 0.9 7 2.2 C7.7 0.9 9 0 10.5 0 C12.4 0 14 1.5 14 3.5 C14 5 13 8 7 12 Z";

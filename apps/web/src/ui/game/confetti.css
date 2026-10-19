@@ -1,0 +1,37 @@
+/* Spec 014, RF-13 y spec 015: confeti de pegatinas. Solo `transform` y `opacity`; nada con movimiento reducido. */
+.confetti {
+  position: fixed;
+  width: 0;
+  height: 0;
+  z-index: var(--z-toast);
+  pointer-events: none;
+}
+.confetti__piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  filter: drop-shadow(0 2px 2px rgb(10 4 24 / 0.4));
+  animation: confettiFly 1.3s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+@keyframes confettiFly {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty) + 40px)) scale(1) rotate(var(--r));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}
