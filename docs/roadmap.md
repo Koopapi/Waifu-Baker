@@ -34,9 +34,10 @@ el CI en verde.
 |---|---|---|
 | 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012 ✓**: moderación de álbumes públicos (los términos ya la prometen); **spec 013 ✓**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos). **Etapa cerrada el 16 oct 2026.** | entrevistas cortas |
 | 1b. Demo pulida (**spec 014**) | Estilo kawaii sobre oscuro: iconos tipo pegatina, sobres compuestos con el arte de la colección (o subidos a mano), apertura con suspense, recompensas y colección con más vida, sin cartas repetidas por sobre, demo optimizada. **Spec 014 ✓, cerrada el 18 oct 2026** tras la prueba del usuario en su teléfono. | maquetas aprobadas |
+| 1c. Premios con vida (**spec 015**) | Galletas y sobres que vuelan hasta su contador, celebración central para los sobres que llegan sin pedirlos y el día 7, racha que se estampa y avisa en el día de gracia, sonidos y vibración por el motor de la apertura, fuera los avisos del sistema para el coleccionista | maquetas aprobadas |
 | 2. Contenido de pago | Pista de arte: elegir las 5 OCs, prueba A0 de consistencia, set SFW de ~30 cartas y set 18+; cargarlos con el panel | aprobar OCs y créditos |
-| 3. Salir a internet (**spec 015**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
-| 4. Piloto de pago (**spec 016**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
+| 3. Salir a internet (**spec 016**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
+| 4. Piloto de pago (**spec 017**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
 | 5. Beta cerrada | Pocos patrons invitados, métricas y correcciones antes de abrir | lista de invitados |
 | Después | Tienda de galletas, juegos (una spec por juego), temas por colección, Storybook | — |
 
@@ -89,4 +90,6 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   por cada uno del código, y tableros «Pantallas · Escritorio/Móvil» con las capturas reales (`pnpm showcase`).
 - 18 oct 2026: spec 014 terminada y validada (24/24 RF): demo pulida con estilo kawaii, probada y aprobada por el
   usuario en su teléfono y en su ordenador. Siguiente, a decidir por el usuario: etapa 2 (OCs propias, con una prueba
-  de consistencia con una sola OC) o etapa 3 (spec 015, publicar la web).
+  de consistencia con una sola OC) o etapa 3 (publicar la web).
+- 18 oct 2026: el usuario pide, antes de seguir, que recibir premios sea mucho más dinámico (los avisos de abajo a la
+  derecha no le convencen). Entra como spec 015 «Premios con vida»; la publicación pasa a ser la 016 y el piloto la 017.
