@@ -9,6 +9,19 @@ resto, Phosphor en doble tono. El sobre de cada colección es `PackArt` (compues
 mano subido en el panel. En código, los tokens viven en `apps/web/src/ui/tokens.css`; el texto sobre los colores
 sólidos va en tinta oscura (`--ui-on-accent`). Sustituye a la paleta «Cereza» de la spec 010.
 
+### Premios con vida (spec 015, 18 oct 2026)
+
+Lámina «Premios (spec 015)», debajo de la kawaii. Lo pequeño vuela y lo grande se celebra: `FlightLayer` pinta las
+pegatinas que vuelan en arco (Web Animations API, solo `transform` y `opacity`) hasta los elementos con
+`data-fly-target` («packs» en la navegación, «cookies» en los contadores), que rebotan al recibirlas; los contadores
+(`Badge` con `count`, `AnimatedCounter`) suben como un marcador. `Celebration` es un diálogo kawaii (píldora de
+origen, título, el sobre en grande, contador «×n», confeti de `Confetti` y botones) que la cola de
+`features/rewards/celebrations.tsx` muestra de una en una y nunca en la apertura. La pegatina del día (`StreakRow`)
+se estampa al reclamar (`.streak-stamp`) y late en el día de gracia (`.streak-pulse`); la etiqueta «¡Nuevo!» es
+`Badge tone="new"`; el error junto al botón es `Alert tone="danger"` con `actions`; el botón de silencio de la
+cabecera reutiliza `SoundToggle`. Con movimiento reducido nada vuela, late ni estampa; la celebración aparece sin
+animación.
+
 ## Marco de carta (aprobado para el piloto, 14 oct 2026)
 
 Diseñado en Pencil: `/Users/koopa/Documents/Waifu Baker/waifubaker.pen`, lámina

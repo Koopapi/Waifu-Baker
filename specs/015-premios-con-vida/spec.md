@@ -39,58 +39,30 @@ ni de sobres (specs 001 y 004).
 ## Requisitos funcionales (criterios de aceptación en EARS)
 
 ### Premios que vuelan
-- RF-1: CUANDO el coleccionista reclame una recompensa diaria de galletas, EL SISTEMA hará volar pegatinas de galleta
-  desde la pegatina del día hasta el contador de galletas a la vista, y el contador subirá como un marcador desde el
-  valor anterior al nuevo mientras llegan; nunca cambiará de golpe.
-- RF-2: CUANDO el coleccionista reclame un sobre gratis, EL SISTEMA hará volar una pegatina de sobre desde el botón
-  hasta el acceso a «Mis sobres» de la navegación (la pestaña «Sobres» en móvil, «Mis sobres» en escritorio), que
-  rebotará al recibirla y subirá su número; la carga gastada se apagará encogiéndose y el anillo empezará a llenarse.
-- RF-3: EL SISTEMA moverá con el mismo marcador todos los contadores del coleccionista a la vista que cambien por un
-  premio (galletas del panel de recompensas, galletas del pie de la barra lateral, número de sobres de la navegación).
-- RF-4: MIENTRAS un premio vuela, EL SISTEMA no bloqueará la pantalla ni los botones; SI el destino no está a la vista,
-  ENTONCES el premio volará hacia el borde de la pantalla más cercano al destino y el contador se actualizará igual;
-  SI el coleccionista cambia de página antes de que termine, ENTONCES los contadores mostrarán el valor final.
+- RF-1: CUANDO el coleccionista reclame una recompensa diaria de galletas, EL SISTEMA hará volar pegatinas de galleta desde la pegatina del día hasta el contador de galletas a la vista, y el contador subirá como un marcador desde el valor anterior al nuevo mientras llegan; nunca cambiará de golpe.
+- RF-2: CUANDO el coleccionista reclame un sobre gratis, EL SISTEMA hará volar una pegatina de sobre desde el botón hasta el acceso a «Mis sobres» de la navegación (la pestaña «Sobres» en móvil, «Mis sobres» en escritorio), que rebotará al recibirla y subirá su número; la carga gastada se apagará encogiéndose y el anillo empezará a llenarse.
+- RF-3: EL SISTEMA moverá con el mismo marcador todos los contadores del coleccionista a la vista que cambien por un premio (galletas del panel de recompensas, galletas del pie de la barra lateral, número de sobres de la navegación).
+- RF-4: MIENTRAS un premio vuela, EL SISTEMA no bloqueará la pantalla ni los botones; SI el destino no está a la vista, ENTONCES el premio volará hacia el borde de la pantalla más cercano al destino y el contador se actualizará igual; SI el coleccionista cambia de página antes de que termine, ENTONCES los contadores mostrarán el valor final.
 
 ### Celebración central
-- RF-5: CUANDO el coleccionista reclame el día 7 de la racha, EL SISTEMA estampará la pegatina del día y mostrará la
-  celebración central con el sobre de la colección elegida, el título «¡Racha completa!», confeti y un botón para
-  cerrarla; al cerrarla, el sobre volará hasta la navegación como en RF-2 y la racha empezará de nuevo en la fila.
-- RF-6: CUANDO el coleccionista entre en una página del coleccionista y tenga llegadas sin celebrar, EL SISTEMA
-  mostrará una sola celebración central que las junte: cuántos sobres son, el sobre de cada colección y de dónde
-  vienen («¡Bienvenida!», «Un regalo para ti», «Tu suscripción de este mes»), con un botón para ir a «Mis sobres» y
-  otro para cerrarla.
-- RF-7: EL SISTEMA celebrará cada llegada una sola vez, también si el coleccionista entra desde varios dispositivos;
-  SI la celebración no llega a mostrarse (cierra la pestaña antes), ENTONCES se mostrará la próxima vez; un sobre
-  anulado antes de celebrarse no se celebra.
-- RF-8: EL SISTEMA mostrará en «Mis sobres», en cada colección con llegadas aún no vistas, una etiqueta «¡Nuevo!» con
-  cuántas son; dejará de mostrarla cuando el coleccionista haya visitado «Mis sobres» con ellas o las haya abierto.
-- RF-9: EL SISTEMA no mostrará la celebración de llegadas encima de la apertura de un sobre ni de «Abrir todos», ni
-  mientras otra celebración esté abierta: esperará a la siguiente página o a que se cierre la anterior; las
-  celebraciones salen de una en una y en el orden en que se ganaron.
+- RF-5: CUANDO el coleccionista reclame el día 7 de la racha, EL SISTEMA estampará la pegatina del día y mostrará la celebración central con el sobre de la colección elegida, el título «¡Racha completa!», confeti y un botón para cerrarla; al cerrarla, el sobre volará hasta la navegación como en RF-2 y la racha empezará de nuevo en la fila.
+- RF-6: CUANDO el coleccionista entre en una página del coleccionista y tenga llegadas sin celebrar, EL SISTEMA mostrará una sola celebración central que las junte: cuántos sobres son, el sobre de cada colección y de dónde vienen («¡Bienvenida!», «Un regalo para ti», «Tu suscripción de este mes»), con un botón para ir a «Mis sobres» y otro para cerrarla.
+- RF-7: EL SISTEMA celebrará cada llegada una sola vez, también si el coleccionista entra desde varios dispositivos; SI la celebración no llega a mostrarse (cierra la pestaña antes), ENTONCES se mostrará la próxima vez; un sobre anulado antes de celebrarse no se celebra.
+- RF-8: EL SISTEMA mostrará en «Mis sobres», en cada colección con llegadas aún no vistas, una etiqueta «¡Nuevo!» con cuántas son; dejará de mostrarla cuando el coleccionista haya visitado «Mis sobres» con ellas o las haya abierto.
+- RF-9: EL SISTEMA no mostrará la celebración de llegadas encima de la apertura de un sobre ni de «Abrir todos», ni mientras otra celebración esté abierta: esperará a la siguiente página o a que se cierre la anterior; las celebraciones salen de una en una y en el orden en que se ganaron.
 
 ### Racha
-- RF-10: CUANDO el coleccionista reclame la recompensa diaria, EL SISTEMA estampará la pegatina de hoy (crece, cae en
-  su sitio con un destello) antes de que vuelen las galletas o salga la celebración.
-- RF-11: MIENTRAS la racha esté en su día de gracia, EL SISTEMA hará latir suavemente la pegatina de hoy y mostrará
-  «¡Reclama hoy o pierdes la racha!» en lugar del texto habitual sobre el día de gracia; con la racha a salvo, ya
-  reclamada o sin empezar no habrá latido.
+- RF-10: CUANDO el coleccionista reclame la recompensa diaria, EL SISTEMA estampará la pegatina de hoy (crece, cae en su sitio con un destello) antes de que vuelen las galletas o salga la celebración.
+- RF-11: MIENTRAS la racha esté en su día de gracia, EL SISTEMA hará latir suavemente la pegatina de hoy y mostrará «¡Reclama hoy o pierdes la racha!» en lugar del texto habitual sobre el día de gracia; con la racha a salvo, ya reclamada o sin empezar no habrá latido.
 
 ### Sonido y vibración
-- RF-12: EL SISTEMA reproducirá un tintineo cuando las galletas lleguen al contador, un «plop» cuando el sobre
-  aterrice en la navegación y una fanfarria breve al abrirse una celebración central; los tres sonidos serán de
-  dominio público (CC0), con su origen en `LICENSES.md`, y pasarán por el mismo motor y botón de silencio de la
-  apertura (spec 013): silenciado, no suena nada.
-- RF-13: CUANDO se abra una celebración central en un dispositivo con vibración y el sonido no esté silenciado, EL
-  SISTEMA vibrará suavemente una vez; los premios que vuelan no vibran.
-- RF-14: EL SISTEMA mostrará el botón de silencio también en la cabecera del coleccionista, en todas sus páginas, con
-  el mismo estado que el de la apertura.
+- RF-12: EL SISTEMA reproducirá un tintineo cuando las galletas lleguen al contador, un «plop» cuando el sobre aterrice en la navegación y una fanfarria breve al abrirse una celebración central; los tres sonidos serán de dominio público (CC0), con su origen en `LICENSES.md`, y pasarán por el mismo motor y botón de silencio de la apertura (spec 013): silenciado, no suena nada.
+- RF-13: CUANDO se abra una celebración central en un dispositivo con vibración y el sonido no esté silenciado, EL SISTEMA vibrará suavemente una vez; los premios que vuelan no vibran.
+- RF-14: EL SISTEMA mostrará el botón de silencio también en la cabecera del coleccionista, en todas sus páginas, con el mismo estado que el de la apertura.
 
 ### Avisos
-- RF-15: EL SISTEMA no mostrará avisos emergentes ni mensajes de éxito dentro de la tarjeta por reclamar recompensas;
-  el premio se comunica solo con el vuelo o la celebración y, a los lectores de pantalla, con un anuncio de texto
-  equivalente («Has recibido 10 galletas. Tienes 30.»).
-- RF-16: SI reclamar falla (sin conexión, sesión caducada, ya reclamada), ENTONCES EL SISTEMA mostrará el error junto
-  al botón con el estilo kawaii y, cuando tenga sentido reintentar, un botón «Reintentar»; no volará ni sonará nada.
+- RF-15: EL SISTEMA no mostrará avisos emergentes ni mensajes de éxito dentro de la tarjeta por reclamar recompensas; el premio se comunica solo con el vuelo o la celebración y, a los lectores de pantalla, con un anuncio de texto equivalente («Has recibido 10 galletas. Tienes 30.»).
+- RF-16: SI reclamar falla (sin conexión, sesión caducada, ya reclamada), ENTONCES EL SISTEMA mostrará el error junto al botón con el estilo kawaii y, cuando tenga sentido reintentar, un botón «Reintentar»; no volará ni sonará nada.
 - RF-17: EL SISTEMA conservará los avisos emergentes del panel de administración tal como están.
 
 ## Requisitos no funcionales

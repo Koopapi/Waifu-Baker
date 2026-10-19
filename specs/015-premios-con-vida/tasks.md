@@ -36,7 +36,7 @@
 - [x] **T12 — Etiqueta «¡Nuevo!» en «Mis sobres»** y marcar vistos al visitar · RF-8 · Depende de T10.
 
 ## Entrega 5 — Cierre
-- [ ] **T13 — El panel conserva sus avisos; textos, reglas de negocio y `DESIGN.md`** · RF-17 y todos · Hecho
+- [x] **T13 — El panel conserva sus avisos; textos, reglas de negocio y `DESIGN.md`** · RF-17 y todos · Hecho
   cuando: test de que el panel sigue usando avisos emergentes; `docs/reglas-de-negocio.md` y `docs/DESIGN.md` al día.
 - [ ] **T14 — E2E `premios.spec.ts` en los cuatro proyectos y presupuesto** · Todos · Depende de T6 a T12.
 - [ ] **T15 — Validación RF por RF y prueba del usuario en el teléfono** · Todos · Hecho cuando: `validation.md` da

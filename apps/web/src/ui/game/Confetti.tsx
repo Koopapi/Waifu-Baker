@@ -8,7 +8,8 @@ import "./confetti.css";
 
 const STAR = "M7 0 L9 5 L14 7 L9 9 L7 14 L5 9 L0 7 L5 5 Z";
 const HEART = "M7 12 C1 8 0 5 0 3.5 C0 1.5 1.6 0 3.5 0 C5 0 6.3 0.9 7 2.2 C7.7 0.9 9 0 10.5 0 C12.4 0 14 1.5 14 3.5 C14 5 13 8 7 12 Z";
-const COLORS = ["#ff7eb6", "#b79cff", "#7ef0c9", "#7cc8ff", "#ffe27a", "#ffb38a"];
+// Los tonos de las pegatinas (tokens del sistema), nunca colores sueltos.
+const COLORS = ["var(--ui-k-chicle)", "var(--ui-k-lavanda)", "var(--ui-k-menta)", "var(--ui-k-celeste)", "var(--ui-k-limon)", "var(--ui-k-melocoton)"];
 
 export interface ConfettiBurst {
   key: number;
@@ -54,7 +55,7 @@ export function Confetti({ burst }: { burst: ConfettiBurst | null }) {
           className="confetti__piece"
           style={{ width: p.size, height: p.size, "--tx": `${p.tx}px`, "--ty": `${p.ty}px`, "--r": `${p.r}deg`, animationDelay: `${p.delay}s` } as React.CSSProperties}
         >
-          <path d={p.heart ? HEART : STAR} fill={p.color} stroke="#ffffff" strokeWidth={2.5} paintOrder="stroke" strokeLinejoin="round" />
+          <path d={p.heart ? HEART : STAR} fill={p.color} stroke="var(--ui-k-blanco)" strokeWidth={2.5} paintOrder="stroke" strokeLinejoin="round" />
         </svg>
       ))}
     </div>

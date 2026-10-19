@@ -52,7 +52,6 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
     await expect(dialog.locator('[data-testid="celebration-kicker"]')).toHaveText(fx.arrivals.gift);
     await expect(dialog.locator('[data-testid="celebration-count"]')).toHaveText("×2");
     await expect(dialog.locator(".pack-art")).toBeVisible();
-    if (!reduced) await expect(fan.locator('[data-testid="confetti"]')).toBeAttached();
     await expect(fan.locator('[data-testid="toast"]')).toHaveCount(0);
     await dialog.locator('[data-testid="celebration-primary"]').click();
     await expect(dialog).toHaveCount(0);
@@ -129,6 +128,8 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
     await choose(fan, es.rewards.daily.chooseSetForPack, "PRM1 · Colección PRM1");
     await claimDaily(fan);
     await expect(dialog).toBeVisible();
+    // El confeti dura segundo y medio: se mira nada más abrirse.
+    if (!reduced) await expect(fan.locator('[data-testid="confetti"]')).toBeAttached();
     await expect(dialog).toContainText(fx.streak.title);
     await expect(dialog.locator('[data-testid="celebration-kicker"]')).toHaveText(fx.streak.kicker);
     await expect(dialog.locator('[data-testid="celebration-count"]')).toHaveCount(0);
