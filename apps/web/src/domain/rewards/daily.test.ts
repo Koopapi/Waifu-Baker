@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DAILY_SCHEDULE, checkDailyClaim, dailyStatus, daysBetween, localDay, safeTimeZone, type DailyState } from "./daily";
+import { DAILY_SCHEDULE, checkDailyClaim, dailyAtRisk, dailyStatus, daysBetween, localDay, safeTimeZone, type DailyState } from "./daily";
 
 const fresh: DailyState = { streakDay: 0, lastDay: null, lastAt: null, lastTimeZone: null };
 
@@ -40,5 +40,25 @@ describe("spec 009 — recompensa diaria", () => {
   it("test_s009_rf14_tras_el_dia_7_empieza_una_racha_nueva", () => {
     expect(dailyStatus({ ...fresh, streakDay: 7, lastDay: "2026-10-15" }, "2026-10-16")).toEqual({ claimedToday: false, day: 1 });
     expect(checkDailyClaim({ ...fresh, streakDay: 6, lastDay: "2026-10-15" }, new Date("2026-10-16T12:00:00Z"), "UTC")).toMatchObject({ day: 7, reward: { kind: "pack" } });
+  });
+});
+
+describe("spec 015 — racha en peligro (día de gracia)", () => {
+  const st = (streakDay: number, lastDay: string | null): DailyState => ({ streakDay, lastDay, lastAt: null, lastTimeZone: null });
+
+  it("test_s015_rf11_ayer_sin_reclamar_y_hoy_tampoco_la_racha_esta_en_peligro", () => {
+    expect(dailyAtRisk(st(4, "2026-10-16"), "2026-10-18")).toBe(true);
+  });
+
+  it("test_s015_rf11_con_la_racha_a_salvo_o_ya_reclamada_no_hay_peligro", () => {
+    expect(dailyAtRisk(st(4, "2026-10-17"), "2026-10-18")).toBe(false);
+    expect(dailyAtRisk(st(4, "2026-10-18"), "2026-10-18")).toBe(false);
+  });
+
+  it("test_s015_rf11_sin_racha_empezada_o_completada_no_hay_nada_que_perder", () => {
+    expect(dailyAtRisk(st(0, null), "2026-10-18")).toBe(false);
+    expect(dailyAtRisk(st(7, "2026-10-16"), "2026-10-18")).toBe(false);
+    // Tres días: la racha ya se perdió; mañana empieza otra, no hay aviso.
+    expect(dailyAtRisk(st(4, "2026-10-15"), "2026-10-18")).toBe(false);
   });
 });

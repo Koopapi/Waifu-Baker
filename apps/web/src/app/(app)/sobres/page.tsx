@@ -22,13 +22,15 @@ export default async function MisSobresPage() {
   const user = await requireUser("/sobres");
   const tz = (await cookies()).get("wb_tz")?.value ?? null;
   const at = now();
-  const [groups, pending, rw, sets] = await Promise.all([
+  const [groups, pending, rw, plainSets] = await Promise.all([
     listMyPacks(db, user.id),
     pendingOpening(db, user.id),
     rewardsSummary(db, user.id, { now: at, timeZone: tz }),
     claimableSets(db),
   ]);
-  const art = await packArtForSets(db, groups.map((g) => g.setId));
+  const art = await packArtForSets(db, [...new Set([...groups.map((g) => g.setId), ...plainSets.map((s) => s.id)])]);
+  // Spec 015, RF-5: el sobre de la colección elegida sale en la celebración del día 7.
+  const sets = plainSets.map((s) => ({ ...s, art: art.get(s.id) ?? { coverVersion: null, packImage: null } }));
   const total = groups.reduce((a, g) => a + g.sealed, 0);
   const t = await getDict();
 

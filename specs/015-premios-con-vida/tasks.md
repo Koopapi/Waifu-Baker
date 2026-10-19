@@ -6,26 +6,26 @@
   cabecera; móvil y escritorio · RF-1 a RF-16 · Hecho cuando: el usuario las aprueba (aprobadas el 18 oct 2026; lámina «Premios (spec 015)»).
 
 ## Entrega 2 — Base
-- [ ] **T2 — Motor de sonido compartido**: mover el motor a `features/sound`, lista de sonidos en `domain/feedback`,
+- [x] **T2 — Motor de sonido compartido**: mover el motor a `features/sound`, lista de sonidos en `domain/feedback`,
   carga perezosa al primer `play`, tres sonidos CC0 con su licencia · RF-12 · Hecho cuando: pasan los tests del motor
   y de los ficheros, y la apertura suena igual.
-- [ ] **T3 — Botón de silencio en la cabecera** · RF-14 · Depende de T2 · Hecho cuando: el botón de la cabecera y el
+- [x] **T3 — Botón de silencio en la cabecera** · RF-14 · Depende de T2 · Hecho cuando: el botón de la cabecera y el
   de la apertura comparten estado (test).
-- [ ] **T4 — Vuelo de premios**: `domain/rewards/flight.ts`, `ui/game/flight.ts` y `FlightLayer`, destinos en el
+- [x] **T4 — Vuelo de premios**: `domain/rewards/flight.ts`, `ui/game/flight.ts` y `FlightLayer`, destinos en el
   shell y `Badge` con marcador · RF-2, RF-3, RF-4 · Hecho cuando: pasan los tests del dominio y del motor (con
   `animate` falso y con movimiento reducido).
-- [ ] **T5 — Celebración**: `Confetti` a `ui/game`, `Celebration` sobre `Modal`, cola de celebraciones, fanfarria y
+- [x] **T5 — Celebración**: `Confetti` a `ui/game`, `Celebration` sobre `Modal`, cola de celebraciones, fanfarria y
   vibración; en `/sistema` · RF-5, RF-6, RF-9, RF-12, RF-13 · Depende de T2 · Hecho cuando: pasan sus tests (diálogo
   accesible, confeti, una a la vez, sonido y vibración solo al abrirse).
 
 ## Entrega 3 — Recompensas
-- [ ] **T6 — Reclamar galletas**: la acción devuelve el premio; estampado, vuelo al contador, marcador, anuncio para
+- [x] **T6 — Reclamar galletas**: la acción devuelve el premio; estampado, vuelo al contador, marcador, anuncio para
   lectores de pantalla; fuera el aviso emergente y el mensaje de la tarjeta; error junto al botón con «Reintentar»
   cuando procede · RF-1, RF-10, RF-15, RF-16 · Depende de T4 · Hecho cuando: pasan los tests del panel.
-- [ ] **T7 — Reclamar un sobre gratis**: vuelo hasta la navegación con rebote, carga que se apaga, anillo que empieza
+- [x] **T7 — Reclamar un sobre gratis**: vuelo hasta la navegación con rebote, carga que se apaga, anillo que empieza
   · RF-2 · Depende de T4 · Hecho cuando: pasa su test.
-- [ ] **T8 — Día 7**: estampado, celebración «¡Racha completa!» y vuelo al cerrarla · RF-5 · Depende de T5 y T6.
-- [ ] **T9 — Día de gracia**: `dailyAtRisk`, dato en el resumen, latido y texto · RF-11 · Hecho cuando: pasan los
+- [x] **T8 — Día 7**: estampado, celebración «¡Racha completa!» y vuelo al cerrarla · RF-5 · Depende de T5 y T6.
+- [x] **T9 — Día de gracia**: `dailyAtRisk`, dato en el resumen, latido y texto · RF-11 · Hecho cuando: pasan los
   tests del dominio y de la fila.
 
 ## Entrega 4 — Llegadas

@@ -3,17 +3,31 @@
 import { useT } from "@/i18n/client";
 import { Sticker } from "@/ui/icons/Sticker";
 import { cx } from "@/ui/variants";
+import "./rewards.css";
 
 type Reward = { kind: "cookies"; amount: number } | { kind: "pack" };
+
+/** Lo que dura el estampado: después salen volando las galletas o la celebración. */
+export const STAMP_MS = 450;
+
+export interface StreakRowProps {
+  schedule: Reward[];
+  day: number;
+  claimedToday: boolean;
+  /** Spec 015, RF-10: el día que se acaba de reclamar se estampa. */
+  stamping?: number | null;
+  /** Spec 015, RF-11: en el día de gracia, la pegatina de hoy late. */
+  atRisk?: boolean;
+}
 
 /**
  * Spec 014, RF-17: la racha como pegatinas por día: hechos (menta, con ✓), el de hoy (chicle, con brillo) y los
  * siguientes. A la vista solo el número y su pegatina; el texto completo, para lectores de pantalla.
  */
-export function StreakRow({ schedule, day, claimedToday }: { schedule: Reward[]; day: number; claimedToday: boolean }) {
+export function StreakRow({ schedule, day, claimedToday, stamping = null, atRisk = false }: StreakRowProps) {
   const t = useT().rewards;
   return (
-    <ol className="grid grid-cols-7 gap-1.5" data-testid="streak">
+    <ol className="grid grid-cols-7 gap-1.5" data-testid="streak" data-at-risk={atRisk || undefined}>
       {schedule.map((r, i) => {
         const n = i + 1;
         const done = claimedToday ? n <= day : n < day;
@@ -24,11 +38,14 @@ export function StreakRow({ schedule, day, claimedToday }: { schedule: Reward[];
             <span className="sr-only">{`${t.daily.day(n)}: ${r.kind === "cookies" ? t.daily.cookies(r.amount) : t.daily.pack}`}</span>
             <span
               aria-hidden
+              data-day-sticker={n}
               className={cx(
-                "grid size-10 place-items-center rounded-full border-[3px] font-display text-base font-semibold",
+                "relative grid size-10 place-items-center rounded-full border-[3px] font-display text-base font-semibold",
                 state === "done" && "border-k-blanco bg-k-menta text-k-tinta shadow-[var(--shadow-relief-soft)]",
                 state === "current" && "border-k-blanco bg-k-chicle text-k-tinta shadow-[0_0_14px_2px_var(--ui-k-chicle)]",
                 state === "next" && (r.kind === "pack" ? "border-k-blanco bg-k-limon text-k-tinta" : "border-k-lavanda/40 bg-ui-hover text-ui-text-3"),
+                stamping === n && "streak-stamp",
+                current && atRisk && stamping !== n && "streak-pulse",
               )}
             >
               {state === "done" ? "✓" : n}

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { cookieLedger, packs, sets, userRewards, users } from "@/db/schema";
-import { DAILY_SCHEDULE, checkDailyClaim, dailyStatus, localDay, safeTimeZone } from "@/domain/rewards/daily";
+import { DAILY_SCHEDULE, checkDailyClaim, dailyAtRisk, dailyStatus, localDay, safeTimeZone } from "@/domain/rewards/daily";
 import { FREE_MAX, currentFree, spendFree } from "@/domain/rewards/free-packs";
 import type { DbLike } from "@/server/db-types";
 import { AppError } from "@/server/errors";
@@ -44,10 +44,13 @@ export async function rewardsSummary(db: DbLike, userId: string, opts: { now: Da
   const row = await db.transaction((tx) => lockRow(tx, userId, opts.now));
   const free = currentFree({ charges: row.freeCharges, anchor: row.freeAnchor }, opts.now);
   const tz = safeTimeZone(opts.timeZone ?? row.lastTimeZone);
-  const daily = dailyStatus({ streakDay: row.streakDay, lastDay: row.lastDailyDay, lastAt: row.lastDailyAt, lastTimeZone: row.lastTimeZone }, localDay(opts.now, tz));
+  const state = { streakDay: row.streakDay, lastDay: row.lastDailyDay, lastAt: row.lastDailyAt, lastTimeZone: row.lastTimeZone };
+  const today = localDay(opts.now, tz);
+  const daily = dailyStatus(state, today);
   return {
     free: { charges: free.charges, max: FREE_MAX, nextAt: free.nextAt },
-    daily: { ...daily, schedule: DAILY_SCHEDULE },
+    // Spec 015, RF-11: `atRisk` = día de gracia con una racha que perder.
+    daily: { ...daily, atRisk: dailyAtRisk(state, today), schedule: DAILY_SCHEDULE },
     cookies: row.cookies,
   };
 }

@@ -1,0 +1,71 @@
+/*
+ * Spec 015, RF-10 y RF-11: la pegatina del día se estampa al reclamar (crece, cae en su sitio con un destello) y
+ * late en el día de gracia. Solo `transform` y `opacity`; nada con movimiento reducido.
+ */
+.streak-stamp {
+  animation: streakStamp 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.streak-stamp::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 3px solid var(--ui-k-blanco);
+  animation: streakFlash 0.45s ease-out both;
+}
+@keyframes streakStamp {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.35);
+  }
+  70% {
+    transform: scale(0.94);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes streakFlash {
+  from {
+    opacity: 0.9;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+.streak-pulse::before,
+.streak-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 999px;
+  border: 2px solid var(--ui-k-chicle);
+  animation: streakPulse 1.6s ease-out infinite;
+}
+.streak-pulse::after {
+  animation-delay: 0.8s;
+}
+@keyframes streakPulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .streak-stamp,
+  .streak-stamp::after {
+    animation: none;
+  }
+  .streak-pulse::before,
+  .streak-pulse::after {
+    display: none;
+  }
+}
