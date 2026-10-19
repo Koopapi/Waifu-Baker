@@ -53,6 +53,23 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
     await expect(dialog.locator('[data-testid="celebration-count"]')).toHaveText("×2");
     await expect(dialog.locator(".pack-art")).toBeVisible();
     await expect(fan.locator('[data-testid="toast"]')).toHaveCount(0);
+    // Centrada y entera dentro de la pantalla, también en una pantalla baja (el portátil del usuario: 868 × 625).
+    const centered = async () => {
+      await fan.waitForTimeout(600);
+      const vp = fan.viewportSize()!;
+      const b = (await dialog.boundingBox())!;
+      expect(b.y).toBeGreaterThanOrEqual(0);
+      expect(b.y + b.height).toBeLessThanOrEqual(vp.height);
+      expect(Math.abs(b.x + b.width / 2 - vp.width / 2)).toBeLessThan(4);
+      expect(Math.abs(b.y + b.height / 2 - vp.height / 2)).toBeLessThan(4);
+    };
+    await centered();
+    if (!test.info().project.use.isMobile) {
+      const size = fan.viewportSize()!;
+      await fan.setViewportSize({ width: 868, height: 625 });
+      await centered();
+      await fan.setViewportSize(size);
+    }
     await dialog.locator('[data-testid="celebration-primary"]').click();
     await expect(dialog).toHaveCount(0);
     await expect(fan).toHaveURL(/\/sobres$/);

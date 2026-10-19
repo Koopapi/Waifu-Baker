@@ -31,7 +31,7 @@ export function ArrivalsCelebration({ group }: { group: ArrivalsGroupDTO | null 
       title: t.arrivals.title(group.total),
       detail: group.sets.map((s) => (s.count > 1 ? `${s.name} ×${s.count}` : s.name)).join(" · "),
       count: group.total,
-      art: <PackArt setId={first.setId} code={first.code} name={first.name} art={first.art} className="w-[180px]" />,
+      art: <PackArt setId={first.setId} code={first.code} name={first.name} art={first.art} className="w-[min(180px,26dvh)]" />,
       primary: { label: t.goToPacks, href: "/sobres" },
       onShown: () => void markCelebratedAction(group.ids),
     });

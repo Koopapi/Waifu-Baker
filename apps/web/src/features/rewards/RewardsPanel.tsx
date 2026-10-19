@@ -164,7 +164,7 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
       kickerTone: "mint",
       title: fx.streak.title,
       detail: fx.streak.detail(set?.name ?? ""),
-      art: set ? <PackArt setId={set.id} code={set.code} name={set.name} art={set.art} className="w-[180px]" /> : <Sticker name="pack" className="size-32" />,
+      art: set ? <PackArt setId={set.id} code={set.code} name={set.name} art={set.art} className="w-[min(180px,26dvh)]" /> : <Sticker name="pack" className="size-32" />,
       onClosed: () => void packLands(rectOf(document.querySelector('[data-testid="celebration-dialog"]'))),
     });
   };

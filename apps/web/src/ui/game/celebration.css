@@ -1,15 +1,19 @@
-/* Spec 015, RF-5 y RF-6: la tarjeta de celebración entra con un pequeño rebote; con movimiento reducido, aparece. */
+/*
+ * Spec 015, RF-5 y RF-6: la tarjeta de celebración entra con un pequeño rebote; con movimiento reducido, aparece.
+ * Solo `scale` y `opacity`: el centrado lo hace la propiedad `translate` de Tailwind y no se debe tocar aquí (si la
+ * animación usara `transform: translate(...)`, se sumaría y la tarjeta saldría desplazada hacia arriba).
+ */
 .celebration {
   animation: celebrationIn 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
 @keyframes celebrationIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.82);
+    scale: 0.82;
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+    scale: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {
