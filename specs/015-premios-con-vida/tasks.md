@@ -38,9 +38,11 @@
 ## Entrega 5 — Cierre
 - [x] **T13 — El panel conserva sus avisos; textos, reglas de negocio y `DESIGN.md`** · RF-17 y todos · Hecho
   cuando: test de que el panel sigue usando avisos emergentes; `docs/reglas-de-negocio.md` y `docs/DESIGN.md` al día.
-- [ ] **T14 — E2E `premios.spec.ts` en los cuatro proyectos y presupuesto** · Todos · Depende de T6 a T12.
+- [x] **T14 — E2E `premios.spec.ts` en los cuatro proyectos y presupuesto** · Todos · Depende de T6 a T12 · Hecho: 16/16 en
+  escritorio; premios, recompensas, kawaii, sonido, coleccionista, estructura y demo en pixel-7, iphone-14 y movimiento
+  reducido; `pnpm budget` 205 kB como máximo (`/cuenta`).
 - [ ] **T15 — Validación RF por RF y prueba del usuario en el teléfono** · Todos · Hecho cuando: `validation.md` da
-  17 de 17 y el usuario aprueba la prueba.
+  17 de 17 (hecho el 19 oct 2026) y el usuario aprueba la prueba (pendiente).
 
 ## Cobertura
 RF-1 T6 · RF-2 T4, T7 · RF-3 T4 · RF-4 T4 · RF-5 T5, T8 · RF-6 T5, T10, T11 · RF-7 T10, T11 · RF-8 T10, T12 ·

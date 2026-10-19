@@ -93,3 +93,6 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   de consistencia con una sola OC) o etapa 3 (publicar la web).
 - 18 oct 2026: el usuario pide, antes de seguir, que recibir premios sea mucho más dinámico (los avisos de abajo a la
   derecha no le convencen). Entra como spec 015 «Premios con vida»; la publicación pasa a ser la 016 y el piloto la 017.
+- 19 oct 2026: spec 015 «Premios con vida» implementada y validada (17/17 RF, 469 tests, E2E en los cuatro proyectos,
+  205 kB como máximo por página); pendiente la prueba del usuario en su teléfono para cerrarla. Pedidos del usuario
+  para después: botón de cerrar en «Probabilidades» (arreglo) y «Abrir todos» mucho más dinámico (spec 016).
