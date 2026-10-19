@@ -12,7 +12,7 @@ import { celebrates, confettiCount, revealSound, teaseLevel, vibrationPattern } 
 import { Confetti, type ConfettiBurst } from "./Confetti";
 import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
-import { sound, useSoundMuted } from "./sound";
+import { sound, useSoundMuted } from "@/features/sound/engine";
 import "./opening.css";
 
 type Phase = "idle" | "torn" | "fanned" | "summary";

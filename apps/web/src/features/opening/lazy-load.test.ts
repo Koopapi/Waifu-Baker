@@ -15,7 +15,7 @@ describe("spec 013 — carga diferida de la apertura", () => {
   });
 
   it("test_s013_rf13_el_motor_de_sonido_descarga_howler_aparte", () => {
-    const engine = src("features/opening/sound.ts");
+    const engine = src("features/sound/engine.ts");
     expect(engine).not.toMatch(HEAVY);
     expect(engine).toMatch(/import\("howler"\)/);
   });

@@ -1,3 +1,4 @@
+import { AnimatedCounter } from "../game/AnimatedCounter";
 import { cx, variants } from "../variants";
 
 const badgeClasses = variants({
@@ -23,12 +24,12 @@ export interface BadgeProps {
   className?: string;
 }
 
-/** Spec 011, RF-7: etiqueta de estado o contador. */
+/** Spec 011, RF-7: etiqueta de estado o contador. Spec 015, RF-3: el contador sube como un marcador, nunca de golpe. */
 export function Badge({ tone, count, children, className }: BadgeProps) {
   if (count !== undefined) {
     return (
       <span className={cx("grid min-w-[18px] place-items-center rounded-full bg-ui-danger px-1.5 text-[11px] font-bold leading-[18px] text-ui-on-accent", className)}>
-        {count > 99 ? "99+" : count}
+        <AnimatedCounter value={Math.min(count, 99)} duration={500} format={(n) => (count > 99 ? "99+" : String(n))} />
       </span>
     );
   }

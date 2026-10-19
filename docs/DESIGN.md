@@ -97,6 +97,7 @@ cualquier componente nuevo se añada a esta tabla.
 | SoundToggle | SoundToggle |
 | RingTimer | RingTimer (anillo de «Recompensas» y «Mis sobres», lámina «Kawaii (spec 014)») |
 | Sticker | Sobre, Carta, Galleta, Regalo, Reloj, Colección, Racha y Perfil (lámina «Kawaii (spec 014)») |
+| FlightLayer | Premio que vuela (lámina «Premios (spec 015)») |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
 

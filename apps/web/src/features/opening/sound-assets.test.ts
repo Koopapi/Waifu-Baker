@@ -1,7 +1,9 @@
-// Spec 013, RF-1: solo sonidos CC0, con origen, autor y licencia anotados junto a ellos; ≤ 200 kB en total.
+// Spec 013, RF-1 y spec 015, RF-12: solo sonidos CC0, con origen, autor y licencia anotados junto a ellos; ≤ 200 kB
+// en total (los nueve: seis de la apertura y tres de los premios).
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { SOUNDS } from "@/domain/feedback/sounds";
 
 const dir = path.resolve(__dirname, "../../../public/sounds");
 const files = readdirSync(dir).filter((f) => f.endsWith(".mp3"));
@@ -9,7 +11,11 @@ const licenses = readFileSync(path.join(dir, "LICENSES.md"), "utf8");
 
 describe("spec 013 — sonidos", () => {
   it("test_s013_rf1_estan_los_seis_sonidos_de_la_apertura", () => {
-    expect(files.sort()).toEqual(["epic.mp3", "flip.mp3", "legendary.mp3", "rare.mp3", "secret.mp3", "tear.mp3"]);
+    expect(files).toEqual(expect.arrayContaining(["epic.mp3", "flip.mp3", "legendary.mp3", "rare.mp3", "secret.mp3", "tear.mp3"]));
+  });
+
+  it("test_s015_rf12_hay_un_fichero_por_cada_sonido_de_la_lista_y_ninguno_de_mas", () => {
+    expect([...files].sort()).toEqual([...SOUNDS].map((s) => `${s}.mp3`).sort());
   });
 
   it("test_s013_rf1_cada_sonido_tiene_origen_autor_y_licencia_cc0", () => {

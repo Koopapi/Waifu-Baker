@@ -1,8 +1,9 @@
 // Spec 013, RF-3 a RF-5 y RF-9: qué suena y cómo vibra cada momento de la apertura. Puro (sin navegador).
 import { RARITIES, type Rarity } from "../catalog/card-rules";
 
-export const SOUNDS = ["tear", "flip", "rare", "epic", "legendary", "secret"] as const;
-export type SoundName = (typeof SOUNDS)[number];
+// Spec 015: la lista vive en `domain/feedback/sounds.ts` (también suenan los premios); aquí se reexporta.
+export { SOUNDS, type SoundName } from "../feedback/sounds";
+import type { SoundName } from "../feedback/sounds";
 
 const REVEAL: Partial<Record<Rarity, SoundName>> = { rare: "rare", epic: "epic", legendary: "legendary", secret: "secret" };
 

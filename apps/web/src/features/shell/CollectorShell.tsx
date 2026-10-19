@@ -11,7 +11,10 @@ import { now } from "@/server/clock";
 import { shellSummary } from "@/server/services/shell";
 import { AppShell, type NavItem } from "@/ui/shell/AppShell";
 import { IconButton } from "@/ui/action/Button";
+import { FlightLayer } from "@/ui/game/FlightLayer";
 import { DemoBanner, demoRoleOf } from "@/features/demo/DemoBanner";
+import { CookiesDetail } from "./CookiesDetail";
+import { HeaderSoundToggle } from "./HeaderSoundToggle";
 
 /** Iniciales para el icono de una colección sin portada: «Fan Art Vol. 1» → «FA». */
 export function initials(name: string) {
@@ -29,7 +32,7 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
   const [t, jar] = await Promise.all([getDict(), cookies()]);
   const s = await shellSummary(db, user.id, { now: now(), timeZone: jar.get("wb_tz")?.value ?? null });
   const sh = t.common.shell;
-  const packs: NavItem = { href: "/sobres", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed };
+  const packs: NavItem = { href: "/sobres", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed, flyTarget: "packs" };
   const collection: NavItem = { href: "/coleccion", label: t.common.nav.myCollection, icon: "collection" };
   const rewards: NavItem = { href: "/recompensas", label: sh.rewards, icon: "rewards", badge: s.rewardsReady };
   const account: NavItem = { href: "/cuenta", label: t.common.nav.myAccount, icon: "account" };
@@ -65,11 +68,18 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
         { ...rewards, label: sh.tabs.rewards },
         { ...account, label: sh.tabs.account },
       ]}
-      user={{ name: user.displayName || "—", detail: sh.cookies(s.cookies) }}
+      user={{ name: user.displayName || "—", detail: <CookiesDetail cookies={s.cookies} /> }}
       userActions={<SignOutButton label={t.common.nav.signOut} />}
-      topActions={<LocaleToggle />}
+      topActions={
+        <>
+          <HeaderSoundToggle />
+          <LocaleToggle />
+        </>
+      }
     >
       {children}
+      {/* Spec 015: los premios que vuelan se pintan por encima de todo el coleccionista. */}
+      <FlightLayer />
     </AppShell>
   );
 }

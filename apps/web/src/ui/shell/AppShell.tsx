@@ -17,6 +17,8 @@ export interface NavItem {
   /** Activo solo con la ruta exacta (p. ej. el resumen del panel). */
   exact?: boolean;
   external?: boolean;
+  /** Spec 015, RF-2: nombre de destino de los premios que vuelan (`data-fly-target`); al recibir uno, rebota. */
+  flyTarget?: string;
 }
 export interface NavGroup {
   label: string;
@@ -37,7 +39,7 @@ export interface ShellProps {
   emptyRail?: string;
   groups: NavGroup[];
   tabs?: NavItem[];
-  user: { name: string; detail: string };
+  user: { name: string; detail: React.ReactNode };
   /** Idioma y salir: los da el servidor (la salida es una server action). */
   userActions: React.ReactNode;
   /** A la derecha de la barra superior (el selector de idioma). */
@@ -214,6 +216,7 @@ export function AppShell(p: ShellProps) {
                 key={i.href}
                 href={i.href}
                 aria-current={active ? "page" : undefined}
+                data-fly-target={i.flyTarget}
                 className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 text-[11px] ${active ? "font-bold text-ui-text" : "text-ui-text-3 hover:text-ui-text-2"}`}
               >
                 <Icon name={i.icon} className={`size-[22px] ${active ? "text-ui-accent-text" : ""}`} />
@@ -296,6 +299,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       target={item.external ? "_blank" : undefined}
       aria-current={active ? "page" : undefined}
+      data-fly-target={item.flyTarget}
       className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm ${
         active ? "bg-ui-hover font-semibold text-ui-text" : "font-medium text-ui-text-2 hover:bg-ui-raised hover:text-ui-text"
       }`}

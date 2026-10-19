@@ -1,9 +1,9 @@
 # Tareas 015 — Premios con vida
 
 ## Entrega 1 — Maquetas (aprobación del usuario)
-- [ ] **T1 — Maquetas en Pencil**: celebración central (llegadas y racha completa), premio que vuela (galletas y sobre),
+- [x] **T1 — Maquetas en Pencil**: celebración central (llegadas y racha completa), premio que vuela (galletas y sobre),
   pegatina estampada y latiendo, etiqueta «¡Nuevo!», error junto al botón con «Reintentar», botón de silencio en la
-  cabecera; móvil y escritorio · RF-1 a RF-16 · Hecho cuando: el usuario las aprueba.
+  cabecera; móvil y escritorio · RF-1 a RF-16 · Hecho cuando: el usuario las aprueba (aprobadas el 18 oct 2026; lámina «Premios (spec 015)»).
 
 ## Entrega 2 — Base
 - [ ] **T2 — Motor de sonido compartido**: mover el motor a `features/sound`, lista de sonidos en `domain/feedback`,
