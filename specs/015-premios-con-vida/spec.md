@@ -139,3 +139,5 @@ etiqueta «¡Nuevo!»; sonido propio para cada cosa por el motor de la apertura,
 la racha se estampa y late en el día de gracia, el día 7 se celebra; fuera los avisos del coleccionista, errores junto
 al botón, el panel conserva los suyos. Supuestos a revisar: el sobre gratis de cada 12 h vuela y no se celebra; el
 botón de silencio pasa también a la cabecera; completar una colección queda para otra spec.
+
+Spec aprobada por el usuario el 18 oct 2026.
