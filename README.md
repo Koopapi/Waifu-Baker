@@ -25,14 +25,14 @@ git switch pruebas
 corepack enable
 pnpm install
 cd apps/web
-DEMO_MANIFEST=e2e/demo-manifest.json pnpm demo
+DEMO_MANIFEST=e2e/demo-manifest.json ART_DIR=public/lab pnpm demo
 ```
 
 `pnpm demo` crea desde cero una base de datos aparte (`waifu_baker_demo`), compila la versión optimizada (la
 primera vez tarda unos minutos) y abre la web en **http://localhost:3300**, con un coleccionista y un administrador
 de prueba: se entra desde la portada, sin Patreon. Cada vez que se lanza vuelve a empezar de cero.
 
-- `DEMO_MANIFEST=e2e/demo-manifest.json` usa las 10 ilustraciones de muestra que vienen en el repo
+- `DEMO_MANIFEST=e2e/demo-manifest.json ART_DIR=public/lab` usa las 10 ilustraciones de muestra que vienen en el repo
   (`apps/web/public/lab`). Si tienes la carpeta de arte de la demo completa (26 cartas, fuera del repo), usa en su
   lugar `ART_DIR=/ruta/a/la/carpeta pnpm demo`.
 - `pnpm demo --dev` arranca en modo desarrollo, con recarga en caliente (más lento, pero ves tus cambios al momento).
