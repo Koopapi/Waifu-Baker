@@ -10,6 +10,39 @@ colección persistente. Patreon cobra y verifica 18+; esta web abre los sobres.
 - `art/` — definiciones del set y pista de arte; el taller está en `ART_DIR`.
 - `.claude/skills/spec-generator/` — entrevista y plantilla de specs.
 
+## Probar la beta en tu máquina
+
+La beta vive en la rama **`pruebas`**; `main` es la versión estable. Necesitas macOS o Linux con:
+
+- **Node.js 22 o superior** y **pnpm 10** (`corepack enable`, que ya viene con Node).
+- **PostgreSQL 16** en local, escuchando en el puerto 5432 sin contraseña para tu usuario
+  (en Mac: `brew install postgresql@16 && brew services start postgresql@16`).
+
+```bash
+git clone https://github.com/Koopapi/Waifu-Baker.git
+cd Waifu-Baker
+git switch pruebas
+corepack enable
+pnpm install
+cd apps/web
+DEMO_MANIFEST=e2e/demo-manifest.json pnpm demo
+```
+
+`pnpm demo` crea desde cero una base de datos aparte (`waifu_baker_demo`), compila la versión optimizada (la
+primera vez tarda unos minutos) y abre la web en **http://localhost:3300**, con un coleccionista y un administrador
+de prueba: se entra desde la portada, sin Patreon. Cada vez que se lanza vuelve a empezar de cero.
+
+- `DEMO_MANIFEST=e2e/demo-manifest.json` usa las 10 ilustraciones de muestra que vienen en el repo
+  (`apps/web/public/lab`). Si tienes la carpeta de arte de la demo completa (26 cartas, fuera del repo), usa en su
+  lugar `ART_DIR=/ruta/a/la/carpeta pnpm demo`.
+- `pnpm demo --dev` arranca en modo desarrollo, con recarga en caliente (más lento, pero ves tus cambios al momento).
+- Para probar en el teléfono, abre la dirección «Network» que aparece al arrancar (misma wifi).
+- Ctrl+C la detiene.
+
+Para trabajar en el código, el flujo de ramas y los comandos (tests, E2E, migraciones) están en `AGENTS.md`.
+
+## Estado
+
 Estado (15 oct 2026):
 
 - **Spec 003 — Panel de administración: terminada.** 29 de 29 tareas, 27 de 27 RF cubiertos
