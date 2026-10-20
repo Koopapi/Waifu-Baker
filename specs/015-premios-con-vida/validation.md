@@ -4,6 +4,8 @@ Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-19. Vitest: 469 de 46
 
 **Veredicto: spec cumplida** (17 de 17 RF con al menos un test en verde).
 
+Cierre: el usuario probó la spec a mano y la aprobó el 20 oct 2026.
+
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
 | RF-1 | CUANDO el coleccionista reclame una recompensa diaria de galletas, EL SISTEMA hará volar pegatinas de galleta desde la pegatina del día hasta el contador de galletas a la vista, y el contador subirá como un marcador desde el valor anterior al nuevo mientras llegan; nunca cambiará de golpe. | ✓ el_arco_sale_del_origen_llega_al_destino_y_se_eleva<br>✓ rf2_las_galletas_vuelan_al_contador_y_el_sobre_a_la_navegacion_y_suenan_al_llegar<br>✓ las_galletas_salen_escalonadas_hacia_el_contador_y_la_promesa_espera_a_la_ultima | RF-1, RF-10, RF-12 y RF-15: la diaria se estampa, las galletas vuelan al contador y suenan; sin avisos | Cumplido |
