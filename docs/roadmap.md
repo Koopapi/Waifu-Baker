@@ -27,7 +27,7 @@ apertura mínima → colección guardada, desplegado en el VPS.
 
 Cada etapa se cierra antes de abrir la siguiente; dentro de cada una, una spec cada vez (entrevista, spec,
 plan, tareas, tests primero, validación). Lo que depende de una decisión del usuario se le pide al empezar la
-etapa, no antes. Desde aquí cada spec va en su rama (`spec/NNN-nombre`) y entra en `main` por pull request con
+etapa, no antes. Desde aquí cada spec va en su rama (`spec/NNN-nombre`) y entra en `pruebas` (desde el 20 oct 2026; luego `pruebas` pasa a `main`) por pull request con
 el CI en verde.
 
 | Etapa | Qué | Necesita del usuario |
