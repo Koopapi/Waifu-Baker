@@ -71,8 +71,11 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
   resultados ni permisos, solo muestra lo que devuelve la API.
 
 ## Reglas
-- Git (desde el 16 oct 2026): cada spec o arreglo va en su rama (`spec/NNN-nombre`, `fix/...`, `docs/...`) y entra en
-  `main` por pull request con el CI en verde; nunca se sube directamente a `main`.
+- Git (desde el 20 oct 2026): dos ramas fijas. `main` es la versión estable; `pruebas` es donde se junta y se prueba
+  lo nuevo antes de pasarlo a `main`. Cada spec o arreglo va en su rama (`spec/NNN-nombre`, `fix/...`, `docs/...`)
+  creada desde `pruebas` y entra en `pruebas` por pull request con el CI en verde. Cuando lo de `pruebas` está probado
+  (también en el teléfono), un pull request de `pruebas` a `main` lo publica. Nunca se sube directamente a `main` ni a
+  `pruebas`.
 - Lee `docs/constitution.md`, `docs/architecture.md` y la spec activa en `specs/` antes de
   tocar el motor (Patreon, concesiones, sorteo, gate 18+, cumplimiento).
 - La experiencia de apertura se itera en la ruta `/lab` con datos falsos y se prueba en
