@@ -54,6 +54,8 @@ export const users = pgTable("users", {
   termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
   /** Spec 010, RF-18: la edad mínima que confirmó (si sube la de la web, se le vuelve a pedir). */
   ageConfirmedMin: integer("age_confirmed_min"),
+  /** Spec 015, RF-8: última visita a «Mis sobres»; las llegadas posteriores llevan «¡Nuevo!». */
+  packsSeenAt: timestamp("packs_seen_at", { withTimezone: true }),
 });
 
 export const characters = pgTable("characters", {
@@ -181,6 +183,8 @@ export const packs = pgTable(
     grantedBy: uuid("granted_by").references(() => users.id),
     grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
     openedAt: timestamp("opened_at", { withTimezone: true }),
+    /** Spec 015, RF-7: una llegada (bienvenida, regalo, suscripción) se celebra una sola vez. */
+    celebratedAt: timestamp("celebrated_at", { withTimezone: true }),
   },
   (t) => [index("packs_user_status_idx").on(t.userId, t.status)],
 );

@@ -2,7 +2,7 @@
 // tras recargar → «Abrir todos» → la colección refleja las cartas y las repetidas suman.
 import { expect, test } from "./fixtures";
 import path from "node:path";
-import { LAB, createPublishedSet, giftPacks, login, tear } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, tear } from "./helpers";
 
 test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
@@ -22,6 +22,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
 
   await test.step("RF-1: «Mis sobres» muestra los sobres por colección", async () => {
     await fan.goto("/sobres");
+    await dismissCelebration(fan);
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x4");
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-1-mis-sobres.png` });
   });
@@ -104,6 +105,7 @@ test("teclado: abrir un sobre y voltear las cartas sin ratón", async ({ browser
   await createPublishedSet(admin, "KEY1", ["01.webp", "02.webp"].map((f) => path.join(LAB, f)), 2);
   await giftPacks(admin, "teclado-e2e", "KEY1", 1);
   await fan.goto("/sobres");
+  await dismissCelebration(fan);
   await fan.click('[data-testid="group-KEY1"] >> text=Abrir un sobre');
   await fan.waitForLoadState("networkidle");
   await fan.locator(".pack__strip").focus();

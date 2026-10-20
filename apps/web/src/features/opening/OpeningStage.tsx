@@ -9,10 +9,10 @@ import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
 import { useTiltSource } from "./useTiltSource";
 import { celebrates, confettiCount, revealSound, teaseLevel, vibrationPattern } from "@/domain/opening/feedback";
-import { Confetti, type ConfettiBurst } from "./Confetti";
+import { Confetti, type ConfettiBurst } from "@/ui/game/Confetti";
 import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
-import { sound, useSoundMuted } from "./sound";
+import { sound, useSoundMuted } from "@/features/sound/engine";
 import "./opening.css";
 
 type Phase = "idle" | "torn" | "fanned" | "summary";

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { RARITIES } from "@/domain/catalog/card-rules";
 import { openAllPacksAction, type OpenAllCard } from "@/app/sobres/actions";
 import { openAllFinale } from "@/domain/opening/feedback";
-import { sound, useSoundMuted } from "@/features/opening/sound";
+import { sound, useSoundMuted } from "@/features/sound/engine";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";

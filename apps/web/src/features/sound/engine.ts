@@ -1,9 +1,9 @@
-// Spec 013: motor de sonido y vibración de la apertura. Es ligero: `howler` se descarga con `import()` al entrar
-// en una pantalla de apertura (RF-6, RF-13). El silencio se guarda en el dispositivo (RF-7, RF-8) y, mientras
-// dura, no suena ni vibra nada (RF-10). Cada sonido o vibración emite un evento del DOM (`wb:sound`,
-// `wb:vibrate`) que usan las pruebas E2E.
+// Spec 013: motor de sonido y vibración de la apertura; desde la spec 015 también de los premios. Es ligero:
+// `howler` se descarga con `import()` al entrar en una pantalla de apertura (RF-6, RF-13) o la primera vez que algo
+// suena. El silencio se guarda en el dispositivo (RF-7, RF-8) y, mientras dura, no suena ni vibra nada (RF-10).
+// Cada sonido o vibración emite un evento del DOM (`wb:sound`, `wb:vibrate`) que usan las pruebas E2E.
 import { useSyncExternalStore } from "react";
-import { SOUNDS, type SoundName } from "@/domain/opening/feedback";
+import { SOUNDS, type SoundName } from "@/domain/feedback/sounds";
 
 export const MUTED_KEY = "wb:sound-muted";
 
@@ -79,11 +79,17 @@ export function createSoundEngine(deps: Deps) {
     play(name: SoundName) {
       if (isMuted()) return;
       deps.emit("wb:sound", name);
-      try {
-        howls.get(name)?.play();
-      } catch {
-        /* sonido roto: se sigue sin él */
-      }
+      const fire = () => {
+        if (isMuted()) return;
+        try {
+          howls.get(name)?.play();
+        } catch {
+          /* sonido roto: se sigue sin él */
+        }
+      };
+      // Spec 015, RF-12: fuera de la apertura nadie precarga; el primer sonido descarga el motor y suena al llegar.
+      if (howler) fire();
+      else void this.preload().then(fire);
     },
     /** RF-9 y RF-10 */
     vibrate(pattern: number[] | null) {

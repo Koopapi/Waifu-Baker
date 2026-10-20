@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { MUTED_KEY, createSoundEngine, type HowlerModule } from "./sound";
+import { MUTED_KEY, createSoundEngine, type HowlerModule } from "@/features/sound/engine";
 
 function fakeHowler(fail: string[] = []) {
   const played: string[] = [];
@@ -94,6 +94,25 @@ describe("spec 013 — motor de sonido", () => {
     const engine = createSoundEngine({ loadHowler: () => Promise.reject(new Error("sin red")), storage: memoryStorage(), vibrate: vi.fn(), emit: vi.fn() });
     await expect(engine.preload()).resolves.toBeUndefined();
     expect(() => engine.play("tear")).not.toThrow();
+  });
+
+  it("test_s015_rf12_sin_precarga_el_primer_sonido_descarga_el_motor_y_suena_al_llegar", async () => {
+    const { engine, h, events } = setup();
+    engine.play("cookies");
+    expect(events).toEqual(["wb:sound:cookies"]);
+    expect(h.played).toEqual([]);
+    await engine.preload();
+    await Promise.resolve();
+    expect(h.played).toEqual(["cookies"]);
+  });
+
+  it("test_s015_rf12_si_se_silencia_mientras_descarga_no_suena", async () => {
+    const { engine, h } = setup();
+    engine.play("fanfare");
+    engine.setMuted(true);
+    await engine.preload();
+    await Promise.resolve();
+    expect(h.played).toEqual([]);
   });
 
   it("test_s013_rf8_sin_almacenamiento_el_sonido_sigue_activado", () => {

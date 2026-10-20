@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { SOUNDS } from "@/domain/opening/feedback";
-import { sound, useSoundMuted } from "@/features/opening/sound";
+import { sound, useSoundMuted } from "@/features/sound/engine";
 import { Bell, Gift, Package, Settings, Sparkles, Trash2 } from "@/ui/icons/glyphs";
 import {
   Alert,
@@ -11,9 +11,12 @@ import {
   Badge,
   Button,
   Card,
+  Celebration,
   Checkbox,
   Countdown,
   EmptyState,
+  FlightLayer,
+  flights,
   FocusView,
   IconButton,
   Menu,
@@ -23,6 +26,7 @@ import {
   Select,
   Skeleton,
   SoundToggle,
+  Sticker,
   Switch,
   Table,
   Tabs,
@@ -213,6 +217,9 @@ export function Catalog() {
           <Card title="Sound toggle">
             <SoundPreview />
           </Card>
+          <Card title="Rewards: flight and celebration">
+            <FxPreview />
+          </Card>
           <Button variant="secondary" onClick={() => setFocus(true)} data-testid="open-focus">
             Open focus view
           </Button>
@@ -237,6 +244,29 @@ export function Catalog() {
         </div>
       </Section>
     </main>
+  );
+}
+
+/** Spec 015: un premio que vuela hasta su destino y la celebración central, para verlos. */
+function FxPreview() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex flex-wrap items-center gap-3" data-testid="fx-preview">
+      <Button size="sm" variant="secondary" onClick={(e) => void flights.fly({ from: e.currentTarget.getBoundingClientRect(), to: "demo-cookies", sticker: "cookie", count: 3 })} data-testid="fly-demo">
+        Fly cookies
+      </Button>
+      <span data-fly-target="demo-cookies" className="inline-flex items-center gap-1 rounded-full border border-k-limon/40 bg-ui-raised py-1 pl-1 pr-3 text-sm font-black">
+        <Sticker name="cookie" className="size-7" />
+        240 cookies
+      </span>
+      <Button size="sm" onClick={() => setOpen(true)} data-testid="celebration-demo">
+        Celebration
+      </Button>
+      <FlightLayer />
+      <Celebration open={open} onClose={() => setOpen(false)} kicker="A gift for you" title="3 packs arrived!" detail="Fan Art · Vol. 1" count={3} closeLabel="Awesome!" primary={{ label: "See my packs", onAction: () => setOpen(false) }}>
+        <Sticker name="pack" className="size-40" />
+      </Celebration>
+    </div>
   );
 }
 

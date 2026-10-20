@@ -203,6 +203,18 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-173 | El arte del sobre solo se sirve con sesión; el de una colección 18+, solo con la edad verificada o al administrador. | Vigente | 014 RF-8 |
 | RN-174 | La demo local arranca en versión optimizada. En producción, la demo y la entrada sin Patreon solo existen en ese build local (`DEMO_LOCAL=1`, sin `SITE_URL`); nunca en la web publicada. | Vigente | 014 RF-23 |
 
+## 17. Premios con vida
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-180 | Un premio no se avisa, se ve: las galletas vuelan desde la pegatina del día hasta el contador y el sobre hasta el acceso a «Mis sobres», que rebota; los contadores suben como un marcador, nunca de golpe. Nada bloquea la pantalla; con movimiento reducido no vuela nada y los contadores cambian directamente. | Vigente | 015 RF-1 a RF-4 |
+| RN-181 | Una «llegada» es un sobre sellado recibido sin pedirlo: bienvenida (`promo`), regalo del administrador (`manual`) o suscripción (`tier_grant`). Los sobres gratis y los del día 7 no lo son; un sobre anulado tampoco. | Vigente | 015 RF-6, RF-7 |
+| RN-182 | Las llegadas se celebran en el centro de la pantalla una sola vez (también desde varios dispositivos), todas juntas, con su origen, al cargar una página del coleccionista; nunca encima de la apertura ni de otra celebración. Se marcan celebradas al mostrarse, no al cerrarse. | Vigente | 015 RF-6, RF-7, RF-9 |
+| RN-183 | En «Mis sobres», las llegadas posteriores a la última visita llevan «¡Nuevo!» con cuántas son; desaparece en la siguiente visita o al abrirlas. | Vigente | 015 RF-8 |
+| RN-184 | Al reclamar la recompensa diaria, la pegatina del día se estampa antes de que vuele nada; el día 7 se celebra en el centro y, al cerrar, el sobre vuela. En el día de gracia (ayer sin reclamar, hoy todavía no, con racha que perder) la pegatina de hoy late y la pantalla avisa. | Vigente | 015 RF-5, RF-10, RF-11 |
+| RN-185 | Las galletas al llegar, el sobre al aterrizar y una celebración al abrirse suenan (sonidos CC0, por el mismo motor y silencio de la apertura); solo la celebración vibra, suave y una vez. El botón de silencio está también en la cabecera del coleccionista. | Vigente | 015 RF-12 a RF-14 |
+| RN-186 | Las pantallas del coleccionista no muestran avisos emergentes ni mensajes de éxito por reclamar; los lectores de pantalla reciben un anuncio de texto. Un fallo se muestra junto al botón, con «Reintentar» solo si falló la red. El panel de administración conserva sus avisos. | Vigente | 015 RF-15 a RF-17 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -217,7 +229,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Nota de moderación | hasta 300 caracteres |
 | Espera entre revisiones de un álbum oculto | 7 días |
 | JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
-| Sonidos de la apertura | 6, hasta 200 kB en total |
+| Sonidos | 9 (6 de la apertura y 3 de los premios), hasta 200 kB en total |
 | Sobre hecho a mano | se recorta a 600 × 900 (2:3) en WebP |
 | Aperturas por minuto | 10 por usuario |
 | Caducidad de los sobres | ninguna |
@@ -234,4 +246,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
 | Edad mínima de la web | 16 o 18 años, la elige el administrador (16 por defecto); 18+ y tier adulto para el contenido adulto |
 | Copias de seguridad | diarias, cifradas, 30 días |
-| Avisos emergentes | 4 s (éxito), 7 s (error), 6 s si se pueden deshacer; como mucho 3 a la vez |
+| Avisos emergentes (solo panel) | 4 s (éxito), 7 s (error), 6 s si se pueden deshacer; como mucho 3 a la vez |
+| Premio que vuela | 0,7 s por pegatina, escalonadas 90 ms (3 galletas, 1 sobre); el destino rebota 0,42 s |
+| Estampado de la pegatina del día | 0,45 s antes de que vuele el premio |
+| Celebración | una a la vez, en orden; confeti de 70 piezas; vibración de 30 ms |

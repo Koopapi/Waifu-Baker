@@ -2,7 +2,7 @@
 import type { Page } from "@playwright/test";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { tickAll } from "./helpers";
+import { dismissCelebration, tickAll } from "./helpers";
 
 const es = dictionaries.es;
 const sh = es.common.shell;
@@ -23,6 +23,8 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   await page.goto("/");
   await page.click('[data-testid="demo-enter-collector"]');
   await page.waitForURL(/\/sobres$/);
+  // Spec 015: los sobres de muestra se celebran al entrar; aquí no va de eso.
+  await dismissCelebration(page);
   const nav = page.locator('[data-testid="app-nav"]');
 
   await test.step("RF-1: la barra lleva el inicio y un icono por colección del usuario", async () => {
@@ -75,13 +77,11 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
     await expect(tabs.locator('a[aria-current="page"]')).toHaveText(new RegExp(sh.tabs.rewards));
   });
 
-  await test.step("RF-8: al reclamar aparece un aviso que desaparece solo", async () => {
+  await test.step("RF-8 (sustituido por la spec 015, RF-15): al reclamar no hay aviso emergente; el premio vuela y se anuncia", async () => {
     await page.goto("/recompensas");
     await page.locator('[data-testid="free-pack"]').getByRole("button", { name: es.rewards.free.claim }).click();
-    const toast = page.locator('[data-testid="toast"]');
-    await expect(toast).toBeVisible();
-    await expect(toast).toHaveAttribute("data-kind", "success");
-    await expect(toast).toBeHidden({ timeout: 8_000 });
+    await expect(page.locator('[data-testid="reward-announce"]')).toHaveText(es.rewards.fx.sr.gotPack);
+    await expect(page.locator('[data-testid="toast"]')).toHaveCount(0);
   });
 
   await test.step("RF-7 y RF-10: estados al pasar el ratón y animaciones según el movimiento reducido", async () => {

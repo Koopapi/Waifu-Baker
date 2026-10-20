@@ -54,7 +54,16 @@ export function dailyStatus(s: DailyState, today: string) {
   return { claimedToday: false, day: continues ? s.streakDay + 1 : 1 };
 }
 
-export type ClaimCheck = { ok: true; day: number; reward: DailyReward } | { ok: false; code: "already_claimed_today" | "tz_change_too_soon" };
+/**
+ * Spec 015, RF-11: la racha está en su día de gracia: ayer no se reclamó, hoy tampoco todavía, y mañana volvería
+ * al día 1. Sin racha empezada o ya completada (día 7) no hay nada que perder.
+ */
+export function dailyAtRisk(s: DailyState, today: string) {
+  if (!s.lastDay || s.lastDay === today || s.streakDay < 1 || s.streakDay >= 7) return false;
+  return daysBetween(s.lastDay, today) === 2;
+}
+
+export type ClaimCheck ={ ok: true; day: number; reward: DailyReward } | { ok: false; code: "already_claimed_today" | "tz_change_too_soon" };
 
 /** RF-10 y RF-11: se puede reclamar hoy, y un cambio de zona no permite dos premios en menos de 20 h. */
 export function checkDailyClaim(s: DailyState, now: Date, timeZone: string): ClaimCheck {

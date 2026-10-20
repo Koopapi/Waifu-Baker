@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
-import { LAB, createPublishedSet, giftPacks, login } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, giftPacks, login } from "./helpers";
 
 const VIEWPORTS = [
   { name: "escritorio", width: 1360, height: 950 },
@@ -87,6 +87,8 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   const setId = await createPublishedSet(admin, "QA1", ["01.webp", "02.webp", "03.webp", "04.webp"].map((f) => path.join(LAB, f)), 4, 50);
   const fan = await login(browser, "fan-sweep", false, "/sobres");
   await giftPacks(admin, "fan-sweep", "QA1", 4);
+  await fan.goto("/sobres");
+  await dismissCelebration(fan);
   await admin.goto("/admin/users?q=fan-sweep");
   await admin.click("a:text-is('fan-sweep')");
   const fanAdminUrl = new URL(admin.url()).pathname;

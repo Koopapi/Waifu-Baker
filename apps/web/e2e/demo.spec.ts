@@ -1,6 +1,7 @@
 // Criterios de la spec 010: demo local (portada con los dos papeles, franja y cambio de papel).
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
+import { dismissCelebration } from "./helpers";
 
 const es = dictionaries.es;
 
@@ -21,6 +22,11 @@ test("demo: portada con papeles, coleccionista y cambio a administrador", async 
     await expect(page.locator(`text=${es.site.demo.enterAdmin}`)).toBeVisible();
     await page.click('[data-testid="demo-enter-collector"]');
     await page.waitForURL(/\/sobres$/);
+    // Spec 015, RF-6: los 3 sobres de muestra se celebran como regalo la primera vez que entra.
+    const celebration = page.locator('[data-testid="celebration-dialog"]');
+    await expect(celebration).toBeVisible();
+    await expect(celebration).toContainText(es.rewards.fx.arrivals.title(3));
+    await dismissCelebration(page);
     await expect(page.locator('[data-testid="group-FA01"] >> text=x3')).toBeVisible();
     await expect(page.locator('[data-testid="cookie-balance"]')).toContainText("240");
   });

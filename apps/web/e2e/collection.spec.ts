@@ -4,7 +4,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import path from "node:path";
-import { LAB, choose, createPublishedSet, giftPacks, login } from "./helpers";
+import { LAB, choose, createPublishedSet, dismissCelebration, giftPacks, login } from "./helpers";
 
 const shot = (p: Page, name: string, fullPage = false) =>
   p.screenshot({ path: `test-results/screens/${test.info().project.name}/s006-${name}.png`, fullPage });
@@ -16,6 +16,7 @@ test("colección y álbum público", async ({ browser }) => {
   await createPublishedSet(admin, "ALB1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, 100);
   await giftPacks(admin, "album-e2e", "ALB1", 1);
   await fan.goto("/sobres");
+  await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-ALB1"] >> text=Abrir un sobre').getAttribute("href");
   await fan.goto(`${href}/todos`);
   await fan.click('[data-testid="open-all"]');

@@ -4,6 +4,7 @@
 // hueco de dos días reinicia la racha → el administrador ve y ajusta sus galletas.
 import type { APIRequestContext, Page } from "@playwright/test";
 import path from "node:path";
+import { DAILY_SCHEDULE } from "../src/domain/rewards/daily";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
 import { LAB, choose, createPublishedSet, login, tear } from "./helpers";
@@ -35,7 +36,8 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   await test.step("RF-4 y RF-8: lo reclama eligiendo colección y lo abre", async () => {
     await choose(fan.locator('[data-testid="free-pack"]'), es.free.chooseSet, "FREE1 · Colección FREE1");
     await fan.locator('[data-testid="free-pack"]').getByRole("button", { name: es.free.claim }).click();
-    await expect(fan.locator(`text=${es.free.claimed}`)).toBeVisible();
+    // Spec 015: sin aviso emergente; el premio vuela y se anuncia a los lectores de pantalla.
+    await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.fx.sr.gotPack);
     await expect(fan.locator('[data-testid="group-FREE1"]')).toContainText("x1");
     await fan.click('[data-testid="group-FREE1"] >> text=Abrir un sobre');
     await tear(fan);
@@ -63,7 +65,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   await test.step("RF-9 y RF-10: la recompensa del día da 10 galletas y solo una vez", async () => {
     await expect(fan.locator('[data-testid="streak"] li[data-day="1"]')).toHaveAttribute("data-state", "current");
     await claimDaily(fan);
-    await expect(fan.locator(`text=${es.daily.gotCookies(10)}`)).toBeVisible();
+    await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.fx.sr.gotCookies(10, 10));
     await reload(fan);
     await expect(fan.locator('[data-testid="cookie-balance"]')).toHaveText(es.cookies.balance(10));
     await expect(fan.locator(`[data-testid="daily"] >> text=${es.daily.claimed}`)).toBeVisible();
@@ -71,19 +73,28 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   });
 
   await test.step("RF-12, RF-14 y RF-15: la racha avanza cada día hasta el sobre del día 7", async () => {
+    let total = 10;
     for (let day = 2; day <= 6; day++) {
       await advance(request, 24);
       await reload(fan);
       await expect(fan.locator(`[data-testid="streak"] li[data-day="${day}"]`)).toHaveAttribute("data-state", "current");
       await claimDaily(fan);
-      await expect(fan.locator('[data-testid="daily"] [role="status"]')).toBeVisible();
+      const reward = DAILY_SCHEDULE[day - 1];
+      total += reward.kind === "cookies" ? reward.amount : 0;
+      await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.fx.sr.gotCookies(reward.kind === "cookies" ? reward.amount : 0, total));
     }
     await advance(request, 24);
     await reload(fan);
     await expect(fan.locator('[data-testid="cookie-balance"]')).toHaveText(es.cookies.balance(90));
     await choose(fan, es.daily.chooseSetForPack, "FREE1 · Colección FREE1");
     await claimDaily(fan);
-    await expect(fan.locator(`text=${es.daily.gotPack}`)).toBeVisible();
+    // Spec 015, RF-5: el día 7 se celebra en el centro; al cerrar, el sobre vuela a la navegación.
+    const celebration = fan.locator('[data-testid="celebration-dialog"]');
+    await expect(celebration).toBeVisible();
+    await expect(celebration).toContainText(es.fx.streak.title);
+    await celebration.locator('[data-testid="celebration-close"]').click();
+    await expect(celebration).toHaveCount(0);
+    await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.fx.sr.gotPack);
     await reload(fan);
     await expect(fan.locator('[data-testid="streak"] li[data-state="done"]')).toHaveCount(7);
   });

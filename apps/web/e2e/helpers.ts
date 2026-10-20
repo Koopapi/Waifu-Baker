@@ -5,7 +5,7 @@ import path from "node:path";
 export const LAB = path.resolve(__dirname, "../public/lab");
 
 /** El administrador entra siempre en escritorio; el resto, con el dispositivo del proyecto. */
-export async function login(browser: Browser, name: string, admin: boolean, next = "/admin"): Promise<Page> {
+export async function login(browser: Browser, name: string, admin: boolean, next = "/admin", opts: { keepCelebration?: boolean } = {}): Promise<Page> {
   const page = await (await browser.newContext(admin ? DESKTOP : {})).newPage();
   page.on("dialog", (d) => d.accept());
   await page.goto(`/login?next=${encodeURIComponent(next)}`);
@@ -17,7 +17,23 @@ export async function login(browser: Browser, name: string, admin: boolean, next
   await page.waitForURL((u) => u.pathname.startsWith(target) || u.pathname.startsWith("/bienvenida"));
   await page.waitForLoadState("networkidle");
   await acceptGate(page);
+  if (!opts.keepCelebration) await dismissCelebration(page);
   return page;
+}
+
+/**
+ * Spec 015, RF-6: al entrar con sobres recibidos sin pedirlos (regalos, suscripción) sale una celebración que
+ * atrapa el foco. Las pruebas que no van de eso la cierran si aparece.
+ */
+export async function dismissCelebration(page: Page, timeout = 1500) {
+  const dialog = page.locator('[data-testid="celebration-dialog"]');
+  const shown = await dialog.waitFor({ state: "visible", timeout }).then(
+    () => true,
+    () => false,
+  );
+  if (!shown) return;
+  await dialog.locator('[data-testid="celebration-close"]').click();
+  await dialog.waitFor({ state: "detached" });
 }
 
 /**

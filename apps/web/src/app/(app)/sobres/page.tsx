@@ -5,7 +5,9 @@ import { cookies } from "next/headers";
 import { now } from "@/server/clock";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
 import { packArtForSets } from "@/server/services/pack-art";
+import { newArrivalsBySet } from "@/server/services/arrivals";
 import { PackArt } from "@/features/packs/PackArt";
+import { MarkPacksSeen } from "@/features/packs/MarkPacksSeen";
 import { claimableSets, rewardsSummary } from "@/server/services/rewards";
 import { RewardsPanel } from "@/features/rewards/RewardsPanel";
 import { getDict } from "@/i18n/server";
@@ -22,13 +24,17 @@ export default async function MisSobresPage() {
   const user = await requireUser("/sobres");
   const tz = (await cookies()).get("wb_tz")?.value ?? null;
   const at = now();
-  const [groups, pending, rw, sets] = await Promise.all([
+  const [groups, pending, rw, plainSets, fresh] = await Promise.all([
     listMyPacks(db, user.id),
     pendingOpening(db, user.id),
     rewardsSummary(db, user.id, { now: at, timeZone: tz }),
     claimableSets(db),
+    // Spec 015, RF-8: llegadas que el coleccionista aún no había visto.
+    newArrivalsBySet(db, user.id),
   ]);
-  const art = await packArtForSets(db, groups.map((g) => g.setId));
+  const art = await packArtForSets(db, [...new Set([...groups.map((g) => g.setId), ...plainSets.map((s) => s.id)])]);
+  // Spec 015, RF-5: el sobre de la colección elegida sale en la celebración del día 7.
+  const sets = plainSets.map((s) => ({ ...s, art: art.get(s.id) ?? { coverVersion: null, packImage: null } }));
   const total = groups.reduce((a, g) => a + g.sealed, 0);
   const t = await getDict();
 
@@ -82,7 +88,14 @@ export default async function MisSobresPage() {
                         <p className="font-mono text-xs text-ui-text-3">{g.code}</p>
                         <h2 className="line-clamp-2 font-display text-xl font-semibold">{g.name}</h2>
                       </div>
-                      <Badge tone="accent" className="shrink-0 tabular-nums">x{g.sealed}</Badge>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {!!fresh.get(g.setId) && (
+                          <span data-testid="new-packs">
+                            <Badge tone="new">{t.rewards.fx.newPacks(fresh.get(g.setId)!)}</Badge>
+                          </span>
+                        )}
+                        <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
+                      </div>
                     </div>
                     {g.locked ? (
                       <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
@@ -105,6 +118,7 @@ export default async function MisSobresPage() {
           </ul>
         )}
         <p className="text-xs text-ui-text-3">{t.common.aiNotice}</p>
+        <MarkPacksSeen />
       </div>
 
       <aside className="min-w-0">
