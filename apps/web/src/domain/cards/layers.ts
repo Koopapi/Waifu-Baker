@@ -103,14 +103,14 @@ export function imageKeys(c: LayersConfig | null | undefined): string[] {
 }
 
 export type LayersIssue =
-  | { code: "invalid_config"; path: string }
+  | { code: "invalid_layers"; path: string }
   | { code: "too_many_layers"; max: number }
   | { code: "no_visible_layer" };
 
 /** RF-17, RF-36, RF-37: forma válida, como mucho 8 capas de imagen (las partículas no cuentan) y alguna visible. */
 export function checkLayersConfig(input: unknown): { ok: true; config: LayersConfig } | { ok: false; issue: LayersIssue } {
   const parsed = layersConfigSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, issue: { code: "invalid_config", path: parsed.error.issues[0]?.path.join(".") ?? "" } };
+  if (!parsed.success) return { ok: false, issue: { code: "invalid_layers", path: parsed.error.issues[0]?.path.join(".") ?? "" } };
   const config = parsed.data;
   if (imageLayers(config).length > MAX_IMAGE_LAYERS) return { ok: false, issue: { code: "too_many_layers", max: MAX_IMAGE_LAYERS } };
   if (!imageLayers(config).some(isVisible)) return { ok: false, issue: { code: "no_visible_layer" } };

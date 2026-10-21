@@ -53,7 +53,7 @@ describe("spec 016 — configuración por capas", () => {
     expect(BLEND_MODES).not.toContain("hue");
     expect(BLEND_MODES).not.toContain("luminosity");
     expect(checkLayersConfig(base([img(1, { mezcla: "overlay" })])).ok).toBe(true);
-    expect(checkLayersConfig(base([img(1, { mezcla: "hue" })]))).toMatchObject({ ok: false, issue: { code: "invalid_config" } });
+    expect(checkLayersConfig(base([img(1, { mezcla: "hue" })]))).toMatchObject({ ok: false, issue: { code: "invalid_layers" } });
   });
 
   it("test_s016_rf12_sello_de_texto_o_de_imagen_en_una_esquina", () => {

@@ -5,29 +5,29 @@ de lo que toca en verde. Al final de cada entrega, «Cómo probarlo» describe e
 (`pnpm demo --dev`, http://localhost:3300, entrar como administrador).
 
 ## Entrega 1 — Editor con vista previa y guardado
-- [ ] **T1 — Migración `0011_card_layers`**: columnas `layers`, `layers_pending` y `pending_keys` en `cards` ·
+- [x] **T1 — Migración `0011_card_layers`**: columnas `layers`, `layers_pending` y `pending_keys` en `cards` ·
   Hecho cuando: `pnpm db:migrate` aplica en limpio y el test de integración que recrea la BD pasa.
-- [ ] **T2 — Dominio de la configuración**: `domain/cards/layers.ts` (esquema, máximo 8 capas de imagen, partículas
+- [x] **T2 — Dominio de la configuración**: `domain/cards/layers.ts` (esquema, máximo 8 capas de imagen, partículas
   aparte, al menos una visible, proporción 700 × 991 ± 1 %, ancho mínimo 700 px, imagen repetida en la misma carta,
   lista de mezclas permitidas) · RF-17, RF-32, RF-33, RF-36 a RF-39, RF-67, RF-69 · Hecho cuando: pasan sus tests
   `test_s016_rfN_*`.
-- [ ] **T3 — Subida de capas**: `server/cards/layer-images.ts` y `POST /api/admin/layer-uploads` (área temporal,
+- [x] **T3 — Subida de capas**: `server/cards/layer-images.ts` y `POST /api/admin/layer-uploads` (área temporal,
   WebP 1400 × 1982, sello hasta 600 px sin regla de proporción, rechazo con motivo y el lote sigue) · RF-6, RF-30 a
   RF-35, RF-38 · Depende de T2 · Hecho cuando: pasan los tests de integración con archivos válidos, de otra proporción,
   pequeños, pesados y de formato no admitido.
-- [ ] **T4 — Guardar capas**: `server/services/card-layers.ts` (`saveCardLayers` con versión y forzado, mover del área
+- [x] **T4 — Guardar capas**: `server/services/card-layers.ts` (`saveCardLayers` con versión y forzado, mover del área
   temporal, quitar capas con RF-67/RF-68, auditoría, liberar imágenes sin uso) y `GET/PUT/DELETE
   /api/admin/cards/[id]/layers` · RF-1, RF-2, RF-14 a RF-22, RF-67, RF-68 · Depende de T1, T3 · Hecho cuando: pasan los
   tests de integración de guardar, conflicto, forzado, quitar y auditoría.
-- [ ] **T5 — Editor del panel**: sección «Carta por capas» en el editor de carta con el estilo actual del panel: subir
+- [x] **T5 — Editor del panel**: sección «Carta por capas» en el editor de carta con el estilo actual del panel: subir
   varias, ordenar (arrastrando y con teclado), ocultar, profundidad, margen, mezcla (solo las permitidas), opacidad,
   partículas, marco, sello de texto o imagen y esquina, «Aplicar estilo de la rareza»; textos en los diccionarios ·
   RF-3 a RF-13, RF-69 · Depende de T4.
-- [ ] **T6 — Vista previa en vivo**: `LayersPreview` con `CartaCapas` sobre fondo oscuro; se actualiza al cambiar
+- [x] **T6 — Vista previa en vivo**: `LayersPreview` con `CartaCapas` sobre fondo oscuro; se actualiza al cambiar
   cualquier ajuste, sin recargar · RF-4, RF-5, RF-14 · Depende de T5.
-- [ ] **T7 — Conflicto**: aviso con «Recargar» y «Guardar de todos modos» (con confirmación) · RF-19 a RF-21 ·
+- [x] **T7 — Conflicto**: aviso con «Recargar» y «Guardar de todos modos» (con confirmación) · RF-19 a RF-21 ·
   Depende de T4, T5.
-- [ ] **T8 — E2E del editor**: `e2e/card-layers.spec.ts`, parte del panel (añadir capas, vista previa, guardar,
+- [x] **T8 — E2E del editor**: `e2e/card-layers.spec.ts`, parte del panel (añadir capas, vista previa, guardar,
   recargar y ver lo guardado, conflicto con dos pestañas) · Depende de T5 a T7.
 - **Cómo probarlo**: Panel → Colecciones → FA01 → editar una carta → «Carta por capas»: subir las capas de Yuki
   (`docs/waifu-baker/waifu-baker/codigo/carta-capas/cartas/yuki/`), ajustarlas viendo la vista previa, guardar, recargar
