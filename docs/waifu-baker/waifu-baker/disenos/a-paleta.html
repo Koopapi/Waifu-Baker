@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waifu Baker · Paleta y componentes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=M+PLUS+Rounded+1c:wght@400;500;700;800&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0;background:#0F0C14;color:#FFF7FB;font-family:"M PLUS Rounded 1c",system-ui,sans-serif}
+a{color:#A6F0E6}a:hover{color:#FFE66B}
+</style>
+</head>
+<body>
+<div style="width: 1000px; height: 1180px; box-sizing: border-box; padding: 48px; background: #0F0C14; display: flex; flex-direction: column; gap: 36px">
+
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <p style="margin: 0; font-family: Unbounded, system-ui, sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .3em; color: #A6F0E6">WAIFU BAKER</p>
+    <h1 style="margin: 0; font-family: 'Lilita One', system-ui, sans-serif; font-weight: 400; font-size: 56px; line-height: 1; color: #FF6FB8; text-shadow: 3px 3px 0 #FFE66B">Paleta pop</h1>
+  </div>
+
+  <!-- colores -->
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 800">Colores</h2>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px">
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #0F0C14; border: 2px solid #3A3147"></div><b style="font-size: 14px">Tinta</b><span style="font-size: 12.5px; color: #CFC6DA">#0F0C14 · fondo</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #1A1622"></div><b style="font-size: 14px">Superficie</b><span style="font-size: 12.5px; color: #CFC6DA">#1A1622 · tarjetas</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #3A3147"></div><b style="font-size: 14px">Línea</b><span style="font-size: 12.5px; color: #CFC6DA">#3A3147 · bordes</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #FFF7FB"></div><b style="font-size: 14px">Texto</b><span style="font-size: 12.5px; color: #CFC6DA">#FFF7FB · y #CFC6DA</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #FF6FB8"></div><b style="font-size: 14px">Chicle</b><span style="font-size: 12.5px; color: #CFC6DA">#FF6FB8 · acción principal</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #A6F0E6"></div><b style="font-size: 14px">Menta</b><span style="font-size: 12.5px; color: #CFC6DA">#A6F0E6 · enlaces y R</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #FFE66B"></div><b style="font-size: 14px">Limón</b><span style="font-size: 12.5px; color: #CFC6DA">#FFE66B · galletas y sombras</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #C8A8FF"></div><b style="font-size: 14px">Lavanda</b><span style="font-size: 12.5px; color: #CFC6DA">#C8A8FF · SR</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #86F07C"></div><b style="font-size: 14px">Lima</b><span style="font-size: 12.5px; color: #CFC6DA">#86F07C · éxito, pocas veces</span></div>
+      <div style="display: flex; flex-direction: column; gap: 8px"><div style="height: 76px; border-radius: 16px; background: #FFC7A6"></div><b style="font-size: 14px">Durazno</b><span style="font-size: 12.5px; color: #CFC6DA">#FFC7A6 · degradados</span></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="height: 40px; border-radius: 999px; background: linear-gradient(120deg, #FF9AD5, #FFC7A6 28%, #FFE66B 48%, #A6F0E6 70%, #C8A8FF)"></div>
+      <span style="font-size: 12.5px; color: #CFC6DA">Holográfico · solo para SSR, barras de progreso y momentos especiales</span>
+    </div>
+  </section>
+
+  <!-- tipografía -->
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 800">Tipografía</h2>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px">
+      <div style="background: #1A1622; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-family: 'Lilita One', system-ui, sans-serif; font-size: 40px; line-height: 1; color: #FF6FB8">Abre sobres</span>
+        <b style="font-size: 14px">Lilita One</b><span style="font-size: 12.5px; color: #CFC6DA">Títulos y números grandes</span>
+      </div>
+      <div style="background: #1A1622; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-size: 18px; line-height: 1.5; font-weight: 500">Voltéalas una por una. 少女たち</span>
+        <b style="font-size: 14px">M PLUS Rounded 1c</b><span style="font-size: 12.5px; color: #CFC6DA">Texto y botones. Incluye japonés</span>
+      </div>
+      <div style="background: #1A1622; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 8px">
+        <span style="font-family: Unbounded, system-ui, sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .3em; color: #A6F0E6">VOL. 1 · SSR</span>
+        <b style="font-size: 14px">Unbounded</b><span style="font-size: 12.5px; color: #CFC6DA">Etiquetas en mayúsculas y rarezas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- componentes -->
+  <section style="display: flex; flex-direction: column; gap: 16px">
+    <h2 style="margin: 0; font-size: 20px; font-weight: 800">Componentes</h2>
+    <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center">
+      <button type="button" style="font: inherit; font-weight: 800; font-size: 16px; border: 0; border-radius: 999px; padding: 13px 22px; background: #FF6FB8; color: #1A0F18; box-shadow: 4px 4px 0 #FFE66B; cursor: pointer">Abrir sobre</button>
+      <button type="button" style="font: inherit; font-weight: 800; font-size: 16px; border: 2px solid #A6F0E6; border-radius: 999px; padding: 11px 20px; background: transparent; color: #A6F0E6; cursor: pointer">Ver probabilidades</button>
+      <button type="button" style="font: inherit; font-weight: 800; font-size: 16px; border: 0; border-radius: 999px; padding: 13px 22px; background: #FFE66B; color: #241B05; cursor: pointer">Reclamar</button>
+      <button type="button" style="font: inherit; font-weight: 700; font-size: 16px; border: 2px solid #3A3147; border-radius: 999px; padding: 11px 20px; background: transparent; color: #FFF7FB; cursor: pointer">Cancelar</button>
+      <button type="button" disabled style="font: inherit; font-weight: 800; font-size: 16px; border: 0; border-radius: 999px; padding: 13px 22px; background: #3A3147; color: #A99FB6">Abriendo…</button>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+      <span style="font-family: Unbounded, system-ui, sans-serif; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 8px; background: #D9DEE8; color: #15121B">N</span>
+      <span style="font-family: Unbounded, system-ui, sans-serif; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 8px; background: #A6F0E6; color: #10201E">R</span>
+      <span style="font-family: Unbounded, system-ui, sans-serif; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 8px; background: #C8A8FF; color: #1D1230">SR</span>
+      <span style="font-family: Unbounded, system-ui, sans-serif; font-weight: 700; font-size: 13px; padding: 4px 10px; border-radius: 8px; background: linear-gradient(120deg, #FF9AD5, #FFE66B 50%, #A6F0E6); color: #1A0F18">SSR</span>
+      <span style="width: 16px"></span>
+      <span style="font-weight: 800; font-size: 13.5px; padding: 6px 14px; border-radius: 999px; background: #FF6FB8; color: #1A0F18">Todas</span>
+      <span style="font-weight: 700; font-size: 13.5px; padding: 4px 12px; border-radius: 999px; border: 2px solid #3A3147">Me faltan</span>
+      <span style="font-weight: 800; font-size: 12px; padding: 2px 9px; border-radius: 999px; background: #FFE66B; color: #241B05">2</span>
+      <span style="font-weight: 800; font-size: 13px; padding: 4px 12px; border-radius: 999px; background: rgba(134,240,124,.16); color: #86F07C">Tres roles distintos +10%</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+      <div style="background: #1A1622; border: 2px solid #3A3147; border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; font-weight: 700"><span>Sobre gratis</span><span style="color: #FFE66B">1 de 2</span></div>
+        <div style="height: 12px; border-radius: 999px; background: #251F30; overflow: hidden"><div style="width: 62%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #FF9AD5, #FFC7A6, #FFE66B)"></div></div>
+        <span style="font-size: 13px; color: #CFC6DA">El siguiente en 7 h</span>
+      </div>
+      <div style="background: #1A1622; border: 2px solid #86F07C; border-radius: 20px; padding: 18px; display: flex; align-items: center; gap: 12px">
+        <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px; flex: none"><path d="M12 0C13 7 17 11 24 12C17 13 13 17 12 24C11 17 7 13 0 12C7 11 11 7 12 0Z" fill="#86F07C"/></svg>
+        <div style="display: flex; flex-direction: column"><b>¡Recompensa reclamada!</b><span style="font-size: 13px; color: #CFC6DA">Ganaste 1 sobre y 40 galletas.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <p style="margin: 0 0 0; font-size: 13px; color: #A99FB6">Regla de uso: el fondo siempre es tinta. Chicle para la acción principal, un solo botón chicle por pantalla. El holográfico se reserva para lo especial, para que siga sintiéndose especial.</p>
+</div>
+</body>
+</html>

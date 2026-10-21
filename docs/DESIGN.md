@@ -115,6 +115,7 @@ cualquier componente nuevo se añada a esta tabla.
 | Confetti | Confeti (lámina «Premios (spec 015)») |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
+| CartaCapas | Sin versión en Pencil: carta por capas del paquete de diseño (`docs/waifu-baker/waifu-baker/codigo/carta-capas`) |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
 de la demo (`pnpm showcase`). Se regeneran tras cada cambio visible.
