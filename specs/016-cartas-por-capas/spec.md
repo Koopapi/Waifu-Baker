@@ -64,6 +64,7 @@ concesiones.
 - RF-7: EL SISTEMA permitirá cambiar el orden de las capas.
 - RF-8: EL SISTEMA permitirá ocultar y volver a mostrar cada capa.
 - RF-9: EL SISTEMA permitirá ajustar por capa de imagen la profundidad, el margen, el modo de mezcla y la opacidad.
+- RF-69: EL SISTEMA solo ofrecerá en el editor los modos de mezcla que la imagen plana reproduce igual que la web.
 - RF-10: EL SISTEMA permitirá añadir capas de partículas con su tipo, cantidad, tamaño, velocidad y color.
 - RF-11: EL SISTEMA permitirá elegir el marco entre los cinco de rareza (n, r, sr, ssr, ur).
 - RF-12: EL SISTEMA permitirá poner un sello de texto con su estilo o un sello de imagen, en cualquiera de las cuatro
@@ -76,6 +77,10 @@ concesiones.
 - RF-17: SI la configuración por capas no tiene ninguna capa visible, ENTONCES EL SISTEMA no la guardará e indicará
   que hace falta al menos una.
 - RF-18: CUANDO el administrador quite todas las capas de una carta y guarde, EL SISTEMA dejará la carta sin capas.
+- RF-67: SI el administrador intenta quitar todas las capas de una carta creada desde capas, ENTONCES EL SISTEMA no
+  lo permitirá e indicará que necesita al menos una capa de imagen visible.
+- RF-68: CUANDO una carta con imagen original se quede sin capas, EL SISTEMA la mostrará con su imagen compuesta con
+  el marco de Pencil.
 
 ### Edición simultánea
 - RF-19: SI otro administrador guardó la configuración por capas de la carta después de que el editor la cargara,
@@ -156,6 +161,7 @@ concesiones.
 - RF-57: CUANDO se voltee una carta con capas en la apertura, EL SISTEMA mostrará su sello con la entrada animada.
 - RF-58: EL SISTEMA mostrará el número, el nombre y la rareza fuera de la carta igual para cartas con capas y sin
   capas.
+- RF-71: EL SISTEMA dibujará el sello de texto con la misma tipografía en la web y en la imagen plana.
 - RF-59: CUANDO el coleccionista toque el control de giroscopio en la ficha o la apertura en un móvil, EL SISTEMA
   pedirá permiso si hace falta y la carta seguirá la inclinación del teléfono.
 - RF-60: SI el permiso de giroscopio se deniega o no existe, ENTONCES EL SISTEMA seguirá respondiendo al dedo sin
@@ -175,6 +181,8 @@ concesiones.
   colocará cada archivo en su capa.
 - RF-66: SI una configuración importada no es válida, ENTONCES EL SISTEMA no cambiará la carta e indicará qué parte
   falla.
+- RF-70: SI una configuración importada usa un modo de mezcla que el editor no ofrece, ENTONCES EL SISTEMA lo cambiará
+  a normal e indicará qué capas cambiaron.
 
 ## Requisitos no funcionales
 - Animación: solo `transform` y `opacity`, `prefers-reduced-motion` respetado (sin balanceo ni parpadeo, pero
@@ -233,6 +241,12 @@ concesiones.
 - Al menos una capa visible para guardar. Edición simultánea con aviso de conflicto: recargar o forzar a sabiendas.
 - Imagen repetida: aviso suave solo dentro de la misma carta.
 - Entran el giroscopio y la importación/exportación del creador; quedan fuera el historial y las plantillas.
+
+## Cambios
+- 21 oct 2026, revisión del plan: RF-67 y RF-68 (quitar todas las capas: se impide en una carta creada desde capas;
+  con imagen original vuelve a Pencil), RF-69 y RF-70 (solo modos de mezcla que la imagen plana reproduce; los
+  importados que no, a normal con aviso) y RF-71 (misma tipografía del sello en la web y en el plano). Los números
+  nuevos van al final para no renumerar los aprobados.
 
 ## Dudas abiertas
 Ninguna.

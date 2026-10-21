@@ -227,6 +227,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-195 | Al cambiar la rareza de una carta con capas cambian el marco y el sello de texto; un sello de imagen se mantiene con aviso; las partículas no cambian. | Aprobada | 016 RF-41 a RF-44 |
 | RN-196 | En una carta 18+, añadir, quitar o sustituir una capa de imagen, o volver visible una que no lo era, anula la revisión. Si la carta está publicada, los coleccionistas siguen viendo la versión revisada hasta la nueva revisión. Las capas 18+ solo se entregan con el doble control de edad. | Aprobada | 016 RF-45 a RF-50 |
 | RN-197 | Las capas se editan también en colecciones publicadas; quien ya tiene la carta ve la versión nueva (las 18+, cuando se revisan). | Aprobada | 016 RF-51, RF-52 |
+| RN-198 | Una carta creada desde capas no puede quedarse sin capas; una con imagen original que las pierde vuelve a su imagen de Pencil. Solo se usan modos de mezcla que la imagen plana reproduce igual (los importados que no, pasan a normal con aviso), y el sello de texto usa la misma tipografía en la web y en la imagen plana. | Aprobada | 016 RF-67 a RF-71 |
 
 ## Parámetros en un vistazo
 

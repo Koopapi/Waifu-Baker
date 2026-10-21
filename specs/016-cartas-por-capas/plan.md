@@ -70,8 +70,8 @@ de npm nueva.**
    (la capa se amplía un `margen` % por lado y se recorta al lienzo, como en el navegador). La opacidad se aplica
    multiplicando el canal alfa. El modo de mezcla se traduce al de `sharp`: `multiply`, `screen`, `overlay`,
    `darken`, `lighten`, `color-dodge` → `colour-dodge`, `color-burn` → `colour-burn`, `hard-light`, `soft-light`,
-   `difference`, `exclusion`. Si una mezcla no tiene equivalente (`hue`, `saturation`, `color`, `luminosity`), se
-   compone en `over` y el editor lo avisa al elegirla.
+   `difference`, `exclusion`. Son los únicos que ofrece el editor (RF-69); un JSON importado con `hue`, `saturation`,
+   `color` o `luminosity` pasa a normal con aviso de las capas cambiadas (RF-70). Así el plano y la web no difieren.
 3. Partículas en posición fija: `domain/cards/particles.ts` replica el generador con semilla de `carta-capas.js`
    (mismo `semilla`, mismas posiciones, tamaños y colores) y produce un SVG con cada partícula en su opacidad máxima;
    `sharp` lo rasteriza y lo compone en la profundidad y con la mezcla de su capa. Un test compara las posiciones con
@@ -79,10 +79,10 @@ de npm nueva.**
 4. Marco: el degradado metálico del escalón como SVG (los mismos colores que `MARCOS` de `carta-capas.js`), con el
    grosor de `borde` y las esquinas redondeadas; recorte del conjunto con la máscara redondeada.
 5. Sello: imagen (con su `recorte`) o texto con su estilo (`oro`, `plata`, `arcoiris`, `rosa`, `azul`, `morado`) en su
-   esquina. Para el sello de texto hace falta una tipografía gruesa en el servidor (el navegador usa «Arial Black» o
-   similar, que el servidor no tiene): se añade **Archivo Black** (licencia OFL) como archivo en `assets/fonts`, igual
-   que Space Grotesk. Es un archivo de fuente, no un paquete; se justifica porque sin él el sello del plano no
-   coincidiría con el de la carta.
+   esquina, con **Archivo Black** (licencia OFL) como archivo en `assets/fonts`, igual que Space Grotesk. La web usa
+   la misma fuente (RF-71): se carga con `next/font` (`--font-sello`) y una regla de mayor especificidad
+   (`.cc .cc-sello-texto b`) sustituye el «Arial Black» de `carta-capas.js` sin modificar el script. Es un archivo de
+   fuente, no un paquete de npm.
 6. Sin holo en la imagen plana (es un efecto que depende del ángulo).
 7. Tamaños como hoy, con la proporción del lienzo: `full` 1400 × 1982, `mid` 700 × 991, `thumb` 300 × 425 y `public`
    600 × 849 con la marca de agua de siempre; `blurhash` del `full`. Las claves llevan la huella del contenido, como las
@@ -125,8 +125,8 @@ bloqueada (`for update`):
 
 Al revisar (`reviewCard`) una carta con algo pendiente: `layers_pending` → `layers`, `pending_keys` → `key_*`, se vacía
 lo pendiente y se libera lo viejo (RF-49). Quitar todas las capas (RF-18) vuelve a la imagen compuesta con Pencil si la
-carta tiene original. **Pendiente de decidir**: una carta creada desde capas no tiene original al que volver; la spec
-no dice qué pasa si se le quitan todas (ver §10).
+carta tiene original (RF-68); en una carta creada desde capas la API lo rechaza y el editor no ofrece quitarlas todas
+(RF-67).
 
 ## 6. Decisiones
 
@@ -163,12 +163,18 @@ Cada RF con su test, con nombres `test_s016_rfN_*`, y validación con `node scri
 
 ## 8. Entregas
 
-1. Migración, dominio puro y sus tests.
-2. Imágenes de capa, imagen plana y servicio de guardado (integración).
-3. Rutas firmadas y protección 18+.
-4. Editor del panel (subida, ajustes, vista previa, conflicto, importar/exportar, crear desde capas).
-5. Coleccionista: apertura, «Abrir todos», colección, ficha y giroscopio.
-6. E2E, rendimiento, `validation.md` y RN-190 a RN-197 a «Vigente».
+Cada entrega se puede probar en el navegador (demo local) y va en su propio PR contra `pruebas` (detalle en
+`tasks.md`):
+
+1. **Editor con vista previa y guardado**: migración, dominio, subida de capas, editor, vista previa en vivo,
+   guardado con aviso de conflicto.
+2. **Imagen plana**: generación en el servidor al guardar; la carta con capas en miniaturas del panel, álbum público
+   y portada.
+3. **Lo que ve el coleccionista**: rutas firmadas con doble control 18+, apertura, «Abrir todos», colección, ficha y
+   giroscopio.
+4. **18+ y rareza**: configuración pendiente hasta la revisión, cambio de rareza.
+5. **Crear desde capas, importar y exportar**.
+6. **Cierre**: E2E completo, rendimiento, `validation.md` y RN-190 a RN-198 a «Vigente».
 
 ## 9. Riesgos
 
@@ -180,11 +186,8 @@ Cada RF con su test, con nombres `test_s016_rfN_*`, y validación con `node scri
 - **Tamaño de las capas**: 8 capas de 1400 × 1982 en WebP pueden sumar 1–2 MB por carta. Se mide en la entrega 5; si
   hace falta, la rejilla pide una versión reducida de cada capa.
 
-## 10. Preguntas para la revisión del plan
+## 10. Decisiones de la revisión del plan (21 oct 2026)
 
-1. **Quitar todas las capas de una carta creada desde capas** (no tiene imagen original): ¿se impide (el botón no
-   está y la API lo rechaza) o se permite y la carta vuelve a «sin imagen», incompleta como una carta recién creada?
-   Cualquiera de las dos necesita una línea en la spec junto a RF-18.
-2. **Mezclas sin equivalente en el servidor** (`hue`, `saturation`, `color`, `luminosity`): ¿se aceptan con aviso
-   (el plano las compone en normal) o se quitan de la lista del editor?
-3. **Archivo Black** como tipografía del sello de texto en la imagen plana: ¿de acuerdo, o prefieres otra OFL?
+1. Una carta creada desde capas no puede quedarse sin capas (RF-67); con imagen original vuelve a Pencil (RF-68).
+2. Solo los modos de mezcla que `sharp` reproduce igual; los importados que no, a normal con aviso (RF-69, RF-70).
+3. Archivo Black para el sello de texto, en la imagen plana y en la web (RF-71).
