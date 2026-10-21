@@ -18,6 +18,16 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import type { LayersConfig } from "@/domain/cards/layers";
+
+/** Spec 016: imagen plana de una configuración pendiente de revisión, en sus cuatro tamaños. */
+export interface PendingFlatKeys {
+  full: string;
+  mid: string;
+  thumb: string;
+  public: string;
+  blurhash: string;
+}
 
 export const userRole = pgEnum("user_role", ["user", "admin"]);
 export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]);
@@ -119,6 +129,11 @@ export const cards = pgTable(
     promptSha256: text("prompt_sha256"),
     sourceJob: text("source_job"),
     version: integer("version").notNull().default(1),
+    // Spec 016: configuración por capas vigente (null = carta sin capas) y la pendiente de revisión (18+ publicada),
+    // con la imagen plana de lo pendiente. La imagen plana vigente va en key_* como la compuesta.
+    layers: jsonb("layers").$type<LayersConfig>(),
+    layersPending: jsonb("layers_pending").$type<LayersConfig>(),
+    pendingKeys: jsonb("pending_keys").$type<PendingFlatKeys>(),
     ...timestamps,
   },
   (t) => [
