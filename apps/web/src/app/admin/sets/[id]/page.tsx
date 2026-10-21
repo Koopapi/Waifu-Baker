@@ -59,6 +59,8 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
     adultReviewedAt: c.adultReviewedAt ? c.adultReviewedAt.toISOString() : null,
     pendingArtUrl: assetUrl(c.pendingOriginalKey),
     chance: chances.get(c.id) ?? 0,
+    layers: c.layers,
+    hasOriginal: Boolean(c.originalKey),
   }));
   const unreviewed = set.isAdult ? cards.filter((c) => !c.adultReviewedAt || c.pendingArtUrl).length : 0;
   const incomplete = cards.filter((c) => c.status !== "ready").length;

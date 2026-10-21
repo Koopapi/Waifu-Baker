@@ -215,6 +215,20 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-185 | Las galletas al llegar, el sobre al aterrizar y una celebración al abrirse suenan (sonidos CC0, por el mismo motor y silencio de la apertura); solo la celebración vibra, suave y una vez. El botón de silencio está también en la cabecera del coleccionista. | Vigente | 015 RF-12 a RF-14 |
 | RN-186 | Las pantallas del coleccionista no muestran avisos emergentes ni mensajes de éxito por reclamar; los lectores de pantalla reciben un anuncio de texto. Un fallo se muestra junto al botón, con «Reintentar» solo si falló la red. El panel de administración conserva sus avisos. | Vigente | 015 RF-15 a RF-17 |
 
+## 18. Cartas por capas (parallax)
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-190 | Solo el administrador crea y edita cartas por capas, desde el panel: añadiendo capas a una carta existente o creando una carta nueva a partir de capas. Cada cambio queda registrado. | Aprobada | 016 RF-1, RF-2, RF-22, RF-23 |
+| RN-191 | Una carta con capas se ve por capas, con el marco, la rareza y el sello de la carta por capas, sin el marco de Pencil y sin texto encima; una carta sin capas se ve como siempre. El número, el nombre y la rareza siguen saliendo de la base de datos. | Aprobada | 016 RF-15, RF-25, RF-53, RF-54, RF-58 |
+| RN-192 | Las capas de imagen tienen la proporción 700 × 991 (±1 %), al menos 700 px de ancho, PNG, JPEG o WebP de hasta 20 MB; se guardan en WebP; como mucho 8 capas de imagen por carta (las partículas no cuentan). El sello de imagen no tiene que cumplir la proporción. | Aprobada | 016 RF-30 a RF-38 |
+| RN-193 | Para guardar hace falta al menos una capa visible. Si otro administrador guardó antes, se avisa del conflicto: recargar o forzar a sabiendas. | Aprobada | 016 RF-17, RF-19 a RF-21 |
+| RN-194 | Toda carta con capas tiene una imagen plana generada en el servidor (mezclas respetadas, partículas en reposo), que sustituye a la compuesta con Pencil donde se usa una imagen simple y, con marca de agua, en las zonas públicas. Las capas sueltas nunca se entregan sin sesión. | Aprobada | 016 RF-26 a RF-29, RF-61 a RF-63 |
+| RN-195 | Al cambiar la rareza de una carta con capas cambian el marco y el sello de texto; un sello de imagen se mantiene con aviso; las partículas no cambian. | Aprobada | 016 RF-41 a RF-44 |
+| RN-196 | En una carta 18+, añadir, quitar o sustituir una capa de imagen, o volver visible una que no lo era, anula la revisión. Si la carta está publicada, los coleccionistas siguen viendo la versión revisada hasta la nueva revisión. Las capas 18+ solo se entregan con el doble control de edad. | Aprobada | 016 RF-45 a RF-50 |
+| RN-197 | Las capas se editan también en colecciones publicadas; quien ya tiene la carta ve la versión nueva (las 18+, cuando se revisan). | Aprobada | 016 RF-51, RF-52 |
+| RN-198 | Una carta creada desde capas no puede quedarse sin capas; una con imagen original que las pierde vuelve a su imagen de Pencil. Solo se usan modos de mezcla que la imagen plana reproduce igual (los importados que no, pasan a normal con aviso), y el sello de texto usa la misma tipografía en la web y en la imagen plana. | Aprobada | 016 RF-67 a RF-71 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -250,3 +264,4 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Premio que vuela | 0,7 s por pegatina, escalonadas 90 ms (3 galletas, 1 sobre); el destino rebota 0,42 s |
 | Estampado de la pegatina del día | 0,45 s antes de que vuele el premio |
 | Celebración | una a la vez, en orden; confeti de 70 piezas; vibración de 30 ms |
+| Capas de una carta | proporción 700 × 991 (±1 %), mínimo 700 px de ancho (recomendado 1400 × 1982); hasta 8 de imagen |

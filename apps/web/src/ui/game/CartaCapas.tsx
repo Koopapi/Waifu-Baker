@@ -59,12 +59,14 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
       const lib = mod.default;
       if (!alive || !box.current || !lib) return;
       const extra: CartaConfig = {
-        ...(rawArt ? {} : { marco: "ninguno", proporcion: CARD_RATIO }),
+        // Una configuración por capas trae su marco y su proporción; una imagen compuesta ya lleva el marco de Pencil.
+        ...(rawArt || config ? {} : { marco: "ninguno", proporcion: CARD_RATIO }),
         etiqueta: label,
         estatica,
         zona: zone?.current ?? undefined,
-        // El holo es la versión holo del juego, no el del preset (la UR lo trae siempre).
-        holo,
+        // Con una imagen, el holo es la versión holo del juego (no el del preset: la UR lo trae siempre); con
+        // capas, también el que elija la configuración.
+        holo: holo || Boolean(config?.holo),
         ...(noSeal ? { sello: null } : {}),
       };
       card.current = config ? lib.montar(box.current, { ...config, ...extra }) : lib.montarRareza(box.current, tier, image, extra);
@@ -80,13 +82,13 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
   }, [tier, image, rawArt, config, estatica, noSeal]);
 
   useEffect(() => {
-    card.current?.set({ holo });
-  }, [holo]);
+    card.current?.set({ holo: holo || Boolean(config?.holo) });
+  }, [holo, config]);
 
   useImperativeHandle(ref, () => ({
     entrar: () => card.current?.entrar(),
     ocultarSello: () => card.current?.ocultarSello(),
   }), []);
 
-  return <div ref={box} className={className} style={{ aspectRatio: rawArt ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} />;
+  return <div ref={box} className={className} style={{ aspectRatio: rawArt || config ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} />;
 });
