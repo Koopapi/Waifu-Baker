@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ejemplo · Carta por capas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: réplica ligera de la app (tokens de la presentación de Waifu Baker). Pestañas arriba; cada vista es una pantalla de la app con Yuki por capas. */
+:root{
+  --rail:#140f17;--nav:#1c1520;--bg:#241b29;--raised:#2e2333;--hover:#3a2c40;--line:#41324a;
+  --text:#f7f0f4;--text2:#c9b9c4;--text3:#9d8a98;--accent:#d6336c;--accent-text:#ff8ab0;
+  --f-head:"Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text)}
+body{font:15px/1.5 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:20px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:14px 16px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--accent);font:700 15px var(--f-head);color:#fff;flex:none}
+h1{margin:0;font:700 20px/1.2 var(--f-head)}
+.sub{margin:0;color:var(--text3);font-size:13px}
+.seg{margin-left:auto;display:inline-flex;background:var(--rail);border-radius:8px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--text2);font:600 14px var(--f-body);padding:8px 16px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:#fff}
+.seg button:focus-visible,button:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
+
+.device{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--bg)}
+.demo-bar{background:var(--accent);color:#fff;text-align:center;font-size:13px;padding:7px 12px}
+
+/* ---------- Ficha ---------- */
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:760px;position:relative}
+@media (max-width:900px){.shell{grid-template-columns:minmax(0,1fr)}.side{display:none}}
+.side{background:var(--nav);border-right:1px solid var(--rail);padding:18px 12px;display:grid;align-content:start;gap:4px}
+.side .bn{font:700 15px var(--f-head);letter-spacing:.04em;padding:0 10px}
+.side .bs{font-size:12px;color:var(--text3);padding:0 10px 14px}
+.side .lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:12px 10px 4px}
+.side .it{padding:8px 10px;border-radius:8px;color:var(--text2);font-size:14.5px;display:flex;justify-content:space-between;align-items:center}
+.side .it.on{background:var(--raised);color:var(--text)}
+.badge{background:#e03131;color:#fff;font-size:11px;border-radius:999px;padding:1px 7px}
+.main{padding:26px 24px;position:relative;min-width:0}
+.back{color:var(--text3);font-size:14px}
+.ttl{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin:4px 0 16px}
+.ttl h2{margin:0;font:700 clamp(26px,4vw,34px)/1.1 var(--f-head)}
+.ttl span{color:var(--text2);font-size:15px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{background:var(--raised);color:var(--text2);border-radius:8px;padding:6px 12px;font-size:14px}
+.chip.on{background:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
+.slot{aspect-ratio:700/991;border:1.5px dashed var(--line);border-radius:12px;display:grid;place-items:center;color:var(--text3);font:500 18px var(--f-mono)}
+.thumb{position:relative;aspect-ratio:700/991;border-radius:12px;padding:4px;cursor:zoom-in;border:0;background:linear-gradient(135deg,#6e4a12,#f7dc8a 25%,#b9862d 45%,#fff3c4 55%,#a0701f 75%,#f2cf6e);box-shadow:0 0 18px rgba(240,190,90,.25)}
+.thumb img{width:100%;height:100%;object-fit:cover;border-radius:9px;display:block}
+.thumb .x{position:absolute;top:9px;right:9px;background:rgba(20,15,23,.8);color:#fff;font-size:11px;border-radius:6px;padding:1px 6px}
+.thumb .r{position:absolute;top:9px;left:9px;background:linear-gradient(135deg,#f7dc8a,#b9862d);color:#2a1a05;font:700 10px var(--f-head);border-radius:5px;padding:1px 6px;letter-spacing:.04em}
+
+.scrim{position:absolute;inset:0;background:rgba(20,15,23,.72);display:grid;place-items:start center;padding:56px 20px 24px;z-index:20}
+.modal{width:min(980px,100%);background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:24px;display:grid;gap:18px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.mh{display:flex;justify-content:space-between;gap:12px;align-items:start}
+.mh h3{margin:0;font:700 22px/1.2 var(--f-head)}
+.mh p{margin:2px 0 0;color:var(--text2);font-size:14.5px}
+.x-btn{border:0;background:transparent;color:var(--text2);font-size:24px;line-height:1;cursor:pointer;padding:4px 8px;border-radius:6px}
+.x-btn:hover{background:var(--raised)}
+.mb{display:grid;grid-template-columns:minmax(0,440px) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:760px){.mb{grid-template-columns:minmax(0,1fr)}}
+.art-box{background:var(--rail);border-radius:10px;padding:44px 20px 28px 36px;display:grid;place-items:center}
+.art-box .cc{width:min(330px,100%)}
+.info{display:grid;gap:16px;min-width:0}
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.count{border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.count span{display:block;color:var(--text2);font-size:14px}
+.count b{font:700 22px var(--f-head)}
+.info p{margin:0;color:var(--text2)}
+.info .hint{font-size:13px;color:var(--text3)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--nav);border-radius:10px;padding:12px 14px}
+.switch small{display:block;color:var(--text3);font-size:12.5px}
+.tg{position:relative;width:42px;height:24px;flex:none}
+.tg input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.tg span{position:absolute;inset:0;border-radius:999px;background:var(--hover);transition:background .2s;pointer-events:none}
+.tg span::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.tg input:checked+span{background:var(--accent)}
+.tg input:checked+span::after{transform:translateX(18px)}
+.tg input:focus-visible+span{outline:2px solid var(--accent-text);outline-offset:2px}
+
+/* ---------- Apertura ---------- */
+.open-stage{min-height:760px;display:grid;grid-template-rows:auto 1fr auto;justify-items:center;gap:16px;padding:20px 16px 26px;
+  background:radial-gradient(60% 50% at 50% 30%,#2a1747 0%,transparent 70%),linear-gradient(#1b1030,#08060c);perspective:1300px;overflow:hidden}
+.open-top{color:var(--text2);font-size:15px;text-align:center;min-height:1.5em}
+.open-top b{color:#f7dc8a;font-family:var(--f-head)}
+.pile{position:relative;width:min(320px,70vw);aspect-ratio:700/991;align-self:center;margin-top:24px}
+.back-card{position:absolute;inset:0;border-radius:18px}
+.back-face{background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 10px,transparent 10px 20px),linear-gradient(150deg,#6b3fd1,#3a1f7a 60%,#24124f);border:2px solid #7e55e0;box-shadow:inset 0 0 0 6px rgba(20,10,40,.6),inset 0 0 0 7px rgba(170,140,255,.35);display:grid;place-items:center}
+.back-face::after{content:"WB";display:grid;place-items:center;width:30%;aspect-ratio:1;border-radius:50%;background:rgba(20,10,40,.55);border:2px solid rgba(200,180,255,.55);color:#e9ddff;font:700 clamp(18px,5vw,26px) var(--f-head)}
+.pile .b1{transform:translate(4%,2%) rotate(3deg);opacity:.9}
+.pile .b2{transform:translate(7%,3.5%) rotate(5deg);opacity:.75}
+.pile .b3{transform:translate(10%,5%) rotate(7deg);opacity:.55}
+.flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .85s cubic-bezier(.3,1.25,.5,1);cursor:pointer;border:0;padding:0;background:none;border-radius:18px}
+.flip.rev{transform:rotateY(180deg);cursor:default}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:18px}
+.face.front{transform:rotateY(180deg)}
+.flip:not(.rev) .face.back-face{animation:hover-pulse 2.4s ease-in-out infinite}
+@keyframes hover-pulse{0%,100%{box-shadow:inset 0 0 0 6px rgba(20,10,40,.6),inset 0 0 0 7px rgba(170,140,255,.35),0 0 0 rgba(170,140,255,0)}50%{box-shadow:inset 0 0 0 6px rgba(20,10,40,.6),inset 0 0 0 7px rgba(170,140,255,.35),0 0 40px rgba(170,140,255,.45)}}
+.open-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{font:600 14px var(--f-body);border-radius:999px;padding:10px 18px;cursor:pointer;border:1px solid var(--line);background:var(--raised);color:var(--text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn[disabled]{opacity:.45;cursor:default}
+
+/* ---------- Notas para el equipo ---------- */
+.notes{display:grid;gap:12px;background:var(--nav);border:1px solid var(--line);border-radius:16px;padding:20px}
+.notes h2{margin:0;font:700 17px var(--f-head)}
+.notes p{margin:0;color:var(--text2);max-width:72ch}
+pre{margin:0;overflow-x:auto;background:var(--rail);border-radius:10px;padding:14px 16px;font:12.5px/1.6 var(--f-mono);color:var(--text2)}
+@media (prefers-reduced-motion:reduce){.flip{transition:none}.flip:not(.rev) .face.back-face{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="brand"><div class="logo">WB</div><div><h1>Yuki en Waifu Baker</h1><p class="sub">Prototipo · carta por capas dentro de la app</p></div></div>
+    <div class="seg" role="group" aria-label="Pantalla">
+      <button type="button" data-v="ficha" aria-pressed="true">Ficha de carta</button>
+      <button type="button" data-v="apertura" aria-pressed="false">Apertura</button>
+    </div>
+  </div>
+
+  <!-- Ficha de carta -->
+  <section class="device" id="v-ficha" aria-label="Ficha de carta">
+    <div class="demo-bar">Modo demo · estás viendo la web como coleccionista</div>
+    <div class="shell">
+      <aside class="side" aria-hidden="true">
+        <div class="bn">WAIFU BAKER</div><div class="bs">Tus colecciones</div>
+        <div class="lbl">Colección</div>
+        <div class="it">Mis sobres</div><div class="it on">Mi colección</div><div class="it">Álbum público</div><div class="it">Recompensas <span class="badge">2</span></div>
+        <div class="lbl">Tú</div>
+        <div class="it">Mi cuenta</div><div class="it">Probabilidades</div>
+      </aside>
+      <div class="main">
+        <div class="back">← Mi colección</div>
+        <div class="ttl"><h2>Expedición · Vol. 1</h2><span>1 de 26 cartas</span></div>
+        <div class="chips"><span class="chip on">Todas</span><span class="chip">Las que tengo</span><span class="chip">Me faltan</span><span class="chip">Holo</span></div>
+        <div class="grid" id="grid"></div>
+
+        <div class="scrim" id="scrim">
+          <div class="modal" role="dialog" aria-modal="false" aria-labelledby="m-t">
+            <div class="mh"><div><h3 id="m-t">Yuki</h3><p>EXP1 · 001 · SSR</p></div><button class="x-btn" id="close" type="button" aria-label="Cerrar">×</button></div>
+            <div class="mb">
+              <div class="art-box" id="fichaZona"><div id="fichaCarta"></div></div>
+              <div class="info">
+                <div class="counts"><div class="count"><span>Normal</span><b>x1</b></div><div class="count"><span>Holo</span><b>x0</b></div></div>
+                <p>La conseguiste por primera vez el 16 de octubre de 2026.</p>
+                <label class="switch" for="holoTg"><span>Ver versión holo<small>Vista previa de cómo se ve si la consigues en holo.</small></span><span class="tg"><input type="checkbox" id="holoTg"><span></span></span></label>
+                <p class="hint">Ilustración por capas. Mueve el ratón o inclina el móvil para ver la profundidad y el brillo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Apertura -->
+  <section class="device" id="v-apertura" aria-label="Apertura de sobre" hidden>
+    <div class="open-stage" id="openZona">
+      <p class="open-top" id="openTop">Toca la carta de arriba · 1 de 5</p>
+      <div class="pile">
+        <div class="back-card back-face b3"></div>
+        <div class="back-card back-face b2"></div>
+        <div class="back-card back-face b1"></div>
+        <button class="flip" id="flip" type="button" aria-label="Revelar carta">
+          <span class="face back-face"></span>
+          <span class="face front"><span id="openCarta" style="display:block;width:100%"></span></span>
+        </button>
+      </div>
+      <div class="open-actions">
+        <button class="btn" type="button" disabled>← Mis sobres</button>
+        <button class="btn primary" id="replay" type="button" hidden>Repetir apertura</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="notes" aria-labelledby="n-t">
+    <h2 id="n-t">Para tu equipo</h2>
+    <p>Todo sale de un solo componente, <b>carta-capas.js</b>, sin dependencias. Cada carta se describe con sus capas, su marco de rareza y su sello. La ficha y la apertura usan exactamente el mismo código; la apertura solo oculta el sello y llama a <code>entrar()</code> al voltear la carta.</p>
+<pre><code>const carta = CartaCapas.montar(contenedor, {
+  marco: 'ssr',
+  capas: [
+    { src: 'yuki_1_fondo.webp',       profundidad: 0.2,  margen: 5 },
+    { destellos: true,                profundidad: 0.55, margen: 4 },
+    { src: 'yuki_3_personaje.webp',   profundidad: 1 },
+    { src: 'yuki_4_particulas1.webp', profundidad: 1.3,  margen: 6, mezcla: 'overlay' },
+    { src: 'yuki_5_insignia.webp',    profundidad: 1.6 }
+  ],
+  sello: { src: 'yuki_ssr.webp', esquina: 'sup-izq' }
+});
+
+carta.set({ holo: true });   // versión holo
+carta.ocultarSello();        // antes de revelar
+carta.entrar();              // al voltear: el SSR rebota y pasa un destello</code></pre>
+  </section>
+</div>
+
+<script src="carta-capas.js"></script>
+<script>
+(function(){
+  var YUKI={
+    etiqueta:'Yuki, rareza SSR',marco:'ssr',
+    capas:[
+      {src:'cartas/yuki/yuki_1_fondo.webp',profundidad:.2,margen:5},
+      {destellos:true,profundidad:.55,margen:4},
+      {src:'cartas/yuki/yuki_3_personaje.webp',profundidad:1},
+      {src:'cartas/yuki/yuki_4_particulas1.webp',profundidad:1.3,margen:6,mezcla:'overlay'},
+      {src:'cartas/yuki/yuki_5_insignia.webp',profundidad:1.6}
+    ],
+    sello:{src:'cartas/yuki/yuki_ssr.webp',esquina:'sup-izq'}
+  };
+  function con(extra){return Object.assign({},YUKI,extra)}
+
+  /* rejilla de colección */
+  var g='<button class="thumb" id="yThumb" type="button" aria-label="Ver Yuki"><img src="cartas/yuki/yuki_mini.webp" alt=""><span class="r">SSR</span><span class="x">x1</span></button>';
+  for(var i=2;i<=12;i++)g+='<div class="slot">'+String(i).padStart(3,'0')+'</div>';
+  document.getElementById('grid').innerHTML=g;
+
+  /* ficha */
+  var ficha=CartaCapas.montar(document.getElementById('fichaCarta'),con({zona:document.getElementById('fichaZona')}));
+  var scrim=document.getElementById('scrim');
+  document.getElementById('close').addEventListener('click',function(){scrim.hidden=true;document.getElementById('yThumb').focus()});
+  document.getElementById('yThumb').addEventListener('click',function(){scrim.hidden=false;ficha.entrar()});
+  scrim.addEventListener('click',function(e){if(e.target===scrim)scrim.hidden=true});
+  document.getElementById('holoTg').addEventListener('change',function(e){ficha.set({holo:e.target.checked})});
+
+  /* apertura */
+  var apertura=CartaCapas.montar(document.getElementById('openCarta'),con({zona:document.getElementById('openZona'),reposo:false}));
+  apertura.ocultarSello();
+  var flip=document.getElementById('flip'),top=document.getElementById('openTop'),replay=document.getElementById('replay');
+  flip.addEventListener('click',function(){
+    if(flip.classList.contains('rev'))return;
+    flip.classList.add('rev');flip.setAttribute('aria-label','Yuki, SSR, revelada');
+    setTimeout(function(){apertura.entrar();apertura.set({reposo:true});top.innerHTML='<b>SSR</b> · Yuki · ¡Nueva!';replay.hidden=false},620);
+  });
+  replay.addEventListener('click',function(){
+    flip.classList.remove('rev');flip.setAttribute('aria-label','Revelar carta');
+    apertura.ocultarSello();apertura.set({reposo:false});
+    top.textContent='Toca la carta de arriba · 1 de 5';replay.hidden=true;flip.focus();
+  });
+
+  /* pestañas */
+  var segs=[].slice.call(document.querySelectorAll('.seg button'));
+  segs.forEach(function(b){b.addEventListener('click',function(){
+    segs.forEach(function(o){o.setAttribute('aria-pressed',o===b?'true':'false')});
+    document.getElementById('v-ficha').hidden=b.dataset.v!=='ficha';
+    document.getElementById('v-apertura').hidden=b.dataset.v!=='apertura';
+  })});
+  try{if(location.hash==='#apertura')segs[1].click()}catch(e){}
+})();
+</script>
+
+</body>
+</html>

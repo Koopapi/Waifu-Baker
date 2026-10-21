@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waifu Baker · Expediciones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&amp;family=M+PLUS+Rounded+1c:wght@400;500;700;800&amp;family=Unbounded:wght@500;700&amp;display=swap">
+<style>
+body{margin:0;background:#0F0C14;color:#FFF7FB;font-family:"M PLUS Rounded 1c",system-ui,sans-serif}
+a{color:#A6F0E6}a:hover{color:#FFE66B}
+@keyframes wb-pulse{50%{box-shadow:0 0 0 4px #0F0C14,0 0 0 10px rgba(255,230,107,.35)}}
+@media (prefers-reduced-motion:reduce){.wb-anim{animation:none!important}}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; background: #0F0C14; box-sizing: border-box; padding: 20px clamp(16px, 3vw, 40px) 40px; display: flex; flex-direction: column; gap: 22px">
+
+  <!-- barra -->
+  <header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px">
+    <a href="a-portada.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #FFF7FB; margin-right: auto">
+      <span style="display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: #FF6FB8; color: #1A0F18; font-family: 'Lilita One', system-ui, sans-serif; font-size: 18px; box-shadow: 3px 3px 0 #A6F0E6">WB</span>
+      <span style="font-family: 'Lilita One', system-ui, sans-serif; font-size: 28px">Expediciones</span>
+    </a>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <span style="display: inline-flex; align-items: center; gap: 8px; background: #1A1622; border: 2px solid #3A3147; border-radius: 999px; padding: 6px 14px 6px 8px; font-weight: 700; font-size: 14px"><span aria-hidden="true" style="width: 20px; height: 20px; border-radius: 50%; background: #FFE66B"></span><b style="font-family: 'Lilita One', system-ui, sans-serif; font-weight: 400; font-size: 18px">240</b> galletas</span>
+      <span style="display: inline-flex; align-items: center; gap: 8px; background: #1A1622; border: 2px solid #3A3147; border-radius: 999px; padding: 6px 14px 6px 8px; font-weight: 700; font-size: 14px"><span aria-hidden="true" style="width: 20px; height: 20px; border-radius: 6px; background: #A6F0E6; transform: rotate(8deg)"></span><b style="font-family: 'Lilita One', system-ui, sans-serif; font-weight: 400; font-size: 18px">6</b> fragmentos</span>
+      <span style="display: inline-flex; align-items: center; gap: 8px; background: #1A1622; border: 2px solid #3A3147; border-radius: 999px; padding: 6px 14px 6px 8px; font-weight: 700; font-size: 14px"><span aria-hidden="true" style="width: 16px; height: 22px; border-radius: 5px; background: #FF6FB8"></span><b style="font-family: 'Lilita One', system-ui, sans-serif; font-weight: 400; font-size: 18px">1</b> sobre</span>
+    </div>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start">
+
+    <!-- mapa -->
+    <section aria-label="Mapa" style="flex: 999 1 560px; min-width: 0; background: #15111C; border: 2px solid #251F30; border-radius: 26px; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+      <div style="position: relative; aspect-ratio: 1000 / 640; border-radius: 18px; overflow: hidden; background: #0F0C14">
+        <svg aria-hidden="true" viewBox="0 0 1000 640" style="position: absolute; inset: 0; width: 100%; height: 100%">
+          <defs>
+            <filter id="exp-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="18"/></filter>
+            <radialGradient id="exp-g1"><stop offset="0" stop-color="#86F07C" stop-opacity=".28"/><stop offset="1" stop-color="#86F07C" stop-opacity="0"/></radialGradient>
+            <radialGradient id="exp-g2"><stop offset="0" stop-color="#FF6FB8" stop-opacity=".28"/><stop offset="1" stop-color="#FF6FB8" stop-opacity="0"/></radialGradient>
+            <radialGradient id="exp-g3"><stop offset="0" stop-color="#A6F0E6" stop-opacity=".26"/><stop offset="1" stop-color="#A6F0E6" stop-opacity="0"/></radialGradient>
+          </defs>
+          <g fill="#FFE66B"><circle cx="60" cy="60" r="2.5"/><circle cx="960" cy="90" r="2"/><circle cx="930" cy="560" r="2.5"/><circle cx="40" cy="600" r="2"/></g>
+          <g fill="#FF6FB8"><circle cx="500" cy="24" r="2"/><circle cx="980" cy="330" r="2.5"/></g>
+          <path d="M70 210C90 120 200 70 320 82C420 40 560 52 650 92C760 48 900 70 942 160C990 250 952 332 902 382C944 452 900 560 790 592C660 630 520 600 420 612C300 632 160 612 100 542C40 472 62 382 50 322C40 272 50 240 70 210Z" fill="#1E1828" stroke="#3A3147" stroke-width="3"/>
+          <ellipse cx="190" cy="243" rx="160" ry="110" fill="url(#exp-g1)"/>
+          <ellipse cx="250" cy="467" rx="160" ry="110" fill="url(#exp-g2)"/>
+          <ellipse cx="530" cy="512" rx="170" ry="100" fill="url(#exp-g3)"/>
+          <g fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 12">
+            <path d="M190 243Q180 370 250 467" stroke="#FF6FB8"/>
+            <path d="M250 467Q420 520 530 512" stroke="#FF6FB8"/>
+            <path d="M530 512Q640 420 670 326" stroke="#5C4F6B"/>
+            <path d="M670 326Q520 230 460 141" stroke="#5C4F6B"/>
+            <path d="M460 141Q650 110 830 147" stroke="#5C4F6B"/>
+          </g>
+          <g filter="url(#exp-blur)" fill="#C8A8FF" opacity=".42">
+            <circle cx="640" cy="320" r="80"/><circle cx="720" cy="350" r="70"/><circle cx="660" cy="270" r="60"/>
+            <circle cx="440" cy="140" r="80"/><circle cx="520" cy="120" r="60"/><circle cx="380" cy="170" r="55"/>
+            <circle cx="820" cy="150" r="85"/><circle cx="900" cy="190" r="60"/><circle cx="760" cy="110" r="55"/>
+          </g>
+        </svg>
+        
+          <button type="button" aria-label="Bosque de los Susurros, Equipo de vuelta" style="position: absolute; left: 19%; top: 38%; transform: translate(-50%, -50%); border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font: inherit; color: #FFF7FB">
+            <span style="display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #86F07C; box-shadow: 0 0 0 4px #0F0C14, 0 0 0 7px #FFE66B; opacity: 1">
+              <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px" fill="none" stroke="#15121B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l6 8h-3.5l4.5 6.5H5L9.5 10H6z M12 16.5V22"/></svg>
+            </span>
+            <span style="background: rgba(15,12,20,.88); border: 2px solid #FFE66B; border-radius: 12px; padding: 4px 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.25; white-space: nowrap">
+              <b style="font-size: 13.5px">Bosque de los Susurros</b>
+              <span style="font-size: 12px; font-weight: 700; color: #FFE66B">Equipo de vuelta</span>
+            </span>
+          </button>
+        
+          <button type="button" aria-label="Calles de Puerto Miel, 1:12:40 · 1 equipo" style="position: absolute; left: 25%; top: 73%; transform: translate(-50%, -50%); border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font: inherit; color: #FFF7FB">
+            <span style="display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #FF6FB8; box-shadow: 0 0 0 4px #0F0C14, 0 0 0 7px #FF6FB8; opacity: 1">
+              <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px" fill="none" stroke="#15121B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l5-3v14M8 21V4l8 3v14M16 21v-9l5 2v7M2 21h20"/></svg>
+            </span>
+            <span style="background: rgba(15,12,20,.88); border: 2px solid #3A3147; border-radius: 12px; padding: 4px 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.25; white-space: nowrap">
+              <b style="font-size: 13.5px">Calles de Puerto Miel</b>
+              <span style="font-size: 12px; font-weight: 700; color: #CFC6DA">1:12:40 · 1 equipo</span>
+            </span>
+          </button>
+        
+          <button type="button" aria-label="Costa Coral, Dificultad 55" style="position: absolute; left: 53%; top: 80%; transform: translate(-50%, -50%); border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font: inherit; color: #FFF7FB">
+            <span style="display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #A6F0E6; box-shadow: 0 0 0 4px #0F0C14, 0 0 0 7px #A6F0E6; opacity: 1">
+              <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px" fill="none" stroke="#15121B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M2 20c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6 0M8 11a4 4 0 0 1 8 0"/></svg>
+            </span>
+            <span style="background: rgba(15,12,20,.88); border: 2px solid #3A3147; border-radius: 12px; padding: 4px 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.25; white-space: nowrap">
+              <b style="font-size: 13.5px">Costa Coral</b>
+              <span style="font-size: 12px; font-weight: 700; color: #CFC6DA">Dificultad 55</span>
+            </span>
+          </button>
+        
+          <button type="button" aria-label="Ruinas de Velmora, Niebla · 6/10 fragmentos" style="position: absolute; left: 67%; top: 51%; transform: translate(-50%, -50%); border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font: inherit; color: #FFF7FB">
+            <span style="display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #FFC7A6; box-shadow: 0 0 0 4px #0F0C14, 0 0 0 7px #FFC7A6; opacity: 1">
+              <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px" fill="none" stroke="#15121B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M4 18h16M6 18V9M10 18V9M14 18v-5M18 18V9M3.5 9L12 4l8.5 5z"/></svg>
+            </span>
+            <span style="background: rgba(15,12,20,.88); border: 2px solid #FFC7A6; border-radius: 12px; padding: 4px 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.25; white-space: nowrap">
+              <b style="font-size: 13.5px">Ruinas de Velmora</b>
+              <span style="font-size: 12px; font-weight: 700; color: #FFC7A6">Niebla · 6/10 fragmentos</span>
+            </span>
+          </button>
+        
+          <button type="button" aria-label="Paso de la Escarcha, Niebla" style="position: absolute; left: 46%; top: 22%; transform: translate(-50%, -50%); border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font: inherit; color: #FFF7FB">
+            <span style="display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #2A2433; box-shadow: 0 0 0 4px #0F0C14, 0 0 0 7px #4A4058; opacity: 0.85">
+              <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px" fill="none" stroke="#A99FB6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20l7.5-13 4 6.5 2.5-3.5L22 20z"/></svg>
+            </span>
+            <span style="background: rgba(15,12,20,.88); border: 2px solid #3A3147; border-radius: 12px; padding: 4px 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.25; white-space: nowrap">
+              <b style="font-size: 13.5px">Paso de la Escarcha</b>
+              <span style="font-size: 12px; font-weight: 700; color: #CFC6DA">Niebla</span>
+            </span>
+          </button>
+        
+          <button type="button" aria-label="Cámara Sellada, Niebla" style="position: absolute; left: 83%; top: 23%; transform: translate(-50%, -50%); border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font: inherit; color: #FFF7FB">
+            <span style="display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: #2A2433; box-shadow: 0 0 0 4px #0F0C14, 0 0 0 7px #4A4058; opacity: 0.85">
+              <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 26px; height: 26px" fill="none" stroke="#A99FB6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V10a7 7 0 0 1 14 0v11zM9 21v-6a3 3 0 0 1 6 0v6"/></svg>
+            </span>
+            <span style="background: rgba(15,12,20,.88); border: 2px solid #3A3147; border-radius: 12px; padding: 4px 10px; display: flex; flex-direction: column; align-items: center; line-height: 1.25; white-space: nowrap">
+              <b style="font-size: 13.5px">Cámara Sellada</b>
+              <span style="font-size: 12px; font-weight: 700; color: #CFC6DA">Niebla</span>
+            </span>
+          </button>
+        
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 0 6px 4px; font-size: 12.5px; font-weight: 700; color: #CFC6DA">
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #FF6FB8"></span>Ciudad</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #86F07C"></span>Bosque</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #A6F0E6"></span>Costa</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #FFC7A6"></span>Ruinas</span>
+        <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #C8A8FF"></span>Montaña</span>
+        <span style="margin-left: auto; color: #A99FB6">Toca una zona para mandar un equipo</span>
+      </div>
+    </section>
+
+    <!-- espacios -->
+    <aside aria-labelledby="exp-slots" style="flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+      <h2 id="exp-slots" style="margin: 0; display: flex; justify-content: space-between; align-items: baseline; font-family: 'Lilita One', system-ui, sans-serif; font-weight: 400; font-size: 26px">Tus equipos <span style="font-family: 'M PLUS Rounded 1c', system-ui, sans-serif; font-size: 14px; font-weight: 700; color: #CFC6DA">2 de 2 en uso</span></h2>
+
+      <div style="background: #1A1622; border: 2px solid #FFE66B; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 0 30px rgba(255,230,107,.12)">
+        <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline"><b style="font-size: 16px">Bosque de los Susurros</b><span style="font-size: 13px; color: #CFC6DA; font-weight: 700">30 min</span></div>
+        <div style="display: flex; align-items: center">
+          <span style="display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #86F07C; color: #10201E; font-weight: 800; box-shadow: 0 0 0 3px #1A1622">L</span>
+          <span style="display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #FFC7A6; color: #2A160C; font-weight: 800; margin-left: -9px; box-shadow: 0 0 0 3px #1A1622">K</span>
+          <span style="margin-left: 10px; font-size: 14px; color: #CFC6DA; font-weight: 700">Lumi y Kaede</span>
+        </div>
+        <div style="height: 10px; border-radius: 999px; background: #FFE66B"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+          <span style="font-family: 'Lilita One', system-ui, sans-serif; font-size: 22px; color: #FFE66B">¡De vuelta!</span>
+          <a href="#" style="text-decoration: none; background: #FFE66B; color: #241B05; font-weight: 800; padding: 10px 18px; border-radius: 999px">Ver reporte</a>
+        </div>
+      </div>
+
+      <div style="background: #1A1622; border: 2px solid #3A3147; border-radius: 22px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; justify-content: space-between; gap: 8px; align-items: baseline"><b style="font-size: 16px">Calles de Puerto Miel</b><span style="font-size: 13px; color: #CFC6DA; font-weight: 700">2 h · Excelente</span></div>
+        <div style="display: flex; align-items: center">
+          <img src="assets/yuki_carta.webp" alt="" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; object-position: 50% 12%; box-shadow: 0 0 0 3px #1A1622">
+          <span style="display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #FF6FB8; color: #1A0F18; font-weight: 800; margin-left: -9px; box-shadow: 0 0 0 3px #1A1622">M</span>
+          <span style="display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #A6F0E6; color: #10201E; font-weight: 800; margin-left: -9px; box-shadow: 0 0 0 3px #1A1622">S</span>
+          <span style="margin-left: 10px; font-size: 14px; color: #CFC6DA; font-weight: 700">Yuki, Mika y Sora</span>
+        </div>
+        <div style="height: 10px; border-radius: 999px; background: #251F30; overflow: hidden"><div style="width: 40%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #FF6FB8, #FF9AD5)"></div></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+          <span style="font-family: 'Lilita One', system-ui, sans-serif; font-size: 22px; font-variant-numeric: tabular-nums">1:12:40</span>
+          <button type="button" style="font: inherit; font-weight: 700; font-size: 14px; border: 2px solid #3A3147; border-radius: 999px; padding: 8px 14px; background: transparent; color: #FFF7FB; cursor: pointer">Cancelar</button>
+        </div>
+      </div>
+
+      <div style="border: 2px dashed #3A3147; border-radius: 22px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; color: #CFC6DA; font-size: 14px; font-weight: 700">
+        <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex: none" fill="none" stroke="#A99FB6" stroke-width="2"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        Espacio 3: completa 10 expediciones (4/10)
+      </div>
+      <div style="border: 2px dashed #3A3147; border-radius: 22px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; color: #CFC6DA; font-size: 14px; font-weight: 700">
+        <svg aria-hidden="true" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex: none" fill="none" stroke="#A99FB6" stroke-width="2"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        Espacio 4: abre la Cámara Sellada
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

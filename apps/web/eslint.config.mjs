@@ -25,6 +25,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // Script de terceros (paquete de diseño, carta por capas), copiado tal cual.
+      "src/ui/game/carta-capas/carta-capas.js",
     ],
   },
 ];

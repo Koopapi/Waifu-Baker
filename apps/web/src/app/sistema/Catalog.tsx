@@ -11,6 +11,7 @@ import {
   Badge,
   Button,
   Card,
+  CartaCapas,
   Celebration,
   Checkbox,
   Countdown,
@@ -39,6 +40,8 @@ import {
 } from "@/ui";
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// Arte suelto de /lab por escalón, para ver el marco, las partículas y el sello de cada uno.
+const TIERS = [["n", "01"], ["r", "07"], ["sr", "08"], ["ssr", "09"], ["ur", "11"]] as const;
 const SETS = Array.from({ length: 12 }, (_, i) => ({ value: `s${i + 1}`, label: `Set ${String(i + 1).padStart(2, "0")}`, description: i === 0 ? "Fan Art · Vol. 1" : undefined }));
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
@@ -70,6 +73,25 @@ export function Catalog() {
         <h1 className="font-display text-4xl font-bold">Design system</h1>
         <p className="text-ui-text-2">Spec 011 · every component, variant and state. Development only.</p>
       </header>
+
+      <Section id="cards" title="Cards (carta-capas)">
+        <p className="max-w-2xl text-sm text-ui-text-2">
+          Layered card: shine that follows the pointer, particles and a floating seal by tier. A composed card (Pencil frame in the image) mounts without an extra frame; raw art like these uses the metallic frame of its tier. Static cards are for grids.
+        </p>
+        <div className="flex flex-wrap items-end gap-x-10 gap-y-8 pl-6 pt-6">
+          <div className="w-56">
+            <CartaCapas tier="ssr" image="/lab/09.webp" rawArt label="Sample card, SSR (interactive)" />
+          </div>
+          <ul className="grid flex-1 grid-cols-2 gap-8 pl-6 pt-6 sm:grid-cols-3 lg:grid-cols-5" aria-label="Static cards by tier">
+            {TIERS.map(([tier, file]) => (
+              <li key={tier} className="space-y-2 text-center">
+                <CartaCapas tier={tier} image={`/lab/${file}.webp`} rawArt estatica label={`Sample card, ${tier.toUpperCase()}`} />
+                <span className="text-xs font-bold uppercase text-ui-text-2">{tier}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
 
       <Section id="action" title="Action">
         <div className="flex flex-wrap items-center gap-3">

@@ -1,0 +1,39 @@
+/* Waifu Baker · Tema B · Street pop (claro)
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Dela+Gothic+One&display=swap"> */
+:root {
+  /* superficies */
+  --wb-fondo: #ECE4FA;
+  --wb-superficie: #FFFFFF;
+  --wb-tinta: #17132B;       /* texto, bordes y sombras */
+  --wb-indigo: #3B2FC9;      /* franjas, rareza SR */
+
+  /* texto */
+  --wb-texto: #17132B;
+  --wb-texto-2: #4A4368;
+  --wb-texto-sobre-indigo: #FFFFFF;
+
+  /* acentos */
+  --wb-primario: #FF3EA5;    /* neón rosa: acción principal, nunca como texto sobre lila */
+  --wb-lima: #C6F432;        /* SSR y destacados, nunca como texto sobre lila */
+  --wb-turquesa: #3FE0D0;    /* rareza R, acentos */
+  --wb-trama: #FFD93D;       /* solo decoración */
+  --wb-trama-fondo: radial-gradient(#FFD93D 30%, transparent 32%) 0 0 / 14px 14px;
+
+  /* rarezas */
+  --wb-rareza-n: #D7D2E3;
+  --wb-rareza-r: #3FE0D0;
+  --wb-rareza-sr: #3B2FC9;
+  --wb-rareza-ssr: #C6F432;
+
+  /* tipografía */
+  --wb-fuente-titulo: "Dela Gothic One", system-ui, sans-serif;
+  --wb-fuente-texto: "Archivo", "Arial Narrow", system-ui, sans-serif;
+
+  /* forma */
+  --wb-borde: 3px solid var(--wb-tinta);
+  --wb-radio: 10px;
+  --wb-sombra: 6px 6px 0 var(--wb-tinta);
+  --wb-inclinacion: skewX(-12deg);
+
+  color-scheme: light;
+}

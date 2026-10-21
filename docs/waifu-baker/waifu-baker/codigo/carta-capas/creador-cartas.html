@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Creador de Cartas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Dela+Gothic+One&display=swap">
+<style>
+/* Layout: herramienta de dos columnas en estilo Street pop de Waifu Baker. Escenario oscuro con rayos a la izquierda (como la carta revelada), paneles blancos con borde de tinta a la derecha. Tema claro único, como la dirección B. */
+:root{
+  --lila:#ECE4FA;--blanco:#FFFFFF;--tinta:#17132B;--indigo:#3B2FC9;--rosa:#FF3EA5;--lima:#C6F432;--turquesa:#3FE0D0;--trama:#FFD93D;
+  --texto:#17132B;--texto2:#4A4368;--suave:#E2DCF0;--suave2:#D7D2E3;--aviso:#B4006A;
+  --f-head:"Dela Gothic One",system-ui,sans-serif;
+  --f-body:Archivo,"Arial Narrow",system-ui,sans-serif;
+  --f-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--lila);color:var(--texto)}
+body{font:500 14.5px/1.5 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;
+  background-image:repeating-linear-gradient(-28deg,transparent 0 46px,rgba(59,47,201,.05) 46px 92px)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--indigo);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:20px}
+.top{display:flex;align-items:center;gap:14px;min-width:0}
+.logo{display:grid;place-items:center;width:46px;height:46px;border-radius:10px;background:var(--lima);border:3px solid var(--tinta);font:16px var(--f-head);color:var(--tinta);flex:none;transform:rotate(-6deg);box-shadow:4px 4px 0 var(--rosa)}
+h1{margin:0;font:30px/1.05 var(--f-head);text-shadow:3px 3px 0 var(--rosa),6px 6px 0 var(--turquesa)}
+.sub{margin:4px 0 0;color:var(--texto2);font-size:13px;font-weight:600}
+
+.main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:24px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- vista previa ---------- */
+.left{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:grid;gap:16px;min-width:0}
+@media (max-width:900px){.left{position:relative;top:auto}}
+.stage{position:relative;display:grid;place-items:center;gap:14px;min-height:620px;padding:60px 16px 20px;border-radius:12px;border:3px solid var(--tinta);box-shadow:8px 8px 0 var(--tinta);overflow:hidden;
+  background:radial-gradient(60% 55% at 50% 46%,#3B2FC9 0%,#241D55 40%,#17132B 75%)}
+.stage::before{content:"";position:absolute;left:50%;top:46%;width:1400px;height:1400px;margin:-700px 0 0 -700px;border-radius:50%;pointer-events:none;
+  background:repeating-conic-gradient(rgba(255,62,165,.2) 0deg 7deg,transparent 7deg 18deg,rgba(198,244,50,.14) 18deg 23deg,transparent 23deg 34deg,rgba(63,224,208,.14) 34deg 39deg,transparent 39deg 50deg);
+  -webkit-mask-image:radial-gradient(closest-side,#000 28%,transparent 74%);mask-image:radial-gradient(closest-side,#000 28%,transparent 74%);animation:spin 70s linear infinite}
+.stage::after{content:"";position:absolute;left:-50px;bottom:-50px;width:260px;height:260px;border-radius:50%;pointer-events:none;background-image:radial-gradient(#FFD93D 30%,transparent 32%);background-size:14px 14px;opacity:.5}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.stage::before{animation:none}}
+@media (max-width:900px){.stage{min-height:540px}}
+.host{position:relative;z-index:1;width:min(330px,68vw)}
+.stage-hint{position:relative;z-index:1;margin:0;color:#FFFFFF;font-size:13px;font-weight:700;font-style:italic;text-align:center;max-width:40ch}
+.stage-hint.warn{color:var(--lima)}
+.empty-msg{position:absolute;inset:0;z-index:1;display:grid;place-items:center;pointer-events:none;text-align:center;color:#FFFFFF;font-size:14px;padding:0 24px}
+.empty-msg b{display:block;font:20px var(--f-head);margin-bottom:6px}
+.quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;background:var(--blanco);border:3px solid var(--tinta);border-radius:10px;padding:14px 16px;box-shadow:6px 6px 0 var(--indigo)}
+@media (max-width:520px){.quick{grid-template-columns:minmax(0,1fr)}}
+.quick .row{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;grid-column:1/-1}
+
+/* ---------- panel ---------- */
+.panel{display:grid;gap:22px;min-width:0}
+.sec{background:var(--blanco);border:3px solid var(--tinta);border-radius:10px;padding:16px;display:grid;gap:12px;min-width:0;box-shadow:6px 6px 0 var(--tinta)}
+.sec h2{margin:0;font:19px var(--f-head);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sec h2 small{font:800 italic 12px var(--f-body);color:var(--indigo);text-transform:uppercase;letter-spacing:.08em}
+.hint{margin:0;color:var(--texto2);font-size:12.5px;font-weight:600}
+
+.drop{position:relative;display:grid;place-items:center;gap:2px;text-align:center;border:3px dashed var(--tinta);border-radius:10px;padding:18px 12px;cursor:pointer;background:var(--lila);transition:background .15s}
+.drop:hover,.drop.over{background:#DCF8A0}
+.drop b{font:900 italic 15px var(--f-body);text-transform:uppercase;letter-spacing:.03em}
+.drop span{color:var(--texto2);font-size:12.5px;font-weight:600}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.drop:focus-within{outline:3px solid var(--indigo);outline-offset:2px}
+
+.list-edge{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:900;font-style:italic;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo)}
+.layers{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ly details{background:var(--blanco);border:3px solid var(--tinta);border-radius:8px}
+.ly details[open]{box-shadow:4px 4px 0 var(--turquesa)}
+.ly summary{list-style:none;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 8px;cursor:pointer;min-width:0}
+.ly summary::-webkit-details-marker{display:none}
+.ly.off summary .nm,.ly.off summary .th{opacity:.4}
+.th{flex:none;width:34px;height:46px;border-radius:4px;border:2px solid var(--tinta);overflow:hidden;background:repeating-conic-gradient(#E2DCF0 0 25%,#FFFFFF 0 50%) 0 0/10px 10px;display:grid;place-items:center;color:var(--texto2);font-size:16px}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th.part{background:var(--tinta)}
+.nm{flex:1;min-width:0}
+.nm b{display:block;font-weight:800;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm small{display:block;color:var(--texto2);font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm small.miss{color:var(--aviso);font-weight:800}
+.acts{display:flex;gap:2px;flex:none}
+.ib{width:30px;height:30px;border:0;border-radius:6px;background:transparent;color:var(--tinta);display:grid;place-items:center;font-size:16px;font-weight:900;line-height:1}
+.ib:hover{background:var(--lima)}
+.ib svg{width:17px;height:17px}
+.ib[disabled]{opacity:.25;cursor:default;background:transparent}
+.ly-body{display:grid;gap:12px;padding:12px 12px 14px;border-top:3px solid var(--tinta)}
+
+.ctl{display:grid;gap:4px}
+.ctl-row{display:flex;justify-content:space-between;gap:10px;font-size:13px;font-weight:700}
+.ctl-row output{font-family:var(--f-mono);font-size:12px;font-weight:700;color:var(--indigo);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--rosa)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:420px){.two{grid-template-columns:minmax(0,1fr)}}
+select,input[type=text]{width:100%;background:var(--blanco);border:3px solid var(--tinta);border-radius:6px;padding:7px 10px;color:var(--tinta);font-weight:700}
+label.lbl{display:grid;gap:4px;font-size:12px;font-weight:900;font-style:italic;letter-spacing:.06em;text-transform:uppercase;color:var(--indigo)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;cursor:pointer}
+.check input{accent-color:var(--rosa);width:17px;height:17px}
+input[type=color]{width:40px;height:32px;border:3px solid var(--tinta);border-radius:6px;background:var(--blanco);padding:1px;cursor:pointer}
+input[type=color]:disabled{opacity:.3;cursor:default}
+.inline{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+
+.btn{border:3px solid var(--tinta);background:var(--blanco);color:var(--tinta);border-radius:8px;padding:8px 14px;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.03em;font-size:13px}
+.btn:hover{background:var(--lila)}
+.btn.primary{background:var(--rosa);box-shadow:4px 4px 0 var(--tinta)}
+.btn.primary:hover{filter:brightness(1.05)}
+.btn.primary:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--tinta)}
+.btn.lime{background:var(--lima);box-shadow:4px 4px 0 var(--tinta)}
+.btn.small{padding:5px 10px;font-size:12px}
+.btn.danger{color:var(--aviso)}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:3px solid var(--tinta);background:var(--blanco);border-radius:6px;padding:5px 11px;font:900 italic 13px var(--f-body);text-transform:uppercase;display:inline-flex;align-items:center;gap:7px;transform:skewX(-8deg)}
+.chip i{width:13px;height:13px;border-radius:3px;border:2px solid var(--tinta);background:var(--sw);display:block}
+.chip[aria-pressed=true]{background:var(--lima);box-shadow:3px 3px 0 var(--rosa)}
+.seg{display:inline-flex;border:3px solid var(--tinta);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--blanco);color:var(--tinta);font:900 italic 12px var(--f-body);text-transform:uppercase;padding:6px 11px}
+.seg button+button{border-left:3px solid var(--tinta)}
+.seg button[aria-pressed=true]{background:var(--tinta);color:#FFFFFF}
+.file-pick{display:flex;align-items:center;gap:10px;background:var(--lila);border:3px solid var(--tinta);border-radius:8px;padding:8px}
+.file-pick .th{width:44px;height:30px}
+.file-pick span{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-pick input{display:none}
+.preset{display:grid;gap:8px;background:var(--lila);border:3px dashed var(--tinta);border-radius:8px;padding:10px 12px}
+
+pre{margin:0;overflow:auto;max-height:340px;background:var(--tinta);border-radius:8px;padding:12px 14px;font:12px/1.55 var(--f-mono);color:#E9E4F5}
+.confirm{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#FFE1F0;border:3px solid var(--tinta);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:700}
+code{font-family:var(--f-mono);font-size:.92em;background:var(--suave);padding:0 4px;border-radius:4px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="logo" aria-hidden="true">WB</div>
+    <div><h1>Creador de cartas</h1><p class="sub">Tus archivos se quedan en tu navegador. No se suben a ningún lado.</p></div>
+  </header>
+
+  <div class="main">
+    <div class="left">
+      <section class="stage" id="stage" aria-label="Vista previa">
+        <div class="host" id="host"></div>
+        <div class="empty-msg" id="emptyMsg" hidden><div><b>Arrastra tus capas aquí</b>Fondo, personaje, efectos… en el orden que quieras.</div></div>
+        <p class="stage-hint" id="stageHint">Pasa el cursor por aquí o arrastra la carta.</p>
+      </section>
+      <div class="quick">
+        <div class="ctl"><div class="ctl-row"><label for="qProf">Profundidad del parallax</label><output id="qProfO">14 px</output></div><input type="range" id="qProf" min="0" max="30" step="1" value="14"></div>
+        <div class="ctl"><div class="ctl-row"><label for="qInc">Inclinación máxima</label><output id="qIncO">14°</output></div><input type="range" id="qInc" min="0" max="26" step="1" value="14"></div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="qHolo"> Versión holo</label>
+          <label class="check"><input type="checkbox" id="qRep" checked> Movimiento solo</label>
+          <button class="btn small" id="qRev" type="button">Probar revelado</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <!-- Capas -->
+      <section class="sec" aria-labelledby="h-capas">
+        <h2 id="h-capas">Capas <small id="capasCount"></small></h2>
+        <label class="drop" id="drop">
+          <input type="file" id="fileIn" accept="image/*" multiple>
+          <b>Arrastra tus capas o toca para elegir</b>
+          <span>PNG, WebP o JPG. Ordénalas con nombres como yuki_1_fondo, yuki_2_personaje…</span>
+        </label>
+        <div class="list-edge"><span>Adelante</span><button class="btn small primary" id="addPart" type="button">+ Partículas</button></div>
+        <ol class="layers" id="layers"></ol>
+        <div class="list-edge"><span>Atrás</span></div>
+      </section>
+
+      <!-- Rareza -->
+      <section class="sec" aria-labelledby="h-rareza">
+        <h2 id="h-rareza">Rareza</h2>
+        <div class="chips" id="marcos" role="group" aria-label="Marco"></div>
+        <div class="preset">
+          <p class="hint">Aplica el look de la rareza elegida: marco, partículas y sello, como las cartas de Yuki. Si ya pusiste un sello de imagen, se respeta.</p>
+          <div class="inline"><button class="btn lime small" id="aplicarRareza" type="button">Aplicar estilo de la rareza</button><span class="hint" id="presetMsg" role="status"></span></div>
+        </div>
+        <div class="inline" id="customRow" hidden>
+          <label class="check">Color <input type="color" id="mColor" value="#d6336c"></label>
+          <label class="check">Brillo <input type="color" id="mBrillo" value="#ffd1e3"></label>
+        </div>
+        <div class="ctl" id="bordeCtl"><div class="ctl-row"><label for="mBorde">Grosor del borde</label><output id="mBordeO">2.2</output></div><input type="range" id="mBorde" min="0.8" max="5" step="0.1" value="2.2"></div>
+
+        <div class="ctl-row" style="align-items:center"><span>Sello que flota en la esquina</span>
+          <div class="seg" role="group" aria-label="Tipo de sello" id="selloTipo">
+            <button type="button" data-t="ninguno">Ninguno</button><button type="button" data-t="texto">Texto</button><button type="button" data-t="imagen">Imagen</button>
+          </div>
+        </div>
+        <div class="two" id="selloTexto">
+          <label class="lbl">Texto<input type="text" id="sTexto" maxlength="6" value="SSR"></label>
+          <label class="lbl">Estilo<select id="sEstilo"></select></label>
+        </div>
+        <label class="file-pick" id="selloImg">
+          <span class="th" id="sThumb">?</span><span id="sName">Elige la imagen del sello (PNG con transparencia)</span>
+          <span class="btn small">Elegir</span><input type="file" id="sFile" accept="image/*">
+        </label>
+        <div class="two" id="selloPos">
+          <label class="lbl">Esquina<select id="sEsq"><option value="sup-izq">Arriba a la izquierda</option><option value="sup-der">Arriba a la derecha</option><option value="inf-izq">Abajo a la izquierda</option><option value="inf-der">Abajo a la derecha</option></select></label>
+          <div class="ctl"><div class="ctl-row"><label for="sTam">Tamaño</label><output id="sTamO"></output></div><input type="range" id="sTam" min="10" max="60" step="1" value="36"></div>
+        </div>
+      </section>
+
+      <!-- Carta -->
+      <section class="sec" aria-labelledby="h-carta">
+        <h2 id="h-carta">Carta</h2>
+        <div class="two">
+          <label class="lbl">Nombre<input type="text" id="cId" value="yuki" spellcheck="false"></label>
+          <label class="lbl">Carpeta en el sitio<input type="text" id="cDir" value="cartas/yuki/" spellcheck="false"></label>
+        </div>
+        <label class="lbl">Proporción<select id="cProp"></select></label>
+      </section>
+
+      <!-- Exportar -->
+      <section class="sec" aria-labelledby="h-exp">
+        <h2 id="h-exp">Configuración para el sitio</h2>
+        <p class="hint">Pégala en el sitio y sube tus archivos a la carpeta de arriba con los mismos nombres. Funciona con <code>carta-capas.js</code> v2 o posterior. Para cartas de una sola imagen también puedes usar <code>CartaCapas.montarRareza(el, 'ssr', 'imagen.webp')</code>.</p>
+        <pre><code id="json"></code></pre>
+        <div class="inline">
+          <button class="btn primary" id="copy" type="button">Copiar configuración</button>
+          <button class="btn" id="loadYuki" type="button">Cargar ejemplo de Yuki</button>
+          <button class="btn danger" id="reset" type="button">Empezar carta nueva</button>
+        </div>
+        <div class="confirm" id="confirm" hidden>
+          <span>Se quitan todas las capas y el sello.</span>
+          <button class="btn small danger" id="confirmYes" type="button">Sí, empezar de cero</button>
+          <button class="btn small" id="confirmNo" type="button">Cancelar</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="carta-capas.js"></script>
+<script>
+(function(){
+  var C = window.CartaCapas;
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = 'wb-creador-carta-v1';
+
+  /* ---------- archivos ---------- */
+  var files = {}; // nombre -> {url, w, h}
+  var MUESTRA = {
+    'yuki_1_fondo.webp': [700, 991], 'yuki_3_personaje.webp': [700, 991], 'yuki_4_particulas1.webp': [700, 991],
+    'yuki_5_insignia.webp': [700, 991], 'yuki_ssr.webp': [210, 147]
+  };
+  Object.keys(MUESTRA).forEach(function(n){ files[n] = { url: 'cartas/yuki/' + n, w: MUESTRA[n][0], h: MUESTRA[n][1] }; });
+
+  var MEZCLAS = [
+    ['normal','Normal'],['multiply','Multiplicar (multiply)'],['screen','Trama (screen)'],['overlay','Superponer (overlay)'],
+    ['soft-light','Luz suave (soft-light)'],['hard-light','Luz fuerte (hard-light)'],['color-dodge','Sobreexponer color (color-dodge)'],
+    ['color-burn','Subexponer color (color-burn)'],['lighten','Aclarar (lighten)'],['darken','Oscurecer (darken)'],
+    ['difference','Diferencia (difference)'],['exclusion','Exclusión (exclusion)'],['hue','Tono (hue)'],
+    ['saturation','Saturación (saturation)'],['color','Color (color)'],['luminosity','Luminosidad (luminosity)']
+  ];
+  var MEZCLA_CORTA = {}; MEZCLAS.forEach(function(m){ MEZCLA_CORTA[m[0]] = m[1].replace(/ \(.*\)/,''); });
+  var MARCOS = [['ur','UR'],['ssr','SSR'],['sr','SR'],['r','R'],['n','N'],['custom','Personalizado'],['ninguno','Sin marco']];
+  var SW = { ur:'linear-gradient(135deg,#ff7aa8,#ffd36e,#8af0c4,#6ec8ff,#c79bff)', ssr:'linear-gradient(135deg,#b9862d,#fff3c4,#b9862d)', sr:'linear-gradient(135deg,#8a5cd6,#f1e6ff,#8a5cd6)', r:'linear-gradient(135deg,#4a7fd6,#e6f0ff,#4a7fd6)', n:'linear-gradient(135deg,#9aa1b0,#fff,#9aa1b0)', custom:'conic-gradient(#ff5c93,#ffd36e,#5ce1a5,#5cb8ff,#b07cff,#ff5c93)', ninguno:'transparent' };
+  var ESTILOS = [['oro','Oro'],['plata','Plata'],['arcoiris','Arcoíris'],['rosa','Rosa'],['azul','Azul'],['morado','Morado']];
+  var PROPS = [['auto','Automática (de tu fondo)'],['0.7064','700 × 991 (como Yuki)'],['0.7159','Carta TCG 63 × 88 mm'],['0.7143','5 : 7'],['0.6667','2 : 3'],['0.75','3 : 4']];
+
+  /* ---------- estado ---------- */
+  var uidN = 0; function uid(){ return 'c' + (++uidN) + Math.random().toString(36).slice(2,6); }
+  function capaImg(archivo, o){ return Object.assign({ uid: uid(), tipo:'imagen', archivo: archivo, profundidad: 1, margen: 0, mezcla:'normal', opacidad: 1, visible: true }, o || {}); }
+  function capaPart(o){
+    var p = Object.assign({ uid: uid(), tipo:'particulas', particulas:'destellos-dorados', tamano: 1, velocidad: 1, color:'', semilla: 1 + Math.floor(Math.random()*9998), profundidad: .55, margen: 4, mezcla:'normal', opacidad: 1, visible: true }, o || {});
+    if (p.cantidad == null) p.cantidad = C.particulas[p.particulas].cantidad;
+    return p;
+  }
+  function base(){ return { id:'carta-nueva', carpeta:'cartas/carta-nueva/', carpetaAuto: true, proporcion:'auto', marco:'ssr', color:'#d6336c', brillo:'#ffd1e3', borde: 2.2, holo:false, reposo:true, profundidad:14, inclinacion:14,
+    sello:{ tipo:'texto', texto:'SSR', estilo:'oro', archivo:'', esquina:'sup-izq', tamano: 36, tamanoTexto: 14 }, capas: [] }; }
+  function yuki(){
+    var s = base();
+    s.id = 'yuki'; s.carpeta = 'cartas/yuki/';
+    s.sello = { tipo:'imagen', texto:'SSR', estilo:'oro', archivo:'yuki_ssr.webp', esquina:'sup-izq', tamano: 36, tamanoTexto: 14 };
+    s.capas = [
+      capaImg('yuki_1_fondo.webp', { profundidad:.2, margen:5 }),
+      capaPart({ particulas:'destellos-dorados', semilla: 7, cantidad: 60 }),
+      capaImg('yuki_3_personaje.webp', { profundidad:1 }),
+      capaImg('yuki_4_particulas1.webp', { profundidad:1.3, margen:6, mezcla:'overlay' }),
+      capaImg('yuki_5_insignia.webp', { profundidad:1.6 })
+    ];
+    return s;
+  }
+  var state;
+  try { var g = JSON.parse(localStorage.getItem(KEY) || 'null'); if (g && Array.isArray(g.capas) && g.sello) state = Object.assign(base(), g); } catch(e) {}
+  if (!state) state = yuki();
+  state.capas.forEach(function(c){ c.uid = uid(); });
+
+  var saveT = 0;
+  function save(){ clearTimeout(saveT); saveT = setTimeout(function(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {} }, 300); }
+
+  /* ---------- de estado a opciones del componente ---------- */
+  function r3(v){ return Math.round(v * 1000) / 1000; }
+  function hex2rgb(h){ h = h.replace('#',''); if (h.length === 3) h = h.split('').map(function(c){ return c + c; }).join(''); var n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function mix(h, k){ var c = hex2rgb(h); return '#' + c.map(function(v){ return Math.round(v * (1 - k)).toString(16).padStart(2,'0'); }).join(''); }
+  function rgba(h, a){ var c = hex2rgb(h); return 'rgba(' + c.join(',') + ',' + a + ')'; }
+  function marcoCustom(){ var b = state.color, l = state.brillo, d = mix(b, .55); return 'linear-gradient(135deg,' + d + ' 0%,' + l + ' 18%,' + b + ' 34%,#ffffff 48%,' + b + ' 62%,' + l + ' 80%,' + d + ' 100%)'; }
+  function proporcion(){
+    if (state.proporcion !== 'auto') return Number(state.proporcion);
+    for (var i = 0; i < state.capas.length; i++) { var c = state.capas[i], f = c.tipo === 'imagen' && files[c.archivo]; if (f && f.w && f.h) return f.w / f.h; }
+    return 700 / 991;
+  }
+  function opciones(exportar){
+    var capas = state.capas.filter(function(c){ return c.visible !== false; }).map(function(c){
+      var o;
+      if (c.tipo === 'imagen') {
+        if (!exportar && !files[c.archivo]) return null;
+        o = { src: exportar ? state.carpeta + c.archivo : files[c.archivo].url };
+      } else {
+        o = { particulas: c.particulas, cantidad: c.cantidad };
+        if (c.tamano !== 1) o.tamano = r3(c.tamano);
+        if (c.velocidad !== 1) o.velocidad = r3(c.velocidad);
+        if (c.color) o.color = c.color;
+        o.semilla = c.semilla;
+      }
+      o.profundidad = r3(c.profundidad);
+      if (c.margen) o.margen = r3(c.margen);
+      if (c.mezcla && c.mezcla !== 'normal') o.mezcla = c.mezcla;
+      if (c.opacidad !== 1) o.opacidad = r3(c.opacidad);
+      return o;
+    }).filter(Boolean);
+    var s = state.sello, sello = null;
+    if (s.tipo === 'imagen' && s.archivo && (exportar || files[s.archivo])) {
+      sello = { src: exportar ? state.carpeta + s.archivo : files[s.archivo].url, esquina: s.esquina, tamano: s.tamano };
+      if (s.recorte) { sello.recorte = s.recorte; sello.relacion = s.relacion; }
+    }
+    if (s.tipo === 'texto' && s.texto.trim()) sello = { texto: s.texto.trim(), estilo: s.estilo, esquina: s.esquina, tamano: s.tamanoTexto };
+    var o = { etiqueta: state.id, marco: state.marco === 'custom' ? marcoCustom() : state.marco, borde: r3(state.borde), proporcion: r3(proporcion()), capas: capas, sello: sello };
+    if (state.marco === 'custom') o.aura = rgba(state.color, .25);
+    return o;
+  }
+
+  /* ---------- carta ---------- */
+  var stage = $('stage');
+  var inst = C.montar($('host'), Object.assign(opciones(false), { zona: stage, holo: state.holo, reposo: state.reposo, profundidad: state.profundidad, inclinacion: state.inclinacion, aparecer: false }));
+  var rafT = 0;
+  function refresh(){
+    if (rafT) return;
+    rafT = requestAnimationFrame(function(){ rafT = 0; inst.set(opciones(false)); renderJSON(); renderHint(); save(); });
+  }
+
+  function renderHint(){
+    var faltan = state.capas.filter(function(c){ return c.tipo === 'imagen' && !files[c.archivo]; }).length;
+    if (state.sello.tipo === 'imagen' && state.sello.archivo && !files[state.sello.archivo]) faltan++;
+    var h = $('stageHint');
+    var hayImg = state.capas.some(function(c){ return c.tipo === 'imagen' && files[c.archivo]; });
+    $('emptyMsg').hidden = hayImg;
+    if (faltan) { h.className = 'stage-hint warn'; h.textContent = 'Falta' + (faltan > 1 ? 'n ' + faltan + ' archivos' : ' 1 archivo') + '. Tu navegador no los guarda entre visitas: vuelve a arrastrarlos y se acomodan solos.'; }
+    else { h.className = 'stage-hint'; h.textContent = 'Pasa el cursor por aquí o arrastra la carta.'; }
+    var n = state.capas.length; $('capasCount').textContent = n ? n + (n === 1 ? ' capa' : ' capas') : '';
+  }
+
+  function renderJSON(){
+    var o = opciones(true), out = { id: state.id, etiqueta: state.id, marco: o.marco };
+    if (o.aura) out.aura = o.aura;
+    if (o.borde !== 2.2) out.borde = o.borde;
+    if (state.holo) out.holo = true;
+    out.proporcion = o.proporcion; out.capas = o.capas;
+    if (o.sello) out.sello = o.sello;
+    var txt = JSON.stringify(out, null, 2).replace(/\{\n\s+([^{}\[\]]+?)\n\s+\}/g, function(m, inner){ return '{ ' + inner.split(/,\n\s+/).join(', ') + ' }'; });
+    $('json').textContent = txt;
+  }
+
+  /* ---------- lista de capas ---------- */
+  var abiertos = {};
+  var EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.9 8.4 2 12 2 12s3.6 7 10 7c1.8 0 3.4-.5 4.8-1.3"/></svg>';
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function fmt(k, v){
+    if (k === 'opacidad') return Math.round(v * 100) + '%';
+    if (k === 'margen') return v + '%';
+    if (k === 'profundidad') return Number(v).toFixed(2);
+    if (k === 'tamano' || k === 'velocidad') return '×' + Number(v).toFixed(2);
+    return String(v);
+  }
+  function rango(c, k, label, min, max, step){
+    var id = c.uid + '-' + k;
+    return '<div class="ctl"><div class="ctl-row"><label for="' + id + '">' + label + '</label><output data-o="' + k + '">' + fmt(k, c[k]) + '</output></div><input type="range" id="' + id + '" data-k="' + k + '" min="' + min + '" max="' + max + '" step="' + step + '" value="' + c[k] + '"></div>';
+  }
+  function meta(c){
+    if (c.tipo === 'particulas') return { t: 'Partículas · ' + MEZCLA_CORTA[c.mezcla] + ' · prof ' + fmt('profundidad', c.profundidad), miss: false };
+    if (!files[c.archivo]) return { t: 'Falta el archivo', miss: true };
+    return { t: MEZCLA_CORTA[c.mezcla] + (c.opacidad !== 1 ? ' ' + fmt('opacidad', c.opacidad) : '') + ' · prof ' + fmt('profundidad', c.profundidad), miss: false };
+  }
+  function nombre(c){ return c.tipo === 'particulas' ? C.particulas[c.particulas].nombre : c.archivo; }
+  function thumb(c){
+    if (c.tipo === 'particulas') {
+      var cols = c.color ? [c.color] : C.particulas[c.particulas].colores, dots = '';
+      [[30,25],[65,40],[40,62],[72,75],[25,85],[55,15]].forEach(function(p, i){ dots += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (6 + (i % 3) * 3) + '" fill="' + cols[i % cols.length] + '"/>'; });
+      return '<span class="th part"><svg viewBox="0 0 100 100" width="34" height="46" preserveAspectRatio="none">' + dots + '</svg></span>';
+    }
+    return files[c.archivo] ? '<span class="th"><img src="' + esc(files[c.archivo].url) + '" alt=""></span>' : '<span class="th">?</span>';
+  }
+  function mezclaSel(c){
+    return '<label class="lbl">Modo de mezcla<select data-k="mezcla">' + MEZCLAS.map(function(m){ return '<option value="' + m[0] + '"' + (m[0] === c.mezcla ? ' selected' : '') + '>' + m[1] + '</option>'; }).join('') + '</select></label>';
+  }
+  function cuerpo(c){
+    var comun = mezclaSel(c) + '<div class="two">' + rango(c,'opacidad','Opacidad',0,1,.01) + rango(c,'profundidad','Profundidad',0,2.5,.05) + '</div>' + rango(c,'margen','Margen extra (para que no se vean bordes)',0,15,.5);
+    if (c.tipo === 'imagen') {
+      return comun + (files[c.archivo] ? '<div class="inline"><button class="btn small" type="button" data-a="sello">Usar como sello</button></div>' : '<p class="hint">Arrastra un archivo llamado <b>' + esc(c.archivo) + '</b> y se coloca aquí.</p>');
+    }
+    var tipos = Object.keys(C.particulas).map(function(k){ return '<option value="' + k + '"' + (k === c.particulas ? ' selected' : '') + '>' + C.particulas[k].nombre + '</option>'; }).join('');
+    return '<label class="lbl">Tipo de partículas<select data-k="particulas">' + tipos + '</select></label>' +
+      '<div class="two">' + rango(c,'cantidad','Cantidad',0,200,1) + rango(c,'tamano','Tamaño',.3,2.5,.05) + '</div>' +
+      rango(c,'velocidad','Velocidad',.3,3,.05) +
+      '<div class="inline"><label class="check"><input type="checkbox" data-k="colorOn"' + (c.color ? ' checked' : '') + '> Un solo color</label><input type="color" data-k="color" aria-label="Color de las partículas" value="' + (c.color || C.particulas[c.particulas].colores[0]) + '"' + (c.color ? '' : ' disabled') + '><button class="btn small" type="button" data-a="semilla">Otra variación</button></div>' +
+      comun;
+  }
+  function renderList(){
+    var n = state.capas.length;
+    $('layers').innerHTML = state.capas.slice().reverse().map(function(c, ri){
+      var i = n - 1 - ri, m = meta(c);
+      return '<li class="ly' + (c.visible === false ? ' off' : '') + '" data-uid="' + c.uid + '"><details' + (abiertos[c.uid] ? ' open' : '') + '><summary>' + thumb(c) +
+        '<span class="nm"><b>' + esc(nombre(c)) + '</b><small class="' + (m.miss ? 'miss' : '') + '">' + esc(m.t) + '</small></span>' +
+        '<span class="acts"><button class="ib" type="button" data-a="vis" aria-label="' + (c.visible === false ? 'Mostrar capa' : 'Ocultar capa') + '">' + (c.visible === false ? EYE_OFF : EYE) + '</button>' +
+        '<button class="ib" type="button" data-a="up" aria-label="Mover adelante"' + (i === n - 1 ? ' disabled' : '') + '>↑</button>' +
+        '<button class="ib" type="button" data-a="down" aria-label="Mover atrás"' + (i === 0 ? ' disabled' : '') + '>↓</button>' +
+        '<button class="ib" type="button" data-a="del" aria-label="Quitar capa">×</button></span></summary>' +
+        '<div class="ly-body">' + cuerpo(c) + '</div></details></li>';
+    }).join('');
+  }
+  function capaDe(el){ var li = el.closest('.ly'); if (!li) return null; var u = li.dataset.uid; for (var i = 0; i < state.capas.length; i++) if (state.capas[i].uid === u) return { c: state.capas[i], i: i, li: li }; return null; }
+
+  var L = $('layers');
+  L.addEventListener('click', function(e){
+    var b = e.target.closest('button[data-a]'); if (!b) return;
+    var x = capaDe(b); if (!x) return;
+    e.preventDefault();
+    var a = b.dataset.a, arr = state.capas;
+    if (a === 'vis') x.c.visible = x.c.visible === false;
+    if (a === 'up' && x.i < arr.length - 1) { arr.splice(x.i, 1); arr.splice(x.i + 1, 0, x.c); }
+    if (a === 'down' && x.i > 0) { arr.splice(x.i, 1); arr.splice(x.i - 1, 0, x.c); }
+    if (a === 'del') arr.splice(x.i, 1);
+    if (a === 'semilla') x.c.semilla = 1 + Math.floor(Math.random() * 9998);
+    if (a === 'sello') { arr.splice(x.i, 1); asignarSello(x.c.archivo); }
+    if (a !== 'semilla') renderList();
+    refresh();
+  });
+  function onField(e){
+    var el = e.target, k = el.dataset.k; if (!k) return;
+    var x = capaDe(el); if (!x) return;
+    var c = x.c;
+    if (k === 'colorOn') {
+      var ci = x.li.querySelector('input[data-k="color"]');
+      ci.disabled = !el.checked; c.color = el.checked ? ci.value : '';
+    } else if (k === 'color') {
+      c.color = el.value;
+    } else if (k === 'particulas') {
+      c.particulas = el.value; c.cantidad = C.particulas[el.value].cantidad; c.color = '';
+      renderList(); refresh(); return;
+    } else if (el.type === 'range') {
+      c[k] = parseFloat(el.value);
+      var o = x.li.querySelector('output[data-o="' + k + '"]'); if (o) o.textContent = fmt(k, c[k]);
+    } else c[k] = el.value;
+    var m = meta(c), sm = x.li.querySelector('.nm small'); sm.textContent = m.t;
+    if (k === 'color' || k === 'colorOn') x.li.querySelector('.th').outerHTML = thumb(c);
+    refresh();
+  }
+  L.addEventListener('input', onField);
+  L.addEventListener('change', function(e){ if (e.target.tagName === 'SELECT' || e.target.type === 'checkbox') onField(e); });
+  L.addEventListener('toggle', function(e){ var x = capaDe(e.target); if (x) abiertos[x.c.uid] = e.target.open; }, true);
+
+  $('addPart').addEventListener('click', function(){
+    var arr = state.capas, pos = -1;
+    for (var i = 0; i < arr.length; i++) if (arr[i].tipo === 'imagen' && /personaje|character|char|waifu|chica/i.test(arr[i].archivo)) { pos = i; break; }
+    if (pos < 0) pos = arr.length >= 2 ? 1 : arr.length;
+    var p = capaPart(); arr.splice(pos, 0, p); abiertos[p.uid] = true;
+    renderList(); refresh();
+  });
+
+  /* ---------- subir archivos ---------- */
+  function natural(a, b){ return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }); }
+  function cargar(f){
+    return new Promise(function(ok){
+      var url = URL.createObjectURL(f), im = new Image();
+      im.onload = function(){ ok({ name: f.name, url: url, w: im.naturalWidth, h: im.naturalHeight }); };
+      im.onerror = function(){ URL.revokeObjectURL(url); ok(null); };
+      im.src = url;
+    });
+  }
+  function bbox(f){
+    return new Promise(function(ok){
+      var im = new Image();
+      im.onload = function(){
+        try {
+          var k = Math.min(1, 1024 / Math.max(im.naturalWidth, im.naturalHeight)), w = Math.max(1, Math.round(im.naturalWidth * k)), h = Math.max(1, Math.round(im.naturalHeight * k));
+          var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          var cx = cv.getContext('2d'); cx.drawImage(im, 0, 0, w, h);
+          var d = cx.getImageData(0, 0, w, h).data, x0 = w, y0 = h, x1 = -1, y1 = -1;
+          for (var y = 0; y < h; y++) for (var x = 0; x < w; x++) if (d[(y * w + x) * 4 + 3] > 10) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+          if (x1 < 0) return ok(null);
+          var bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+          if (bw * bh > .8 * w * h) return ok(null);
+          var pad = 2; x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); bw = Math.min(w - x0, bw + 2 * pad); bh = Math.min(h - y0, bh + 2 * pad);
+          ok({ recorte: [r4(x0 / w), r4(y0 / h), r4(bw / w), r4(bh / h)], relacion: r4(bw / bh) });
+        } catch(e) { ok(null); }
+      };
+      im.onerror = function(){ ok(null); };
+      im.src = f.url;
+    });
+  }
+  function r4(v){ return Math.round(v * 10000) / 10000; }
+  function asignarSello(nombreArchivo){
+    var s = state.sello; s.tipo = 'imagen'; s.archivo = nombreArchivo; delete s.recorte; delete s.relacion;
+    var f = files[nombreArchivo];
+    if (!f) return Promise.resolve();
+    return bbox(f).then(function(b){ if (b && state.sello.archivo === nombreArchivo) { state.sello.recorte = b.recorte; state.sello.relacion = b.relacion; } renderSello(); refresh(); });
+  }
+  function agregar(lista){
+    var arr = [].slice.call(lista).filter(function(f){ return /^image\//.test(f.type); }).sort(natural);
+    if (!arr.length) return;
+    var pendientes = [];
+    Promise.all(arr.map(cargar)).then(function(res){
+      res.filter(Boolean).forEach(function(f){
+        if (files[f.name] && /^blob:/.test(files[f.name].url)) URL.revokeObjectURL(files[f.name].url);
+        files[f.name] = { url: f.url, w: f.w, h: f.h };
+        if (state.sello.archivo === f.name) { pendientes.push(f.name); return; }
+        var ya = state.capas.some(function(c){ return c.tipo === 'imagen' && c.archivo === f.name; });
+        if (ya) return;
+        var n = f.name;
+        if (/sello|badge|insignia-rareza|rareza|(^|[_\-\s])(ssr|ur|sr)([_\-\s.]|$)/i.test(n) && !(state.sello.tipo === 'imagen' && files[state.sello.archivo])) {
+          pendientes.push(n); state.sello.tipo = 'imagen'; state.sello.archivo = n; return;
+        }
+        var c = capaImg(n);
+        if (/fondo|background|(^|[_\-\s])bg([_\-\s.]|$)/i.test(n)) { c.profundidad = .2; c.margen = 5; state.capas.unshift(c); return; }
+        if (/personaje|character|char|waifu|chica/i.test(n)) c.profundidad = 1;
+        else if (/overlay|brillo|glitter|textura|luz/i.test(n)) { c.profundidad = 1.3; c.margen = 6; c.mezcla = /overlay/i.test(n) ? 'overlay' : 'normal'; }
+        else { var mx = state.capas.reduce(function(m, k){ return k.tipo === 'imagen' ? Math.max(m, k.profundidad) : m; }, 0); c.profundidad = Math.min(2.5, r3(Math.max(.5, mx + .3))); }
+        state.capas.push(c);
+      });
+      renderList(); renderSello(); refresh();
+      if (pendientes.length) asignarSello(pendientes[pendientes.length - 1]);
+    });
+  }
+  $('fileIn').addEventListener('change', function(e){ agregar(e.target.files); e.target.value = ''; });
+  var drop = $('drop'), dragN = 0;
+  document.addEventListener('dragenter', function(e){ if (e.dataTransfer && [].indexOf.call(e.dataTransfer.types, 'Files') >= 0) { dragN++; drop.classList.add('over'); } });
+  document.addEventListener('dragleave', function(){ dragN = Math.max(0, dragN - 1); if (!dragN) drop.classList.remove('over'); });
+  document.addEventListener('dragover', function(e){ e.preventDefault(); });
+  document.addEventListener('drop', function(e){ e.preventDefault(); dragN = 0; drop.classList.remove('over'); if (e.dataTransfer && e.dataTransfer.files.length) agregar(e.dataTransfer.files); });
+
+  /* ---------- rareza ---------- */
+  $('marcos').innerHTML = MARCOS.map(function(m){ return '<button type="button" class="chip" data-m="' + m[0] + '" aria-pressed="false"><i style="--sw:' + SW[m[0]] + '"></i>' + m[1] + '</button>'; }).join('');
+  $('sEstilo').innerHTML = ESTILOS.map(function(e){ return '<option value="' + e[0] + '">' + e[1] + '</option>'; }).join('');
+  $('cProp').innerHTML = PROPS.map(function(p){ return '<option value="' + p[0] + '">' + p[1] + '</option>'; }).join('');
+
+  function renderMarco(){
+    [].forEach.call($('marcos').children, function(b){ b.setAttribute('aria-pressed', b.dataset.m === state.marco ? 'true' : 'false'); });
+    $('customRow').hidden = state.marco !== 'custom';
+    $('bordeCtl').hidden = state.marco === 'ninguno';
+    $('mColor').value = state.color; $('mBrillo').value = state.brillo;
+    $('mBorde').value = state.borde; $('mBordeO').textContent = Number(state.borde).toFixed(1);
+  }
+  $('marcos').addEventListener('click', function(e){ var b = e.target.closest('[data-m]'); if (!b) return; state.marco = b.dataset.m; renderMarco(); refresh(); });
+  $('mColor').addEventListener('input', function(e){ state.color = e.target.value; refresh(); });
+  $('mBrillo').addEventListener('input', function(e){ state.brillo = e.target.value; refresh(); });
+  $('mBorde').addEventListener('input', function(e){ state.borde = parseFloat(e.target.value); $('mBordeO').textContent = state.borde.toFixed(1); refresh(); });
+
+  function renderSello(){
+    var s = state.sello;
+    [].forEach.call($('selloTipo').children, function(b){ b.setAttribute('aria-pressed', b.dataset.t === s.tipo ? 'true' : 'false'); });
+    $('selloTexto').hidden = s.tipo !== 'texto';
+    $('selloImg').hidden = s.tipo !== 'imagen';
+    $('selloPos').hidden = s.tipo === 'ninguno';
+    $('sTexto').value = s.texto; $('sEstilo').value = s.estilo; $('sEsq').value = s.esquina;
+    var t = $('sTam');
+    if (s.tipo === 'texto') { t.min = 8; t.max = 26; t.step = .5; t.value = s.tamanoTexto; $('sTamO').textContent = s.tamanoTexto + '% del ancho'; }
+    else { t.min = 10; t.max = 60; t.step = 1; t.value = s.tamano; $('sTamO').textContent = s.tamano + '% del ancho'; }
+    var f = s.archivo && files[s.archivo];
+    $('sThumb').innerHTML = f ? '<img src="' + esc(f.url) + '" alt="" style="object-fit:contain">' : '?';
+    $('sName').textContent = s.archivo ? (f ? s.archivo : s.archivo + ' · falta el archivo') : 'Elige la imagen del sello (PNG con transparencia)';
+  }
+  $('selloTipo').addEventListener('click', function(e){ var b = e.target.closest('[data-t]'); if (!b) return; state.sello.tipo = b.dataset.t; renderSello(); refresh(); });
+  $('sTexto').addEventListener('input', function(e){ state.sello.texto = e.target.value; refresh(); });
+  $('sEstilo').addEventListener('change', function(e){ state.sello.estilo = e.target.value; refresh(); });
+  $('sEsq').addEventListener('change', function(e){ state.sello.esquina = e.target.value; refresh(); });
+  $('sTam').addEventListener('input', function(e){
+    var v = parseFloat(e.target.value);
+    if (state.sello.tipo === 'texto') state.sello.tamanoTexto = v; else state.sello.tamano = v;
+    $('sTamO').textContent = v + '% del ancho'; refresh();
+  });
+  $('sFile').addEventListener('change', function(e){
+    var f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    cargar(f).then(function(r){ if (!r) return; files[r.name] = { url: r.url, w: r.w, h: r.h }; asignarSello(r.name); });
+  });
+
+  /* ---------- estilo por rareza ---------- */
+  $('aplicarRareza').addEventListener('click', function(){
+    var P = C.presets && C.presets[state.marco];
+    var msg = $('presetMsg');
+    if (!P) { msg.textContent = 'Elige UR, SSR, SR, R o N.'; return; }
+    var imgs = state.capas.filter(function(c){ return c.tipo === 'imagen'; });
+    var part = null; state.capas.forEach(function(c){ if (!part && c.tipo === 'particulas') part = c; });
+    if (imgs.length === 1) { imgs[0].profundidad = 0.35; imgs[0].margen = Math.max(imgs[0].margen || 0, 4); }
+    if (P.particulas) {
+      var cfg = { particulas: P.particulas.particulas, cantidad: P.particulas.cantidad, tamano: P.particulas.tamano || 1, opacidad: P.particulas.opacidad || 1, color: '' };
+      if (part) Object.assign(part, cfg);
+      else {
+        var np = capaPart(cfg);
+        if (imgs.length <= 1) { np.profundidad = 1.4; np.margen = 6; np.mezcla = 'screen'; state.capas.push(np); }
+        else state.capas.splice(1, 0, np);
+        abiertos[np.uid] = false;
+      }
+    } else if (part) {
+      state.capas = state.capas.filter(function(c){ return c !== part; });
+    }
+    if (P.sello) {
+      if (!(state.sello.tipo === 'imagen' && state.sello.archivo)) {
+        state.sello.tipo = 'texto'; state.sello.texto = P.sello.texto; state.sello.estilo = P.sello.estilo; state.sello.tamanoTexto = P.sello.tamano;
+      }
+    } else if (state.sello.tipo === 'texto') state.sello.tipo = 'ninguno';
+    state.holo = !!P.holo;
+    renderList(); renderSello(); renderQuick(); inst.set({ holo: state.holo }); refresh();
+    msg.textContent = 'Listo: estilo ' + state.marco.toUpperCase() + ' aplicado.';
+    setTimeout(function(){ msg.textContent = ''; }, 2600);
+  });
+
+  /* ---------- carta ---------- */
+  function slug(s){ return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'carta'; }
+  function renderCarta(){ $('cId').value = state.id; $('cDir').value = state.carpeta; $('cProp').value = String(state.proporcion); }
+  $('cId').addEventListener('input', function(e){ state.id = e.target.value; if (state.carpetaAuto) { state.carpeta = 'cartas/' + slug(state.id) + '/'; $('cDir').value = state.carpeta; } refresh(); });
+  $('cDir').addEventListener('input', function(e){ state.carpeta = e.target.value; state.carpetaAuto = false; refresh(); });
+  $('cProp').addEventListener('change', function(e){ state.proporcion = e.target.value; refresh(); });
+
+  /* ---------- controles rápidos ---------- */
+  function renderQuick(){
+    $('qProf').value = state.profundidad; $('qProfO').textContent = state.profundidad + ' px';
+    $('qInc').value = state.inclinacion; $('qIncO').textContent = state.inclinacion + '°';
+    $('qHolo').checked = state.holo; $('qRep').checked = state.reposo;
+  }
+  $('qProf').addEventListener('input', function(e){ state.profundidad = +e.target.value; $('qProfO').textContent = state.profundidad + ' px'; inst.set({ profundidad: state.profundidad }); save(); });
+  $('qInc').addEventListener('input', function(e){ state.inclinacion = +e.target.value; $('qIncO').textContent = state.inclinacion + '°'; inst.set({ inclinacion: state.inclinacion }); save(); });
+  $('qHolo').addEventListener('change', function(e){ state.holo = e.target.checked; inst.set({ holo: state.holo }); renderJSON(); save(); });
+  $('qRep').addEventListener('change', function(e){ state.reposo = e.target.checked; inst.set({ reposo: state.reposo }); save(); });
+  $('qRev').addEventListener('click', function(){ inst.ocultarSello(); setTimeout(function(){ inst.entrar(); }, 350); });
+
+  /* ---------- exportar ---------- */
+  var cp = $('copy');
+  cp.addEventListener('click', function(){
+    var code = $('json');
+    function sel(){ var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = 'Seleccionada: copia con Ctrl+C'; }
+    try { navigator.clipboard.writeText(code.textContent).then(function(){ cp.textContent = 'Copiada'; }, sel); } catch(_) { sel(); }
+    setTimeout(function(){ cp.textContent = 'Copiar configuración'; }, 2200);
+  });
+  function todo(){ renderList(); renderMarco(); renderSello(); renderCarta(); renderQuick(); inst.set(Object.assign(opciones(false), { holo: state.holo, reposo: state.reposo, profundidad: state.profundidad, inclinacion: state.inclinacion })); renderJSON(); renderHint(); save(); }
+  $('loadYuki').addEventListener('click', function(){ state = yuki(); abiertos = {}; todo(); });
+  $('reset').addEventListener('click', function(){ $('confirm').hidden = false; $('confirmYes').focus(); });
+  $('confirmNo').addEventListener('click', function(){ $('confirm').hidden = true; });
+  $('confirmYes').addEventListener('click', function(){ $('confirm').hidden = true; state = base(); abiertos = {}; todo(); });
+
+  todo();
+})();
+</script>
+
+</body>
+</html>

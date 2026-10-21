@@ -1,4 +1,5 @@
 export { AnimatedCounter } from "./AnimatedCounter";
+export { CartaCapas, CARD_RATIO, type CartaCapasHandle, type CartaCapasProps } from "./CartaCapas";
 export { Celebration } from "./Celebration";
 export { Confetti } from "./Confetti";
 export { Countdown } from "./Countdown";
