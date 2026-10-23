@@ -30,9 +30,9 @@
   páginas del coleccionista vuelven a su peso (+0,5 kB de errores del panel en el diccionario común).
 
 ## Entrega 3 — Cierre
-- [ ] **T13 — Reglas de negocio, presupuesto y validación** · Todos · Hecho cuando: reglas nuevas en
+- [x] **T13 — Reglas de negocio, presupuesto y validación** · Todos · Hecho cuando: reglas nuevas en
   `docs/reglas-de-negocio.md` (adaptadas de las RN-190 a RN-198 de Bruno que tocan el editor), `pnpm budget` sin
-  cambios en el coleccionista, `validation.md` 25 de 25 y demo manual del dueño.
+  cambios en el coleccionista, `validation.md` 25 de 25 y demo manual del dueño (aprobada el 23 oct 2026: «sí funciona»).
 
 ## Cobertura
 RF-1 T7 · RF-2 T4 · RF-3 T5 · RF-4 T7 · RF-5 T5 · RF-6 T5, T6 · RF-7 T2 · RF-8 T5 · RF-9 T2 · RF-10 T2 · RF-11 T11 ·

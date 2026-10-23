@@ -4,6 +4,10 @@ Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-23. Vitest: 514 de 51
 
 **Veredicto: spec cumplida** (25 de 25 RF con al menos un test en verde).
 
+Cierre: el dueño probó el editor y lo aprobó el 23 oct 2026. Decidió además que, desde ahora, **todas las cartas serán
+cartas por capas** con el sistema de Bruno; el montaje original (una ilustración con el marco de Pencil) deja de ser
+la forma de hacer cartas. Eso replantea las specs 017 y 018.
+
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
 | RF-1 | EL SISTEMA solo permitirá ver, crear, editar o quitar configuraciones por capas a cuentas con rol de | ✓ las_rutas_de_capas_exigen_administrador_y_responden_404_al_resto | — | Cumplido |
