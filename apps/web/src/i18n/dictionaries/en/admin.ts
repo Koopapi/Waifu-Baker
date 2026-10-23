@@ -207,8 +207,6 @@ export const admin = {
     sessionExpired: "Session expired: please sign in again.",
     connectionLost: "Connection lost. You can drop this file again.",
     locked: "Set published: cards can no longer be added (RF-8).",
-    dropHere: "Drop the cut-out girls here: each one creates a card",
-    hint: "PNG or WebP with transparency · up to 20 MB · at least 991 px tall · or click to choose",
     uploading: "Uploading…",
     finished: "Upload finished",
     summary: (done: number, failed: number) => `${done} succeeded${failed ? ` · ${failed} failed` : ""}`,

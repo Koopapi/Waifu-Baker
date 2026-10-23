@@ -95,8 +95,8 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && input.current?.click()}
         className={`cursor-pointer rounded-l border-2 border-dashed p-8 text-center transition-colors duration-[var(--duration-fast)] ${focusRing} ${over ? "border-ui-accent bg-ui-accent/10" : "border-ui-line hover:border-ui-hover"}`}
       >
-        <p className="font-semibold">{t.upload.dropHere}</p>
-        <p className="mt-1 text-sm text-ui-text-3">{t.upload.hint}</p>
+        <p className="font-semibold">{tl.dropHere}</p>
+        <p className="mt-1 text-sm text-ui-text-3">{tl.dropHint}</p>
         <input
           ref={input}
           type="file"

@@ -218,19 +218,25 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 ## 18. Cartas por capas
 
 Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto en las specs 016 a 018. Las que dependen
-de las specs 017 y 018 quedan «Propuesta» hasta que se aprueben.
+de la spec 018 quedan «Propuesta» hasta que se apruebe. Desde la spec 017, todas las cartas son cartas por capas.
 
 | Regla | Enunciado | Estado | Spec |
 |---|---|---|---|
-| RN-190 | Solo el administrador crea y edita cartas por capas, desde el panel; cada cambio queda registrado. Hasta la spec 017, las capas no salen del panel. | Vigente | 016 RF-1, RF-2, RF-4 |
+| RN-190 | Solo el administrador crea y edita cartas por capas, desde el panel; cada cambio queda registrado. Hasta la spec 018, las capas no salen del panel. | Vigente | 016 RF-1, RF-2, RF-4 |
 | RN-191 | Una carta por capas lleva el marco y el sello de su escalón (N, R, SR, SSR, UR; común y poco común → N, rara → R, épica → SR, legendaria → SSR, secreta → UR) y ningún texto encima. Las rarezas del juego, el sorteo y las probabilidades no cambian. El número, el nombre, la rareza y la colección siguen en la base de datos. | Vigente | 016 RF-9 a RF-11, RF-15 |
 | RN-192 | Las capas de imagen tienen la proporción 700 × 991 (±1 %), al menos 700 px de ancho, PNG, JPEG o WebP de hasta 20 MB; se guardan en WebP; como mucho 8 capas de imagen por carta (las partículas no cuentan). El sello de imagen no tiene que cumplir la proporción. Lo subido y no guardado se borra a las 24 h. | Vigente | 016 RF-19 a RF-23 |
-| RN-193 | Para guardar hace falta al menos una capa visible. Si otro administrador guardó antes, se avisa del conflicto: recargar o forzar a sabiendas. Una carta con imagen original que pierde sus capas vuelve a su imagen de Pencil. | Vigente | 016 RF-13, RF-14, RF-17, RF-18 |
+| RN-193 | Para guardar hace falta al menos una capa visible. Si otro administrador guardó antes, se avisa del conflicto: recargar o forzar a sabiendas. Una carta con chica no puede quedarse sin capas (spec 017; sustituye a la vuelta a la imagen de Pencil de la spec 016). | Vigente | 016 RF-13, RF-17, RF-18; 017 RF-5 |
 | RN-195 | Al cambiar la rareza de una carta con capas cambian el marco y el sello de texto; un sello de imagen se mantiene con aviso; las partículas no cambian. | Vigente | 016 RF-25 |
 | RN-197 | Las capas se editan también en colecciones publicadas. | Vigente | 016 RF-16 |
-| RN-194 | Toda carta con capas tiene una imagen plana generada en el servidor, que sustituye a la compuesta con Pencil donde se usa una imagen simple y, con marca de agua, en las zonas públicas. Las capas sueltas nunca se entregan sin sesión. | Propuesta | 017 |
-| RN-196 | En una carta 18+, añadir, quitar o sustituir una capa de imagen, o volver visible una que no lo era, anula la revisión; en publicadas, los coleccionistas ven la versión revisada hasta la nueva revisión; las capas 18+ solo se entregan con el doble control de edad. | Propuesta | 017 |
-| RN-198 | Una carta creada desde capas no puede quedarse sin capas; los modos de mezcla importados que la imagen plana no reproduce pasan a normal con aviso. | Propuesta | 017, 018 |
+| RN-194 | Toda carta con capas tiene una imagen plana generada en el servidor, que sustituye a la compuesta con Pencil donde se usa una imagen simple y, con marca de agua, en las zonas públicas. Las capas sueltas nunca se entregan sin sesión. | Propuesta | 018 |
+| RN-196 | En una carta 18+, añadir, quitar o sustituir una capa de imagen, o volver visible una que no lo era, anula la revisión; en publicadas, los coleccionistas ven la versión revisada hasta la nueva revisión; las capas 18+ solo se entregan con el doble control de edad. | Propuesta | 018 |
+| RN-198 | Una carta no puede quedarse sin su chica ni sin capas; los modos de mezcla importados que el editor no ofrece pasan a normal con aviso. | Vigente | 017 RF-5, RF-19 |
+| RN-199 | Toda carta nace de la imagen de la chica recortada (PNG o WebP con transparencia, hasta 20 MB, al menos 991 px de alto, de cualquier proporción), centrada y entera. Sin transparencia se acepta con aviso. Sustituirla conserva su encuadre y el resto de la carta. El recorte se hace fuera del panel. | Vigente | 017 RF-1 a RF-4 |
+| RN-200 | Cada colección tiene una biblioteca de fondos (con las reglas de las capas de imagen); una carta usa uno de la biblioteca o uno propio. Un fondo que usa alguna carta no se quita de la biblioteca. | Vigente | 017 RF-6 a RF-9 |
+| RN-201 | Cada capa de imagen se puede mover, escalar (10 % a 400 %) y girar (−180° a 180°) sin perder el parallax ni el brillo. | Vigente | 017 RF-10 a RF-12 |
+| RN-202 | Mientras nadie cambie a mano el marco, las partículas o el sello, la carta lleva el estilo completo de su escalón y lo cambia con la rareza; aplicar el estilo de la rareza lo vuelve automático. | Vigente | 017 RF-13, RF-14 |
+| RN-203 | Una colección solo se publica con todas sus cartas armadas (chica y fondo visibles); el panel dice cuáles faltan, con enlace a cada una. | Vigente | 017 RF-15, RF-16 |
+| RN-204 | Las cartas se exportan y se importan en el formato del creador de cartas de Bruno (configuración con nombres de archivo y encuadre); una importación no válida no cambia la carta. | Vigente | 017 RF-17 a RF-19 |
 
 ## Parámetros en un vistazo
 
@@ -256,6 +262,8 @@ de las specs 017 y 018 quedan «Propuesta» hasta que se aprueben.
 | Alias del álbum | 2 a 30 caracteres |
 | Cartas destacadas | hasta 5 |
 | Imágenes subidas | PNG, JPEG o WebP; hasta 20 MB; mínimo 600 px de ancho |
+| Imagen de la chica (crea la carta) | PNG o WebP con transparencia; hasta 20 MB; al menos 991 px de alto |
+| Encuadre de una capa | escala 10 % a 400 %; giro −180° a 180° |
 | Código de colección | 2 a 8 letras o números |
 | Idioma por defecto | inglés |
 | Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |

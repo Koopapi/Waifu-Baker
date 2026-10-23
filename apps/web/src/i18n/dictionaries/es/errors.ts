@@ -62,7 +62,6 @@ export const errors: Record<string, Msg> = {
       pack: "Ese sobre no existe.",
       card: "La carta no existe.",
       selected_cards: "Alguna de las cartas seleccionadas ya no existe.",
-      background: "El fondo no existe.",
     })[String(p.entity)] ?? "No se encontró lo que buscabas.",
   stale_version: (p) => {
     if (p.entity === "set") {
@@ -147,13 +146,6 @@ export const errors: Record<string, Msg> = {
   invalid_layers: (p) => `La configuración de capas no es válida${p.path ? ` (${p.path})` : ""}.`,
   layer_missing: "Una de las capas ya no está disponible: vuelve a subirla.",
   layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
-  two_characters: "Una carta solo puede tener una chica (capa de personaje).",
-  no_layers: "Esta carta todavía no tiene capas que exportar.",
-  character_required: "La chica no se puede quitar ni ocultar; puedes sustituirla.",
-  character_type: "La chica debe subirse en PNG o WebP (con transparencia).",
-  character_too_short: (p) => `La imagen mide ${p.height} px de alto; el mínimo es ${p.min} px.`,
-  duplicate_background: (p) => `Este fondo ya está en la biblioteca («${p.name}»).`,
-  background_in_use: (p) => `Este fondo lo usan ${p.count} ${plural(Number(p.count), "carta", "cartas")}: cámbialo en ellas antes de quitarlo.`,
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
@@ -161,11 +153,6 @@ export const errors: Record<string, Msg> = {
   slot_sum: (p) => `La ranura ${p.slot} suma ${p.sum} % en vez de 100 %.`,
   holo_range: "La probabilidad de holo debe estar entre 0 % y 100 %.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: tiene probabilidad en el sobre pero ninguna carta.`,
-  card_not_assembled: (p) =>
-    `Carta ${String(p.number).padStart(3, "0")}: no está armada (falta ${String(p.missing)
-      .split(",")
-      .map((m) => (m === "personaje" ? "la chica" : "el fondo"))
-      .join(" y ")}).`,
   card_incomplete: (p) =>
     `Carta ${pad(p.number)}: falta ${String(p.missing ?? "")
       .split(",")

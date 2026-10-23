@@ -32,7 +32,8 @@
 - [x] **T12 — Demo y colecciones de prueba armadas** · RF-20.
 
 ## Entrega 5 — Cierre
-- [ ] **T13 — E2E del panel, presupuesto, reglas de negocio, `DESIGN.md` y validación** · Todos · Hecho cuando:
+- [ ] **T13 — E2E del panel, presupuesto, reglas de negocio, `DESIGN.md` y validación** (hecho todo menos la demo
+  manual del dueño) · Todos · Hecho cuando:
   `validation.md` 20 de 20, `pnpm budget` sin cambios en el coleccionista y demo manual del dueño.
 
 ## Cobertura

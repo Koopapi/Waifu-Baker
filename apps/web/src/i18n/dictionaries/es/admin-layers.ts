@@ -2,6 +2,8 @@ import type { adminLayers as en } from "../en/admin-layers";
 
 export const adminLayers: typeof en = {
   title: "Carta por capas",
+  dropHere: "Suelta aquí las chicas recortadas: cada una crea una carta",
+  dropHint: "PNG o WebP con transparencia · hasta 20 MB · mínimo 991 px de alto · o pulsa para elegir",
   uncut: "Parece que no está recortada (no tiene transparencia).",
   intro: "Capas del mismo lienzo (700 × 991) que se mueven a distinta velocidad. Súbelas de atrás hacia adelante.",
   previewLabel: "Vista previa en vivo de la carta por capas",
@@ -85,6 +87,11 @@ export const adminLayers: typeof en = {
     autoNote: "Marco, partículas y sello siguen a la rareza mientras no los cambies a mano.",
     manualNote: "Cambiaste el estilo a mano: al cambiar la rareza solo se actualizan el marco y el sello. «Aplicar estilo de la rareza» lo vuelve automático.",
   },
+  notAssembledCard: (number: number, missing: string) =>
+    `Carta ${String(number).padStart(3, "0")}: no está armada (falta ${missing
+      .split(",")
+      .map((m) => (m === "personaje" ? "la chica" : "el fondo"))
+      .join(" y ")}).`,
   notAssembled: (n: number) => `${n === 1 ? "1 carta no está armada" : `${n} cartas no están armadas`} (les falta la chica o el fondo): la colección no se puede publicar así.`,
   io: {
     export: "Exportar",

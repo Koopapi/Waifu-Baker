@@ -62,7 +62,6 @@ export const errors: Record<string, Msg> = {
       pack: "That pack doesn't exist.",
       card: "This card doesn't exist.",
       selected_cards: "Some of the selected cards no longer exist.",
-      background: "This background doesn't exist.",
     })[String(p.entity)] ?? "Not found.",
   stale_version: (p) => {
     if (p.entity === "set") {
@@ -146,13 +145,6 @@ export const errors: Record<string, Msg> = {
   invalid_layers: (p) => `The layer setup is not valid${p.path ? ` (${p.path})` : ""}.`,
   layer_missing: "One of the layers is no longer available: upload it again.",
   layers_required: "This card was created from layers and has no original image: it needs at least one visible image layer.",
-  two_characters: "A card can only have one girl (character layer).",
-  no_layers: "This card has no layers to export yet.",
-  character_required: "The girl can't be removed or hidden; you can replace her.",
-  character_type: "Upload the girl as PNG or WebP (with transparency).",
-  character_too_short: (p) => `The image is ${p.height} px tall; the minimum is ${p.min} px.`,
-  duplicate_background: (p) => `This background is already in the library ("${p.name}").`,
-  background_in_use: (p) => `${p.count} ${Number(p.count) === 1 ? "card uses" : "cards use"} this background: change it on them before removing it.`,
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>
@@ -161,11 +153,6 @@ export const errors: Record<string, Msg> = {
   slot_sum: (p) => `Slot ${p.slot} adds up to ${p.sum}% instead of 100%.`,
   holo_range: "The holo chance must be between 0% and 100%.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: has a chance in the pack but no cards.`,
-  card_not_assembled: (p) =>
-    `Card ${String(p.number).padStart(3, "0")}: not assembled (missing ${String(p.missing)
-      .split(",")
-      .map((m) => (m === "personaje" ? "the girl" : "the background"))
-      .join(" and ")}).`,
   card_incomplete: (p) =>
     `Card ${pad(p.number)}: missing ${String(p.missing ?? "")
       .split(",")

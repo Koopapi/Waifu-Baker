@@ -116,6 +116,7 @@ cualquier componente nuevo se añada a esta tabla.
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
 | CartaCapas | Carta por capas (componente) con los cinco escalones N, R, SR, SSR y UR (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Armado por capas | Editor de la carta (chica, fondo de la biblioteca o propio, encuadre, estilo automático, exportar e importar), biblioteca de fondos y aviso de cartas sin armar (lámina «Armado de cartas por capas (spec 017)») |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
 de la demo (`pnpm showcase`). Se regeneran tras cada cambio visible.

@@ -3,6 +3,8 @@
 
 export const adminLayers = {
   title: "Layered card",
+  dropHere: "Drop the cut-out girls here: each one creates a card",
+  dropHint: "PNG or WebP with transparency · up to 20 MB · at least 991 px tall · or click to choose",
   uncut: "It doesn't look cut out (it has no transparency).",
   intro: "Layers of the same canvas (700 × 991) that move at different speeds. Upload them back to front.",
   previewLabel: "Live preview of the layered card",
@@ -86,6 +88,11 @@ export const adminLayers = {
     autoNote: "Frame, particles and seal follow the rarity until you change them by hand.",
     manualNote: "You changed the style by hand: changing the rarity only updates the frame and seal. \"Apply rarity style\" makes it automatic again.",
   },
+  notAssembledCard: (number: number, missing: string) =>
+    `Card ${String(number).padStart(3, "0")}: not assembled (missing ${missing
+      .split(",")
+      .map((m) => (m === "personaje" ? "the girl" : "the background"))
+      .join(" and ")}).`,
   notAssembled: (n: number) => `${n === 1 ? "1 card isn't assembled" : `${n} cards aren't assembled`} (missing the girl or the background): the set can't be published like this.`,
   io: {
     export: "Export",

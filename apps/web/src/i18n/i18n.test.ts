@@ -3,6 +3,8 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { translateError } from "./errors";
+import { panelErrors as panelErrorsEn } from "./dictionaries/en/panel-errors";
+import { panelErrors as panelErrorsEs } from "./dictionaries/es/panel-errors";
 import { dictionaries } from "./index";
 import { DEFAULT_LOCALE, normalizeLocale } from "./locales";
 
@@ -43,6 +45,7 @@ describe("spec 008 — idiomas", () => {
 
   it("test_s008_rf10_los_dos_diccionarios_tienen_las_mismas_claves", () => {
     expect(shape(dictionaries.es).sort()).toEqual(shape(dictionaries.en).sort());
+    expect(Object.keys(panelErrorsEs).sort()).toEqual(Object.keys(panelErrorsEn).sort());
   });
 
   it("test_s008_rf10_cada_codigo_de_error_tiene_traduccion_en_los_dos_idiomas", () => {
@@ -54,7 +57,10 @@ describe("spec 008 — idiomas", () => {
       for (const m of readFileSync(f, "utf8").matchAll(/\bcode: "([a-z0-9_]+)"/g)) codes.add(m[1]);
     }
     expect(codes.size).toBeGreaterThan(20);
-    const missing = [...codes].filter((c) => !(c in dictionaries.en.errors) || !(c in dictionaries.es.errors));
+    // Los errores del panel de capas (spec 017) se traducen solo en el servidor, con su propio diccionario.
+    const en = { ...dictionaries.en.errors, ...panelErrorsEn };
+    const es = { ...dictionaries.es.errors, ...panelErrorsEs };
+    const missing = [...codes].filter((c) => !(c in en) || !(c in es));
     expect(missing).toEqual([]);
   });
 
