@@ -19,6 +19,7 @@ import { TextArea, TextField } from "@/ui/form/TextField";
 import { useConfirm } from "@/ui/overlay/Confirm";
 import { Modal } from "@/ui/overlay/Modal";
 import { CardPreview } from "./CardPreview";
+import { LayersEditor } from "./LayersEditor";
 import type { CardDTO, CharacterOption, Permissions } from "./types";
 import { useLocale, useT } from "@/i18n/client";
 import { formatPercent } from "@/i18n/format";
@@ -279,6 +280,8 @@ function CardEditor({
           </div>
         </div>
       </form>
+      {/* Spec 016: la carta por capas se guarda aparte del formulario de la carta. */}
+      <LayersEditor card={card} onSaved={onSaved} />
     </Modal>
   );
 }

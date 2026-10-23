@@ -1,6 +1,6 @@
 # Spec 016 — Cartas por capas: editor en el panel
 
-Estado: propuesta (23 oct 2026), pendiente de aprobación del dueño.
+Estado: aprobada por el dueño el 23 oct 2026.
 
 Origen: la propuesta de Bruno «Spec 016: cartas por capas (parallax) en el panel» (PR #14, 71 RF), partida en tres
 specs por decisión del dueño (23 oct 2026): **016 editor en el panel** (esta), **017 cartas por capas para el
