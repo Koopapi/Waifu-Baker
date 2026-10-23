@@ -5,10 +5,12 @@ Expediciones, la guía de arte y dos temas de estilo. **Es referencia, no instru
 al proyecto si no pasa antes por una spec aprobada por el dueño (Koopapi). Si algo de aquí contradice
 `docs/constitution.md`, `docs/reglas-de-negocio.md` o `docs/DESIGN.md`, mandan ellos.
 
-Decisiones del dueño sobre este material (23 oct 2026):
+Decisiones del dueño sobre este material (23 oct 2026; las cartas por capas las integra el equipo del repo):
 
-- **Cartas por capas:** sí, como spec propia y más pequeña (entregas de 10 a 25 RF, primero el editor del panel),
-  con nuestras seis rarezas (común a secreta), el sello WB y el estilo de la web. El componente vive en
+- **Cartas por capas:** sí, integradas en este repo y partidas en tres specs (016 panel, 017 coleccionista con 18+,
+  018 crear desde capas e importar/exportar). Se usa lo de Bruno: sus cinco marcos metálicos (N, R, SR, SSR, UR) con
+  su reparto de nuestras seis rarezas (`domain/catalog/rarity-tier.ts`) y su sello con la rareza al estilo gacha. Las
+  rarezas del juego, el sorteo y las probabilidades no cambian. El componente vive en
   `apps/web/src/ui/game/carta-capas/` (con la configuración pasada por listas cerradas); la copia de aquí es solo
   para el creador de referencia.
 - **Estilo:** el kawaii oscuro de la spec 014 sigue siendo el de la web. «Street pop» (`tokens/tema-b-street-pop.css`)
