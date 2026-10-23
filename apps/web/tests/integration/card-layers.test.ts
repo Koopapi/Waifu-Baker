@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { and, eq } from "drizzle-orm";
 import { auditLog, cards } from "@/db/schema";
 import { createSet } from "@/server/services/collections";
-import { uploadCardImage } from "@/server/services/cards";
+import { bulkUpdateCards, updateCard, uploadCardImage } from "@/server/services/cards";
 import { getCardLayers, removeCardLayers, saveCardLayers } from "@/server/services/card-layers";
 import { stageLayerImage } from "@/server/cards/layer-images";
 import { inRollback } from "./db";
-import { makeAdmin } from "./factories";
+import { createPublishedSet, makeAdmin } from "./factories";
 import { MIME, testImage } from "./images";
 import { tempStore } from "./store";
 
@@ -168,6 +168,66 @@ describe("spec 016 — quitar capas", () => {
       const r = await saveCardLayers(tx, store, admin.id, card.id, { config: config([await stage(10)]), expectedVersion: card.version });
       await tx.update(cards).set({ originalKey: null }).where(eq(cards.id, card.id));
       await expect(removeCardLayers(tx, store, admin.id, card.id, { expectedVersion: r.card.version })).rejects.toMatchObject({ code: "layers_required" });
+    });
+  });
+});
+
+describe("spec 016 — la carta conserva sus datos, colecciones publicadas y cambio de rareza", () => {
+  it("test_s016_rf15_guardar_capas_no_toca_el_numero_el_nombre_la_rareza_ni_la_coleccion", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage, load } = await setup(tx);
+      const before = await load();
+      await saveCardLayers(tx, store, admin.id, card.id, { config: config([await stage(30)]), expectedVersion: card.version });
+      const after = await load();
+      expect({ number: after.number, name: after.name, rarity: after.rarity, setId: after.setId }).toEqual({
+        number: before.number,
+        name: before.name,
+        rarity: before.rarity,
+        setId: before.setId,
+      });
+    });
+  });
+
+  it("test_s016_rf16_en_una_coleccion_publicada_tambien_se_editan_las_capas", async () => {
+    await inRollback(async (tx) => {
+      const admin = await makeAdmin(tx);
+      const store = tempStore();
+      const { cards: published } = await createPublishedSet(tx, admin.id, { code: "LAYP", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], store });
+      const staged = (await stageLayerImage(store, { body: await testImage({ width: 1400, height: 1982, hue: 50 }), mime: MIME.png, filename: "p.png" }, "layer")).key;
+      const r = await saveCardLayers(tx, store, admin.id, published[0].id, { config: config([staged]), expectedVersion: published[0].version });
+      expect(r.card.layers?.capas).toHaveLength(1);
+    });
+  });
+
+  it("test_s016_rf25_al_cambiar_la_rareza_el_marco_y_el_sello_de_texto_siguen_al_escalon", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage, load } = await setup(tx);
+      const r = await saveCardLayers(tx, store, admin.id, card.id, {
+        config: config([await stage(70)], { marco: "r", sello: { texto: "R", estilo: "plata", esquina: "inf-izq" } }),
+        expectedVersion: card.version,
+      });
+      const updated = await updateCard(tx, store, admin.id, card.id, r.card.version, { rarity: "legendary" });
+      expect(updated.layersSealToReview).toBe(false);
+      const saved = await load();
+      expect(saved.layers?.marco).toBe("ssr");
+      expect(saved.layers?.sello).toMatchObject({ texto: "SSR", esquina: "inf-izq" });
+    });
+  });
+
+  it("test_s016_rf25_con_sello_de_imagen_se_mantiene_y_avisa_tambien_en_lote", async () => {
+    await inRollback(async (tx) => {
+      const { admin, set, store, card, stage, load } = await setup(tx);
+      const seal = (await stageLayerImage(store, { body: await testImage({ width: 400, height: 400, hue: 200 }), mime: MIME.png, filename: "s.png" }, "seal")).key;
+      const r = await saveCardLayers(tx, store, admin.id, card.id, {
+        config: config([await stage(90)], { marco: "n", sello: { key: seal, esquina: "sup-der" } }),
+        expectedVersion: card.version,
+      });
+      const sealKey = ((await load()).layers?.sello as { key: string }).key;
+      const out = await bulkUpdateCards(tx, store, admin.id, set.id, { [card.id]: r.card.version }, { rarity: "secret" });
+      expect(out).toEqual({ updated: 1, layersSealsToReview: 1 });
+      const saved = await load();
+      expect(saved.layers?.marco).toBe("ur");
+      expect(saved.layers?.sello).toEqual({ key: sealKey, esquina: "sup-der" });
     });
   });
 });

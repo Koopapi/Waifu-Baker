@@ -18,7 +18,7 @@ export interface StagedLayerImage {
 }
 
 /**
- * Spec 016, RF-30 a RF-35 y RF-38: valida una imagen de capa o de sello, la deja en WebP optimizado y la guarda en el
+ * Spec 016, RF-19 a RF-21 y RF-23: valida una imagen de capa o de sello, la deja en WebP optimizado y la guarda en el
  * área temporal. Las capas se escalan al lienzo (1400 × 1982); el sello no sigue la proporción y se limita a 600 px.
  */
 export async function stageLayerImage(store: CardStore, file: UploadFile, kind: LayerUploadKind): Promise<StagedLayerImage> {
@@ -56,4 +56,12 @@ export async function stageLayerImage(store: CardStore, file: UploadFile, kind: 
   await store.put(key, out);
   const stored = await sharp(out).metadata();
   return { key, width: stored.width ?? 0, height: stored.height ?? 0, scaled };
+}
+
+/** Spec 016 (RNF): lo que lleva más de 24 h en el área temporal no se guardó nunca; se borra. Devuelve cuántas. */
+export const TEMP_LAYER_TTL_MS = 24 * 60 * 60 * 1000;
+export async function purgeTempLayers(store: CardStore, now: Date): Promise<number> {
+  const stale = (await store.list("tmp/layers")).filter((f) => now.getTime() - f.modifiedAt.getTime() > TEMP_LAYER_TTL_MS);
+  for (const f of stale) await store.delete(f.key);
+  return stale.length;
 }

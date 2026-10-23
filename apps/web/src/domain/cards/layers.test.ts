@@ -70,3 +70,14 @@ describe("spec 016 — configuración por capas", () => {
     expect(isSetLayerKey("s2", img(1).key)).toBe(false);
   });
 });
+
+describe("spec 016 — capas de partículas", () => {
+  it("test_s016_rf8_las_particulas_llevan_tipo_cantidad_tamano_velocidad_y_color", () => {
+    const ok = checkLayersConfig(base([img(1), { particulas: "petalos", cantidad: 40, tamano: 1.5, velocidad: 0.8, color: "#ff7eb6" }]));
+    expect(ok.ok).toBe(true);
+    // Un color que no es hexadecimal o una cantidad fuera de rango no se guardan.
+    expect(checkLayersConfig(base([img(1), { particulas: "petalos", color: "red;x" }])).ok).toBe(false);
+    expect(checkLayersConfig(base([img(1), { particulas: "petalos", cantidad: 500 }])).ok).toBe(false);
+    expect(checkLayersConfig(base([img(1), { particulas: "no-existe" }])).ok).toBe(false);
+  });
+});

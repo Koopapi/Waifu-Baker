@@ -6,6 +6,7 @@ import { BLEND_MODES, CORNERS, imageLayers, isImageLayer, isImageSeal, isVisible
 import { applyTierStyle } from "@/domain/cards/layers-rarity";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import { useT } from "@/i18n/client";
+import { useAdminLayersT } from "@/i18n/admin-layers";
 import { Button, IconButton } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";
 import { Checkbox } from "@/ui/form/Choice";
@@ -40,13 +41,13 @@ function numberOr(v: string, fallback: number | undefined) {
 }
 
 /**
- * Spec 016, RF-3 a RF-21: editor de la carta por capas dentro del editor de carta del panel (estilo actual del panel;
+ * Spec 016, RF-3 y RF-5 a RF-18: editor de la carta por capas dentro del editor de carta del panel (estilo actual del panel;
  * solo la vista previa va sobre fondo oscuro). Las imágenes se suben al área temporal y nada cambia en la carta hasta
  * «Guardar capas».
  */
 export function LayersEditor({ card, onSaved }: { card: CardDTO; onSaved: (version: number) => void }) {
   const tt = useT();
-  const t = tt.admin.layers;
+  const t = useAdminLayersT();
   const confirm = useConfirm();
   const router = useRouter();
   const [saved, setSaved] = useState<LayersConfig | null>(card.layers);

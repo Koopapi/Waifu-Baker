@@ -13,6 +13,9 @@ import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { AdminError, isUniqueViolation } from "@/server/errors";
 import { auditChange, recordAudit } from "./audit";
+import { rarityTier } from "@/domain/catalog/rarity-tier";
+import type { LayersConfig } from "@/domain/cards/layers";
+import { retierLayers } from "@/domain/cards/layers-rarity";
 
 type CardRow = typeof cards.$inferSelect;
 type Variant = CardRow["variant"];
@@ -186,9 +189,20 @@ function applyPatch(cur: CardRow, patch: CardPatch, status: SetStatus) {
 const needsRecompose = (cur: CardRow, next: { rarity: Rarity | null; number?: number }) =>
   cur.rarity !== next.rarity || (next.number !== undefined && cur.number !== next.number);
 
+/**
+ * Spec 016, RF-25: si cambia la rareza de una carta con capas, su marco y su sello de texto siguen al escalón nuevo.
+ * Devuelve las columnas a cambiar y si queda un sello de imagen que hay que revisar a mano.
+ */
+function retierIfLayered(cur: CardRow, rarity: Rarity | null): { patch: { layers?: LayersConfig }; sealToReview: boolean } {
+  if (!cur.layers || !rarity || cur.rarity === rarity) return { patch: {}, sealToReview: false };
+  const r = retierLayers(cur.layers as LayersConfig, rarityTier(rarity));
+  return { patch: { layers: r.config }, sealToReview: r.imageSealToReview };
+}
+
 /** RF-14 y RF-16: edita una carta con control de versión y regenera si cambia lo que se ve. */
 export async function updateCard(db: DbLike, store: CardStore, actorUserId: string, cardId: string, expectedVersion: number, patch: CardPatch) {
   const toDelete: (string | null)[] = [];
+  let sealToReview = false;
   const result = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
     if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
@@ -202,11 +216,13 @@ export async function updateCard(db: DbLike, store: CardStore, actorUserId: stri
       keys = await composeAndStore(store, { ...cur, ...next }, set.code);
       toDelete.push(...composedKeys(cur));
     }
+    const retier = retierIfLayered(cur, next.rarity);
+    sealToReview = retier.sealToReview;
     const merged = { ...cur, ...next, ...keys };
     try {
       const [row] = await tx
         .update(cards)
-        .set({ ...next, ...keys, status: isCardComplete(merged) ? "ready" : "draft", version: cur.version + 1, updatedAt: sql`now()` })
+        .set({ ...next, ...keys, ...retier.patch, status: isCardComplete(merged) ? "ready" : "draft", version: cur.version + 1, updatedAt: sql`now()` })
         .where(and(eq(cards.id, cardId), eq(cards.version, expectedVersion)))
         .returning();
       await auditChange(tx, { actorUserId, action: "card_update", entityType: "card", entityId: cardId, before: pick(cur), after: next });
@@ -217,12 +233,13 @@ export async function updateCard(db: DbLike, store: CardStore, actorUserId: stri
     }
   });
   await deleteKeys(store, toDelete, db);
-  return result;
+  // Spec 016, RF-25: el panel avisa si la carta tiene un sello de imagen que ya no encaja con su rareza.
+  return { ...result, layersSealToReview: sealToReview };
 }
 
 const pick = (c: CardRow) => ({ name: c.name, flavorText: c.flavorText, characterId: c.characterId, rarity: c.rarity, variant: c.variant });
 
-/** RF-14: aplica personaje, rareza o variante a varias cartas; todo o nada. */
+/** RF-14: aplica personaje, rareza o variante a varias cartas; todo o nada. Spec 016, RF-25: retoca las cartas con capas. */
 export async function bulkUpdateCards(
   db: DbLike,
   store: CardStore,
@@ -232,8 +249,9 @@ export async function bulkUpdateCards(
   patch: Pick<CardPatch, "characterId" | "rarity" | "variant">,
 ) {
   const ids = Object.keys(versions);
-  if (ids.length === 0) return 0;
+  if (ids.length === 0) return { updated: 0, layersSealsToReview: 0 };
   const toDelete: (string | null)[] = [];
+  let sealsToReview = 0;
   await db.transaction(async (tx) => {
     const set = await lockSet(tx, setId);
     const rows = await tx.select().from(cards).where(and(eq(cards.setId, setId), inArray(cards.id, ids))).for("update");
@@ -248,16 +266,18 @@ export async function bulkUpdateCards(
     for (const [i, { cur, next }] of plans.entries()) {
       const keys = recomposed[i] ?? {};
       if (recomposed[i]) toDelete.push(...composedKeys(cur));
+      const retier = retierIfLayered(cur, next.rarity);
+      if (retier.sealToReview) sealsToReview += 1;
       const merged = { ...cur, ...next, ...keys };
       await tx
         .update(cards)
-        .set({ ...next, ...keys, status: isCardComplete(merged) ? "ready" : "draft", version: cur.version + 1, updatedAt: sql`now()` })
+        .set({ ...next, ...keys, ...retier.patch, status: isCardComplete(merged) ? "ready" : "draft", version: cur.version + 1, updatedAt: sql`now()` })
         .where(eq(cards.id, cur.id));
       await auditChange(tx, { actorUserId, action: "card_bulk_update", entityType: "card", entityId: cur.id, before: pick(cur), after: next });
     }
   });
   await deleteKeys(store, toDelete, db);
-  return ids.length;
+  return { updated: ids.length, layersSealsToReview: sealsToReview };
 }
 
 /** Aplica una numeración nueva sin chocar con el índice único y regenera las que cambian. */

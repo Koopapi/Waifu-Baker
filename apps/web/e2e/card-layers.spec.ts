@@ -1,4 +1,4 @@
-// Spec 016, entrega 1: el editor de cartas por capas del panel (subir capas, vista previa en vivo, guardar, recargar,
+// Criterios de la spec 016 (entrega 1): el editor de cartas por capas del panel (subir capas, vista previa en vivo, guardar, recargar,
 // conflicto entre dos administradores y quitar capas).
 import type { Page } from "@playwright/test";
 import path from "node:path";
@@ -56,6 +56,13 @@ test("editor de cartas por capas", async ({ browser }) => {
     const editor = await openEditor(admin, setId);
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(3);
     await expect(editor.locator('[data-testid="layers-preview"] .cc-card')).toBeVisible();
+  });
+
+  await test.step("RF-11: la carta por capas no lleva texto encima (ni número ni nombre)", async () => {
+    const card = admin.locator('[data-testid="layers-preview"] .cc-card');
+    // La común (escalón N) no lleva sello: dentro de la carta no hay ningún texto.
+    await expect(card).toHaveText("");
+    expect(await card.evaluate((el) => el.textContent ?? "")).not.toMatch(/001|carta/i);
   });
 
   await test.step("RF-17 y RF-18: si otro administrador guardó antes, avisa; recargar trae su versión", async () => {

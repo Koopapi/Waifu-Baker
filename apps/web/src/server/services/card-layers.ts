@@ -73,7 +73,7 @@ async function releaseLayerImages(db: DbLike, store: CardStore, setId: string, c
 }
 
 /**
- * Spec 016, RF-14 a RF-22: guarda la configuración por capas de una carta. Si otro administrador guardó la carta
+ * Spec 016, RF-12 a RF-18: guarda la configuración por capas de una carta. Si otro administrador guardó la carta
  * desde que se abrió el editor, avisa del conflicto salvo que se fuerce (RF-19 a RF-21); cada guardado queda en la
  * auditoría con los valores anteriores y nuevos (RF-2).
  */

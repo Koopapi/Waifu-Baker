@@ -23,7 +23,7 @@ async function guard(params: Promise<{ id: string }>) {
   return session && z.string().uuid().safeParse(id).success ? { session, id } : null;
 }
 
-/** Spec 016, RF-20: configuración guardada y versión actual (recargar tras un conflicto). */
+/** Spec 016, RF-18: configuración guardada y versión actual (recargar tras un conflicto). */
 export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const g = await guard(params);
   if (!g) return notFoundResponse();

@@ -1,6 +1,6 @@
 // Spec 016: estilo del escalón de rareza en una configuración por capas (los presets de carta-capas.js v3). Puro.
 import type { RarityTier } from "@/domain/catalog/rarity-tier";
-import { isImageLayer, type LayersConfig, type ParticleLayer, type TextSeal } from "./layers";
+import { isImageLayer, isImageSeal, type LayersConfig, type ParticleLayer, type TextSeal } from "./layers";
 
 interface Preset {
   particles: Omit<ParticleLayer, "profundidad" | "margen"> | null;
@@ -33,4 +33,17 @@ export function applyTierStyle(config: LayersConfig, tier: RarityTier, seed: num
     sello: p.seal ? { ...p.seal, esquina: "sup-izq" } : null,
     holo: p.holo,
   };
+}
+
+/**
+ * Spec 016, RF-25: al cambiar la rareza de una carta con capas, el marco y el sello de texto siguen al escalón nuevo
+ * (el sello conserva su esquina; un escalón sin sello lo quita), las partículas no cambian y un sello de imagen se
+ * mantiene, pero hay que revisarlo a mano.
+ */
+export function retierLayers(config: LayersConfig, tier: RarityTier): { config: LayersConfig; imageSealToReview: boolean } {
+  const preset = TIER_PRESETS[tier].seal;
+  const seal = config.sello;
+  if (seal && isImageSeal(seal)) return { config: { ...config, marco: tier }, imageSealToReview: true };
+  const sello = seal && preset ? { ...preset, esquina: seal.esquina } : null;
+  return { config: { ...config, marco: tier, sello }, imageSealToReview: false };
 }

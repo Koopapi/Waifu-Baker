@@ -8,7 +8,7 @@ import { isAdminError } from "@/server/errors";
 export const runtime = "nodejs";
 
 /**
- * Spec 016, RF-6 y RF-30 a RF-35: sube una imagen de capa (o de sello) al área temporal. Un archivo por petición: el
+ * Spec 016, RF-6 y RF-19 a RF-21: sube una imagen de capa (o de sello) al área temporal. Un archivo por petición: el
  * editor envía varios en paralelo y cada uno se acepta o se rechaza con su motivo sin parar el resto (RF-31).
  */
 export async function POST(req: Request) {
