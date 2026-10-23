@@ -147,6 +147,8 @@ export const errors: Record<string, Msg> = {
   layers_required: "This card was created from layers and has no original image: it needs at least one visible image layer.",
   two_characters: "A card can only have one girl (character layer).",
   character_required: "The girl can't be removed or hidden; you can replace her.",
+  character_type: "Upload the girl as PNG or WebP (with transparency).",
+  character_too_short: (p) => `The image is ${p.height} px tall; the minimum is ${p.min} px.`,
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>

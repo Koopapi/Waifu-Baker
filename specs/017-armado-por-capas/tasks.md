@@ -12,7 +12,7 @@
   dos personajes (tests de integración).
 - [x] **T3 — Encuadre en `carta-capas.js`** (en la imagen, con `ajuste`) y tipos · RF-12 · Hecho cuando: test de que el
   HTML lleva el `transform` en la imagen y la capa conserva el parallax; configuraciones antiguas sin cambios.
-- [ ] **T4 — Imagen de la chica**: validación y detección de «sin recortar» · RF-2, RF-3.
+- [x] **T4 — Imagen de la chica**: validación y detección de «sin recortar» · RF-2, RF-3.
 - [ ] **T5 — Estilo automático** en `retierLayers` · RF-13, RF-14.
 
 ## Entrega 3 — Crear y armar

@@ -148,6 +148,8 @@ export const errors: Record<string, Msg> = {
   layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
   two_characters: "Una carta solo puede tener una chica (capa de personaje).",
   character_required: "La chica no se puede quitar ni ocultar; puedes sustituirla.",
+  character_type: "La chica debe subirse en PNG o WebP (con transparencia).",
+  character_too_short: (p) => `La imagen mide ${p.height} px de alto; el mínimo es ${p.min} px.`,
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BLEND_MODES, DEFAULT_FRAMING, characterLayer, checkLayerSize, checkLayersConfig, framingOf, imageKeys, isAssembled, isSetLayerKey, isTempKey, missingParts, repeatedImages, resetFraming, type ImageLayer, type LayersConfig } from "./layers";
+import { BLEND_MODES, DEFAULT_FRAMING, characterLayer, checkCharacterSize, checkLayerSize, checkLayersConfig, framingOf, imageKeys, isAssembled, isSetLayerKey, isTempKey, missingParts, repeatedImages, resetFraming, type ImageLayer, type LayersConfig } from "./layers";
 
 const img = (n: number, extra: Record<string, unknown> = {}) => ({ key: `sets/s1/layers/${String(n).padStart(64, "0")}.webp`, ...extra });
 const base = (capas: unknown[], extra: Record<string, unknown> = {}) => ({ capas, marco: "ssr", sello: null, ...extra });
@@ -141,5 +141,13 @@ describe("spec 017 — armado por capas", () => {
     expect(checkLayersConfig(base([fondo(), img(7, { rol: "personaje" })]), before).ok).toBe(true);
     // Sin personaje antes (configuración antigua), no se exige.
     expect(checkLayersConfig(base([fondo()]), parse(base([img(1)]))).ok).toBe(true);
+  });
+});
+
+describe("spec 017 — tamaño de la imagen de la chica", () => {
+  it("test_s017_rf2_al_menos_991_px_de_alto_y_cualquier_proporcion", () => {
+    expect(checkCharacterSize(400, 990)).toEqual({ ok: false, code: "character_too_short", min: 991 });
+    expect(checkCharacterSize(400, 991)).toEqual({ ok: true });
+    expect(checkCharacterSize(3000, 1000)).toEqual({ ok: true });
   });
 });

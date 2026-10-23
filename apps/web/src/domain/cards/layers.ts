@@ -189,3 +189,14 @@ export function checkLayerSize(width: number, height: number): LayerSizeVerdict 
   }
   return { ok: true, scaled: width !== STORED_LAYER.width || height !== STORED_LAYER.height };
 }
+
+/** Spec 017, RF-2: la chica recortada llega en PNG o WebP (los formatos con transparencia), de cualquier proporción. */
+export const CHARACTER_TYPES = ["image/png", "image/webp"] as const;
+export const MIN_CHARACTER_HEIGHT = CANVAS.height;
+
+export type CharacterSizeVerdict = { ok: true } | { ok: false; code: "character_too_short"; min: number };
+
+/** Spec 017, RF-2: al menos la altura del lienzo (991 px); el ancho y la proporción son libres. */
+export function checkCharacterSize(_width: number, height: number): CharacterSizeVerdict {
+  return height < MIN_CHARACTER_HEIGHT ? { ok: false, code: "character_too_short", min: MIN_CHARACTER_HEIGHT } : { ok: true };
+}
