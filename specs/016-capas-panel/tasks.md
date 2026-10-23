@@ -23,7 +23,7 @@
 - [x] **T11 — Sin texto encima en el E2E** · RF-11 · Hecho: paso nuevo en `card-layers.spec.ts` en verde. El cambio de
   rareza (RF-25) solo se puede hacer en colecciones en borrador y el E2E usa una publicada: lo cubren los tests de
   integración.
-- [ ] **T12 — Carta por capas en Pencil** y fila de `docs/DESIGN.md` · RNF · Hecho cuando: el componente está en la
+- [x] **T12 — Carta por capas en Pencil** y fila de `docs/DESIGN.md` · RNF · Hecho cuando: el componente está en la
   lámina del sistema de diseño.
 
 - [x] **T12b — Textos del editor fuera del diccionario general** · RNF de peso · Hecho: `i18n/admin-layers.ts`; las
