@@ -22,6 +22,14 @@ export interface StagedLayerImage {
  * área temporal. Las capas se escalan al lienzo (1400 × 1982); el sello no sigue la proporción y se limita a 600 px.
  */
 export async function stageLayerImage(store: CardStore, file: UploadFile, kind: LayerUploadKind): Promise<StagedLayerImage> {
+  const { body, ...rest } = await prepareLayerImage(file, kind);
+  const key = `tmp/layers/${randomUUID()}.webp`;
+  await store.put(key, body);
+  return { key, ...rest };
+}
+
+/** La imagen de capa o de sello validada y en WebP, lista para guardar (spec 017: también los fondos de la biblioteca). */
+export async function prepareLayerImage(file: UploadFile, kind: LayerUploadKind): Promise<Omit<StagedLayerImage, "key"> & { body: Buffer }> {
   if (!(ALLOWED_UPLOAD_TYPES as readonly string[]).includes(file.mime)) {
     throw new AdminError("unsupported_type", "Formato no admitido: sube PNG, JPEG o WebP.");
   }
@@ -52,10 +60,8 @@ export async function stageLayerImage(store: CardStore, file: UploadFile, kind: 
   } else {
     out = await sharp(file.body).rotate().resize({ width: Math.min(width, SEAL_MAX_WIDTH), withoutEnlargement: true }).webp({ quality: 90, alphaQuality: 90 }).toBuffer();
   }
-  const key = `tmp/layers/${randomUUID()}.webp`;
-  await store.put(key, out);
   const stored = await sharp(out).metadata();
-  return { key, width: stored.width ?? 0, height: stored.height ?? 0, scaled };
+  return { body: out, width: stored.width ?? 0, height: stored.height ?? 0, scaled };
 }
 
 /** Spec 016 (RNF): lo que lleva más de 24 h en el área temporal no se guardó nunca; se borra. Devuelve cuántas. */

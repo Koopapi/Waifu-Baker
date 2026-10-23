@@ -62,6 +62,7 @@ export const errors: Record<string, Msg> = {
       pack: "Ese sobre no existe.",
       card: "La carta no existe.",
       selected_cards: "Alguna de las cartas seleccionadas ya no existe.",
+      background: "El fondo no existe.",
     })[String(p.entity)] ?? "No se encontró lo que buscabas.",
   stale_version: (p) => {
     if (p.entity === "set") {
@@ -150,6 +151,8 @@ export const errors: Record<string, Msg> = {
   character_required: "La chica no se puede quitar ni ocultar; puedes sustituirla.",
   character_type: "La chica debe subirse en PNG o WebP (con transparencia).",
   character_too_short: (p) => `La imagen mide ${p.height} px de alto; el mínimo es ${p.min} px.`,
+  duplicate_background: (p) => `Este fondo ya está en la biblioteca («${p.name}»).`,
+  background_in_use: (p) => `Este fondo lo usan ${p.count} ${plural(Number(p.count), "carta", "cartas")}: cámbialo en ellas antes de quitarlo.`,
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,

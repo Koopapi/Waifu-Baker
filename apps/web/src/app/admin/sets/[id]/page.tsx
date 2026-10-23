@@ -9,6 +9,8 @@ import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
+import { BackgroundsLibrary } from "@/features/admin/sets/BackgroundsLibrary";
+import { listSetBackgrounds } from "@/server/services/set-backgrounds";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
@@ -27,7 +29,7 @@ import { EditSetForm } from "../forms";
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters, packArts] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id])]);
+  const [overview, characters, packArts, backgrounds] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listSetBackgrounds(db, id)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -99,6 +101,8 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
       >
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
       </Card>
+
+      <BackgroundsLibrary setId={set.id} backgrounds={backgrounds.map((b) => ({ id: b.id, name: b.name, uses: b.uses, url: assetUrl(b.key)! }))} />
 
       <Card title={t.pack.title}>
         <PackSettings

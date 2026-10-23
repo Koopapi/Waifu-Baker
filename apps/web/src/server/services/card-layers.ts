@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { cards } from "@/db/schema";
 import { settleAutoStyle } from "@/domain/cards/layers-rarity";
-import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
+import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetBackgroundKey, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
@@ -52,7 +52,7 @@ async function settleKeys(store: CardStore, setId: string, config: LayersConfig)
   const map = new Map<string, string>();
   const temps: string[] = [];
   for (const key of new Set(imageKeys(config))) {
-    if (isSetLayerKey(setId, key)) {
+    if (isSetLayerKey(setId, key) || isSetBackgroundKey(setId, key)) {
       if (!(await store.get(key))) throw new AdminError("layer_missing", "Una de las capas ya no está disponible.");
       map.set(key, key);
     } else if (isTempKey(key)) {
@@ -71,8 +71,12 @@ async function settleKeys(store: CardStore, setId: string, config: LayersConfig)
   return { config: { ...config, capas, sello }, temps };
 }
 
-/** Borra las imágenes de capa que ya no usa ninguna carta de la colección (vigente ni pendiente). */
-export async function releaseLayerImages(db: DbLike, store: CardStore, setId: string, candidates: string[]) {
+/**
+ * Borra las imágenes de capa que ya no usa ninguna carta de la colección (vigente ni pendiente). Los fondos de la
+ * biblioteca (spec 017) no: se quitan desde la biblioteca.
+ */
+export async function releaseLayerImages(db: DbLike, store: CardStore, setId: string, keys: string[]) {
+  const candidates = keys.filter((k) => !isSetBackgroundKey(setId, k));
   if (candidates.length === 0) return;
   const rows = await db.select({ layers: cards.layers, pending: cards.layersPending }).from(cards).where(eq(cards.setId, setId));
   const used = new Set(rows.flatMap((r) => [...imageKeys(r.layers), ...imageKeys(r.pending)]));

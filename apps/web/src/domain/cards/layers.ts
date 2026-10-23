@@ -29,6 +29,9 @@ export type BlendMode = (typeof BLEND_MODES)[number];
 export const layerKey = (setId: string, sha: string) => `sets/${setId}/layers/${sha}.webp`;
 export const isTempKey = (key: string) => /^tmp\/layers\/[0-9a-f-]{36}\.webp$/.test(key);
 export const isSetLayerKey = (setId: string, key: string) => key.startsWith(`sets/${setId}/layers/`) && /\/[0-9a-f]{64}\.webp$/.test(key);
+/** Spec 017: fondos de la biblioteca de la colección; las cartas los usan con su clave, sin copiarlos. */
+export const backgroundKey = (setId: string, sha: string) => `sets/${setId}/backgrounds/${sha}.webp`;
+export const isSetBackgroundKey = (setId: string, key: string) => key.startsWith(`sets/${setId}/backgrounds/`) && /\/[0-9a-f]{64}\.webp$/.test(key);
 
 const num = (min: number, max: number) => z.number().finite().min(min).max(max);
 

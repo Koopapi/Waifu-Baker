@@ -52,4 +52,17 @@ export const adminLayers: typeof en = {
   forceSave: "Guardar de todos modos",
   confirmForce: "Sus cambios se sustituirán por los tuyos. Queda registrado en la auditoría.",
   unsaved: "Cambios sin guardar",
+  backgrounds: {
+    title: "Fondos de la colección",
+    intro: "Fondos para elegir al armar las cartas de esta colección. Proporción del lienzo (700 × 991); otro tamaño con la misma proporción se escala solo.",
+    upload: "Subir fondos",
+    uploaded: (name: string) => `${name}: listo.`,
+    empty: "Todavía no hay fondos en la biblioteca.",
+    inUse: (n: number) => `En ${n} ${n === 1 ? "carta" : "cartas"} · no se puede quitar`,
+    unused: "Sin usar",
+    remove: (name: string) => `Quitar el fondo ${name}`,
+    confirmRemove: (name: string) => `Se borra «${name}» de la biblioteca.`,
+    removed: "Fondo quitado.",
+    removeShort: "Quitar",
+  },
 };

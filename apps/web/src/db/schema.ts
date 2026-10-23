@@ -143,6 +143,25 @@ export const cards = pgTable(
   ],
 );
 
+/**
+ * Spec 017, RF-6 a RF-9: biblioteca de fondos de una colección. La imagen vive en `sets/<setId>/backgrounds/<sha>.webp`;
+ * un fondo está «en uso» si su clave aparece en la configuración por capas de alguna carta de la colección.
+ */
+export const setBackgrounds = pgTable(
+  "set_backgrounds",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    setId: uuid("set_id")
+      .notNull()
+      .references(() => sets.id, { onDelete: "cascade" }),
+    key: text("key").notNull(),
+    sha256: text("sha256").notNull(),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("set_backgrounds_set_sha_uq").on(t.setId, t.sha256)],
+);
+
 export const dropTables = pgTable(
   "drop_tables",
   {

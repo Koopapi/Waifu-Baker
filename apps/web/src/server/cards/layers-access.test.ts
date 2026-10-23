@@ -1,5 +1,5 @@
 // Spec 016, RF-1 y RF-4: las capas solo se tocan desde el panel. Las rutas responden 404 a quien no es administrador
-// y la configuración por capas solo se lee en código del panel (el coleccionista la verá con la spec 017).
+// y la configuración por capas solo se lee en código del panel (el coleccionista la verá con la spec 018).
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -14,9 +14,9 @@ function walk(dir: string): string[] {
   });
 }
 
-const ROUTES = ["app/api/admin/cards/[id]/layers/route.ts", "app/api/admin/layer-uploads/route.ts"];
-/** Donde se puede leer la configuración por capas en esta spec: el esquema, el servicio del panel y el panel. */
-const ALLOWED = [/^db\/schema\.ts$/, /^server\/services\/card-layers\.ts$/, /^app\/admin\//, /^app\/api\/admin\//, /^features\/admin\//];
+const ROUTES = ["app/api/admin/cards/[id]/layers/route.ts", "app/api/admin/layer-uploads/route.ts", "app/api/admin/sets/[id]/backgrounds/route.ts"];
+/** Donde se puede leer la configuración por capas: el esquema, los servicios del panel (capas y fondos) y el panel. */
+const ALLOWED = [/^db\/schema\.ts$/, /^server\/services\/card-layers\.ts$/, /^server\/services\/set-backgrounds\.ts$/, /^app\/admin\//, /^app\/api\/admin\//, /^features\/admin\//];
 
 describe("spec 016 — acceso a las capas", () => {
   it("test_s016_rf1_las_rutas_de_capas_exigen_administrador_y_responden_404_al_resto", () => {

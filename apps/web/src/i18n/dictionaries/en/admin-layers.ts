@@ -53,4 +53,17 @@ export const adminLayers = {
   forceSave: "Save anyway",
   confirmForce: "Their changes will be replaced by yours. This is recorded in the audit log.",
   unsaved: "Unsaved changes",
+  backgrounds: {
+    title: "Set backgrounds",
+    intro: "Backgrounds to choose from when assembling this set's cards. Canvas ratio (700 × 991); other sizes with the same ratio are scaled automatically.",
+    upload: "Upload backgrounds",
+    uploaded: (name: string) => `${name}: ready.`,
+    empty: "There are no backgrounds in the library yet.",
+    inUse: (n: number) => `Used by ${n} ${n === 1 ? "card" : "cards"} · can't be removed`,
+    unused: "Unused",
+    remove: (name: string) => `Remove background ${name}`,
+    confirmRemove: (name: string) => `"${name}" will be deleted from the library.`,
+    removed: "Background removed.",
+    removeShort: "Remove",
+  },
 };

@@ -62,6 +62,7 @@ export const errors: Record<string, Msg> = {
       pack: "That pack doesn't exist.",
       card: "This card doesn't exist.",
       selected_cards: "Some of the selected cards no longer exist.",
+      background: "This background doesn't exist.",
     })[String(p.entity)] ?? "Not found.",
   stale_version: (p) => {
     if (p.entity === "set") {
@@ -149,6 +150,8 @@ export const errors: Record<string, Msg> = {
   character_required: "The girl can't be removed or hidden; you can replace her.",
   character_type: "Upload the girl as PNG or WebP (with transparency).",
   character_too_short: (p) => `The image is ${p.height} px tall; the minimum is ${p.min} px.`,
+  duplicate_background: (p) => `This background is already in the library ("${p.name}").`,
+  background_in_use: (p) => `${p.count} ${Number(p.count) === 1 ? "card uses" : "cards use"} this background: change it on them before removing it.`,
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>
