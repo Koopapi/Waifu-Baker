@@ -160,6 +160,13 @@
   function clamp(v) { return Math.max(-1, Math.min(1, v)); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function num(v, d) { v = Number(v); return isFinite(v) ? v : d; }
+  // Lo que va dentro de `style` o de atributos solo puede ser de una lista cerrada (la config puede venir de la BD).
+  var MEZCLAS = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light',
+    'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity', 'plus-lighter'];
+  var ESQUINAS = ['sup-izq', 'sup-der', 'inf-izq', 'inf-der'];
+  function mezclaSegura(m) { return MEZCLAS.indexOf(m) >= 0 ? m : 'normal'; }
+  function esquinaSegura(e) { return ESQUINAS.indexOf(e) >= 0 ? e : 'sup-izq'; }
+  function colorSeguro(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : null; }
 
   function particulasHTML(c, semilla) {
     var p = PARTICULAS[c.particulas] || PARTICULAS['destellos-dorados'];
@@ -167,7 +174,7 @@
     function r() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
     var n = Math.max(0, Math.min(200, Math.round(num(c.cantidad, p.cantidad) * (c._factor || 1))));
     var t = Math.max(.2, num(c.tamano, 1)), v = Math.max(.2, num(c.velocidad, 1));
-    var colores = c.color ? [c.color] : p.colores, h = '';
+    var colores = colorSeguro(c.color) ? [c.color] : p.colores, h = '';
     for (var i = 0; i < n; i++) {
       var forma = p.formas.length > 1 ? (r() < .42 ? p.formas[0] : p.formas[1]) : p.formas[0];
       var tm = TAM[forma], du = DUR[p.anim];
@@ -199,7 +206,7 @@
 
     function capaHTML(c, i) {
       var estilo = 'inset:-' + num(c.margen, 0) + '%;' +
-        (c.mezcla && c.mezcla !== 'normal' ? 'mix-blend-mode:' + c.mezcla + ';' : '') +
+        (mezclaSegura(c.mezcla) !== 'normal' ? 'mix-blend-mode:' + mezclaSegura(c.mezcla) + ';' : '') +
         (c.opacidad != null && c.opacidad !== 1 ? 'opacity:' + num(c.opacidad, 1) + ';' : '');
       var prof = c.profundidad == null ? 1 : num(c.profundidad, 1);
       var tipo = c.particulas || (c.destellos ? 'destellos-dorados' : null);
@@ -214,7 +221,7 @@
     function selloHTML() {
       var s = op.sello;
       if (!s || (!s.src && !s.texto)) return '';
-      var esq = s.esquina || 'sup-izq';
+      var esq = esquinaSegura(s.esquina);
       if (s.src) {
         var rc = s.recorte, img;
         if (rc && rc.length === 4 && rc[2] > 0 && rc[3] > 0) {
@@ -414,7 +421,7 @@
     return montar(el, desdeRareza(rareza, imagen, extra));
   }
 
-  var api = { montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
+  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
   global.CartaCapas = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : {});
