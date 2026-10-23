@@ -1,6 +1,7 @@
 # Spec 017 — Armado de cartas por capas
 
-Estado: aprobada por el dueño el 23 oct 2026.
+Estado: aprobada por el dueño el 23 oct 2026. **Ampliación del 23 oct 2026 pendiente de aprobación**: la biblioteca de
+fondos de cada colección pasa a ser una biblioteca general de elementos (RF-6 a RF-9 reescritos y RF-21 nuevo).
 
 ## Contexto y objetivo
 La spec 016 llevó al panel el editor de cartas por capas de Bruno. Al aprobarlo, el dueño decidió que **todas las
@@ -9,8 +10,8 @@ chica recortada, sin fondo** (PNG con transparencia), y alrededor se arma el fon
 sello. El dueño y Bruno arman cada carta a mano antes de lanzar una colección; las ilustraciones que hay hoy en el
 sistema son material de prueba que se recortará fuera (Photoshop u otra herramienta).
 
-Esta spec hace que las cartas se **creen y se armen** así en el panel: subir la chica crea la carta, los fondos salen de
-una biblioteca de la colección o de uno propio de la carta, cada capa se puede mover, escalar y girar, el estilo sigue a
+Esta spec hace que las cartas se **creen y se armen** así en el panel: subir la chica crea la carta, los fondos, sellos,
+adornos y partículas salen de una biblioteca general de elementos (o son propios de la carta), cada capa se puede mover, escalar y girar, el estilo sigue a
 la rareza mientras nadie lo toque, y una colección solo se publica con todas sus cartas armadas. El proyecto aún no está
 en producción: no hay conversión de cartas antiguas ni periodo de transición. Lo que ve el coleccionista (la carta por
 capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo, probabilidades ni concesiones.
@@ -29,8 +30,12 @@ capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo
 
 ## Vocabulario
 - **Imagen de la chica (personaje)**: la ilustración recortada, con transparencia, que es el centro de la carta.
-- **Fondo**: capa de imagen que va detrás del personaje; sale de la biblioteca de la colección o es propio de la carta.
-- **Biblioteca de fondos**: los fondos subidos a una colección para elegirlos al armar sus cartas.
+- **Fondo**: capa de imagen que va detrás del personaje; sale de la biblioteca o es propio de la carta.
+- **Capa de adorno**: cualquier otra capa de imagen del lienzo (insignias, destellos, texturas, marcos extra), delante o
+  detrás de la chica.
+- **Partículas guardadas**: una configuración de partículas (tipo, cantidad, tamaño, velocidad, color) con nombre.
+- **Biblioteca de elementos**: fondos, sellos de imagen, capas de adorno y partículas guardadas, comunes a todas las
+  colecciones, para reutilizarlos al armar cualquier carta.
 - **Carta armada**: tiene una capa de personaje visible y un fondo visible.
 - **Encuadre de una capa**: su posición (x, y), su escala y su giro dentro del lienzo, además de la profundidad, el
   margen, la mezcla y la opacidad de la spec 016.
@@ -52,14 +57,21 @@ capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo
 - RF-5: EL SISTEMA no permitirá quitar la capa de personaje de una carta ni dejarla sin ninguna capa visible (sustituye
   a la spec 016, RF-14: ninguna carta vuelve al montaje con el marco de Pencil).
 
-### Fondos
-- RF-6: EL SISTEMA permitirá subir fondos a la biblioteca de una colección, verlos y quitarlos.
-- RF-7: EL SISTEMA aplicará a los fondos las reglas de las capas de imagen de la spec 016 (formato, peso, proporción
-  del lienzo con escalado, WebP).
-- RF-8: CUANDO el administrador arme una carta, EL SISTEMA le permitirá elegir un fondo de la biblioteca de su colección
-  o subir uno propio para esa carta.
-- RF-9: SI un fondo de la biblioteca está en uso, ENTONCES EL SISTEMA no permitirá quitarlo e indicará cuántas cartas lo
-  usan.
+### Biblioteca de elementos
+- RF-6: EL SISTEMA tendrá una biblioteca de elementos común a todas las colecciones, con cuatro tipos (fondos, sellos de
+  imagen, capas de adorno y partículas guardadas), y permitirá agregar elementos con un nombre, verlos por tipo,
+  renombrarlos y quitarlos.
+- RF-7: EL SISTEMA aplicará a los fondos y a las capas de adorno las reglas de las capas de imagen de la spec 016
+  (formato, peso, proporción del lienzo con escalado, WebP) y a los sellos las del sello de imagen (spec 016, RF-23); la
+  misma imagen no se guardará dos veces.
+- RF-8: CUANDO el administrador arme una carta, EL SISTEMA le permitirá tomar de la biblioteca su fondo, su sello y
+  capas de adorno y partículas guardadas, o subir los suyos propios para esa carta.
+- RF-9: SI una imagen de la biblioteca está en uso, ENTONCES EL SISTEMA no permitirá quitarla e indicará cuántas cartas
+  la usan y de qué colecciones. Las partículas guardadas se copian a la carta al usarlas: cambiarlas o quitarlas de la
+  biblioteca no cambia ninguna carta.
+- RF-21: CUANDO el administrador elija «Guardar en la biblioteca» en el fondo, el sello de imagen, una capa de adorno o
+  una capa de partículas de una carta, EL SISTEMA la agregará a la biblioteca con un nombre y su tipo; SI esa imagen ya
+  está en la biblioteca, ENTONCES avisará y no la duplicará.
 
 ### Encuadre
 - RF-10: EL SISTEMA permitirá mover, escalar y girar cada capa de imagen en el editor, arrastrando sobre la vista
@@ -98,12 +110,15 @@ capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo
 - Las capas y fondos solo se sirven al administrador (spec 016, RF-4) hasta la spec 018.
 - Textos nuevos en inglés y español, en el diccionario del panel (no en el general).
 - Peso: ninguna página del coleccionista crece (`pnpm budget`).
-- Sistema de diseño: el editor ampliado y la biblioteca de fondos usan componentes de `ui/` y tienen su maqueta en Pencil.
+- Sistema de diseño: el editor ampliado y la biblioteca de elementos usan componentes de `ui/` y tienen su maqueta en
+  Pencil.
 
 ## Casos límite
 - Imagen de chica sin transparencia (sin recortar): se acepta con aviso (RF-3).
 - Chica muy pequeña o muy grande para la carta: se ajusta con la escala (RF-10, RF-11).
-- Fondo de la biblioteca en uso: no se quita (RF-9).
+- Imagen de la biblioteca en uso (en cualquier colección): no se quita (RF-9).
+- Guardar en la biblioteca una imagen que ya está: se avisa y no se duplica (RF-7, RF-21).
+- Partículas guardadas que se cambian después: las cartas que ya las usan no cambian (RF-9).
 - Colección con una carta sin fondo: no se publica (RF-15).
 - Importación con más de 8 capas de imagen: se rechaza (RF-18).
 
@@ -116,14 +131,17 @@ capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo
 
 ## Criterios de finalización
 Cada RF con su test en verde y la suite completa en verde; E2E del panel en escritorio: subir una chica recortada y ver
-la carta creada, elegir un fondo de la biblioteca y uno propio, encuadrar a la chica, cambiar la rareza con estilo
+la carta creada, agregar elementos de los cuatro tipos a la biblioteca (subiéndolos y desde una carta), armar una carta
+con fondo, sello, adorno y partículas de la biblioteca y con un fondo propio, encuadrar a la chica, cambiar la rareza con estilo
 automático, intentar publicar con una carta sin armar, exportar e importar; la demo arranca con sus cartas armadas;
 `pnpm budget` sin cambios en el coleccionista; demo manual del dueño.
 
 ## Decisiones (23 oct 2026)
 - Todas las cartas son cartas por capas (sistema de Bruno); el dueño y Bruno las arman a mano antes de lanzar.
 - La imagen central es la chica recortada sin fondo; el recorte se hace fuera del panel.
-- Fondos: biblioteca por colección y, si hace falta, uno propio por carta.
+- Fondos: biblioteca por colección y, si hace falta, uno propio por carta. **Ampliado el mismo día**: una biblioteca
+  general de elementos (fondos, sellos de imagen, capas de adorno y partículas guardadas) común a todas las colecciones;
+  se agregan desde su página y con «Guardar en la biblioteca» desde una carta.
 - Encuadre: mover, escalar y girar cada capa.
 - No se publica una colección con cartas sin armar.
 - Sin conversión de cartas antiguas ni transición: el proyecto aún no está en producción.
