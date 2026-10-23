@@ -1,6 +1,6 @@
 # Spec 017 — Armado de cartas por capas
 
-Estado: aprobada por el dueño el 23 oct 2026. **Ampliación del 23 oct 2026 pendiente de aprobación**: la biblioteca de
+Estado: aprobada por el dueño el 23 oct 2026. Ampliación aprobada el mismo día, con sus maquetas: la biblioteca de
 fondos de cada colección pasa a ser una biblioteca general de elementos (RF-6 a RF-9 reescritos y RF-21 nuevo).
 
 ## Contexto y objetivo
