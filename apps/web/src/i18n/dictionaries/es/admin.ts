@@ -194,6 +194,7 @@ export const admin: typeof en = {
     regenerate: "Regenerar imágenes",
     updated: (n) => `${n} ${plural(n, "carta actualizada", "cartas actualizadas")}.`,
     saved: "Carta guardada.",
+    layersSealReview: (n) => (n === 1 ? "Tiene un sello de imagen en sus capas: revisa que siga encajando con la rareza nueva." : `${n} cartas tienen un sello de imagen en sus capas: revisa que siga encajando con la rareza nueva.`),
     orderSaved: "Orden guardado.",
     deleted: "Carta eliminada.",
     regenerated: (n) => `${n} ${plural(n, "carta regenerada", "cartas regeneradas")} con el marco actual.`,
@@ -371,6 +372,7 @@ export const admin: typeof en = {
     reasonHint: "Queda en el historial: soporte, sorteo, compensación…",
     gifted: (n) => `${n} ${plural(n, "sobre regalado", "sobres regalados")}.`,
   },
+  // Spec 016: editor de cartas por capas.
   api: {
     missingSetOrFile: "Falta la colección o el archivo.",
     missingFileOrVersion: "Falta el archivo o la versión de la carta.",
