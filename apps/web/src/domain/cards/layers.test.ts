@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BLEND_MODES, DEFAULT_FRAMING, characterLayer, checkCharacterSize, checkLayerSize, checkLayersConfig, framingOf, imageKeys, isAssembled, isSetLayerKey, isTempKey, missingParts, repeatedImages, resetFraming, type ImageLayer, type LayersConfig } from "./layers";
+import { BLEND_MODES, DEFAULT_FRAMING, characterLayer, checkCharacterSize, checkLayerSize, checkLayersConfig, framingOf, imageKeys, isAssembled, isSetLayerKey, isTempKey, missingParts, repeatedImages, resetFraming, setBackground, type ImageLayer, type LayersConfig } from "./layers";
 
 const img = (n: number, extra: Record<string, unknown> = {}) => ({ key: `sets/s1/layers/${String(n).padStart(64, "0")}.webp`, ...extra });
 const base = (capas: unknown[], extra: Record<string, unknown> = {}) => ({ capas, marco: "ssr", sello: null, ...extra });
@@ -149,5 +149,23 @@ describe("spec 017 — tamaño de la imagen de la chica", () => {
     expect(checkCharacterSize(400, 990)).toEqual({ ok: false, code: "character_too_short", min: 991 });
     expect(checkCharacterSize(400, 991)).toEqual({ ok: true });
     expect(checkCharacterSize(3000, 1000)).toEqual({ ok: true });
+  });
+});
+
+describe("spec 017 — elegir el fondo", () => {
+  const parse = (input: unknown) => (checkLayersConfig(input) as { ok: true; config: LayersConfig }).config;
+
+  it("test_s017_rf8_poner_un_fondo_lo_coloca_detras_de_todo", () => {
+    const c = parse(base([img(1, { rol: "personaje" })]));
+    const out = setBackground(c, "sets/s1/backgrounds/x.webp");
+    expect(out.capas[0]).toMatchObject({ key: "sets/s1/backgrounds/x.webp", rol: "fondo", profundidad: 0.2, margen: 5 });
+    expect(out.capas[1]).toEqual(c.capas[0]);
+  });
+
+  it("test_s017_rf8_cambiar_el_fondo_conserva_sus_ajustes", () => {
+    const c = parse(base([img(2, { rol: "fondo", profundidad: 0.1, encuadre: { escala: 1.2 } }), img(1, { rol: "personaje" })]));
+    const out = setBackground(c, "sets/s1/backgrounds/y.webp");
+    expect(out.capas[0]).toEqual({ key: "sets/s1/backgrounds/y.webp", rol: "fondo", profundidad: 0.1, encuadre: { escala: 1.2 } });
+    expect(out.capas).toHaveLength(2);
   });
 });

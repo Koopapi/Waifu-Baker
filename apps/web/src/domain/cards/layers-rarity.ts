@@ -61,13 +61,14 @@ export function retierLayers(config: LayersConfig, tier: RarityTier): { config: 
 const styleOf = (c: LayersConfig) => JSON.stringify([c.marco, c.sello, c.holo ?? false, c.capas.filter((l: Layer) => !isImageLayer(l))]);
 
 /**
- * Spec 017, RF-14: al guardar, si el administrador cambió a mano el marco, las partículas o el sello, la carta deja de
- * tener estilo automático; una vez apagado, no vuelve solo.
+ * Spec 017, RF-13 y RF-14: al guardar, si el administrador cambió a mano el marco, las partículas o el sello, la carta
+ * deja de tener estilo automático; una vez apagado, solo vuelve si se aplica el estilo del escalón (`tier`) tal cual.
  */
-export function settleAutoStyle(previous: LayersConfig | null | undefined, next: LayersConfig): LayersConfig {
+export function settleAutoStyle(previous: LayersConfig | null | undefined, next: LayersConfig, tier?: RarityTier): LayersConfig {
   if (!previous || !next.estiloAuto) return next;
-  const keep = Boolean(previous.estiloAuto) && styleOf(previous) === styleOf(next);
-  return { ...next, estiloAuto: keep };
+  const untouched = Boolean(previous.estiloAuto) && styleOf(previous) === styleOf(next);
+  const isPreset = tier !== undefined && styleOf(applyTierStyle(next, tier, particleSeed(next))) === styleOf(next);
+  return { ...next, estiloAuto: untouched || isPreset };
 }
 
 /** Spec 017, RF-1: la carta recién creada con la chica: centrada, entera, y con el estilo automático de su escalón. */

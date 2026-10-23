@@ -19,7 +19,7 @@
 - [x] **T6 — Crear carta desde la chica** (subida del panel) y sustituirla conservando el encuadre · RF-1, RF-4 ·
   Depende de T2 y T4.
 - [x] **T7 — Biblioteca de fondos**: migración `0012`, servicio, API y sección en la colección · RF-6, RF-7, RF-9.
-- [ ] **T8 — Editor**: elegir fondo, encuadre (arrastrar, numérico, teclado, restablecer), no quitar el personaje,
+- [x] **T8 — Editor**: elegir fondo, encuadre (arrastrar, numérico, teclado, restablecer), no quitar el personaje,
   estilo automático al tocar marco/partículas/sello · RF-5, RF-8, RF-10, RF-11, RF-14 · Depende de T3 y T7. Incluye
   adaptar `e2e/card-layers.spec.ts` (la carta ya nace con la chica como capa).
 - [ ] **T9 — Crear desde capas** · RF-11 (crear), RF-16.

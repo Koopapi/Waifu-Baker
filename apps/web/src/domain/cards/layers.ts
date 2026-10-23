@@ -139,6 +139,15 @@ export function resetFraming(l: ImageLayer): ImageLayer {
   return { ...l, encuadre: { ...DEFAULT_FRAMING, ajuste: defaultFit(l) } };
 }
 
+/**
+ * Spec 017, RF-8: pone el fondo de la carta (de la biblioteca o propio). Si ya tenía uno, cambia su imagen y conserva
+ * sus ajustes; si no, va detrás de todo, casi quieto y con margen para el parallax.
+ */
+export function setBackground(c: LayersConfig, key: string): LayersConfig {
+  if (imageLayers(c).some((l) => l.rol === "fondo")) return { ...c, capas: c.capas.map((l) => (isImageLayer(l) && l.rol === "fondo" ? { ...l, key } : l)) };
+  return { ...c, capas: [{ key, rol: "fondo", profundidad: 0.2, margen: 5 }, ...c.capas] };
+}
+
 export type AssemblyPart = "personaje" | "fondo";
 
 /** Spec 017, RF-15: lo que le falta a una carta para estar armada (personaje y fondo visibles). */

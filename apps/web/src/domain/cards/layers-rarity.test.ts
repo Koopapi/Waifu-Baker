@@ -122,3 +122,14 @@ describe("spec 017 — estilo automático", () => {
     expect(settleAutoStyle(null, armada).estiloAuto).toBe(true);
   });
 });
+
+describe("spec 017 — volver al estilo automático", () => {
+  const chica: LayersConfig = { capas: [{ key: key(1), rol: "fondo" }, { key: key(2), rol: "personaje" }], marco: "n", sello: { texto: "X", estilo: "oro", esquina: "inf-der" }, estiloAuto: false };
+
+  it("test_s017_rf13_aplicar_el_estilo_de_la_rareza_vuelve_a_activar_el_automatico", () => {
+    const reapplied = { ...applyTierStyle(chica, "ssr", 5), estiloAuto: true };
+    expect(settleAutoStyle(chica, reapplied, "ssr").estiloAuto).toBe(true);
+    // Si después de aplicarlo se toca algo del estilo, ya no es el del escalón.
+    expect(settleAutoStyle(chica, { ...reapplied, marco: "ur" }, "ssr").estiloAuto).toBe(false);
+  });
+});

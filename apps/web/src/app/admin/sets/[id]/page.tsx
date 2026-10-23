@@ -161,7 +161,13 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           </div>
         )}
         <Dropzone setId={set.id} disabled={!perms.canAdd} />
-        <CardWorkspace setId={set.id} cards={cards} characters={characters.map((c) => ({ id: c.id, name: c.name }))} perms={perms} />
+        <CardWorkspace
+          setId={set.id}
+          cards={cards}
+          characters={characters.map((c) => ({ id: c.id, name: c.name }))}
+          backgrounds={backgrounds.map((b) => ({ key: b.key, name: b.name, url: assetUrl(b.key)! }))}
+          perms={perms}
+        />
       </section>
     </div>
   );

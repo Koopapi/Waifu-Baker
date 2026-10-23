@@ -57,6 +57,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await expect(page.locator(`text=Subida terminada · ${IMAGES.length} correctas`)).toBeVisible({ timeout: 90_000 });
     await expect(page.locator("[data-card-tile]")).toHaveCount(IMAGES.length);
     await expect(page.locator('[data-testid="upload-list"] li').first()).toContainText("Carta 001");
+    // Spec 017, RF-3: las imágenes de prueba no tienen transparencia; las cartas se crean con el aviso.
+    await expect(page.locator('[data-testid="upload-uncut"]')).toHaveCount(IMAGES.length);
   });
 
   await test.step("RF-14: asignar personaje y rareza en lote", async () => {
