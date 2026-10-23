@@ -145,6 +145,8 @@ export const errors: Record<string, Msg> = {
   invalid_layers: (p) => `The layer setup is not valid${p.path ? ` (${p.path})` : ""}.`,
   layer_missing: "One of the layers is no longer available: upload it again.",
   layers_required: "This card was created from layers and has no original image: it needs at least one visible image layer.",
+  two_characters: "A card can only have one girl (character layer).",
+  character_required: "The girl can't be removed or hidden; you can replace her.",
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>

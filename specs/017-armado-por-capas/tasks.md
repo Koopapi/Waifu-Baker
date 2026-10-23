@@ -1,13 +1,15 @@
 # Tareas 017 — Armado de cartas por capas
 
 ## Entrega 1 — Maquetas (aprobación del dueño)
-- [ ] **T1 — Maquetas en Pencil**: editor con encuadre (arrastrar, escala, giro, restablecer), selector de fondo
+- [x] **T1 — Maquetas en Pencil**: editor con encuadre (arrastrar, escala, giro, restablecer), selector de fondo
   (biblioteca o propio), biblioteca de fondos de la colección, aviso de imagen sin recortar y publicación bloqueada con
-  la lista de cartas sin armar · RF-3, RF-6 a RF-11, RF-15 · Hecho cuando: el dueño las aprueba.
+  la lista de cartas sin armar · RF-3, RF-6 a RF-11, RF-15 · Hecho: aprobadas por el dueño el 23 oct 2026 (hoja
+  «Armado de cartas por capas (spec 017)» de `waifubaker.pen`).
 
 ## Entrega 2 — Base
-- [ ] **T2 — Dominio**: `rol`, `encuadre`, `estiloAuto`, `isAssembled`, no quitar el personaje · RF-5, RF-10, RF-11,
-  RF-15 · Hecho cuando: tests de unidad en verde.
+- [x] **T2 — Dominio**: `rol`, `encuadre`, `estiloAuto`, `isAssembled`, no quitar el personaje · RF-5, RF-10, RF-11,
+  RF-15 · Hecho: tests de unidad en verde; el servicio de guardado rechaza quitar u ocultar a la chica y
+  dos personajes (tests de integración).
 - [ ] **T3 — Encuadre en `carta-capas.js`** (en la imagen, con `ajuste`) y tipos · RF-12 · Hecho cuando: test de que el
   HTML lleva el `transform` en la imagen y la capa conserva el parallax; configuraciones antiguas sin cambios.
 - [ ] **T4 — Imagen de la chica**: validación y detección de «sin recortar» · RF-2, RF-3.

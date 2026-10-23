@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { cards } from "@/db/schema";
-import { checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
+import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
@@ -28,12 +28,18 @@ function staleVersion() {
   return new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.", { entity: "card" });
 }
 
-/** RF-17, RF-36, RF-37: traduce el veredicto del dominio a un error de negocio. */
-function validConfig(input: unknown): LayersConfig {
-  const v = checkLayersConfig(input);
+function characterRequired() {
+  return new AdminError("character_required", "La chica (capa de personaje) no se puede quitar ni ocultar; puedes sustituirla.");
+}
+
+/** RF-17, RF-36, RF-37 y spec 017, RF-5: traduce el veredicto del dominio a un error de negocio. */
+function validConfig(input: unknown, previous?: LayersConfig | null): LayersConfig {
+  const v = checkLayersConfig(input, previous);
   if (v.ok) return v.config;
   if (v.issue.code === "too_many_layers") throw new AdminError("too_many_layers", `Una carta admite como mucho ${v.issue.max} capas de imagen.`, { max: v.issue.max });
   if (v.issue.code === "no_visible_layer") throw new AdminError("no_visible_layer", "Hace falta al menos una capa de imagen visible.");
+  if (v.issue.code === "two_characters") throw new AdminError("two_characters", "Una carta solo puede tener una chica (capa de personaje).");
+  if (v.issue.code === "character_required") throw characterRequired();
   throw new AdminError("invalid_layers", "La configuración de capas no es válida.", { path: v.issue.path });
 }
 
@@ -86,6 +92,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
     if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
     if (cur.version !== input.expectedVersion && !input.force) throw staleVersion();
+    validConfig(requested, cur.layers);
     setId = cur.setId;
     const settled = await settleKeys(store, cur.setId, requested);
     temps = settled.temps;
@@ -112,7 +119,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
 
 /**
  * RF-18, RF-67 y RF-68: quita todas las capas. Una carta con imagen original vuelve a verse con ella; una carta creada
- * desde capas no tiene original y no puede quedarse sin capas.
+ * desde capas no tiene original y no puede quedarse sin capas. Spec 017, RF-5: una carta con chica tampoco.
  */
 export async function removeCardLayers(db: DbLike, store: CardStore, actorUserId: string, cardId: string, input: { expectedVersion: number; force?: boolean }) {
   let previous: LayersConfig | null = null;
@@ -121,6 +128,7 @@ export async function removeCardLayers(db: DbLike, store: CardStore, actorUserId
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
     if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
     if (cur.version !== input.expectedVersion && !input.force) throw staleVersion();
+    if (cur.layers && characterLayer(cur.layers)) throw characterRequired();
     if (!cur.originalKey) throw new AdminError("layers_required", "Esta carta se creó desde capas: necesita al menos una capa de imagen visible.");
     setId = cur.setId;
     previous = cur.layers;

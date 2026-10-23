@@ -231,3 +231,40 @@ describe("spec 016 — la carta conserva sus datos, colecciones publicadas y cam
     });
   });
 });
+
+describe("spec 017 — el personaje no se quita", () => {
+  const armada = (fondo: string, chica: string, extra: Record<string, unknown> = {}) => ({
+    capas: [{ key: fondo, rol: "fondo" }, { key: chica, rol: "personaje", ...extra }],
+    marco: "sr",
+    sello: null,
+  });
+
+  it("test_s017_rf5_guardar_sin_el_personaje_o_con_el_oculto_se_rechaza", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage } = await setup(tx);
+      const [f, c] = [await stage(10), await stage(200)];
+      const r = await saveCardLayers(tx, store, admin.id, card.id, { config: armada(f, c), expectedVersion: card.version });
+      const fondo = (r.card.layers!.capas[0] as { key: string }).key;
+      await expect(saveCardLayers(tx, store, admin.id, card.id, { config: { capas: [{ key: fondo, rol: "fondo" }], marco: "sr", sello: null }, expectedVersion: r.card.version })).rejects.toMatchObject({ code: "character_required" });
+      const chica = (r.card.layers!.capas[1] as { key: string }).key;
+      await expect(saveCardLayers(tx, store, admin.id, card.id, { config: armada(fondo, chica, { visible: false }), expectedVersion: r.card.version })).rejects.toMatchObject({ code: "character_required" });
+    });
+  });
+
+  it("test_s017_rf5_una_carta_con_personaje_no_puede_quitar_sus_capas", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage, load } = await setup(tx);
+      const r = await saveCardLayers(tx, store, admin.id, card.id, { config: armada(await stage(10), await stage(200)), expectedVersion: card.version });
+      await expect(removeCardLayers(tx, store, admin.id, card.id, { expectedVersion: r.card.version })).rejects.toMatchObject({ code: "character_required" });
+      expect((await load()).layers).not.toBeNull();
+    });
+  });
+
+  it("test_s017_rf5_dos_personajes_en_la_misma_carta_se_rechaza", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage } = await setup(tx);
+      const config = { capas: [{ key: await stage(10), rol: "personaje" }, { key: await stage(200), rol: "personaje" }], marco: "sr", sello: null };
+      await expect(saveCardLayers(tx, store, admin.id, card.id, { config, expectedVersion: card.version })).rejects.toMatchObject({ code: "two_characters" });
+    });
+  });
+});

@@ -32,8 +32,25 @@ export const isSetLayerKey = (setId: string, key: string) => key.startsWith(`set
 
 const num = (min: number, max: number) => z.number().finite().min(min).max(max);
 
+/** Spec 017: papel de una capa de imagen en la carta armada. */
+export const LAYER_ROLES = ["personaje", "fondo", "extra"] as const;
+export type LayerRole = (typeof LAYER_ROLES)[number];
+/** `cubrir` llena el lienzo (fondos); `contener` dibuja la imagen entera (la chica recortada, de cualquier proporción). */
+export const FITS = ["cubrir", "contener"] as const;
+
+/** Spec 017, RF-10 y RF-11: x e y en % del lienzo, escala de 0,1 a 4 y giro en grados. Todo opcional. */
+const framing = z.object({
+  x: num(-100, 100).optional(),
+  y: num(-100, 100).optional(),
+  escala: num(0.1, 4).optional(),
+  giro: num(-180, 180).optional(),
+  ajuste: z.enum(FITS).optional(),
+});
+
 const imageLayer = z.object({
   key: z.string().min(1),
+  rol: z.enum(LAYER_ROLES).optional(),
+  encuadre: framing.optional(),
   profundidad: num(-3, 3).optional(),
   margen: num(0, 30).optional(),
   mezcla: z.enum(BLEND_MODES).optional(),
@@ -76,12 +93,15 @@ export const layersConfigSchema = z.object({
   borde: num(0, 8).optional(),
   sello: z.union([imageSeal, textSeal]).nullable(),
   holo: z.boolean().optional(),
+  /** Spec 017, RF-13: el sistema pone marco, partículas y sello del escalón mientras nadie los toque. */
+  estiloAuto: z.boolean().optional(),
 });
 
 export type ImageLayer = z.infer<typeof imageLayer>;
 export type ParticleLayer = z.infer<typeof particleLayer>;
 export type Layer = ImageLayer | ParticleLayer;
 export type ImageSeal = z.infer<typeof imageSeal>;
+export type Framing = Required<z.infer<typeof framing>>;
 export type TextSeal = z.infer<typeof textSeal>;
 /** Configuración guardada: las imágenes son claves del almacén, nunca URLs. */
 export type LayersConfig = z.infer<typeof layersConfigSchema>;
@@ -102,18 +122,51 @@ export function imageKeys(c: LayersConfig | null | undefined): string[] {
   return keys;
 }
 
+/** Spec 017: la capa de personaje (la chica) de una carta, si la tiene. */
+export const characterLayer = (c: LayersConfig) => imageLayers(c).find((l) => l.rol === "personaje");
+
+export const DEFAULT_FRAMING = { x: 0, y: 0, escala: 1, giro: 0 } as const;
+const defaultFit = (l: ImageLayer) => (l.rol === "personaje" ? "contener" : "cubrir");
+
+/** Spec 017, RF-10: el encuadre completo de una capa, con los valores por defecto de lo que no tenga. */
+export const framingOf = (l: ImageLayer): Framing => ({ ...DEFAULT_FRAMING, ajuste: defaultFit(l), ...l.encuadre });
+
+/** Spec 017, RF-11: la capa vuelve a su encuadre inicial (centrada, al 100 %, sin giro). */
+export function resetFraming(l: ImageLayer): ImageLayer {
+  const { encuadre: _encuadre, ...rest } = l;
+  return { ...rest, encuadre: { ...DEFAULT_FRAMING, ajuste: defaultFit(l) } };
+}
+
+export type AssemblyPart = "personaje" | "fondo";
+
+/** Spec 017, RF-15: lo que le falta a una carta para estar armada (personaje y fondo visibles). */
+export function missingParts(c: LayersConfig | null | undefined): AssemblyPart[] {
+  const visible = c ? imageLayers(c).filter(isVisible) : [];
+  return (["personaje", "fondo"] as const).filter((rol) => !visible.some((l) => l.rol === rol));
+}
+
+export const isAssembled = (c: LayersConfig | null | undefined) => missingParts(c).length === 0;
+
 export type LayersIssue =
   | { code: "invalid_layers"; path: string }
   | { code: "too_many_layers"; max: number }
-  | { code: "no_visible_layer" };
+  | { code: "no_visible_layer" }
+  | { code: "two_characters" }
+  | { code: "character_required" };
 
-/** RF-17, RF-36, RF-37: forma válida, como mucho 8 capas de imagen (las partículas no cuentan) y alguna visible. */
-export function checkLayersConfig(input: unknown): { ok: true; config: LayersConfig } | { ok: false; issue: LayersIssue } {
+/**
+ * RF-17, RF-36, RF-37: forma válida, como mucho 8 capas de imagen (las partículas no cuentan) y alguna visible.
+ * Spec 017, RF-5: como mucho un personaje y, si la carta ya tenía uno (`previous`), no se quita ni se oculta.
+ */
+export function checkLayersConfig(input: unknown, previous?: LayersConfig | null): { ok: true; config: LayersConfig } | { ok: false; issue: LayersIssue } {
   const parsed = layersConfigSchema.safeParse(input);
   if (!parsed.success) return { ok: false, issue: { code: "invalid_layers", path: parsed.error.issues[0]?.path.join(".") ?? "" } };
   const config = parsed.data;
   if (imageLayers(config).length > MAX_IMAGE_LAYERS) return { ok: false, issue: { code: "too_many_layers", max: MAX_IMAGE_LAYERS } };
   if (!imageLayers(config).some(isVisible)) return { ok: false, issue: { code: "no_visible_layer" } };
+  if (imageLayers(config).filter((l) => l.rol === "personaje").length > 1) return { ok: false, issue: { code: "two_characters" } };
+  const character = characterLayer(config);
+  if (previous && characterLayer(previous) && !(character && isVisible(character))) return { ok: false, issue: { code: "character_required" } };
   return { ok: true, config };
 }
 

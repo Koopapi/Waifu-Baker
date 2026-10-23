@@ -146,6 +146,8 @@ export const errors: Record<string, Msg> = {
   invalid_layers: (p) => `La configuración de capas no es válida${p.path ? ` (${p.path})` : ""}.`,
   layer_missing: "Una de las capas ya no está disponible: vuelve a subirla.",
   layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
+  two_characters: "Una carta solo puede tener una chica (capa de personaje).",
+  character_required: "La chica no se puede quitar ni ocultar; puedes sustituirla.",
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,

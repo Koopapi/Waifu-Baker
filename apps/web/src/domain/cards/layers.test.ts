@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BLEND_MODES, checkLayerSize, checkLayersConfig, imageKeys, isSetLayerKey, isTempKey, repeatedImages, type LayersConfig } from "./layers";
+import { BLEND_MODES, DEFAULT_FRAMING, characterLayer, checkLayerSize, checkLayersConfig, framingOf, imageKeys, isAssembled, isSetLayerKey, isTempKey, missingParts, repeatedImages, resetFraming, type ImageLayer, type LayersConfig } from "./layers";
 
 const img = (n: number, extra: Record<string, unknown> = {}) => ({ key: `sets/s1/layers/${String(n).padStart(64, "0")}.webp`, ...extra });
 const base = (capas: unknown[], extra: Record<string, unknown> = {}) => ({ capas, marco: "ssr", sello: null, ...extra });
@@ -79,5 +79,67 @@ describe("spec 016 — capas de partículas", () => {
     expect(checkLayersConfig(base([img(1), { particulas: "petalos", color: "red;x" }])).ok).toBe(false);
     expect(checkLayersConfig(base([img(1), { particulas: "petalos", cantidad: 500 }])).ok).toBe(false);
     expect(checkLayersConfig(base([img(1), { particulas: "no-existe" }])).ok).toBe(false);
+  });
+});
+
+describe("spec 017 — armado por capas", () => {
+  const chica = (extra: Record<string, unknown> = {}) => img(1, { rol: "personaje", ...extra });
+  const fondo = (extra: Record<string, unknown> = {}) => img(2, { rol: "fondo", ...extra });
+  const parse = (input: unknown) => (checkLayersConfig(input) as { ok: true; config: LayersConfig }).config;
+
+  it("test_s017_rf10_cada_capa_de_imagen_lleva_rol_y_encuadre_opcionales", () => {
+    const c = checkLayersConfig(base([fondo(), chica({ encuadre: { x: 10, y: -5, escala: 1.4, giro: 12, ajuste: "contener" } })], { estiloAuto: true }));
+    expect(c.ok).toBe(true);
+    // Las configuraciones de la spec 016 (sin rol ni encuadre) siguen siendo válidas.
+    expect(checkLayersConfig(base([img(1)])).ok).toBe(true);
+    expect(checkLayersConfig(base([img(1, { rol: "jefa" })])).ok).toBe(false);
+    expect(checkLayersConfig(base([chica({ encuadre: { ajuste: "estirar" } })])).ok).toBe(false);
+  });
+
+  it("test_s017_rf11_escala_entre_10_y_400_por_ciento_y_giro_entre_menos_180_y_180", () => {
+    const con = (encuadre: Record<string, unknown>) => checkLayersConfig(base([chica({ encuadre })])).ok;
+    expect(con({ escala: 0.1 })).toBe(true);
+    expect(con({ escala: 4 })).toBe(true);
+    expect(con({ escala: 0.09 })).toBe(false);
+    expect(con({ escala: 4.01 })).toBe(false);
+    expect(con({ giro: -180 })).toBe(true);
+    expect(con({ giro: 181 })).toBe(false);
+    expect(con({ x: 101 })).toBe(false);
+  });
+
+  it("test_s017_rf11_restablecer_el_encuadre_de_una_capa", () => {
+    const c = parse(base([fondo({ encuadre: { x: 30, escala: 2 } }), chica({ encuadre: { x: -20, y: 8, escala: 0.5, giro: 40 } })]));
+    expect(framingOf(c.capas[0] as ImageLayer)).toEqual({ x: 30, y: 0, escala: 2, giro: 0, ajuste: "cubrir" });
+    const [f, p] = c.capas.map((l) => resetFraming(l as ImageLayer));
+    // El personaje se dibuja entero (contener); el fondo cubre el lienzo.
+    expect(framingOf(p)).toEqual({ ...DEFAULT_FRAMING, ajuste: "contener" });
+    expect(framingOf(f)).toEqual({ ...DEFAULT_FRAMING, ajuste: "cubrir" });
+    expect(p.key).toBe(chica().key);
+  });
+
+  it("test_s017_rf15_carta_armada_con_personaje_y_fondo_visibles", () => {
+    expect(isAssembled(parse(base([fondo(), chica()])))).toBe(true);
+    expect(missingParts(parse(base([chica()])))).toEqual(["fondo"]);
+    expect(missingParts(parse(base([fondo(), chica({ visible: false })])))).toEqual(["personaje"]);
+    expect(missingParts(parse(base([fondo({ opacidad: 0 }), chica()])))).toEqual(["fondo"]);
+    // Capas sin rol (spec 016) no cuentan como armado; sin configuración falta todo.
+    expect(missingParts(parse(base([img(1), img(2)])))).toEqual(["personaje", "fondo"]);
+    expect(missingParts(null)).toEqual(["personaje", "fondo"]);
+  });
+
+  it("test_s017_rf5_una_carta_tiene_como_mucho_un_personaje", () => {
+    expect(checkLayersConfig(base([chica(), img(3, { rol: "personaje" })]))).toEqual({ ok: false, issue: { code: "two_characters" } });
+    expect(characterLayer(parse(base([fondo(), chica()])))?.key).toBe(chica().key);
+  });
+
+  it("test_s017_rf5_no_se_puede_quitar_el_personaje", () => {
+    const before = parse(base([fondo(), chica()]));
+    expect(checkLayersConfig(base([fondo()]), before)).toEqual({ ok: false, issue: { code: "character_required" } });
+    // Ocultarlo tampoco: el personaje debe seguir visible.
+    expect(checkLayersConfig(base([fondo(), chica({ visible: false })]), before)).toEqual({ ok: false, issue: { code: "character_required" } });
+    // Sustituirlo por otra imagen sí.
+    expect(checkLayersConfig(base([fondo(), img(7, { rol: "personaje" })]), before).ok).toBe(true);
+    // Sin personaje antes (configuración antigua), no se exige.
+    expect(checkLayersConfig(base([fondo()]), parse(base([img(1)]))).ok).toBe(true);
   });
 });
