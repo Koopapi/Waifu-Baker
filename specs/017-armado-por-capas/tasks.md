@@ -13,7 +13,7 @@
 - [x] **T3 — Encuadre en `carta-capas.js`** (en la imagen, con `ajuste`) y tipos · RF-12 · Hecho cuando: test de que el
   HTML lleva el `transform` en la imagen y la capa conserva el parallax; configuraciones antiguas sin cambios.
 - [x] **T4 — Imagen de la chica**: validación y detección de «sin recortar» · RF-2, RF-3.
-- [ ] **T5 — Estilo automático** en `retierLayers` · RF-13, RF-14.
+- [x] **T5 — Estilo automático** en `retierLayers` · RF-13, RF-14.
 
 ## Entrega 3 — Crear y armar
 - [ ] **T6 — Crear carta desde la chica** (subida del panel) y sustituirla conservando el encuadre · RF-1, RF-4 ·

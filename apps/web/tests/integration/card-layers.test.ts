@@ -268,3 +268,38 @@ describe("spec 017 — el personaje no se quita", () => {
     });
   });
 });
+
+describe("spec 017 — estilo automático", () => {
+  const auto = (fondo: string, chica: string) => ({
+    capas: [{ key: fondo, rol: "fondo" }, { key: chica, rol: "personaje" }],
+    marco: "n",
+    sello: null,
+    estiloAuto: true,
+  });
+
+  it("test_s017_rf13_con_estilo_automatico_cambiar_la_rareza_viste_la_carta_con_el_escalon", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage, load } = await setup(tx);
+      const r = await saveCardLayers(tx, store, admin.id, card.id, { config: auto(await stage(10), await stage(200)), expectedVersion: card.version });
+      await updateCard(tx, store, admin.id, card.id, r.card.version, { rarity: "legendary" });
+      const saved = (await load()).layers!;
+      expect(saved).toMatchObject({ marco: "ssr", estiloAuto: true, sello: { texto: "SSR" } });
+      expect(saved.capas.map((l) => ("key" in l ? l.rol : l.particulas))).toEqual(["fondo", "destellos-dorados", "personaje"]);
+    });
+  });
+
+  it("test_s017_rf14_al_tocar_el_estilo_a_mano_el_cambio_de_rareza_solo_cambia_marco_y_sello", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage, load } = await setup(tx);
+      const r1 = await saveCardLayers(tx, store, admin.id, card.id, { config: auto(await stage(10), await stage(200)), expectedVersion: card.version });
+      // El administrador pone nieve a mano: el estilo deja de ser automático aunque el editor lo siga mandando.
+      const manual = { ...r1.card.layers!, capas: [...r1.card.layers!.capas, { particulas: "nieve" }] };
+      const r2 = await saveCardLayers(tx, store, admin.id, card.id, { config: manual, expectedVersion: r1.card.version });
+      expect(r2.card.layers?.estiloAuto).toBe(false);
+      await updateCard(tx, store, admin.id, card.id, r2.card.version, { rarity: "legendary" });
+      const saved = (await load()).layers!;
+      expect(saved.marco).toBe("ssr");
+      expect(saved.capas.filter((l) => "particulas" in l)).toEqual([{ particulas: "nieve" }]);
+    });
+  });
+});

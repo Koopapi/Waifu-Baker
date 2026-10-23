@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { cards } from "@/db/schema";
+import { settleAutoStyle } from "@/domain/cards/layers-rarity";
 import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
@@ -94,7 +95,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
     if (cur.version !== input.expectedVersion && !input.force) throw staleVersion();
     validConfig(requested, cur.layers);
     setId = cur.setId;
-    const settled = await settleKeys(store, cur.setId, requested);
+    const settled = await settleKeys(store, cur.setId, settleAutoStyle(cur.layers, requested));
     temps = settled.temps;
     previous = cur.layers;
     const [updated] = await tx
