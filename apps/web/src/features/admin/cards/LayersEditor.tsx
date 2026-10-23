@@ -319,7 +319,8 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
 
       <div className="grid gap-6 md:grid-cols-[260px_1fr]">
         {/* RF-4, RF-5, RF-14: vista previa en vivo sobre fondo oscuro; el ratón se escucha en todo el recuadro. */}
-        <div className="space-y-2">
+        {/* La vista previa acompaña al bajar por las secciones del editor. */}
+        <div className="space-y-2 self-start md:sticky md:top-0">
           <div
             ref={zone}
             className={`grid min-h-[360px] touch-none place-items-center rounded-l bg-ui-rail px-7 pb-6 pt-9 ${focusRing}`}
@@ -421,13 +422,13 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
           {selLayer && (
             <div className="space-y-3 rounded-l border border-ui-line bg-ui-nav p-3" data-testid="layers-framing">
               <h4 className="text-sm font-bold text-ui-text">{t.framing.title}</h4>
-              <div className="grid gap-3 sm:grid-cols-5">
-                <Select
-                  label={t.framing.layer}
-                  value={String(sel)}
-                  onValueChange={(v) => setSelected(Number(v))}
-                  options={draft.capas.flatMap((l, i) => (isImageLayer(l) ? [{ value: String(i), label: roleLabel(l, i) }] : []))}
-                />
+              <Select
+                label={t.framing.layer}
+                value={String(sel)}
+                onValueChange={(v) => setSelected(Number(v))}
+                options={draft.capas.flatMap((l, i) => (isImageLayer(l) ? [{ value: String(i), label: roleLabel(l, i) }] : []))}
+              />
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <TextField label={t.framing.x} type="number" step={1} min={-100} max={100} value={framingOf(selLayer).x} onChange={(e) => setFraming(sel, { x: numberOr(e.target.value, 0) })} data-testid="framing-x" />
                 <TextField label={t.framing.y} type="number" step={1} min={-100} max={100} value={framingOf(selLayer).y} onChange={(e) => setFraming(sel, { y: numberOr(e.target.value, 0) })} data-testid="framing-y" />
                 <TextField label={t.framing.scale} type="number" step={5} min={10} max={400} value={Math.round(framingOf(selLayer).escala * 100)} onChange={(e) => setFraming(sel, { escala: (numberOr(e.target.value, 100) ?? 100) / 100 })} data-testid="framing-scale" />
