@@ -72,7 +72,7 @@ async function settleKeys(store: CardStore, setId: string, config: LayersConfig)
 }
 
 /** Borra las imágenes de capa que ya no usa ninguna carta de la colección (vigente ni pendiente). */
-async function releaseLayerImages(db: DbLike, store: CardStore, setId: string, candidates: string[]) {
+export async function releaseLayerImages(db: DbLike, store: CardStore, setId: string, candidates: string[]) {
   if (candidates.length === 0) return;
   const rows = await db.select({ layers: cards.layers, pending: cards.layersPending }).from(cards).where(eq(cards.setId, setId));
   const used = new Set(rows.flatMap((r) => [...imageKeys(r.layers), ...imageKeys(r.pending)]));

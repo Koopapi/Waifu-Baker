@@ -15,7 +15,10 @@ import { AdminError, isUniqueViolation } from "@/server/errors";
 import { auditChange, recordAudit } from "./audit";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import type { LayersConfig } from "@/domain/cards/layers";
-import { retierLayers } from "@/domain/cards/layers-rarity";
+import { configFromCharacter, replaceCharacter, retierLayers } from "@/domain/cards/layers-rarity";
+import { characterLayer, layerKey } from "@/domain/cards/layers";
+import { prepareCharacterImage } from "@/server/cards/character-images";
+import { releaseLayerImages } from "./card-layers";
 
 type CardRow = typeof cards.$inferSelect;
 type Variant = CardRow["variant"];
@@ -104,12 +107,21 @@ export async function inspectUpload(file: UploadFile) {
   return meta;
 }
 
-/** RF-11, RF-12, RF-13: una imagen → una carta en borrador, numerada y compuesta. */
+/** Semilla estable de las partículas a partir de la huella de la imagen (1 a 2^31 − 2, como carta-capas.js). */
+const seedFrom = (hash: string) => (parseInt(hash.slice(0, 8), 16) % 2_147_483_646) + 1;
+
+/**
+ * RF-11, RF-12, RF-13: una imagen → una carta en borrador, numerada y compuesta. Spec 017, RF-1 a RF-3: la imagen es la
+ * chica recortada y la carta nace por capas, con ella como personaje y el estilo automático; `uncut` avisa si la imagen
+ * no tiene transparencia.
+ */
 export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId: string, setId: string, file: UploadFile) {
   const meta = await inspectUpload(file);
+  const character = await prepareCharacterImage(file);
   const hash = sha256(file.body);
   const id = randomUUID();
   const originalKey = `sets/${setId}/original/${hash}.${EXT[file.mime]}`;
+  const characterKey = layerKey(setId, sha256(character.body));
 
   let created: CardRow;
   let setCode: string;
@@ -126,7 +138,7 @@ export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId:
       const [last] = await tx.select({ n: cards.number }).from(cards).where(eq(cards.setId, setId)).orderBy(desc(cards.number)).limit(1);
       const [row] = await tx
         .insert(cards)
-        .values({ id, setId, number: (last?.n ?? 0) + 1, originalSha256: hash, originalKey, width: meta.width, height: meta.height })
+        .values({ id, setId, number: (last?.n ?? 0) + 1, originalSha256: hash, originalKey, width: meta.width, height: meta.height, layers: configFromCharacter(characterKey, "n", seedFrom(hash)) })
         .returning();
       await recordAudit(tx, {
         actorUserId,
@@ -143,13 +155,16 @@ export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId:
   }
 
   await store.put(originalKey, file.body);
+  await store.put(characterKey, character.body);
   try {
+    // Hasta la spec 018, el coleccionista ve la imagen compuesta con el marco de Pencil a partir del original.
     const keys = await composeAndStore(store, created, setCode);
     const [done] = await db.update(cards).set(keys).where(eq(cards.id, id)).returning();
-    return done;
+    return { ...done, uncut: character.uncut };
   } catch (e) {
     await db.delete(cards).where(eq(cards.id, id));
     await store.delete(originalKey);
+    await releaseLayerImages(db, store, setId, [characterKey]);
     throw e;
   }
 }
@@ -405,8 +420,11 @@ export async function reviewCard(db: DbLike, store: CardStore, actorUserId: stri
  */
 export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: string, cardId: string, expectedVersion: number, file: UploadFile) {
   const meta = await inspectUpload(file);
+  const character = await prepareCharacterImage(file);
   const hash = sha256(file.body);
   const toDelete: (string | null)[] = [];
+  const layersToRelease: string[] = [];
+  let setId = "";
   const row = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
     if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
@@ -431,8 +449,15 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
     } else {
       const keys = await composeAndStore(store, { ...cur, originalKey: key }, set.code);
       toDelete.push(cur.originalKey, ...composedKeys(cur));
+      // Spec 017, RF-4: la chica nueva ocupa la capa de personaje con el mismo encuadre.
+      const characterKey = layerKey(cur.setId, sha256(character.body));
+      await store.put(characterKey, character.body);
+      const old = cur.layers ? characterLayer(cur.layers)?.key : undefined;
+      if (old && old !== characterKey) layersToRelease.push(old);
+      setId = cur.setId;
       patch = {
         ...keys,
+        layers: cur.layers ? replaceCharacter(cur.layers, characterKey) : configFromCharacter(characterKey, rarityTier(cur.rarity), seedFrom(hash)),
         originalKey: key,
         originalSha256: hash,
         width: meta.width,
@@ -450,7 +475,8 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
     return updated;
   });
   await deleteKeys(store, toDelete, db);
-  return row;
+  if (setId) await releaseLayerImages(db, store, setId, layersToRelease);
+  return { ...row, uncut: character.uncut };
 }
 
 /**

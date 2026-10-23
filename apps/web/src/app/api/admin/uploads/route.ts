@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       mime: file.type,
       filename: file.name,
     });
-    return Response.json({ ok: true, card: { id: card.id, number: card.number } });
+    return Response.json({ ok: true, card: { id: card.id, number: card.number }, uncut: card.uncut });
   } catch (e) {
     if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: STATUS[e.code] ?? 422 });
     throw e;

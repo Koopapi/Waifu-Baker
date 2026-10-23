@@ -3,20 +3,22 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@/i18n/client";
+import { useAdminLayersT } from "@/i18n/admin-layers";
 import { Button } from "@/ui/action/Button";
 import { Progress } from "@/ui/content/Progress";
 import { Alert } from "@/ui/feedback/Alert";
 import { focusRing } from "@/ui/focus";
 import type { Dict } from "@/i18n";
 
-type Item = { id: string; name: string; status: "queued" | "uploading" | "ok" | "error"; progress: number; message?: string };
+type Item = { id: string; name: string; status: "queued" | "uploading" | "ok" | "error"; progress: number; message?: string; warning?: string };
 
 // Una a una y en orden de nombre: así la numeración sigue el orden de los archivos (RF-15).
 const PARALLEL = 1;
 const byName = new Intl.Collator("es", { numeric: true, sensitivity: "base" });
-const ACCEPT = "image/png,image/jpeg,image/webp";
+// Spec 017, RF-2: la chica recortada llega en un formato con transparencia.
+const ACCEPT = "image/png,image/webp";
 
-function uploadOne(t: Dict["admin"], setId: string, file: File, onProgress: (p: number) => void): Promise<{ ok: boolean; message?: string; number?: number }> {
+function uploadOne(t: Dict["admin"], setId: string, file: File, onProgress: (p: number) => void): Promise<{ ok: boolean; message?: string; number?: number; uncut?: boolean }> {
   return new Promise((resolve) => {
     const xhr = new XMLHttpRequest();
     const fd = new FormData();
@@ -26,7 +28,7 @@ function uploadOne(t: Dict["admin"], setId: string, file: File, onProgress: (p: 
     xhr.onload = () => {
       try {
         const body = JSON.parse(xhr.responseText);
-        resolve(body.ok ? { ok: true, number: body.card.number } : { ok: false, message: body.message });
+        resolve(body.ok ? { ok: true, number: body.card.number, uncut: Boolean(body.uncut) } : { ok: false, message: body.message });
       } catch {
         resolve({ ok: false, message: xhr.status === 404 ? t.upload.sessionExpired : t.serverError(xhr.status) });
       }
@@ -37,13 +39,14 @@ function uploadOne(t: Dict["admin"], setId: string, file: File, onProgress: (p: 
   });
 }
 
-/** RF-11: zona de arrastre con cola, 3 subidas en paralelo y estado por archivo. */
+/** RF-11: zona de arrastre con cola, 3 subidas en paralelo y estado por archivo. Spec 017: cada chica crea una carta. */
 export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean }) {
   const [items, setItems] = useState<Item[]>([]);
   const [over, setOver] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const t = useT().admin;
+  const tl = useAdminLayersT();
   const busy = items.some((i) => i.status === "queued" || i.status === "uploading");
 
   const patch = (id: string, p: Partial<Item>) => setItems((list) => list.map((i) => (i.id === id ? { ...i, ...p } : i)));
@@ -59,7 +62,7 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         const { file, item } = batch[next++];
         patch(item.id, { status: "uploading" });
         const r = await uploadOne(t, setId, file, (progress) => patch(item.id, { progress }));
-        patch(item.id, r.ok ? { status: "ok", progress: 100, message: t.cards.cardN(String(r.number).padStart(3, "0")) } : { status: "error", message: r.message });
+        patch(item.id, r.ok ? { status: "ok", progress: 100, message: t.cards.cardN(String(r.number).padStart(3, "0")), warning: r.uncut ? tl.uncut : undefined } : { status: "error", message: r.message });
       }
     };
     await Promise.all(Array.from({ length: Math.min(PARALLEL, batch.length) }, worker));
@@ -84,7 +87,7 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
         onDrop={(e) => {
           e.preventDefault();
           setOver(false);
-          void enqueue([...e.dataTransfer.files].filter((f) => ACCEPT.includes(f.type) || f.type.startsWith("image/")));
+          void enqueue([...e.dataTransfer.files].filter((f) => f.type.startsWith("image/")));
         }}
         onClick={() => input.current?.click()}
         role="button"
@@ -128,6 +131,8 @@ export function Dropzone({ setId, disabled }: { setId: string; disabled: boolean
                   <Progress label={i.name} value={i.progress} className="w-28" />
                 )}
                 {i.message && <span className={`text-xs ${i.status === "error" ? "text-ui-danger-text" : "text-ui-text-3"}`}>{i.message}</span>}
+                {/* Spec 017, RF-3: se crea la carta, pero se avisa de que la imagen no tiene transparencia. */}
+                {i.warning && <span className="text-xs text-ui-warning-text" data-testid="upload-uncut">{i.warning}</span>}
               </li>
             ))}
           </ul>

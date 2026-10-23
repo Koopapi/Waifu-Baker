@@ -133,8 +133,7 @@ export const framingOf = (l: ImageLayer): Framing => ({ ...DEFAULT_FRAMING, ajus
 
 /** Spec 017, RF-11: la capa vuelve a su encuadre inicial (centrada, al 100 %, sin giro). */
 export function resetFraming(l: ImageLayer): ImageLayer {
-  const { encuadre: _encuadre, ...rest } = l;
-  return { ...rest, encuadre: { ...DEFAULT_FRAMING, ajuste: defaultFit(l) } };
+  return { ...l, encuadre: { ...DEFAULT_FRAMING, ajuste: defaultFit(l) } };
 }
 
 export type AssemblyPart = "personaje" | "fondo";

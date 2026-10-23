@@ -2,6 +2,7 @@ import type { adminLayers as en } from "../en/admin-layers";
 
 export const adminLayers: typeof en = {
   title: "Carta por capas",
+  uncut: "Parece que no está recortada (no tiene transparencia).",
   intro: "Capas del mismo lienzo (700 × 991) que se mueven a distinta velocidad. Súbelas de atrás hacia adelante.",
   previewLabel: "Vista previa en vivo de la carta por capas",
   previewHint: "Mueve el ratón sobre la vista previa para inclinarla.",

@@ -22,6 +22,7 @@ import { CardPreview } from "./CardPreview";
 import { LayersEditor } from "./LayersEditor";
 import type { CardDTO, CharacterOption, Permissions } from "./types";
 import { useLocale, useT } from "@/i18n/client";
+import { useAdminLayersT } from "@/i18n/admin-layers";
 import { formatPercent } from "@/i18n/format";
 import type { Locale } from "@/i18n";
 
@@ -134,6 +135,7 @@ function CardEditor({
   onSaved: (version: number) => void;
 }) {
   const tt = useT();
+  const tl = useAdminLayersT();
   const confirm = useConfirm();
   const t = tt.admin.cards;
   const locale = useLocale();
@@ -176,6 +178,12 @@ function CardEditor({
       const res = await fetch(`/api/admin/cards/${card.id}/art`, { method: "POST", body: fd });
       const body = await res.json().catch(() => ({ ok: false, message: tt.admin.serverError(res.status) }));
       setState(body.ok ? { ok: true, message: body.pending ? t.newArtPending : t.artReplaced } : { ok: false, error: body.message });
+      // Spec 017, RF-3: si la chica nueva no está recortada, el editor sigue abierto para que se vea el aviso.
+      if (body.ok && body.uncut) {
+        setState({ ok: true, message: `${t.artReplaced} ${tl.uncut}` });
+        router.refresh();
+        return;
+      }
       if (body.ok) {
         router.refresh();
         onClose();
@@ -210,7 +218,7 @@ function CardEditor({
           )}
           <div className="mt-3 space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-ui-text-2">{t.replaceArt}</span>
-            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-ui-text-2" data-testid="replace-art" />
+            <input type="file" accept="image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-ui-text-2" data-testid="replace-art" />
             {file && (
               <Button size="sm" variant="secondary" onClick={replaceArt} disabled={pending}>
                 {t.uploadNewArt}

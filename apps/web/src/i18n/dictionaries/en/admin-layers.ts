@@ -3,6 +3,7 @@
 
 export const adminLayers = {
   title: "Layered card",
+  uncut: "It doesn't look cut out (it has no transparency).",
   intro: "Layers of the same canvas (700 × 991) that move at different speeds. Upload them back to front.",
   previewLabel: "Live preview of the layered card",
   previewHint: "Move the pointer over the preview to tilt it.",

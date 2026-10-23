@@ -1,6 +1,6 @@
 // Spec 016: estilo del escalón de rareza en una configuración por capas (los presets de carta-capas.js v3). Puro.
 import type { RarityTier } from "@/domain/catalog/rarity-tier";
-import { isImageLayer, isImageSeal, type Layer, type LayersConfig, type ParticleLayer, type TextSeal } from "./layers";
+import { DEFAULT_FRAMING, characterLayer, isImageLayer, isImageSeal, type ImageLayer, type Layer, type LayersConfig, type ParticleLayer, type TextSeal } from "./layers";
 
 interface Preset {
   particles: Omit<ParticleLayer, "profundidad" | "margen"> | null;
@@ -68,4 +68,16 @@ export function settleAutoStyle(previous: LayersConfig | null | undefined, next:
   if (!previous || !next.estiloAuto) return next;
   const keep = Boolean(previous.estiloAuto) && styleOf(previous) === styleOf(next);
   return { ...next, estiloAuto: keep };
+}
+
+/** Spec 017, RF-1: la carta recién creada con la chica: centrada, entera, y con el estilo automático de su escalón. */
+export function configFromCharacter(key: string, tier: RarityTier, seed: number): LayersConfig {
+  const chica: ImageLayer = { key, rol: "personaje", encuadre: { ...DEFAULT_FRAMING, ajuste: "contener" } };
+  return applyTierStyle({ capas: [chica], marco: tier, sello: null, estiloAuto: true }, tier, seed);
+}
+
+/** Spec 017, RF-4: cambia la imagen de la chica y conserva su encuadre y el resto de capas y ajustes. */
+export function replaceCharacter(config: LayersConfig, key: string): LayersConfig {
+  if (!characterLayer(config)) return { ...config, capas: [...config.capas, { key, rol: "personaje", encuadre: { ...DEFAULT_FRAMING, ajuste: "contener" } }] };
+  return { ...config, capas: config.capas.map((l) => (isImageLayer(l) && l.rol === "personaje" ? { ...l, key } : l)) };
 }

@@ -18,6 +18,8 @@ async function setup(tx: Tx) {
   const set = await createSet(tx, admin.id, { code: "LAY1", name: "Capas", isAdult: false });
   const store = tempStore();
   const card = await uploadCardImage(tx, store, admin.id, set.id, { body: await testImage(), mime: MIME.png, filename: "base.png" });
+  // Desde la spec 017 la carta nace con la chica como capa; estas pruebas parten de una carta sin capas.
+  await tx.update(cards).set({ layers: null }).where(eq(cards.id, card.id));
   const stage = async (hue: number, size = { width: 1400, height: 1982 }) =>
     (await stageLayerImage(store, { body: await testImage({ ...size, hue }), mime: MIME.png, filename: `${hue}.png` }, "layer")).key;
   const load = async () => (await tx.select().from(cards).where(eq(cards.id, card.id)))[0];
@@ -194,8 +196,10 @@ describe("spec 016 — la carta conserva sus datos, colecciones publicadas y cam
       const store = tempStore();
       const { cards: published } = await createPublishedSet(tx, admin.id, { code: "LAYP", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], store });
       const staged = (await stageLayerImage(store, { body: await testImage({ width: 1400, height: 1982, hue: 50 }), mime: MIME.png, filename: "p.png" }, "layer")).key;
-      const r = await saveCardLayers(tx, store, admin.id, published[0].id, { config: config([staged]), expectedVersion: published[0].version });
-      expect(r.card.layers?.capas).toHaveLength(1);
+      // Se añade un fondo detrás de la chica con la que nació la carta (spec 017).
+      const layers = published[0].layers!;
+      const r = await saveCardLayers(tx, store, admin.id, published[0].id, { config: { ...layers, capas: [{ key: staged, rol: "fondo" }, ...layers.capas] }, expectedVersion: published[0].version });
+      expect(r.card.layers?.capas).toHaveLength(2);
     });
   });
 
