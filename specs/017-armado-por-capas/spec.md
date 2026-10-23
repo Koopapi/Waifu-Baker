@@ -1,6 +1,6 @@
 # Spec 017 — Armado de cartas por capas
 
-Estado: propuesta (23 oct 2026), pendiente de aprobación del dueño.
+Estado: aprobada por el dueño el 23 oct 2026.
 
 ## Contexto y objetivo
 La spec 016 llevó al panel el editor de cartas por capas de Bruno. Al aprobarlo, el dueño decidió que **todas las
