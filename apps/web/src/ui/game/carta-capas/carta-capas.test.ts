@@ -33,3 +33,29 @@ describe("carta por capas — valores seguros", () => {
     expect(src).not.toMatch(/c\.color \? \[c\.color\]/);
   });
 });
+
+describe("spec 017 — encuadre de cada capa", () => {
+  it("test_s017_rf12_el_encuadre_es_un_transform_de_la_imagen", () => {
+    expect(api.seguro.encuadre({ x: 10, y: -5, escala: 1.5, giro: 12 })).toBe("transform:translate(10%,-5%) scale(1.5) rotate(12deg);");
+    // Lo que no trae toma el valor por defecto; el ajuste «contener» dibuja la imagen entera.
+    expect(api.seguro.encuadre({ escala: 0.5, ajuste: "contener" })).toBe("transform:translate(0%,0%) scale(0.5) rotate(0deg);object-fit:contain;");
+    expect(api.seguro.encuadre({ ajuste: "contener" })).toBe("object-fit:contain;");
+  });
+
+  it("test_s017_rf12_sin_encuadre_la_capa_se_dibuja_como_antes", () => {
+    expect(api.seguro.encuadre(undefined)).toBe("");
+    expect(api.seguro.encuadre({ x: 0, y: 0, escala: 1, giro: 0, ajuste: "cubrir" })).toBe("");
+  });
+
+  it("test_s017_rf11_valores_fuera_de_rango_o_no_numericos_se_acotan", () => {
+    expect(api.seguro.encuadre({ x: 500, escala: 99, giro: -900 })).toBe("transform:translate(100%,0%) scale(4) rotate(-180deg);");
+    expect(api.seguro.encuadre({ x: '1%;background:url(x)', escala: "a" })).toBe("");
+    expect(api.seguro.encuadre({ ajuste: "fill;color:red" })).toBe("");
+  });
+
+  it("test_s017_rf12_el_encuadre_va_en_la_imagen_y_el_parallax_en_la_capa", () => {
+    // La capa (.cc-capa) recibe el translate3d del parallax; el encuadre va en su <img>, así no se pisan.
+    expect(src).toMatch(/draggable="false" style="' \+ encuadreEstilo\(c\.encuadre\)/);
+    expect(src).toMatch(/capas\[i\]\.style\.transform = 'translate3d\(/);
+  });
+});

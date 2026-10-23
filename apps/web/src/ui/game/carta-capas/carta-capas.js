@@ -164,6 +164,15 @@
   var MEZCLAS = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light',
     'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity', 'plus-lighter'];
   var ESQUINAS = ['sup-izq', 'sup-der', 'inf-izq', 'inf-der'];
+  // Encuadre de una capa de imagen (Waifu Baker, spec 017): x e y en %, escala de 0,1 a 4 y giro en grados. Va en
+  // el <img>, no en la capa, que ya lleva el translate3d del parallax. Valores acotados: vienen de la base de datos.
+  function lim(v, a, b, d) { v = num(v, d); return +Math.max(a, Math.min(b, v)).toFixed(3); }
+  function encuadreEstilo(e) {
+    if (!e || typeof e !== 'object') return '';
+    var x = lim(e.x, -100, 100, 0), y = lim(e.y, -100, 100, 0), s = lim(e.escala, .1, 4, 1), g = lim(e.giro, -180, 180, 0);
+    var t = x || y || s !== 1 || g ? 'transform:translate(' + x + '%,' + y + '%) scale(' + s + ') rotate(' + g + 'deg);' : '';
+    return t + (e.ajuste === 'contener' ? 'object-fit:contain;' : '');
+  }
   function mezclaSegura(m) { return MEZCLAS.indexOf(m) >= 0 ? m : 'normal'; }
   function esquinaSegura(e) { return ESQUINAS.indexOf(e) >= 0 ? e : 'sup-izq'; }
   function colorSeguro(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : null; }
@@ -215,7 +224,7 @@
         return '<div class="cc-capa cc-part" data-p="' + prof + '" style="' + estilo + '">' + particulasHTML(cfg, 7 + id + i) + '</div>';
       }
       if (!c.src) return '';
-      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false"></div>';
+      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false" style="' + encuadreEstilo(c.encuadre) + '"></div>';
     }
 
     function selloHTML() {
@@ -421,7 +430,7 @@
     return montar(el, desdeRareza(rareza, imagen, extra));
   }
 
-  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
+  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro, encuadre: encuadreEstilo }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
   global.CartaCapas = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : {});

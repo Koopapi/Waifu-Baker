@@ -10,7 +10,7 @@
 - [x] **T2 — Dominio**: `rol`, `encuadre`, `estiloAuto`, `isAssembled`, no quitar el personaje · RF-5, RF-10, RF-11,
   RF-15 · Hecho: tests de unidad en verde; el servicio de guardado rechaza quitar u ocultar a la chica y
   dos personajes (tests de integración).
-- [ ] **T3 — Encuadre en `carta-capas.js`** (en la imagen, con `ajuste`) y tipos · RF-12 · Hecho cuando: test de que el
+- [x] **T3 — Encuadre en `carta-capas.js`** (en la imagen, con `ajuste`) y tipos · RF-12 · Hecho cuando: test de que el
   HTML lleva el `transform` en la imagen y la capa conserva el parallax; configuraciones antiguas sin cambios.
 - [ ] **T4 — Imagen de la chica**: validación y detección de «sin recortar» · RF-2, RF-3.
 - [ ] **T5 — Estilo automático** en `retierLayers` · RF-13, RF-14.
