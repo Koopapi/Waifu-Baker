@@ -11,6 +11,7 @@ export const admin: typeof en = {
     overview: "Resumen",
     sets: "Colecciones",
     characters: "Personajes",
+    library: "Biblioteca",
     tiers: "Tiers de Patreon",
     users: "Usuarios",
     albums: "Álbumes",

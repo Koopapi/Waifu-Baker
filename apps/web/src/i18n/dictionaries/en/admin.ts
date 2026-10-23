@@ -11,6 +11,7 @@ export const admin = {
     overview: "Overview",
     sets: "Sets",
     characters: "Characters",
+    library: "Library",
     tiers: "Patreon tiers",
     users: "Users",
     albums: "Albums",

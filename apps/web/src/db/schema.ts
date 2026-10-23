@@ -19,6 +19,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import type { LayersConfig } from "@/domain/cards/layers";
+import type { ParticlePreset } from "@/domain/cards/library";
 
 /** Spec 016: imagen plana de una configuración pendiente de revisión, en sus cuatro tamaños. */
 export interface PendingFlatKeys {
@@ -143,23 +144,25 @@ export const cards = pgTable(
   ],
 );
 
+export const libraryKind = pgEnum("library_kind", ["fondo", "sello", "adorno", "particulas"]);
+
 /**
- * Spec 017, RF-6 a RF-9: biblioteca de fondos de una colección. La imagen vive en `sets/<setId>/backgrounds/<sha>.webp`;
- * un fondo está «en uso» si su clave aparece en la configuración por capas de alguna carta de la colección.
+ * Spec 017, RF-6 a RF-9 y RF-21: biblioteca general de elementos, común a todas las colecciones. Las imágenes viven en
+ * `library/<sha>.webp` (o en la clave que ya tenían los fondos de antes); las partículas guardadas, en `particles`.
+ * Una imagen está «en uso» si su clave aparece en la configuración por capas de alguna carta.
  */
-export const setBackgrounds = pgTable(
-  "set_backgrounds",
+export const libraryItems = pgTable(
+  "library_items",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    setId: uuid("set_id")
-      .notNull()
-      .references(() => sets.id, { onDelete: "cascade" }),
-    key: text("key").notNull(),
-    sha256: text("sha256").notNull(),
+    kind: libraryKind("kind").notNull(),
     name: text("name").notNull(),
+    key: text("key"),
+    sha256: text("sha256"),
+    particles: jsonb("particles").$type<ParticlePreset>(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("set_backgrounds_set_sha_uq").on(t.setId, t.sha256)],
+  (t) => [uniqueIndex("library_items_sha_uq").on(t.sha256).where(sql`${t.sha256} is not null`)],
 );
 
 export const dropTables = pgTable(

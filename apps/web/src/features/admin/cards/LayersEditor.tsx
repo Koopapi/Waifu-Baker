@@ -37,13 +37,9 @@ import { ArrowDown, ArrowUp, Plus, Sparkles, Trash2 } from "@/ui/icons/glyphs";
 import { useConfirm } from "@/ui/overlay/Confirm";
 import { focusRing } from "@/ui/focus";
 import type { CardDTO } from "./types";
-
-/** Fondo de la biblioteca de la colección, para elegirlo en el editor (spec 017, RF-8). */
-export interface LibraryBackground {
-  key: string;
-  name: string;
-  url: string;
-}
+import { LibraryPicker, type LibraryEntry } from "@/features/admin/library/LibraryPicker";
+import { SaveToLibraryDialog, type SaveTarget } from "@/features/admin/library/SaveToLibraryDialog";
+import { kindForLayer, layerFromPreset } from "@/domain/cards/library";
 
 type Notice = { tone: "success" | "warning" | "danger"; text: string } | null;
 type Upload = { id: number; name: string; status: "uploading" | "ok" | "warning" | "error"; message?: string };
@@ -89,7 +85,7 @@ function numberOr(v: string, fallback: number | undefined) {
  * «Guardar capas». Spec 017: la chica (sustituir, no quitar), el fondo (biblioteca o propio), el encuadre de cada capa
  * (arrastrando, con números o con el teclado) y el estilo automático.
  */
-export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDTO; backgrounds?: LibraryBackground[]; onSaved: (version: number) => void }) {
+export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; library?: LibraryEntry[]; onSaved: (version: number) => void }) {
   const tt = useT();
   const t = useAdminLayersT();
   const confirm = useConfirm();
@@ -104,6 +100,13 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
   const zone = useRef<HTMLDivElement>(null);
   const seq = useRef(0);
   const [selected, setSelected] = useState(() => defaultSelection(card.layers ?? emptyConfig(card)));
+  // Spec 017 (ampliación): biblioteca general de elementos.
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [saveTarget, setSaveTarget] = useState<SaveTarget | null>(null);
+  const backgrounds = library.filter((i): i is LibraryEntry & { key: string; url: string } => i.kind === "fondo" && Boolean(i.key && i.url));
+  const librarySeals = library.filter((i): i is LibraryEntry & { key: string; url: string } => i.kind === "sello" && Boolean(i.key && i.url));
+  const libraryKeys = new Set(library.map((i) => i.key).filter((k): k is string => Boolean(k)));
+  const cardLabel = card.name || `#${String(card.number).padStart(3, "0")}`;
   const drag = useRef<{ x0: number; y0: number; width: number; start: Framing; next: Framing; img: HTMLImageElement | null } | null>(null);
 
   const preview = useMemo(() => (imageLayers(draft).some(isVisible) ? previewConfig(draft) : null), [draft]);
@@ -218,6 +221,21 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
     setUploads([]);
     const key = await uploadOne(file, "character");
     if (key) update((c) => replaceCharacter(c, key));
+  }
+
+  /** Spec 017 (ampliación), RF-8: lo elegido en «Añadir de la biblioteca» (adornos y partículas se suman; fondo y sello se ponen). */
+  function addFromLibrary(picked: LibraryEntry[]) {
+    update((c) => {
+      let next = c;
+      let n = imageLayers(c).length;
+      for (const item of picked) {
+        if (item.kind === "fondo" && item.key) next = setBackground(next, item.key);
+        else if (item.kind === "sello" && item.key) next = { ...next, sello: { key: item.key, esquina: next.sello?.esquina ?? "sup-izq", tamano: 36 } };
+        else if (item.kind === "adorno" && item.key) next = { ...next, capas: [...next.capas, { key: item.key, rol: "extra", ...defaultsFor(n++) }] };
+        else if (item.kind === "particulas" && item.particles) next = { ...next, capas: [...next.capas, layerFromPreset(item.particles, randomSeed())] };
+      }
+      return next;
+    });
   }
 
   // Spec 017, RF-8: un fondo propio de esta carta (las reglas de las capas, RF-7).
@@ -493,6 +511,9 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
               {t.upload}
               <input type="file" multiple accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void addLayers(e.target.files).finally(() => (e.target.value = ""))} data-testid="layers-upload" />
             </label>
+            <Button size="sm" onClick={() => setPickerOpen(true)} data-testid="library-picker-open">
+              {t.pick.open}
+            </Button>
             <Button size="sm" variant="secondary" icon={<Sparkles className="size-4" aria-hidden />} onClick={() => update((c) => ({ ...c, capas: [...c.capas, { particulas: "destellos-dorados", cantidad: 40, semilla: randomSeed(), profundidad: 0.55, margen: 4 }] }))}>
               {t.addParticles}
             </Button>
@@ -530,7 +551,21 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
                           <Sparkles className="size-4 text-ui-text-3" />
                         </span>
                       )}
-                      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ui-text">{label}</span>
+                      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ui-text">
+                        {label}
+                        {isImageLayer(l) && libraryKeys.has(l.key) && <span className="ml-2 text-xs font-normal text-ui-text-3">· {t.pick.fromLibrary}</span>}
+                      </span>
+                      {/* Spec 017 (ampliación), RF-21: lo propio de la carta se puede guardar en la biblioteca (la chica no). */}
+                      {(isImageLayer(l) ? kindForLayer(l) && !libraryKeys.has(l.key) : true) && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => setSaveTarget(isImageLayer(l) ? { kind: kindForLayer(l)!, key: l.key, name: `${label} · ${cardLabel}` } : { kind: "particulas", particles: l, name: `${l.particulas} · ${cardLabel}` })}
+                          data-testid="layer-save-to-library"
+                        >
+                          {t.pick.save}
+                        </Button>
+                      )}
                       <Checkbox label={t.visible} checked={l.visible !== false} disabled={locked} onCheckedChange={(v) => setLayer(i, { visible: v })} />
                       <IconButton label={`${t.moveDown} · ${label}`} size="sm" disabled={i === 0} onClick={() => move(i, i - 1)}>
                         <ArrowUp className="size-4" aria-hidden />
@@ -591,6 +626,32 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
               <TextField label={t.sealSize} type="number" step={1} min={4} max={40} value={draft.sello.tamano ?? 14} onChange={(e) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: numberOr(e.target.value, undefined) } } : c))} />
             </div>
           )}
+          {sealKind === "image" && librarySeals.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-semibold text-ui-text-2">{t.pick.sealLibrary}</p>
+              <ul className="flex flex-wrap gap-2">
+                {librarySeals.map((s) => {
+                  const chosen = isImageSeal(draft.sello) && draft.sello.key === s.key;
+                  return (
+                    <li key={s.key}>
+                      <button
+                        type="button"
+                        aria-pressed={chosen}
+                        aria-label={t.pick.choose(s.name)}
+                        title={s.name}
+                        onClick={() => update((c) => ({ ...c, sello: { key: s.key, esquina: c.sello?.esquina ?? "sup-izq", tamano: isImageSeal(c.sello) ? c.sello.tamano ?? 36 : 36 } }))}
+                        className={`grid h-14 w-20 place-items-center rounded-s border-2 bg-ui-rail p-1 ${chosen ? "border-ui-accent" : "border-transparent hover:border-ui-line"}`}
+                        data-testid="layers-seal-option"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element -- sello privado servido por la API del panel */}
+                        <img src={s.url} alt="" className="max-h-full max-w-full object-contain" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
           {sealKind === "image" ? (
             <div className="flex flex-wrap items-center gap-3">
               {isImageSeal(draft.sello) && (
@@ -602,6 +663,11 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
                 {t.sealUpload}
                 <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void setSealImage(e.target.files).finally(() => (e.target.value = ""))} />
               </label>
+              {isImageSeal(draft.sello) && !libraryKeys.has(draft.sello.key) && (
+                <Button size="sm" variant="secondary" onClick={() => isImageSeal(draft.sello) && setSaveTarget({ kind: "sello", key: draft.sello.key, name: `${t.seal} · ${cardLabel}` })} data-testid="seal-save-to-library">
+                  {t.pick.save}
+                </Button>
+              )}
             </div>
           ) : null}
 
@@ -658,6 +724,8 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
           <p className="text-xs text-ui-text-3">{t.io.importHint}</p>
         </div>
       </div>
+      <LibraryPicker open={pickerOpen} onOpenChange={setPickerOpen} items={library} onPick={addFromLibrary} />
+      <SaveToLibraryDialog target={saveTarget} onClose={() => setSaveTarget(null)} />
     </section>
   );
 }

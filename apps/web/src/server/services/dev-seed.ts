@@ -11,7 +11,7 @@ import { createCharacter } from "./characters";
 import { reviewCard, updateCard, uploadCardImage, type UploadFile } from "./cards";
 import { saveCardLayers } from "./card-layers";
 import { createSet, publishSet, saveOdds } from "./collections";
-import { uploadSetBackground } from "./set-backgrounds";
+import { ensureLibraryImage } from "./library";
 import { upsertUserFromLogin } from "./users";
 import { giftPacks } from "./users-admin";
 
@@ -44,15 +44,15 @@ async function testBackground(hue: number) {
 }
 
 /**
- * Spec 017, RF-20: arma las cartas de una colección de prueba. Sube un fondo a su biblioteca y lo pone a cada carta
- * que no tenga fondo; la ilustración completa queda como chica (mientras no haya recortes).
+ * Spec 017, RF-20: arma las cartas de una colección de prueba. Toma (o sube) un fondo de la biblioteca general y lo pone
+ * a cada carta que no tenga fondo; la ilustración completa queda como chica (mientras no haya recortes).
  */
 export async function assembleSetCards(db: DbLike, store: CardStore, actorUserId: string, setId: string, hue = 320) {
-  const bg = await uploadSetBackground(db, store, actorUserId, setId, { body: await testBackground(hue), mime: "image/png", filename: "Fondo de prueba.png" });
+  const bg = await ensureLibraryImage(db, store, actorUserId, "fondo", { body: await testBackground(hue), mime: "image/png", filename: "Fondo de prueba.png" });
   const rows = await db.select().from(cards).where(eq(cards.setId, setId));
   for (const c of rows) {
     if (!c.layers || !missingParts(c.layers).includes("fondo")) continue;
-    await saveCardLayers(db, store, actorUserId, c.id, { config: setBackground(c.layers, bg.key), expectedVersion: c.version });
+    await saveCardLayers(db, store, actorUserId, c.id, { config: setBackground(c.layers, bg.key!), expectedVersion: c.version });
   }
   return bg;
 }

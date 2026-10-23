@@ -19,7 +19,8 @@ import { TextArea, TextField } from "@/ui/form/TextField";
 import { useConfirm } from "@/ui/overlay/Confirm";
 import { Modal } from "@/ui/overlay/Modal";
 import { CardPreview } from "./CardPreview";
-import { LayersEditor, type LibraryBackground } from "./LayersEditor";
+import { LayersEditor } from "./LayersEditor";
+import type { LibraryEntry } from "@/features/admin/library/LibraryPicker";
 import type { CardDTO, CharacterOption, Permissions } from "./types";
 import { useLocale, useT } from "@/i18n/client";
 import { useAdminLayersT } from "@/i18n/admin-layers";
@@ -122,7 +123,7 @@ function CardEditor({
   setId,
   card,
   characters,
-  backgrounds,
+  library,
   perms,
   onClose,
   onSaved,
@@ -130,7 +131,7 @@ function CardEditor({
   setId: string;
   card: CardDTO;
   characters: CharacterOption[];
-  backgrounds: LibraryBackground[];
+  library: LibraryEntry[];
   perms: Permissions;
   onClose: () => void;
   /** Versión nueva tras guardar: la cuadrícula la recuerda aunque el refresco llegue tarde. */
@@ -291,7 +292,7 @@ function CardEditor({
         </div>
       </form>
       {/* Spec 016: la carta por capas se guarda aparte del formulario de la carta. */}
-      <LayersEditor card={card} backgrounds={backgrounds} onSaved={onSaved} />
+      <LayersEditor card={card} library={library} onSaved={onSaved} />
     </Modal>
   );
 }
@@ -301,14 +302,14 @@ export function CardWorkspace({
   setId,
   cards,
   characters,
-  backgrounds = [],
+  library = [],
   perms,
 }: {
   setId: string;
   cards: CardDTO[];
   characters: CharacterOption[];
-  /** Spec 017, RF-8: fondos de la biblioteca de la colección, para elegirlos en el editor de capas. */
-  backgrounds?: LibraryBackground[];
+  /** Spec 017, RF-8: la biblioteca general de elementos, para armar las cartas en el editor de capas. */
+  library?: LibraryEntry[];
   perms: Permissions;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -475,7 +476,7 @@ export function CardWorkspace({
           setId={setId}
           card={latest(byId.get(editing.id) ?? editing)}
           characters={characters}
-          backgrounds={backgrounds}
+          library={library}
           perms={perms}
           onClose={() => setEditing(null)}
           onSaved={(v) => setKnown((k) => ({ ...k, [editing.id]: Math.max(k[editing.id] ?? 0, v) }))}

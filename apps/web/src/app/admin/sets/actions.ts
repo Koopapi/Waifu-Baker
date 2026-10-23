@@ -8,7 +8,6 @@ import { getDict } from "@/i18n/server";
 import { setWelcomeSet } from "@/server/services/welcome";
 import { removePackImage, setCoverCard } from "@/server/services/pack-art";
 import { getCardStore } from "@/server/cards/store-instance";
-import { removeSetBackground } from "@/server/services/set-backgrounds";
 
 export async function createSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
   return adminAction("createSet", ["/admin/sets", "/admin"], async ({ db, actorId }) => {
@@ -87,12 +86,5 @@ export async function removePackImageAction(setId: string): Promise<ActionState>
   return adminAction("removePackImage", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
     await removePackImage(db, getCardStore(), actorId, setId);
     return (await getDict()).admin.set.pack.removed;
-  });
-}
-
-/** Spec 017, RF-6 y RF-9: quita un fondo de la biblioteca (no si alguna carta lo usa). El aviso lo pone el panel. */
-export async function removeBackgroundAction(setId: string, backgroundId: string): Promise<ActionState> {
-  return adminAction("removeBackground", [`/admin/sets/${setId}`], async ({ db, actorId }) => {
-    await removeSetBackground(db, getCardStore(), actorId, setId, backgroundId);
   });
 }

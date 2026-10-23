@@ -4,11 +4,12 @@ import { cards, sets } from "@/db/schema";
 import { exportCreatorConfig } from "@/domain/cards/layers-io";
 import { settleAutoStyle } from "@/domain/cards/layers-rarity";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
-import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetBackgroundKey, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
+import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
 import { recordAudit } from "./audit";
+import { libraryKeysAmong } from "./library";
 
 type CardRow = typeof cards.$inferSelect;
 const sha256 = (b: Buffer) => createHash("sha256").update(b).digest("hex");
@@ -48,13 +49,15 @@ function validConfig(input: unknown, previous?: LayersConfig | null): LayersConf
 
 /**
  * Pasa cada imagen del área temporal a la colección (`sets/<setId>/layers/<sha>.webp`): la huella en la clave hace que
- * una imagen repetida se guarde una sola vez (RF-40). Devuelve la configuración con las claves definitivas.
+ * una imagen repetida se guarde una sola vez (RF-40). Devuelve la configuración con las claves definitivas. Spec 017: las
+ * imágenes de la biblioteca general se usan con su clave, sin copiarlas.
  */
-async function settleKeys(store: CardStore, setId: string, config: LayersConfig): Promise<{ config: LayersConfig; temps: string[] }> {
+async function settleKeys(db: DbLike, store: CardStore, setId: string, config: LayersConfig): Promise<{ config: LayersConfig; temps: string[] }> {
   const map = new Map<string, string>();
   const temps: string[] = [];
+  const library = await libraryKeysAmong(db, imageKeys(config));
   for (const key of new Set(imageKeys(config))) {
-    if (isSetLayerKey(setId, key) || isSetBackgroundKey(setId, key)) {
+    if (isSetLayerKey(setId, key) || library.has(key)) {
       if (!(await store.get(key))) throw new AdminError("layer_missing", "Una de las capas ya no está disponible.");
       map.set(key, key);
     } else if (isTempKey(key)) {
@@ -74,11 +77,12 @@ async function settleKeys(store: CardStore, setId: string, config: LayersConfig)
 }
 
 /**
- * Borra las imágenes de capa que ya no usa ninguna carta de la colección (vigente ni pendiente). Los fondos de la
- * biblioteca (spec 017) no: se quitan desde la biblioteca.
+ * Borra las imágenes de capa que ya no usa ninguna carta de la colección (vigente ni pendiente). Las de la biblioteca
+ * general (spec 017) no: se quitan desde la biblioteca.
  */
 export async function releaseLayerImages(db: DbLike, store: CardStore, setId: string, keys: string[]) {
-  const candidates = keys.filter((k) => !isSetBackgroundKey(setId, k));
+  const library = await libraryKeysAmong(db, keys);
+  const candidates = keys.filter((k) => !library.has(k));
   if (candidates.length === 0) return;
   const rows = await db.select({ layers: cards.layers, pending: cards.layersPending }).from(cards).where(eq(cards.setId, setId));
   const used = new Set(rows.flatMap((r) => [...imageKeys(r.layers), ...imageKeys(r.pending)]));
@@ -101,7 +105,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
     if (cur.version !== input.expectedVersion && !input.force) throw staleVersion();
     validConfig(requested, cur.layers);
     setId = cur.setId;
-    const settled = await settleKeys(store, cur.setId, settleAutoStyle(cur.layers, requested, rarityTier(cur.rarity)));
+    const settled = await settleKeys(tx, store, cur.setId, settleAutoStyle(cur.layers, requested, rarityTier(cur.rarity)));
     temps = settled.temps;
     previous = cur.layers;
     const [updated] = await tx

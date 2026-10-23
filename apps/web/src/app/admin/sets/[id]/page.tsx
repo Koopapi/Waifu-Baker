@@ -9,8 +9,7 @@ import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
-import { BackgroundsLibrary } from "@/features/admin/sets/BackgroundsLibrary";
-import { listSetBackgrounds } from "@/server/services/set-backgrounds";
+import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
@@ -31,7 +30,7 @@ import { EditSetForm } from "../forms";
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters, packArts, backgrounds] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listSetBackgrounds(db, id)]);
+  const [overview, characters, packArts, library] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listLibrary(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -107,7 +106,13 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
       </Card>
 
-      <BackgroundsLibrary setId={set.id} backgrounds={backgrounds.map((b) => ({ id: b.id, name: b.name, uses: b.uses, url: assetUrl(b.key)! }))} />
+      {/* Spec 017 (ampliación): los elementos para armar las cartas viven en la biblioteca general. */}
+      <Card className="flex flex-wrap items-center justify-between gap-3" data-testid="library-link">
+        <p className="text-sm text-ui-text-3">{tl.library.setNote}</p>
+        <Button size="sm" variant="secondary" asChild>
+          <Link href="/admin/library">{tl.library.goTo}</Link>
+        </Button>
+      </Card>
 
       <Card title={t.pack.title}>
         <PackSettings
@@ -183,7 +188,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           setId={set.id}
           cards={cards}
           characters={characters.map((c) => ({ id: c.id, name: c.name }))}
-          backgrounds={backgrounds.map((b) => ({ key: b.key, name: b.name, url: assetUrl(b.key)! }))}
+          library={library.map((i) => ({ id: i.id, kind: i.kind, name: i.name, key: i.key, url: assetUrl(i.key), particles: i.particles }))}
           perms={perms}
         />
       </section>
