@@ -29,7 +29,7 @@
 - [x] **T10 — Publicar solo con cartas armadas** · RF-15, RF-16 · Hecho: comprobación al publicar con enlace a
   cada carta, aviso en la página de la colección y colecciones de prueba armadas con un fondo de su biblioteca.
 - [x] **T11 — Exportar e importar** el formato del creador · RF-17 a RF-19.
-- [ ] **T12 — Demo y colecciones de prueba armadas** · RF-20.
+- [x] **T12 — Demo y colecciones de prueba armadas** · RF-20.
 
 ## Entrega 5 — Cierre
 - [ ] **T13 — E2E del panel, presupuesto, reglas de negocio, `DESIGN.md` y validación** · Todos · Hecho cuando:

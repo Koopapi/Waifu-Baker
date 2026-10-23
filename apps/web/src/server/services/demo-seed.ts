@@ -9,6 +9,10 @@ import type { DemoManifest } from "@/domain/demo/manifest";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { activateAlbum, featurableCards, setFeatured } from "./album";
+import { characterLayer } from "@/domain/cards/layers";
+import { parseCreatorConfig, withKeys } from "@/domain/cards/layers-io";
+import { stageLayerImage } from "@/server/cards/layer-images";
+import { saveCardLayers } from "./card-layers";
 import { seedPublishedSet } from "./dev-seed";
 import { acceptTerms } from "./legal";
 import { ackOpenings, openPack } from "./packs";
@@ -33,11 +37,23 @@ const MIME: Record<string, string> = { ".webp": "image/webp", ".png": "image/png
 const DAY = 24 * 60 * 60 * 1000;
 
 /**
+ * Spec 017, RF-20: carta de muestra armada con la chica recortada, desde una configuración del creador de cartas (la de
+ * Yuki del paquete de Bruno). `readFile` lee cada archivo que nombra la configuración.
+ */
+export interface DemoSample {
+  name: string;
+  character: string;
+  rarity: Rarity;
+  config: unknown;
+  readFile: (name: string) => Promise<Buffer>;
+}
+
+/**
  * Spec 010, RF-12: la base de datos de la demo. Colección publicada (y de bienvenida) con las cartas
  * del manifiesto; un administrador; un coleccionista con 4 sobres ya abiertos (semillas fijas: cada
  * ejecución da las mismas cartas), 3 sin abrir, 240 galletas, racha en el día 4 y álbum público.
  */
-export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: DemoManifest; readImage: (file: string) => Promise<Buffer>; now: Date }) {
+export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: DemoManifest; readImage: (file: string) => Promise<Buffer>; now: Date; sample?: DemoSample }) {
   const { manifest, now } = opts;
   const admin = await upsertUserFromLogin(db, { patreonUserId: `dev:${DEMO_USERS.admin.name}`, displayName: DEMO_USERS.admin.displayName, role: "admin" });
   const fan = await upsertUserFromLogin(db, { patreonUserId: `dev:${DEMO_USERS.collector.name}`, displayName: DEMO_USERS.collector.displayName, role: "user" });
@@ -49,7 +65,14 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
     const ext = path.extname(c.file).toLowerCase();
     files.push({ file: { body: await opts.readImage(c.file), mime: MIME[ext] ?? "image/webp", filename: path.basename(c.file) }, name: c.title, rarity: c.rarity, character: c.character });
   }
-  const present = new Set<Rarity>(manifest.cards.map((c) => c.rarity));
+  // Spec 017, RF-20: la chica recortada de la muestra crea su carta como cualquier otra.
+  const sample = opts.sample ? parseCreatorConfig(opts.sample.config) : null;
+  if (sample && !sample.ok) throw new Error(`Configuración de muestra no válida (${sample.path})`);
+  const sampleGirl = sample?.ok ? sample.files.find((f) => f.kind === "character") : undefined;
+  if (opts.sample && sampleGirl) {
+    files.push({ file: { body: await opts.sample.readFile(sampleGirl.name), mime: "image/webp", filename: sampleGirl.name }, name: opts.sample.name, rarity: opts.sample.rarity, character: opts.sample.character });
+  }
+  const present = new Set<Rarity>(files.map((c) => c.rarity));
   // Solo rarezas que tienen cartas (para publicar, toda rareza con probabilidad debe tener cartas).
   const slots = DEMO_SLOTS.map((s) => {
     const kept = Object.entries(s).filter(([r]) => present.has(r as Rarity));
@@ -74,6 +97,17 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
     holoPercent: 20,
   });
   await setWelcomeSet(db, admin.id, setId);
+
+  // La carta de muestra recibe el resto de sus capas (fondo, partículas, sello…) como al importarla en el panel.
+  if (opts.sample && sample?.ok && sampleGirl) {
+    const [card] = await db.select().from(cards).where(and(eq(cards.setId, setId), eq(cards.name, opts.sample.name)));
+    const keys: Record<string, string> = { [sampleGirl.name]: characterLayer(card.layers!)!.key };
+    for (const f of sample.files.filter((x) => x.kind !== "character")) {
+      const staged = await stageLayerImage(store, { body: await opts.sample.readFile(f.name), mime: "image/webp", filename: f.name }, f.kind === "seal" ? "seal" : "layer");
+      keys[f.name] = staged.key;
+    }
+    await saveCardLayers(db, store, admin.id, card.id, { config: { ...withKeys(sample.config, keys), estiloAuto: false }, expectedVersion: card.version });
+  }
 
   // Cartas del coleccionista: 4 sobres abiertos con semillas fijas.
   await giftPacks(db, admin.id, { userId: fan.id, setId, count: 4, reason: "Demo: first pulls" });
