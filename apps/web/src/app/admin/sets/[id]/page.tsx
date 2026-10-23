@@ -19,7 +19,9 @@ import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
 import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
-import { getDict } from "@/i18n/server";
+import { getDict, getLocale } from "@/i18n/server";
+import { adminLayersDictionaries } from "@/i18n/admin-layers";
+import { missingParts } from "@/domain/cards/layers";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
 import { Card } from "@/ui/content/Card";
@@ -66,6 +68,9 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   }));
   const unreviewed = set.isAdult ? cards.filter((c) => !c.adultReviewedAt || c.pendingArtUrl).length : 0;
   const incomplete = cards.filter((c) => c.status !== "ready").length;
+  // Spec 017, RF-15: cartas sin chica o sin fondo, enlazadas, antes de intentar publicar.
+  const notAssembled = cards.filter((c) => missingParts(c.layers).length > 0);
+  const tl = adminLayersDictionaries[await getLocale()];
 
   return (
     <div className="space-y-8">
@@ -149,13 +154,26 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
             {counts.none > 0 && <Badge>{t.noRarityCount(counts.none)}</Badge>}
           </div>
         </div>
-        {(gaps.length > 0 || incomplete > 0 || unreviewed > 0) && cards.length > 0 && (
+        {(gaps.length > 0 || incomplete > 0 || unreviewed > 0 || notAssembled.length > 0) && cards.length > 0 && (
           <div data-testid="set-warnings">
             <Alert tone="warning">
               <ul className="space-y-1">
                 {gaps.length > 0 && <li>{t.gaps(gaps.map((g) => tt.common.rarity[g]).join(", "))}</li>}
                 {incomplete > 0 && <li>{t.incomplete(incomplete)}</li>}
                 {unreviewed > 0 && <li>{t.unreviewed(unreviewed)}</li>}
+                {notAssembled.length > 0 && (
+                  <li data-testid="not-assembled">
+                    {tl.notAssembled(notAssembled.length)}{" "}
+                    {notAssembled.map((c, i) => (
+                      <span key={c.id}>
+                        {i > 0 && ", "}
+                        <a href={`#carta-${String(c.number).padStart(3, "0")}`} className="underline underline-offset-4">
+                          {String(c.number).padStart(3, "0")}
+                        </a>
+                      </span>
+                    ))}
+                  </li>
+                )}
               </ul>
             </Alert>
           </div>

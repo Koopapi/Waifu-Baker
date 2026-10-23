@@ -22,20 +22,22 @@ test("editor de cartas por capas", async ({ browser }) => {
   const admin = await login(browser, "admin-capas", true);
   const setId = await createPublishedSet(admin, "CAP1", ["01.webp", "02.webp"].map((f) => path.join(LAB, f)), 2);
 
-  await test.step("Spec 017, RF-1: la carta nace con la chica como capa de personaje", async () => {
+  await test.step("Spec 017, RF-1 y RF-20: la carta nace con la chica como personaje y la de prueba viene armada", async () => {
     const editor = await openEditor(admin, setId);
-    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(1);
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(2);
+    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Fondo");
+    await expect(editor.locator('[data-testid="layer-row"]').nth(1)).toContainText("Chica");
     await expect(editor.locator('[data-testid="layers-character"]')).toBeVisible();
-    await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(1);
+    await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(2);
   });
 
   await test.step("RF-3, RF-5 y RF-6: el editor sube varias capas a la vez con vista previa en vivo", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
     await admin.setInputFiles('[data-testid="layers-upload"]', LAYERS);
-    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(4);
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
     await expect(editor.locator('[data-testid="layers-uploads"]')).toContainText("escalada al lienzo");
     // La vista previa monta la carta por capas en vivo, sin guardar nada.
-    await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(4);
+    await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(5);
   });
 
   await test.step("RF-19 y RF-20: una capa de otra proporción se rechaza con su motivo y el resto sigue", async () => {
@@ -43,22 +45,22 @@ test("editor de cartas por capas", async ({ browser }) => {
     await admin.setInputFiles('[data-testid="layers-upload"]', [path.join(LAB, "01.webp"), path.join(YUKI, "yuki_5_insignia.webp")]);
     await expect(editor.locator('[data-testid="layers-uploads"]')).toContainText("01.webp:");
     await expect(editor.locator('[data-testid="layers-uploads"]')).toContainText("proporción del lienzo");
-    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(6);
   });
 
   await test.step("RF-5, RF-6 y RF-9: los ajustes cambian la vista previa al momento", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
-    await editor.locator('[data-testid="layer-row"]').nth(4).getByRole("checkbox", { name: "Visible" }).uncheck();
-    await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(4);
-    await editor.locator('[data-testid="layer-row"]').nth(4).getByRole("button", { name: /^Quitar capa/ }).click();
+    await editor.locator('[data-testid="layer-row"]').nth(5).getByRole("checkbox", { name: "Visible" }).uncheck();
+    await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(5);
+    await editor.locator('[data-testid="layer-row"]').nth(5).getByRole("button", { name: /^Quitar capa/ }).click();
     await editor.locator('[data-testid="layers-apply-rarity"]').click();
-    // La carta 001 es común (n): marco plateado, sin partículas ni sello; las cuatro capas de imagen siguen.
-    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(4);
+    // La carta 001 es común (n): marco plateado, sin partículas ni sello; las cinco capas de imagen siguen.
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
   });
 
   await test.step("Spec 017, RF-5: la chica no se puede quitar ni ocultar, ni la carta volver a su imagen original", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
-    const chica = editor.locator('[data-testid="layer-row"]').first();
+    const chica = editor.locator('[data-testid="layer-row"]', { hasText: "Chica" });
     await expect(chica.getByRole("button", { name: /^Quitar capa/ })).toBeDisabled();
     await expect(chica.getByRole("checkbox", { name: "Visible" })).toBeDisabled();
     await expect(editor.locator('[data-testid="layers-remove"]')).toHaveCount(0);
@@ -69,7 +71,7 @@ test("editor de cartas por capas", async ({ browser }) => {
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
     await admin.reload();
     const editor = await openEditor(admin, setId);
-    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(4);
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
     await expect(editor.locator('[data-testid="layers-preview"] .cc-card')).toBeVisible();
   });
 
@@ -87,11 +89,11 @@ test("editor de cartas por capas", async ({ browser }) => {
     await a.getByRole("button", { name: "Añadir partículas" }).click();
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
-    await b.locator('[data-testid="layer-row"]').nth(1).getByRole("button", { name: /^Quitar capa/ }).click();
+    await b.locator('[data-testid="layer-row"]').nth(2).getByRole("button", { name: /^Quitar capa/ }).click();
     await other.click('[data-testid="layers-save"]');
     await expect(other.locator('[data-testid="layers-conflict"]')).toBeVisible();
     await other.click('[data-testid="layers-reload"]');
-    await expect(b.locator('[data-testid="layer-row"]')).toHaveCount(5);
+    await expect(b.locator('[data-testid="layer-row"]')).toHaveCount(6);
     await expect(other.locator('[data-testid="layers-conflict"]')).toHaveCount(0);
   });
 });
@@ -103,24 +105,26 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
 
   await test.step("Spec 017, RF-6: subir un fondo a la biblioteca de la colección", async () => {
     await admin.goto(`/admin/sets/${setId}`);
+    // La colección de prueba ya trae su «Fondo de prueba», que usan sus dos cartas.
+    await expect(admin.locator('[data-testid="background-item"]', { hasText: "Fondo de prueba" })).toContainText("En 2 cartas");
     await admin.setInputFiles('[data-testid="backgrounds-input"]', path.join(YUKI, "yuki_1_fondo.webp"));
-    const item = admin.locator('[data-testid="background-item"]');
-    await expect(item).toHaveCount(1);
-    await expect(item).toContainText("yuki_1_fondo");
+    const item = admin.locator('[data-testid="background-item"]', { hasText: "yuki_1_fondo" });
     await expect(item).toContainText("Sin usar");
   });
 
   await test.step("Spec 017, RF-8 y RF-9: la carta usa el fondo de la biblioteca y ya no se puede quitar", async () => {
     const editor = await openEditor(admin, setId);
-    await expect(editor.locator('[data-testid="layers-background"]')).toContainText("Sin fondo");
-    await editor.locator('[data-testid="layers-background-option"]').first().click();
-    await expect(editor.locator('[data-testid="layers-background-option"]').first()).toHaveAttribute("aria-pressed", "true");
+    const yuki = editor.getByRole("button", { name: "Usar el fondo yuki_1_fondo" });
+    await yuki.click();
+    await expect(yuki).toHaveAttribute("aria-pressed", "true");
+    await expect(editor.getByRole("button", { name: "Usar el fondo Fondo de prueba" })).toHaveAttribute("aria-pressed", "false");
     await expect(editor.locator('[data-testid="layer-row"]').first()).toContainText("Fondo");
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
     await admin.goto(`/admin/sets/${setId}`);
-    await expect(admin.locator('[data-testid="background-uses"]')).toContainText("En 1 carta");
-    await expect(admin.locator('[data-testid="background-item"]').getByRole("button", { name: /^Quitar el fondo/ })).toHaveCount(0);
+    const item = admin.locator('[data-testid="background-item"]', { hasText: "yuki_1_fondo" });
+    await expect(item.locator('[data-testid="background-uses"]')).toContainText("En 1 carta");
+    await expect(item.getByRole("button", { name: /^Quitar el fondo/ })).toHaveCount(0);
   });
 
   await test.step("Spec 017, RF-10 a RF-12: encuadrar a la chica con números, teclado y arrastre, y restablecer", async () => {
@@ -154,7 +158,9 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await editor.getByRole("tab", { name: "Propio de esta carta" }).click();
     await admin.setInputFiles('[data-testid="layers-background-upload"]', path.join(YUKI, "yuki_1_fondo.webp"));
     await expect(editor.locator('[data-testid="layer-row"]').first()).toContainText("Fondo");
-    await expect(editor.locator('[data-testid="layers-background"]')).not.toContainText("Sin fondo");
+    // El fondo propio sustituye al de la biblioteca: ninguno de la biblioteca queda elegido.
+    await editor.getByRole("tab", { name: "Biblioteca de la colección" }).click();
+    await expect(editor.locator('[data-testid="layers-background-option"][aria-pressed="true"]')).toHaveCount(0);
   });
 
   await test.step("Spec 017, RF-13 y RF-14: el estilo es automático hasta que se toca a mano", async () => {

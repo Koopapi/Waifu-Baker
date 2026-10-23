@@ -133,3 +133,12 @@ describe("spec 017 — volver al estilo automático", () => {
     expect(settleAutoStyle(chica, { ...reapplied, marco: "ur" }, "ssr").estiloAuto).toBe(false);
   });
 });
+
+describe("spec 017 — el estilo se compara sin depender del orden de las claves", () => {
+  it("test_s017_rf14_el_orden_de_las_claves_no_apaga_el_estilo_automatico", () => {
+    // La base de datos (jsonb) y la validación reordenan las claves de cada objeto.
+    const a: LayersConfig = { capas: [{ key: key(2), rol: "personaje" }, { particulas: "nieve", cantidad: 10, semilla: 3 }], marco: "r", sello: { texto: "R", estilo: "oro", esquina: "sup-izq" }, estiloAuto: true };
+    const b = JSON.parse('{"sello":{"esquina":"sup-izq","estilo":"oro","texto":"R"},"marco":"r","estiloAuto":true,"capas":[{"rol":"personaje","key":"' + key(2) + '"},{"semilla":3,"cantidad":10,"particulas":"nieve"}]}') as LayersConfig;
+    expect(settleAutoStyle(a, b).estiloAuto).toBe(true);
+  });
+});

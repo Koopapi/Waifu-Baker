@@ -196,10 +196,10 @@ describe("spec 016 — la carta conserva sus datos, colecciones publicadas y cam
       const store = tempStore();
       const { cards: published } = await createPublishedSet(tx, admin.id, { code: "LAYP", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], store });
       const staged = (await stageLayerImage(store, { body: await testImage({ width: 1400, height: 1982, hue: 50 }), mime: MIME.png, filename: "p.png" }, "layer")).key;
-      // Se añade un fondo detrás de la chica con la que nació la carta (spec 017).
+      // Se añade una capa delante de la carta ya armada (spec 017: chica y fondo).
       const layers = published[0].layers!;
-      const r = await saveCardLayers(tx, store, admin.id, published[0].id, { config: { ...layers, capas: [{ key: staged, rol: "fondo" }, ...layers.capas] }, expectedVersion: published[0].version });
-      expect(r.card.layers?.capas).toHaveLength(2);
+      const r = await saveCardLayers(tx, store, admin.id, published[0].id, { config: { ...layers, capas: [...layers.capas, { key: staged, rol: "extra" }] }, expectedVersion: published[0].version });
+      expect(r.card.layers?.capas).toHaveLength(layers.capas.length + 1);
     });
   });
 

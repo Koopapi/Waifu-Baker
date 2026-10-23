@@ -160,6 +160,11 @@ export const errors: Record<string, Msg> = {
   slot_sum: (p) => `Slot ${p.slot} adds up to ${p.sum}% instead of 100%.`,
   holo_range: "The holo chance must be between 0% and 100%.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: has a chance in the pack but no cards.`,
+  card_not_assembled: (p) =>
+    `Card ${String(p.number).padStart(3, "0")}: not assembled (missing ${String(p.missing)
+      .split(",")
+      .map((m) => (m === "personaje" ? "the girl" : "the background"))
+      .join(" and ")}).`,
   card_incomplete: (p) =>
     `Card ${pad(p.number)}: missing ${String(p.missing ?? "")
       .split(",")

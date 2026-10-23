@@ -86,6 +86,7 @@ export const adminLayers = {
     autoNote: "Frame, particles and seal follow the rarity until you change them by hand.",
     manualNote: "You changed the style by hand: changing the rarity only updates the frame and seal. \"Apply rarity style\" makes it automatic again.",
   },
+  notAssembled: (n: number) => `${n === 1 ? "1 card isn't assembled" : `${n} cards aren't assembled`} (missing the girl or the background): the set can't be published like this.`,
   backgrounds: {
     title: "Set backgrounds",
     intro: "Backgrounds to choose from when assembling this set's cards. Canvas ratio (700 × 991); other sizes with the same ratio are scaled automatically.",

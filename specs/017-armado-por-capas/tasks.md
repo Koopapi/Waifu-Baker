@@ -22,10 +22,12 @@
 - [x] **T8 — Editor**: elegir fondo, encuadre (arrastrar, numérico, teclado, restablecer), no quitar el personaje,
   estilo automático al tocar marco/partículas/sello · RF-5, RF-8, RF-10, RF-11, RF-14 · Depende de T3 y T7. Incluye
   adaptar `e2e/card-layers.spec.ts` (la carta ya nace con la chica como capa).
-- [ ] **T9 — Crear desde capas** · RF-11 (crear), RF-16.
+- [x] **T9 — Crear desde capas** · Se junta con la T11: ningún RF pide otra forma de crear cartas (la RF-1 las crea
+  desde la chica) y la importación (RF-18) pone todas las capas de una vez.
 
 ## Entrega 4 — Publicar, importar y demo
-- [ ] **T10 — Publicar solo con cartas armadas** · RF-15, RF-16.
+- [x] **T10 — Publicar solo con cartas armadas** · RF-15, RF-16 · Hecho: comprobación al publicar con enlace a
+  cada carta, aviso en la página de la colección y colecciones de prueba armadas con un fondo de su biblioteca.
 - [ ] **T11 — Exportar e importar** el formato del creador · RF-17 a RF-19.
 - [ ] **T12 — Demo y colecciones de prueba armadas** · RF-20.
 
@@ -35,5 +37,5 @@
 
 ## Cobertura
 RF-1 T6 · RF-2 T4 · RF-3 T4 · RF-4 T6 · RF-5 T2, T8 · RF-6 T7 · RF-7 T7 · RF-8 T8 · RF-9 T7 · RF-10 T2, T8 ·
-RF-11 T2, T8, T9 · RF-12 T3 · RF-13 T5 · RF-14 T5, T8 · RF-15 T2, T10 · RF-16 T9, T10 · RF-17 T11 · RF-18 T11 ·
+RF-11 T2, T8 · RF-12 T3 · RF-13 T5 · RF-14 T5, T8 · RF-15 T2, T10 · RF-16 T10 · RF-17 T11 · RF-18 T11 ·
 RF-19 T11 · RF-20 T12.

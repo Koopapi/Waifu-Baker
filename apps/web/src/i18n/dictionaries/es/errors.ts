@@ -160,6 +160,11 @@ export const errors: Record<string, Msg> = {
   slot_sum: (p) => `La ranura ${p.slot} suma ${p.sum} % en vez de 100 %.`,
   holo_range: "La probabilidad de holo debe estar entre 0 % y 100 %.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: tiene probabilidad en el sobre pero ninguna carta.`,
+  card_not_assembled: (p) =>
+    `Carta ${String(p.number).padStart(3, "0")}: no está armada (falta ${String(p.missing)
+      .split(",")
+      .map((m) => (m === "personaje" ? "la chica" : "el fondo"))
+      .join(" y ")}).`,
   card_incomplete: (p) =>
     `Carta ${pad(p.number)}: falta ${String(p.missing ?? "")
       .split(",")

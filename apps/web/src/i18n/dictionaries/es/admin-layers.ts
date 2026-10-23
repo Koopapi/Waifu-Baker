@@ -85,6 +85,7 @@ export const adminLayers: typeof en = {
     autoNote: "Marco, partículas y sello siguen a la rareza mientras no los cambies a mano.",
     manualNote: "Cambiaste el estilo a mano: al cambiar la rareza solo se actualizan el marco y el sello. «Aplicar estilo de la rareza» lo vuelve automático.",
   },
+  notAssembled: (n: number) => `${n === 1 ? "1 carta no está armada" : `${n} cartas no están armadas`} (les falta la chica o el fondo): la colección no se puede publicar así.`,
   backgrounds: {
     title: "Fondos de la colección",
     intro: "Fondos para elegir al armar las cartas de esta colección. Proporción del lienzo (700 × 991); otro tamaño con la misma proporción se escala solo.",

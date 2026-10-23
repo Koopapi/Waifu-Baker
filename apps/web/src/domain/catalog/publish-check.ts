@@ -1,6 +1,8 @@
-// RF-6 y RF-7: todas las comprobaciones antes de publicar, devueltas a la vez y enlazadas.
+// RF-6 y RF-7: todas las comprobaciones antes de publicar, devueltas a la vez y enlazadas. Spec 017, RF-15 y RF-16: también
+// que cada carta esté armada (chica y fondo visibles).
 import { RARITY_LABEL, rarityGaps, type Rarity } from "./card-rules";
 import { validateOdds, type Problem, type Slot } from "./odds";
+import { missingParts, type LayersConfig } from "@/domain/cards/layers";
 
 export interface PublishInput {
   isAdult: boolean;
@@ -16,6 +18,8 @@ export interface PublishInput {
     keyFull: string | null;
     adultReviewedAt: Date | null;
     pendingOriginalKey: string | null;
+    /** Spec 017: configuración por capas (la carta tiene que estar armada). */
+    layers: LayersConfig | null;
   }[];
 }
 
@@ -48,6 +52,16 @@ export function publishProblems(input: PublishInput): Problem[] {
         message: `Carta ${pad(c.number)}: falta ${missing.map((f) => FIELD_LABEL[f]).join(", ")}.`,
         target,
         params: { number: c.number, missing: missing.join(",") },
+      });
+    }
+    const parts = missingParts(c.layers);
+    if (parts.length) {
+      const labels = { personaje: "la chica", fondo: "el fondo" } as const;
+      out.push({
+        code: "card_not_assembled",
+        message: `Carta ${pad(c.number)}: no está armada (falta ${parts.map((p) => labels[p]).join(" y ")}).`,
+        target,
+        params: { number: c.number, missing: parts.join(",") },
       });
     }
     if (!input.isAdult) continue;

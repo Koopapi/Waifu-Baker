@@ -2,7 +2,7 @@
 // lote → editar probabilidades → simular sobre → publicar → comprobar bloqueos → regalar un sobre.
 import type { Browser, Page } from "@playwright/test";
 import { DESKTOP, desktopOnly, expect, test } from "./fixtures";
-import { choose, tick, untickAdmin } from "./helpers";
+import { assembleSet, choose, tick, untickAdmin } from "./helpers";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -100,6 +100,10 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click("text=Comprobar y publicar");
     await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator('[data-testid="publish-problems"]')).toContainText("tiene probabilidad en el sobre pero ninguna carta");
+    // Spec 017, RF-15: las cartas recién subidas tienen a la chica pero no fondo; cada una sale enlazada.
+    await expect(page.locator('[data-testid="publish-problems"]')).toContainText("Carta 001: no está armada (falta el fondo).");
+    await expect(page.locator('[data-testid="publish-problems"] a[href="#carta-001"]', { hasText: "no está armada" })).toBeVisible();
+    await expect(page.locator('[data-testid="not-assembled"]')).toContainText("10 cartas no están armadas");
     await expect(page.locator("h1 ~ span").first()).toHaveText("Borrador");
   });
 
@@ -139,6 +143,10 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   });
 
   await test.step("RF-21 y RF-8: publicar, congelar probabilidades y bloquear la colección", async () => {
+    // Spec 017, RF-15: con las cartas armadas ya se puede publicar.
+    await assembleSet(page, "E2E1");
+    await page.reload();
+    await expect(page.locator('[data-testid="not-assembled"]')).toHaveCount(0);
     await page.click("text=Comprobar y publicar");
     await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator("text=Colección publicada. Sus probabilidades ya son públicas.")).toBeVisible();

@@ -57,8 +57,18 @@ export function retierLayers(config: LayersConfig, tier: RarityTier): { config: 
   return { config: { ...config, marco: tier, sello }, imageSealToReview: false };
 }
 
+/** JSON con las claves ordenadas: la base de datos (jsonb) y la validación reordenan las claves de cada objeto. */
+function stableJson(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(stableJson).join(",")}]`;
+  if (v && typeof v === "object") {
+    const entries = Object.entries(v as Record<string, unknown>).filter(([, x]) => x !== undefined);
+    return `{${entries.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([k, x]) => `${JSON.stringify(k)}:${stableJson(x)}`).join(",")}}`;
+  }
+  return JSON.stringify(v ?? null);
+}
+
 /** Lo que forma el estilo de una carta: marco, sello, holo y partículas (no las capas de imagen ni su orden). */
-const styleOf = (c: LayersConfig) => JSON.stringify([c.marco, c.sello, c.holo ?? false, c.capas.filter((l: Layer) => !isImageLayer(l))]);
+const styleOf = (c: LayersConfig) => stableJson([c.marco, c.sello, c.holo ?? false, c.capas.filter((l: Layer) => !isImageLayer(l))]);
 
 /**
  * Spec 017, RF-13 y RF-14: al guardar, si el administrador cambió a mano el marco, las partículas o el sello, la carta
