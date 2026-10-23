@@ -147,6 +147,7 @@ export const errors: Record<string, Msg> = {
   layer_missing: "One of the layers is no longer available: upload it again.",
   layers_required: "This card was created from layers and has no original image: it needs at least one visible image layer.",
   two_characters: "A card can only have one girl (character layer).",
+  no_layers: "This card has no layers to export yet.",
   character_required: "The girl can't be removed or hidden; you can replace her.",
   character_type: "Upload the girl as PNG or WebP (with transparency).",
   character_too_short: (p) => `The image is ${p.height} px tall; the minimum is ${p.min} px.`,

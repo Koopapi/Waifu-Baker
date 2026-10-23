@@ -180,4 +180,33 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await expect(editor.locator('[data-testid="layers-uploads"]')).not.toContainText("no está recortada");
     await expect(editor.locator('input[data-testid="framing-x"]')).toHaveValue("12");
   });
+
+  await test.step("Spec 017, RF-17: exportar la carta en el formato del creador", async () => {
+    await admin.click('[data-testid="layers-save"]');
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
+    const [download] = await Promise.all([admin.waitForEvent("download"), admin.click('[data-testid="layers-export"]')]);
+    expect(download.suggestedFilename()).toBe("ARM1-carta-002.zip");
+  });
+
+  await test.step("Spec 017, RF-18: una configuración no válida o sin sus archivos no cambia la carta", async () => {
+    const editor = admin.locator('[data-testid="layers-editor"]');
+    const rows = await editor.locator('[data-testid="layer-row"]').count();
+    await admin.setInputFiles('[data-testid="layers-import"]', { name: "mala.json", mimeType: "application/json", buffer: Buffer.from('{"marco":"dorado","capas":[]}') });
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("falla «marco»");
+    await admin.setInputFiles('[data-testid="layers-import"]', path.join(YUKI, "..", "yuki.json"));
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Faltan archivos de la configuración");
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(rows);
+  });
+
+  await test.step("Spec 017, RF-18: importar la carta de Yuki del creador con sus archivos", async () => {
+    const editor = admin.locator('[data-testid="layers-editor"]');
+    const files = ["yuki_1_fondo.webp", "yuki_3_personaje.webp", "yuki_4_particulas1.webp", "yuki_5_insignia.webp", "yuki_ssr.webp"].map((f) => path.join(YUKI, f));
+    await admin.setInputFiles('[data-testid="layers-import"]', [path.join(YUKI, "..", "yuki.json"), ...files]);
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Configuración importada");
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
+    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Fondo");
+    await expect(editor.locator('[data-testid="layer-row"]').nth(2)).toContainText("Chica");
+    await admin.click('[data-testid="layers-save"]');
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
+  });
 });

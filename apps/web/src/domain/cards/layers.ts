@@ -50,7 +50,7 @@ const framing = z.object({
   ajuste: z.enum(FITS).optional(),
 });
 
-const imageLayer = z.object({
+export const imageLayerSchema = z.object({
   key: z.string().min(1),
   rol: z.enum(LAYER_ROLES).optional(),
   encuadre: framing.optional(),
@@ -61,7 +61,7 @@ const imageLayer = z.object({
   visible: z.boolean().optional(),
 });
 
-const particleLayer = z.object({
+export const particleLayerSchema = z.object({
   particulas: z.enum(PARTICLE_TYPES),
   cantidad: num(0, 200).optional(),
   tamano: num(0.2, 5).optional(),
@@ -75,7 +75,7 @@ const particleLayer = z.object({
   visible: z.boolean().optional(),
 });
 
-const imageSeal = z.object({
+export const imageSealSchema = z.object({
   key: z.string().min(1),
   esquina: z.enum(CORNERS),
   tamano: num(5, 100).optional(),
@@ -83,7 +83,7 @@ const imageSeal = z.object({
   relacion: num(0.01, 100).optional(),
 });
 
-const textSeal = z.object({
+export const textSealSchema = z.object({
   texto: z.string().trim().min(1).max(8),
   estilo: z.enum(SEAL_STYLES),
   esquina: z.enum(CORNERS),
@@ -91,21 +91,21 @@ const textSeal = z.object({
 });
 
 export const layersConfigSchema = z.object({
-  capas: z.array(z.union([imageLayer, particleLayer])).max(40),
+  capas: z.array(z.union([imageLayerSchema, particleLayerSchema])).max(40),
   marco: z.enum(TIERS),
   borde: num(0, 8).optional(),
-  sello: z.union([imageSeal, textSeal]).nullable(),
+  sello: z.union([imageSealSchema, textSealSchema]).nullable(),
   holo: z.boolean().optional(),
   /** Spec 017, RF-13: el sistema pone marco, partículas y sello del escalón mientras nadie los toque. */
   estiloAuto: z.boolean().optional(),
 });
 
-export type ImageLayer = z.infer<typeof imageLayer>;
-export type ParticleLayer = z.infer<typeof particleLayer>;
+export type ImageLayer = z.infer<typeof imageLayerSchema>;
+export type ParticleLayer = z.infer<typeof particleLayerSchema>;
 export type Layer = ImageLayer | ParticleLayer;
-export type ImageSeal = z.infer<typeof imageSeal>;
+export type ImageSeal = z.infer<typeof imageSealSchema>;
 export type Framing = Required<z.infer<typeof framing>>;
-export type TextSeal = z.infer<typeof textSeal>;
+export type TextSeal = z.infer<typeof textSealSchema>;
 /** Configuración guardada: las imágenes son claves del almacén, nunca URLs. */
 export type LayersConfig = z.infer<typeof layersConfigSchema>;
 

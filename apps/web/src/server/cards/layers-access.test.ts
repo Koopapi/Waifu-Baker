@@ -14,7 +14,7 @@ function walk(dir: string): string[] {
   });
 }
 
-const ROUTES = ["app/api/admin/cards/[id]/layers/route.ts", "app/api/admin/layer-uploads/route.ts", "app/api/admin/sets/[id]/backgrounds/route.ts"];
+const ROUTES = ["app/api/admin/cards/[id]/layers/route.ts", "app/api/admin/layer-uploads/route.ts", "app/api/admin/sets/[id]/backgrounds/route.ts", "app/api/admin/cards/[id]/layers/export/route.ts"];
 /** Donde se puede leer la configuración por capas: el esquema, los servicios del panel (capas y fondos) y el panel. */
 const ALLOWED = [/^db\/schema\.ts$/, /^server\/services\/card-layers\.ts$/, /^server\/services\/set-backgrounds\.ts$/, /^app\/admin\//, /^app\/api\/admin\//, /^features\/admin\//];
 

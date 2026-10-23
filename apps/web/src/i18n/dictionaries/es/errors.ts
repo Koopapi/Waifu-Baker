@@ -148,6 +148,7 @@ export const errors: Record<string, Msg> = {
   layer_missing: "Una de las capas ya no está disponible: vuelve a subirla.",
   layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
   two_characters: "Una carta solo puede tener una chica (capa de personaje).",
+  no_layers: "Esta carta todavía no tiene capas que exportar.",
   character_required: "La chica no se puede quitar ni ocultar; puedes sustituirla.",
   character_type: "La chica debe subirse en PNG o WebP (con transparencia).",
   character_too_short: (p) => `La imagen mide ${p.height} px de alto; el mínimo es ${p.min} px.`,

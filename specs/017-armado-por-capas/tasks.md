@@ -28,7 +28,7 @@
 ## Entrega 4 — Publicar, importar y demo
 - [x] **T10 — Publicar solo con cartas armadas** · RF-15, RF-16 · Hecho: comprobación al publicar con enlace a
   cada carta, aviso en la página de la colección y colecciones de prueba armadas con un fondo de su biblioteca.
-- [ ] **T11 — Exportar e importar** el formato del creador · RF-17 a RF-19.
+- [x] **T11 — Exportar e importar** el formato del creador · RF-17 a RF-19.
 - [ ] **T12 — Demo y colecciones de prueba armadas** · RF-20.
 
 ## Entrega 5 — Cierre

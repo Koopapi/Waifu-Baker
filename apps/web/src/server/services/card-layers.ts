@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
-import { cards } from "@/db/schema";
+import { cards, sets } from "@/db/schema";
+import { exportCreatorConfig } from "@/domain/cards/layers-io";
 import { settleAutoStyle } from "@/domain/cards/layers-rarity";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import { characterLayer, checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetBackgroundKey, isSetLayerKey, isTempKey, layerKey, repeatedImages, type LayersConfig } from "@/domain/cards/layers";
@@ -151,4 +152,24 @@ export async function getCardLayers(db: DbLike, cardId: string) {
   const [cur] = await db.select({ layers: cards.layers, version: cards.version, originalKey: cards.originalKey }).from(cards).where(eq(cards.id, cardId));
   if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
   return { layers: cur.layers, version: cur.version, hasOriginal: Boolean(cur.originalKey) };
+}
+
+/**
+ * Spec 017, RF-17: la carta en el formato del creador de Bruno: `carta.json` con los nombres de archivo de sus capas y su
+ * encuadre, y cada imagen con ese nombre (para el ZIP de la descarga).
+ */
+export async function exportCardLayers(db: DbLike, store: CardStore, cardId: string) {
+  const [row] = await db.select({ card: cards, code: sets.code }).from(cards).innerJoin(sets, eq(sets.id, cards.setId)).where(eq(cards.id, cardId));
+  if (!row) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
+  if (!row.card.layers) throw new AdminError("no_layers", "Esta carta todavía no tiene capas que exportar.");
+  const id = `carta-${String(row.card.number).padStart(3, "0")}`;
+  const { json, files } = exportCreatorConfig(row.card.layers, id);
+  const images = await Promise.all(
+    files.map(async (f) => {
+      const file = await store.get(f.key);
+      if (!file) throw new AdminError("layer_missing", "Una de las capas ya no está disponible.");
+      return { name: f.name, body: file.body };
+    }),
+  );
+  return { fileName: `${row.code}-${id}.zip`, files: [{ name: "carta.json", body: Buffer.from(JSON.stringify(json, null, 2)) }, ...images] };
 }

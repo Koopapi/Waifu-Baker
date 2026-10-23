@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { auditLog, cards } from "@/db/schema";
 import { createSet } from "@/server/services/collections";
 import { bulkUpdateCards, updateCard, uploadCardImage } from "@/server/services/cards";
-import { getCardLayers, removeCardLayers, saveCardLayers } from "@/server/services/card-layers";
+import { exportCardLayers, getCardLayers, removeCardLayers, saveCardLayers } from "@/server/services/card-layers";
 import { stageLayerImage } from "@/server/cards/layer-images";
 import { inRollback } from "./db";
 import { createPublishedSet, makeAdmin } from "./factories";
@@ -304,6 +304,31 @@ describe("spec 017 — estilo automático", () => {
       const saved = (await load()).layers!;
       expect(saved.marco).toBe("ssr");
       expect(saved.capas.filter((l) => "particulas" in l)).toEqual([{ particulas: "nieve" }]);
+    });
+  });
+});
+
+describe("spec 017 — exportar", () => {
+  it("test_s017_rf17_exporta_la_configuracion_y_sus_imagenes", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, stage } = await setup(tx);
+      const [f, c] = [await stage(10), await stage(200)];
+      const config = { capas: [{ key: f, rol: "fondo" }, { key: c, rol: "personaje", encuadre: { x: 3 } }], marco: "sr", sello: null };
+      const r = await saveCardLayers(tx, store, admin.id, card.id, { config, expectedVersion: card.version });
+      const out = await exportCardLayers(tx, store, card.id);
+      expect(out.fileName).toBe("LAY1-carta-001.zip");
+      expect(out.files.map((x) => x.name)).toEqual(["carta.json", "carta-001_1_fondo.webp", "carta-001_2_personaje.webp"]);
+      const json = JSON.parse(out.files[0].body.toString("utf8"));
+      expect(json).toMatchObject({ id: "carta-001", marco: "sr", capas: [{ src: "carta-001_1_fondo.webp", rol: "fondo" }, { src: "carta-001_2_personaje.webp", encuadre: { x: 3 } }] });
+      const saved = r.card.layers!.capas as { key: string }[];
+      expect(out.files[1].body.equals((await store.get(saved[0].key))!.body)).toBe(true);
+    });
+  });
+
+  it("test_s017_rf17_una_carta_sin_capas_no_se_exporta", async () => {
+    await inRollback(async (tx) => {
+      const { store, card } = await setup(tx);
+      await expect(exportCardLayers(tx, store, card.id)).rejects.toMatchObject({ code: "no_layers" });
     });
   });
 });

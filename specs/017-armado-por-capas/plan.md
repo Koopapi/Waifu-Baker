@@ -27,7 +27,7 @@ después el código.
 | `domain/cards/layers-io.ts` | Exportar e importar el formato del creador (claves ↔ nombres de archivo, encuadre incluido; mezclas no ofrecidas a normal con aviso) | RF-17 a RF-19 |
 | `ui/game/carta-capas/carta-capas.js` | Encuadre por capa: `transform` en la imagen (no en la capa, que lleva el parallax) y `object-fit` según `ajuste` | RF-12 |
 | `server/cards/character-images.ts` | Valida la imagen de la chica (PNG/WebP, ≤ 20 MB, ≥ 991 px de alto), la guarda en WebP con su proporción (alto máximo 1982 px) en el área temporal de capas y detecta si no tiene transparencia (`sharp().stats()`) | RF-2, RF-3 |
-| `server/services/card-layers.ts` | `createCardFromCharacter` (carta nueva con la chica como personaje y estilo automático), `replaceCharacter` (conserva encuadre), `createCardFromLayers` | RF-1, RF-4, RF-11 |
+| `server/services/cards.ts` y `card-layers.ts` | La subida crea la carta con la chica como personaje y estilo automático (`configFromCharacter`); sustituirla conserva el encuadre (`replaceCharacter`); `exportCardLayers` arma el ZIP del creador (`server/zip.ts`, sin compresión y sin dependencias) | RF-1, RF-4, RF-17 |
 | `server/services/set-backgrounds.ts` + API | Subir, listar y quitar fondos de la biblioteca; no se quita si está en uso | RF-6, RF-7, RF-9 |
 | `server/services/collections.ts` (`publishSet`) | Nueva comprobación: todas las cartas armadas, con la lista de las que faltan | RF-15, RF-16 |
 | `features/admin/cards/LayersEditor.tsx` | Elegir fondo (biblioteca o propio), encuadre arrastrando sobre la vista previa, controles numéricos y teclado, restablecer; marca `estiloAuto=false` al tocar marco, partículas o sello; exportar e importar | RF-8, RF-10, RF-11, RF-14, RF-17, RF-18 |

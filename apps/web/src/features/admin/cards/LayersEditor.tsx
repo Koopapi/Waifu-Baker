@@ -21,6 +21,7 @@ import {
   type LayersConfig,
 } from "@/domain/cards/layers";
 import { applyTierStyle, replaceCharacter, settleAutoStyle } from "@/domain/cards/layers-rarity";
+import { parseCreatorConfig, withKeys } from "@/domain/cards/layers-io";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import { useT } from "@/i18n/client";
 import { useAdminLayersT } from "@/i18n/admin-layers";
@@ -245,6 +246,43 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
     if (!file) return;
     const key = await uploadOne(file, "seal");
     if (key) update((c) => ({ ...c, sello: { key, esquina: c.sello?.esquina ?? "sup-izq", tamano: 36 } }));
+  }
+
+  /**
+   * Spec 017, RF-18 y RF-19: importa una configuración del creador con sus archivos. Si algo falla (configuración no
+   * válida, archivos que faltan o que no se pueden subir), la carta no cambia y se dice qué parte falla.
+   */
+  async function importCreator(files: FileList | null) {
+    const list = [...(files ?? [])];
+    if (!list.length) return;
+    const fail = (text: string) => setNotice({ tone: "danger", text });
+    const jsonFile = list.find((f) => f.name.toLowerCase().endsWith(".json"));
+    if (!jsonFile) return fail(t.io.noJson);
+    let raw: unknown;
+    try {
+      raw = JSON.parse(await jsonFile.text());
+    } catch {
+      return fail(t.io.invalid(""));
+    }
+    const parsed = parseCreatorConfig(raw);
+    if (!parsed.ok) return fail(parsed.max ? t.io.tooMany(parsed.max) : t.io.invalid(parsed.path));
+    const byName = new Map(list.map((f) => [f.name, f]));
+    const missing = parsed.files.filter((f) => !byName.has(f.name)).map((f) => f.name);
+    if (missing.length) return fail(t.io.missing(missing.join(", ")));
+    if (characterIndex >= 0 && !parsed.config.capas.some((l) => "src" in l && l.rol === "personaje")) return fail(t.io.noCharacter);
+    setUploads([]);
+    setNotice(null);
+    const keys: Record<string, string> = {};
+    for (const f of parsed.files) {
+      const key = await uploadOne(byName.get(f.name)!, f.kind);
+      if (!key) return fail(t.io.failed);
+      keys[f.name] = key;
+    }
+    // Lo importado es un estilo hecho a mano: no sigue a la rareza hasta que se aplique el de la rareza.
+    const next: LayersConfig = { ...withKeys(parsed.config, keys), estiloAuto: false };
+    setDraft(next);
+    setSelected(defaultSelection(next));
+    setNotice(parsed.changedBlends.length ? { tone: "warning", text: t.io.blends(parsed.changedBlends.join(", ")) } : { tone: "success", text: t.io.done });
   }
 
   async function send(method: "PUT" | "DELETE", force = false) {
@@ -597,6 +635,18 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
             <Button onClick={() => void send("PUT")} loading={busy} disabled={!dirty || conflict} data-testid="layers-save">
               {t.save}
             </Button>
+            {/* Spec 017, RF-17 y RF-18: el formato del creador de cartas. */}
+            {saved && (
+              <Button variant="secondary" asChild title={t.io.exportHint}>
+                <a href={`/api/admin/cards/${card.id}/layers/export`} download data-testid="layers-export">
+                  {t.io.export}
+                </a>
+              </Button>
+            )}
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-ui-hover px-4 py-2 text-sm font-semibold text-ui-text hover:bg-ui-line" title={t.io.importHint}>
+              {t.io.import}
+              <input type="file" multiple accept="application/json,.json,image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void importCreator(e.target.files).finally(() => (e.target.value = ""))} data-testid="layers-import" />
+            </label>
             {/* Spec 017, RF-5: una carta con chica no vuelve a la imagen original. */}
             {saved && characterIndex < 0 && (
               <Button variant="danger" onClick={() => void removeAll()} disabled={busy || !card.hasOriginal} title={card.hasOriginal ? undefined : t.cannotRemoveAll} data-testid="layers-remove">
@@ -605,6 +655,7 @@ export function LayersEditor({ card, backgrounds = [], onSaved }: { card: CardDT
             )}
             {saved && characterIndex < 0 && !card.hasOriginal && <p className="text-xs text-ui-text-3">{t.cannotRemoveAll}</p>}
           </div>
+          <p className="text-xs text-ui-text-3">{t.io.importHint}</p>
         </div>
       </div>
     </section>
