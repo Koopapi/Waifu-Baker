@@ -9,8 +9,11 @@
 ## Entrega 2 — Imagen fija
 - [x] **T2 — Renderizador** (`flatten.ts` con `playwright-core` y `carta-capas.js`): foto de la carta en reposo a 2×,
   tamaños y marca de agua · RF-1.
-- [ ] **T3 — Acabado holo** en CSS sobre la imagen fija donde se marca la holo · RF-5.
-- [ ] **T4 — Generación al crear, guardar capas, cambiar rareza y regenerar**; fallo que no guarda · RF-2 a RF-4.
+- [x] **T3 — Acabado holo** en CSS sobre la imagen fija donde se marca la holo · RF-5.
+- [x] **T4 — Generación al crear, guardar capas, cambiar rareza y regenerar**; fallo que no guarda · RF-2 a RF-4 ·
+  Hecho: el dibujo es un puerto (`setFlattener`): los tests que no miran la imagen usan uno rápido con sharp; los de la
+  imagen fija, Chromium. La CI instala Chromium antes de Vitest. Al aprobar una chica pendiente en una 18+ publicada,
+  ahora ocupa su capa de personaje (spec 017, RF-4).
 
 ## Entrega 3 — Carta viva
 - [ ] **T5 — Capas firmadas** (`/api/cards/[id]/live` y `/api/cards/layer`) con dueño y doble control 18+ · RF-16, RF-17.

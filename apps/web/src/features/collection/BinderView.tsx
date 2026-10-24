@@ -70,7 +70,7 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
               <button
                 type="button"
                 onClick={() => setOpen(s.number)}
-                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? "binder-card--holo" : ""}`}
+                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? "binder-card--holo holo-finish" : ""}`}
                 aria-label={t.collection.binder.viewCard(pad(s.number))}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}

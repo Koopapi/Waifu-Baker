@@ -1,8 +1,8 @@
 // Spec 018: la imagen fija de una carta armada sale del mismo carta-capas.js (Chromium sin ventana).
-import { afterAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import sharp from "sharp";
 import type { LayersConfig } from "@/domain/cards/layers";
-import { closeFlattenBrowser, FLAT_SIZES, flattenCard, renderFlatCard } from "@/server/cards/flatten";
+import { FLAT_SIZES, flattenCard, renderFlatCard } from "@/server/cards/flatten";
 import { testImage } from "./images";
 
 const pixel = async (png: Buffer, x: number, y: number) => {
@@ -39,7 +39,6 @@ const config: LayersConfig = {
 const SLOW = 60_000;
 
 describe("spec 018 — imagen fija", () => {
-  afterAll(() => closeFlattenBrowser());
 
   it("test_s018_rf1_la_imagen_fija_es_la_carta_completa_a_1400_por_1982", async () => {
     const png = await flattenCard(config, await images());

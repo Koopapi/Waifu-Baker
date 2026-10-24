@@ -69,6 +69,14 @@ const dataUrl = (body: Buffer) => `data:image/webp;base64,${body.toString("base6
 export async function flattenCard(config: LayersConfig, images: Map<string, Buffer>, opts: { holo?: boolean } = {}): Promise<Buffer> {
   const missing = imageKeys(config).filter((k) => !images.has(k));
   if (missing.length) throw new AdminError("flatten_failed", "No se pudo generar la imagen de la carta: falta una de sus capas.");
+  // Una imagen dañada no rompe la foto (el navegador la deja en blanco): se comprueba antes.
+  for (const body of images.values()) {
+    const ok = await sharp(body)
+      .metadata()
+      .then((m) => Boolean(m.width && m.height))
+      .catch(() => false);
+    if (!ok) throw new AdminError("flatten_failed", "No se pudo generar la imagen de la carta: una de sus capas no es una imagen válida.");
+  }
   const capas = config.capas.map((l) => (isImageLayer(l) ? { ...l, src: dataUrl(images.get(l.key)!) } : l));
   const sello = isImageSeal(config.sello) ? { ...config.sello, src: dataUrl(images.get(config.sello.key)!) } : config.sello;
   const cfg = { ...config, capas, sello, holo: Boolean(opts.holo || config.holo), aparecer: false, reposo: false, etiqueta: "carta" };
@@ -94,7 +102,11 @@ export async function flattenCard(config: LayersConfig, images: Map<string, Buff
 
 /** RF-1, RF-2 y RF-15: la imagen fija en todos sus tamaños (la pública, con marca de agua) y su blurhash. */
 export async function renderFlatCard(config: LayersConfig, images: Map<string, Buffer>, opts: { holo?: boolean } = {}): Promise<FlatCard> {
-  const png = await flattenCard(config, images, opts);
+  return flatVariants(await flattenCard(config, images, opts));
+}
+
+/** Los cuatro tamaños y el blurhash a partir de la carta dibujada a 1400 × 1982. */
+export async function flatVariants(png: Buffer): Promise<FlatCard> {
   const full = await sharp(png).webp({ quality: 88, alphaQuality: 90 }).toBuffer();
   const resized = (size: FlatSize, quality: number) => sharp(png).resize(FLAT_SIZES[size].width, FLAT_SIZES[size].height).webp({ quality }).toBuffer();
   const pub = FLAT_SIZES.public;

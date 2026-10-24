@@ -277,7 +277,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
             <div className="summary__grid">
               {cards.map((c, i) => (
                 <div key={i} className={`summary__row rarity-${c.rarity}`}>
-                  <span className="summary__thumb">
+                  <span className={`summary__thumb ${c.holo ? "holo-finish" : ""}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
                     <img src={c.image} alt="" draggable={false} />
                   </span>

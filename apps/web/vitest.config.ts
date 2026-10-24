@@ -20,6 +20,7 @@ export default defineConfig({
           name: "integration",
           include: ["tests/integration/**/*.test.ts"],
           globalSetup: ["tests/integration/global-setup.ts"],
+          setupFiles: ["tests/integration/setup.ts"],
           // Procesan imágenes reales con sharp: la primera composición carga fuente y marcos (~1,5 s).
           testTimeout: 20000,
           fileParallelism: false,

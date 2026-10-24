@@ -10,6 +10,8 @@ import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
 import { recordAudit } from "./audit";
 import { libraryKeysAmong } from "./library";
+import { renderCardFlat, storeFlat } from "@/server/cards/flat-store";
+import { composeCard } from "@/server/cards/compose";
 
 type CardRow = typeof cards.$inferSelect;
 const sha256 = (b: Buffer) => createHash("sha256").update(b).digest("hex");
@@ -98,6 +100,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
   const requested = validConfig(input.config);
   let previous: LayersConfig | null = null;
   let temps: string[] = [];
+  let oldFlat: string[] = [];
   let setId = "";
   const card = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
@@ -105,12 +108,17 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
     if (cur.version !== input.expectedVersion && !input.force) throw staleVersion();
     validConfig(requested, cur.layers);
     setId = cur.setId;
-    const settled = await settleKeys(tx, store, cur.setId, settleAutoStyle(cur.layers, requested, rarityTier(cur.rarity)));
+    const config = settleAutoStyle(cur.layers, requested, rarityTier(cur.rarity));
+    // Spec 018, RF-3 y RF-4: la imagen fija se saca antes de guardar nada; si falla, la carta no cambia.
+    const flat = await renderCardFlat(store, config);
+    const settled = await settleKeys(tx, store, cur.setId, config);
     temps = settled.temps;
     previous = cur.layers;
+    const flatKeys = await storeFlat(store, cur, flat);
+    oldFlat = [cur.keyFull, cur.keyMid, cur.keyThumb, cur.keyPublic].filter((k): k is string => Boolean(k));
     const [updated] = await tx
       .update(cards)
-      .set({ layers: settled.config, version: cur.version + 1, updatedAt: sql`now()` })
+      .set({ layers: settled.config, ...flatKeys, version: cur.version + 1, updatedAt: sql`now()` })
       .where(eq(cards.id, cardId))
       .returning();
     await recordAudit(tx, {
@@ -125,6 +133,8 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
     return updated;
   });
   await releaseLayerImages(db, store, setId, [...imageKeys(previous), ...temps]);
+  // Las imágenes fijas llevan el id de la carta en la clave: las anteriores no las usa nadie más.
+  await Promise.all(oldFlat.filter((k) => ![card.keyFull, card.keyMid, card.keyThumb, card.keyPublic].includes(k)).map((k) => store.delete(k)));
   return { card, repeated: repeatedImages(card.layers!) };
 }
 
@@ -134,6 +144,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
  */
 export async function removeCardLayers(db: DbLike, store: CardStore, actorUserId: string, cardId: string, input: { expectedVersion: number; force?: boolean }) {
   let previous: LayersConfig | null = null;
+  let oldFlat: string[] = [];
   let setId = "";
   const card = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
@@ -143,11 +154,18 @@ export async function removeCardLayers(db: DbLike, store: CardStore, actorUserId
     if (!cur.originalKey) throw new AdminError("layers_required", "Esta carta se creó desde capas: necesita al menos una capa de imagen visible.");
     setId = cur.setId;
     previous = cur.layers;
-    const [updated] = await tx.update(cards).set({ layers: null, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(cards.id, cardId)).returning();
+    // Spec 016, RF-14 (cartas anteriores a la spec 017): vuelve a la imagen compuesta con el marco de Pencil.
+    const original = await store.get(cur.originalKey);
+    if (!original) throw new AdminError("missing_original", "No se encontró la imagen original de la carta.", { what: "original" });
+    const [set] = await tx.select({ code: sets.code }).from(sets).where(eq(sets.id, cur.setId));
+    const composed = await storeFlat(store, cur, await composeCard(original.body, { number: cur.number, rarity: cur.rarity, setCode: set.code }));
+    oldFlat = [cur.keyFull, cur.keyMid, cur.keyThumb, cur.keyPublic].filter((k): k is string => Boolean(k));
+    const [updated] = await tx.update(cards).set({ layers: null, ...composed, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(cards.id, cardId)).returning();
     await recordAudit(tx, { actorUserId, action: "card_layers_remove", entityType: "card", entityId: cardId, before: { layers: cur.layers }, after: { layers: null } });
     return updated;
   });
   await releaseLayerImages(db, store, setId, imageKeys(previous));
+  await Promise.all(oldFlat.filter((k) => ![card.keyFull, card.keyMid, card.keyThumb, card.keyPublic].includes(k)).map((k) => store.delete(k)));
   return card;
 }
 

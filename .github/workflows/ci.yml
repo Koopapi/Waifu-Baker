@@ -60,10 +60,11 @@ jobs:
           AUTH_SECRET: ci-build-secreto-solo-para-medir-0123456789
           NEXT_DIST_DIR: .next-build
         run: pnpm build && pnpm budget
-      - name: Vitest (unidad e integración)
-        run: pnpm test
+      # Spec 018: la imagen fija de las cartas se saca con Chromium; sus tests de integración lo necesitan.
       - name: Navegador de Playwright
         run: pnpm exec playwright install --with-deps chromium
+      - name: Vitest (unidad e integración)
+        run: pnpm test
       - name: E2E de escritorio
         run: pnpm exec playwright test --project=chromium-desktop
       - name: Resultados del E2E si falla
