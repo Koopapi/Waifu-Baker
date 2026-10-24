@@ -186,7 +186,8 @@
 .card3d {
   grid-area: 1 / 1;
   width: min(64vw, 300px);
-  aspect-ratio: 63 / 88;
+  /* Spec 018: la proporción de la carta por capas (700 × 991). */
+  aspect-ratio: 700 / 991;
   pointer-events: auto;
   transform-style: preserve-3d;
   --rx: 0deg;
@@ -538,7 +539,7 @@
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 63 / 88;
+  aspect-ratio: 700 / 991;
   border-radius: 10px;
   overflow: hidden;
   border: 3px solid var(--rarity-color, #c9cdd3);
@@ -757,4 +758,13 @@
   .card3d--tease::before {
     animation: none;
   }
+}
+
+/* Spec 018, RF-6: la carta viva encima de la imagen fija de la cara, al revelarla (posición en línea en Card3D). */
+.card3d__live {
+  z-index: 3;
+}
+/* En cuanto la carta viva cargó, la imagen fija de debajo se oculta: al inclinarse, la viva dejaría ver su borde. */
+.card3d__front:has(.card3d__live .cc-card:not(.cc-cargando)) > :not(.card3d__live) {
+  opacity: 0;
 }

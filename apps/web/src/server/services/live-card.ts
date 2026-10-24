@@ -2,18 +2,14 @@
 // enlaces firmados que caducan y, en las colecciones 18+, con el doble control de edad. Nunca lo pendiente de revisión.
 import { and, eq } from "drizzle-orm";
 import { cards, sets, userCards, users } from "@/db/schema";
-import { imageKeys, isImageLayer, isImageSeal, type LayersConfig } from "@/domain/cards/layers";
-import { rarityTier, type RarityTier } from "@/domain/catalog/rarity-tier";
+import { imageKeys, isImageLayer, isImageSeal, type LayersConfig, type ParticleLayer } from "@/domain/cards/layers";
+import { rarityTier } from "@/domain/catalog/rarity-tier";
+import type { LiveCard, LiveImageLayer, LiveSeal } from "@/domain/cards/live";
 import { verifyLayer } from "@/domain/signed-url";
 import { cardLayerUrl, imageSecret } from "@/server/cards/image-urls";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 
-/** La configuración tal como la monta carta-capas.js en el navegador: enlaces en vez de claves del almacén. */
-export interface LiveCard {
-  tier: RarityTier;
-  config: Omit<LayersConfig, "capas" | "sello"> & { capas: Record<string, unknown>[]; sello: Record<string, unknown> | null };
-}
 
 /** La carta, si el usuario la tiene y puede verla (18+: declaración y tier adulto verificados). */
 async function visibleCard(db: DbLike, userId: string, cardId: string) {
@@ -37,12 +33,12 @@ export async function liveCardConfig(db: DbLike, userId: string, cardId: string,
   const card = await visibleCard(db, userId, cardId);
   if (!card?.layers) return null;
   const url = (key: string) => cardLayerUrl(cardId, key, userId, now);
-  const capas = card.layers.capas.map((l) => {
+  const capas = card.layers.capas.map((l): LiveImageLayer | ParticleLayer => {
     if (!isImageLayer(l)) return { ...l };
     const { key, ...rest } = l;
     return { ...rest, src: url(key) };
   });
-  let sello: Record<string, unknown> | null = card.layers.sello ? { ...card.layers.sello } : null;
+  let sello: LiveSeal | null = card.layers.sello && !isImageSeal(card.layers.sello) ? { ...card.layers.sello } : null;
   if (isImageSeal(card.layers.sello)) {
     const { key, ...rest } = card.layers.sello;
     sello = { ...rest, src: url(key) };

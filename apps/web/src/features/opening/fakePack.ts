@@ -1,5 +1,6 @@
 // Datos falsos para el prototipo /lab. Las imágenes de public/lab son renders SFW de
 // calibración del taller de arte: solo para desarrollo local, nunca entran en un set real.
+import type { LiveCard } from "@/domain/cards/live";
 
 export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary" | "secret";
 
@@ -14,6 +15,8 @@ export interface LabCard {
   framed?: boolean;
   /** Aclaración para el resumen (p. ej. rareza sustituida en una simulación de borrador). */
   note?: string;
+  /** Spec 018, RF-6: la carta viva que se monta al revelarla (sin ella, se ve la imagen fija). */
+  live?: LiveCard | null;
 }
 
 export const RARITY_ORDER: Rarity[] = ["common", "uncommon", "rare", "epic", "legendary", "secret"];

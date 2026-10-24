@@ -29,7 +29,7 @@ describe("spec 018 — capas para la carta viva", () => {
       const { store, card, fan } = await world(tx);
       const live = await liveCardConfig(tx, fan.id, card.id, NOW);
       expect(live).not.toBeNull();
-      const srcs = live!.config.capas.flatMap((l) => ("src" in l ? [l.src as string] : []));
+      const srcs = live!.config.capas.flatMap((l) => ("src" in l ? [l.src] : []));
       expect(srcs).toHaveLength(card.layers!.capas.filter((l) => "key" in l).length);
       for (const src of srcs) {
         expect(src).toMatch(/^\/api\/cards\/layer\?/);
@@ -46,7 +46,7 @@ describe("spec 018 — capas para la carta viva", () => {
     await inRollback(async (tx) => {
       const { store, card, fan, other } = await world(tx);
       expect(await liveCardConfig(tx, other.id, card.id, NOW)).toBeNull();
-      const src = (await liveCardConfig(tx, fan.id, card.id, NOW))!.config.capas.flatMap((l) => ("src" in l ? [l.src as string] : []))[0];
+      const src = (await liveCardConfig(tx, fan.id, card.id, NOW))!.config.capas.flatMap((l) => ("src" in l ? [l.src] : []))[0];
       const grant = { cardId: param(src, "c"), key: param(src, "k"), expires: Number(param(src, "e")), sig: param(src, "sig") };
       // El enlace es de otra persona, ha caducado o pide otra clave: nada.
       expect(await serveLiveLayer(tx, store, other.id, grant, NOW)).toBeNull();

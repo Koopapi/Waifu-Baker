@@ -27,6 +27,8 @@ export interface CartaCapasProps {
   noSeal?: boolean;
   /** Apertura: el sello espera escondido hasta `entrar()`. */
   sealHidden?: boolean;
+  /** Spec 018, RF-6: al cargar sus capas, hace su entrada (brillo que barre y el sello que salta). */
+  entrance?: boolean;
   /** Elemento donde se escucha el ratón (por defecto, el padre). */
   zone?: React.RefObject<HTMLElement | null>;
   className?: string;
@@ -45,7 +47,7 @@ export interface CartaCapasHandle {
  * destruye (con sus escuchas) al desmontarse.
  */
 export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function CartaCapas(
-  { tier, image, label, rawArt = false, config, holo = false, estatica = false, noSeal = false, sealHidden = false, zone, className, style },
+  { tier, image, label, rawArt = false, config, holo = false, estatica = false, noSeal = false, sealHidden = false, entrance = false, zone, className, style },
   ref,
 ) {
   const box = useRef<HTMLDivElement>(null);
@@ -70,7 +72,11 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
         ...(noSeal ? { sello: null } : {}),
       };
       card.current = config ? lib.montar(box.current, { ...config, ...extra }) : lib.montarRareza(box.current, tier, image, extra);
-      if (hidden.current) card.current.ocultarSello();
+      if (hidden.current || entrance) card.current.ocultarSello();
+      if (entrance) {
+        const inst = card.current;
+        void inst.listo.then(() => alive && inst.entrar());
+      }
     });
     return () => {
       alive = false;
@@ -79,7 +85,7 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
     };
     // `zone` es un ref estable; `label` solo cambia con la carta.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tier, image, rawArt, config, estatica, noSeal]);
+  }, [tier, image, rawArt, config, estatica, noSeal, entrance]);
 
   useEffect(() => {
     card.current?.set({ holo: holo || Boolean(config?.holo) });

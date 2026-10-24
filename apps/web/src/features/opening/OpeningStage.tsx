@@ -61,6 +61,8 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
   const [revealed, setRevealed] = useState(0);
   const [packKey, setPackKey] = useState(0);
   const [flash, setFlash] = useState<Rarity | null>(null);
+  // Spec 018, RF-6: la carta recién revelada se ve viva mientras está en el centro.
+  const [liveIndex, setLiveIndex] = useState<number | null>(null);
   // Spec 014, RF-13: confeti y celebración al revelar una rara o mejor.
   const [burst, setBurst] = useState<ConfettiBurst | null>(null);
   const [party, setParty] = useState<Rarity | null>(null);
@@ -168,9 +170,12 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
         window.setTimeout(() => setFlash(null), 400);
       }
       el.classList.add("card3d--revealed");
+      // RF-6 y RF-14: viva (con su entrada y el sello que salta) salvo con movimiento reducido; se queda algo más.
+      const live = !reduced && Boolean(card.live);
+      if (live) setLiveIndex(i);
       const pos = trayLayout(i, el);
       gsap.to(el, {
-        delay: reduced ? 0.4 : 1.1,
+        delay: reduced ? 0.4 : live ? 1.9 : 1.1,
         duration: reduced ? 0.2 : 0.55,
         ease: "power2.inOut",
         x: pos.x,
@@ -179,6 +184,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
         rotation: 0,
         onComplete: () => {
           el.classList.remove("card3d--revealed");
+          setLiveIndex(null);
           flipping.current = false;
           setRevealed(i + 1);
           if (i + 1 === cards.length) setPhase("summary");
@@ -208,6 +214,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
 
   const reset = () => {
     setError(null);
+    setLiveIndex(null);
     setCards([]);
     setRevealed(0);
     setPhase("idle");
@@ -253,6 +260,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
             tiltTarget={tilt.target}
             style={{ zIndex: cards.length - i }}
             onClick={phase === "fanned" && i === revealed ? flipTop : undefined}
+            showLive={liveIndex === i}
           />
         ))}
       </div>

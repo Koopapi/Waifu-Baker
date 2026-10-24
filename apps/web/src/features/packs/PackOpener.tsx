@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import type { LabCard } from "@/features/opening/fakePack";
+import { liveImageUrls } from "@/domain/cards/live";
 import { PackArt, type PackArtData } from "@/features/packs/PackArt";
 import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/sobres/actions";
 import { useT } from "@/i18n/client";
@@ -15,14 +16,16 @@ const OpeningStage = dynamic(() => import("@/features/opening/OpeningStage").the
   loading: () => <div aria-busy="true" data-testid="stage-loading" className="fixed inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_55%,#050408_100%)]" />,
 });
 
+/** Descarga las imágenes fijas y, para la carta viva (spec 018, RF-6), las capas de cada carta. */
 async function preload(cards: LabCard[]) {
+  const urls = cards.flatMap((c) => [c.image, ...(c.live ? liveImageUrls(c.live) : [])]);
   await Promise.all(
-    cards.map(
-      (c) =>
+    urls.map(
+      (src) =>
         new Promise<void>((resolve) => {
           const img = new Image();
           img.onload = img.onerror = () => resolve();
-          img.src = c.image;
+          img.src = src;
         }),
     ),
   );
