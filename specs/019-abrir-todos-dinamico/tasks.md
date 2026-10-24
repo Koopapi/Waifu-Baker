@@ -5,7 +5,7 @@
   2026.
 
 ## Entrega 2 — Base
-- [ ] **T2 — Dominio** (`burstPlan`, `throttleSounds`, `highlights`, `groupByRarity`) · RF-2 a RF-5, RF-8, RF-10 a RF-12.
+- [x] **T2 — Dominio** (`burstPlan`, `throttleSounds`, `highlights`, `groupByRarity`) · RF-2 a RF-5, RF-8, RF-10 a RF-12.
 - [ ] **T3 — Datos de la acción** (sobre de cada carta y carta viva de las destacadas) · RF-1, RF-6.
 
 ## Entrega 3 — Interfaz
