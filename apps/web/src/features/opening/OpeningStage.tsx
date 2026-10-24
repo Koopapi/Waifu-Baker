@@ -13,6 +13,7 @@ import { Confetti, type ConfettiBurst } from "@/ui/game/Confetti";
 import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
 import { sound, useSoundMuted } from "@/features/sound/engine";
+import { useReducedMotion } from "@/ui/hooks/useReducedMotion";
 import "./opening.css";
 
 type Phase = "idle" | "torn" | "fanned" | "summary";
@@ -25,18 +26,6 @@ const SPARKLES: [number, number, number, string, number][] = [
   [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
 ];
 const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "secret"];
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return reduced;
-}
 
 interface StageProps {
   /** Fuente de cartas del sobre. Por defecto, datos falsos del laboratorio. */
@@ -67,7 +56,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
   const [burst, setBurst] = useState<ConfettiBurst | null>(null);
   const [party, setParty] = useState<Rarity | null>(null);
   const flipping = useRef(false);
-  const reduced = usePrefersReducedMotion();
+  const reduced = useReducedMotion();
   const tilt = useTiltSource();
   const stage = useRef<HTMLDivElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);

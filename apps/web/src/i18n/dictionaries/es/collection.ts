@@ -27,7 +27,10 @@ export const collection: typeof en = {
     holo: "Holo",
     version: "Versión",
     firstObtained: (date) => `La conseguiste por primera vez el ${date}.`,
-    aiHint: "Ilustración generada con IA. Mueve el ratón o inclina el móvil para ver el brillo.",
+    aiHint: "Ilustración generada con IA. Mueve el ratón o arrastra la carta con el dedo para inclinarla.",
+    gyro: "Mover con el teléfono",
+    gyroHint: "La carta sigue la inclinación del celular. Apagado, se inclina arrastrando el dedo.",
+    gyroDenied: "No diste permiso para usar el movimiento del teléfono; la carta se inclina con el dedo.",
   },
   album: {
     moderation: {

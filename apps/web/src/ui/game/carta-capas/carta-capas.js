@@ -381,6 +381,11 @@
           return true;
         }).catch(function () { return false; });
       },
+      // Waifu Baker, spec 018: el interruptor «Mover con el teléfono» se puede apagar.
+      deshabilitarGiroscopio: function () {
+        global.removeEventListener('deviceorientation', onOri);
+        giro = false; tx = 0; ty = 0;
+      },
       destruir: function () {
         cancelAnimationFrame(raf); raf = 0; visible = false;
         if (io) io.disconnect();

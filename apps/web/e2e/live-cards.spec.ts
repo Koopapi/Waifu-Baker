@@ -51,4 +51,62 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
       expect((await admin.request.get(layerUrl)).status()).toBe(404);
     });
   }
+
+  await test.step("RF-7, RF-11 y RF-14: la ficha muestra la carta viva; el interruptor del giroscopio solo en el teléfono", async () => {
+    await fan.goto("/coleccion");
+    await fan.click(`[data-testid="collection-${code}"] a`);
+    await fan.click('[aria-label="Ver carta 001"]');
+    const art = fan.locator('[data-testid="card-sheet-art"]');
+    if (reduced) {
+      await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
+      await expect(art.locator(".cc-card")).toHaveCount(0);
+      return;
+    }
+    await expect(art.locator(".cc-card")).toBeVisible();
+    const mobile = test.info().project.name !== "chromium-desktop";
+    await expect(fan.locator('[data-testid="gyro"]')).toHaveCount(mobile ? 1 : 0);
+    if (mobile) {
+      // RF-12: con el permiso de los sensores concedido, se activa al momento.
+      if (test.info().project.name === "pixel-7") await fan.context().grantPermissions(["accelerometer", "gyroscope"]);
+      const sw = fan.locator('[data-testid="gyro"]').getByRole("switch");
+      await sw.click();
+      await expect(sw).toHaveAttribute("aria-checked", "true");
+      await sw.click();
+      await expect(sw).toHaveAttribute("aria-checked", "false");
+    }
+    await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-ficha-viva.png` });
+  });
+});
+
+test("cartas por capas: permiso del giroscopio negado", async ({ browser }) => {
+  test.skip(!["pixel-7", "iphone-14"].includes(test.info().project.name), "Solo en los teléfonos");
+  const tag = test.info().project.name.replace(/[^a-z0-9]/g, "");
+  const fan = await login(browser, `giro-${tag}`, false, "/sobres");
+  // Como en iOS: el permiso se pide y se niega.
+  await fan.addInitScript(() => {
+    (window.DeviceOrientationEvent as unknown as { requestPermission: () => Promise<string> }).requestPermission = async () => "denied";
+  });
+  const admin = await login(browser, `admin-giro-${tag}`, true);
+  const code = `GN${tag.slice(0, 4).toUpperCase()}`;
+  await createPublishedSet(admin, code, ["09.webp", "11.webp"].map((f) => path.join(LAB, f)), 2);
+  await giftPacks(admin, `giro-${tag}`, code, 1);
+  await fan.goto("/sobres");
+  await dismissCelebration(fan);
+  await fan.click(`[data-testid="group-${code}"] >> text=Abrir un sobre`);
+  await tear(fan);
+  for (let i = 1; i <= 2; i++) {
+    await fan.locator('.card3d[role="button"]').first().click();
+    if (i < 2) await expect(fan.locator(`.stage[data-revealed="${i}"]`)).toBeVisible();
+  }
+  await expect(fan.locator(".summary")).toBeVisible();
+
+  await test.step("RF-13: si se niega el permiso, el interruptor queda apagado y avisa", async () => {
+    await fan.goto("/coleccion");
+    await fan.click(`[data-testid="collection-${code}"] a`);
+    await fan.click('[aria-label="Ver carta 001"]');
+    const sw = fan.locator('[data-testid="gyro"]').getByRole("switch");
+    await sw.click();
+    await expect(fan.locator('[data-testid="gyro-denied"]')).toContainText("No diste permiso");
+    await expect(sw).toHaveAttribute("aria-checked", "false");
+  });
 });

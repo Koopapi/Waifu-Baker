@@ -38,6 +38,9 @@ export interface CartaCapasProps {
 export interface CartaCapasHandle {
   entrar(): void;
   ocultarSello(): void;
+  /** Spec 018, RF-12: sigue la inclinación del teléfono (pide permiso si el dispositivo lo exige). */
+  habilitarGiroscopio(): Promise<boolean>;
+  deshabilitarGiroscopio(): void;
 }
 
 /**
@@ -94,6 +97,8 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
   useImperativeHandle(ref, () => ({
     entrar: () => card.current?.entrar(),
     ocultarSello: () => card.current?.ocultarSello(),
+    habilitarGiroscopio: () => card.current?.habilitarGiroscopio() ?? Promise.resolve(false),
+    deshabilitarGiroscopio: () => card.current?.deshabilitarGiroscopio(),
   }), []);
 
   return <div ref={box} className={className} style={{ aspectRatio: rawArt || config ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} />;
