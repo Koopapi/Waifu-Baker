@@ -1,14 +1,16 @@
 # Tareas 018 — Las cartas por capas se ven en toda la web
 
 ## Entrega 1 — Maquetas (aprobación del dueño)
-- [ ] **T1 — Maquetas en Pencil**: revelación con la carta viva, ficha con la carta viva y el interruptor «Mover con el
+- [x] **T1 — Maquetas en Pencil**: revelación con la carta viva, ficha con la carta viva y el interruptor «Mover con el
   teléfono» (activado, negado y sin giroscopio), colección con imágenes fijas (normal y holo), álbum público con marca y
-  aviso del panel de cambios 18+ pendientes · RF-6 a RF-15, RF-21 · Hecho cuando: el dueño las aprueba.
+  aviso del panel de cambios 18+ pendientes · RF-6 a RF-15, RF-21 · Hecho: aprobadas por el dueño el 23 oct 2026 (hoja
+  «Cartas por capas en la web (spec 018)» de `waifubaker.pen`).
 
 ## Entrega 2 — Imagen fija
-- [ ] **T2 — Superposiciones de marco, brillo y holo** exportadas de `carta-capas.js` · RF-1, RF-5.
-- [ ] **T3 — Compositor** (`flatten.ts`): capas con encuadre, partículas, marco, sello y holo · RF-1, RF-5.
-- [ ] **T4 — Generación al guardar, cambiar rareza y crear**; fallo que no guarda; migración `0015` (holo) · RF-2 a RF-4.
+- [ ] **T2 — Renderizador** (`flatten.ts` con `playwright-core` y `carta-capas.js`): foto de la carta en reposo a 2×,
+  tamaños y marca de agua · RF-1.
+- [ ] **T3 — Acabado holo** en CSS sobre la imagen fija donde se marca la holo · RF-5.
+- [ ] **T4 — Generación al crear, guardar capas, cambiar rareza y regenerar**; fallo que no guarda · RF-2 a RF-4.
 
 ## Entrega 3 — Carta viva
 - [ ] **T5 — Capas firmadas** (`/api/cards/[id]/live` y `/api/cards/layer`) con dueño y doble control 18+ · RF-16, RF-17.

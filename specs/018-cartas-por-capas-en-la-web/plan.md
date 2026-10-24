@@ -5,24 +5,24 @@ Respeta `docs/constitution.md` y `docs/reglas-de-negocio.md`. Parte de las specs
 
 ## 1. Imagen fija (RF-1 a RF-5)
 
-- **Compositor en el servidor con sharp** (`server/cards/flatten.ts`), sin dependencias nuevas: dibuja la carta armada
-  en reposo en el lienzo 1400 × 1982 (2 × 700 × 991):
-  - capas de imagen en orden, con su encuadre (`translate/scale/rotate` y `cubrir`/`contener`), margen, opacidad y
-    mezcla (solo los modos que sharp reproduce, spec 016 RF-7);
-  - partículas en reposo: las mismas posiciones que `carta-capas.js` (misma semilla y generador), dibujadas como SVG;
-  - marco y brillo de cada escalón (N, R, SR, SSR, UR) como **superposiciones PNG** exportadas una vez de
-    `carta-capas.js` (script de desarrollo con Playwright, como los marcos de Pencil) en `assets/frames-capas/`;
-  - sello: el de imagen tal cual; el de texto con sus estilos dibujado en SVG con la fuente del proyecto;
-  - holo (RF-5): superposición arcoíris (`assets/frames-capas/holo.png`) con mezcla `soft-light`.
+- **Decisión del dueño (23 oct 2026): la imagen fija se saca del mismo `carta-capas.js`** en un Chromium sin ventana
+  (`playwright-core`, dependencia nueva de producción; en Docker se instala Chromium). Así queda idéntica a la carta viva
+  (marco, brillo, sello de texto, mezclas, encuadre, partículas) y sigue sola cualquier cambio de `carta-capas.js`.
+  Descartado redibujarla con sharp: un segundo dibujo que mantener y que nunca queda igual.
+- `server/cards/flatten.ts`: un navegador por proceso (se abre al primer uso y se reutiliza), una página por carta con
+  `carta-capas.js` (leído de `src/ui/game/carta-capas/`), las imágenes de las capas como `data:` URLs, movimiento
+  reducido emulado (partículas quietas y deterministas por su semilla), sin aura ni sombra exterior y con el sello
+  **dentro del borde** (en la viva sobresale; en una imagen fija se cortaría). Foto del elemento a 2× (1400 × 1982) con
+  fondo transparente; sharp saca de ahí los tamaños.
 - Salidas en las mismas claves que hoy (`key_full/mid/thumb/public` + blurhash), con la proporción del lienzo:
   full 1400 × 1982, mid 700 × 991, thumb 300 × 425 y public 600 × 849 con la marca de agua actual (RF-15). Así todo lo
   que hoy muestra la compuesta (colección, resumen, «Abrir todos», portada del sobre, álbum, vista previa de enlaces)
   pasa a la imagen fija sin tocar cada pantalla (RF-2, RF-8).
-- La versión holo se genera aparte (`key_holo_mid`, `key_holo_thumb`; migración `0015`) solo para rara o mejor, porque
-  la misma carta puede salir normal u holo.
+- **Holo (RF-5)**: la misma imagen fija con el acabado arcoíris por encima en CSS donde se marca la holo (las
+  cuadrículas ya llevan `binder-card--holo` y `oa-card--holo`); sin imágenes aparte.
 - `composeCard` (marco de Pencil) deja de usarse para cartas; se borra junto con sus marcos al final.
-- **Cuándo se genera (RF-3, RF-4)**: al guardar capas, al cambiar la rareza y al crear la carta desde la chica, dentro
-  del mismo caso de uso; si falla, el guardado no se hace y se devuelve `flatten_failed`.
+- **Cuándo se genera (RF-3, RF-4)**: al crear la carta desde la chica, al guardar capas, al cambiar la rareza y al
+  regenerar la colección; si falla, el guardado no se hace y se devuelve `flatten_failed`.
 
 ## 2. Carta viva para el coleccionista (RF-6 a RF-14, RF-16, RF-17)
 
