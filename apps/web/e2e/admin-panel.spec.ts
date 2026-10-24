@@ -88,7 +88,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click('[aria-label="Editar carta 010"]');
     const preview = page.locator('[data-testid="card-preview"]');
     await expect(preview.locator("img")).toHaveAttribute("src", /\/api\/admin\/assets\/.+\/mid\.[0-9a-f]+\.webp$/);
-    await expect.poll(() => preview.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(750);
+    // Spec 018: la imagen fija de la carta por capas (700 × 991).
+    await expect.poll(() => preview.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(700);
     await expect(preview.locator(".card3d--holo")).toHaveCount(0);
     await tick(page, "Ver con efecto holo");
     await expect(preview.locator(".card3d--holo .holo--foil")).toHaveCount(1);

@@ -26,6 +26,7 @@ export const ROUTES = [
   `/admin/sets/${ID}`,
   `/admin/sets/${ID}/simulate`,
   "/admin/characters",
+  "/admin/library",
   "/admin/albumes",
   "/admin/tiers",
   "/admin/users",
@@ -43,4 +44,11 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   { method: "GET", path: `/api/album/AAAAAAAAAAAA/img?c=${ID}` },
   { method: "GET", path: "/api/cards/img" },
   { method: "GET", path: "/api/demo/card/1" },
+  // Specs 016 a 018: capas del panel, biblioteca, exportar y carta viva del coleccionista.
+  { method: "GET", path: `/api/admin/cards/${ID}/layers` },
+  { method: "GET", path: `/api/admin/cards/${ID}/layers/export` },
+  { method: "POST", path: "/api/admin/layer-uploads", body: "{}" },
+  { method: "POST", path: "/api/admin/library", body: "{}" },
+  { method: "GET", path: `/api/cards/${ID}/live` },
+  { method: "GET", path: "/api/cards/layer" },
 ];

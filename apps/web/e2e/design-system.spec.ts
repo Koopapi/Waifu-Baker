@@ -26,9 +26,12 @@ test("sistema de diseño: catálogo, teclado, superposiciones, avisos y acciones
 
   await test.step("RF-4 y RF-14: desplegable con buscador usable solo con teclado", async () => {
     const combo = page.locator('[data-testid="catalog-form"] button[role="combobox"]');
-    await combo.focus();
-    await page.keyboard.press("Enter");
-    await expect(combo).toHaveAttribute("aria-expanded", "true");
+    // Hasta que la página se hidrata, el botón no responde al teclado: se repite el gesto hasta que abre.
+    await expect(async () => {
+      await combo.focus();
+      await page.keyboard.press("Enter");
+      await expect(combo).toHaveAttribute("aria-expanded", "true", { timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
     await page.keyboard.type("07");
     await page.keyboard.press("Enter");
     await expect(page.locator('[data-testid="catalog-select-value"]')).toHaveText("Selected: s7");

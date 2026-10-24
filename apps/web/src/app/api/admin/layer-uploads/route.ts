@@ -16,7 +16,8 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
   const session = await adminFromRequest("/api/admin/layer-uploads");
   if (!session) return notFoundResponse();
-  const form = await req.formData();
+  const form = await req.formData().catch(() => null);
+  if (!form) return Response.json({ ok: false, code: "bad_request" }, { status: 400 });
   const file = form.get("file");
   const raw = form.get("kind");
   const kind = raw === "seal" ? "seal" : raw === "character" ? "character" : "layer";
