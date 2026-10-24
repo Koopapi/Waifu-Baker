@@ -1,6 +1,6 @@
 # Spec 018 — Las cartas por capas se ven en toda la web
 
-Estado: propuesta, pendiente de aprobación del dueño.
+Estado: aprobada por el dueño el 23 oct 2026.
 
 ## Contexto y objetivo
 Desde la spec 017 todas las cartas se arman por capas en el panel, pero el coleccionista sigue viendo la imagen
