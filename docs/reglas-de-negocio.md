@@ -65,7 +65,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-40 | Los sobres sin abrir no caducan nunca, aunque la persona deje de ser patron o la colección se archive. | Vigente | 004 RF-4 |
 | RN-41 | Un sobre se abre una sola vez. Repetir la petición (doble clic, dos pestañas, recarga) devuelve el mismo resultado. | Vigente | 004 RF-6, RF-17 |
 | RN-42 | Cada apertura guarda la versión de probabilidades, la semilla, las tiradas, si actuó la protección y las cartas. No se puede modificar después. | Vigente | 004 RF-9 |
-| RN-43 | «Abrir todos» abre hasta 50 sobres de una colección, cada uno por separado y con las mismas reglas. | Vigente | 004 RF-18, RF-19 |
+| RN-43 | «Abrir todos» abre hasta 50 sobres de una colección, cada uno por separado y con las mismas reglas. Los sobres se abren en el servidor antes de animar: después, una ráfaga de sobres rasgándose (como mucho 6 s), las destacadas en grande y vivas (épicas, legendarias y secretas siempre; raras solo si son nuevas; como mucho 10) y un resumen agrupado por rareza con copias, nuevas, holo y totales. «Saltar» lleva al resumen; con movimiento reducido no hay ráfaga. | Vigente | 004 RF-18, RF-19; 019 |
 | RN-44 | Como máximo 10 aperturas por minuto y usuario. | Vigente | 004 RF-21 |
 | RN-45 | Las cartas repetidas se acumulan (x2, x3…). Una carta holo cuenta aparte de su versión normal. | Vigente | 004 RF-10 |
 
@@ -188,7 +188,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Regla | Descripción | Estado | Origen |
 |---|---|---|---|
 | RN-160 | Los sonidos son de dominio público (CC0) y su origen, autor y licencia constan junto a ellos en el repositorio. | Vigente | 013 RF-1 |
-| RN-161 | Rasgar y voltear suenan igual para todas las cartas; una rara, épica, legendaria o secreta añade un sonido de su nivel. En «Abrir todos» suena una sola vez, con la mejor carta. | Vigente | 013 RF-2 a RF-5 |
+| RN-161 | Rasgar y voltear suenan igual para todas las cartas; una rara, épica, legendaria o secreta añade un sonido de su nivel. En «Abrir todos», la ráfaga suena con los rasgados (como mucho uno cada 120 ms) y cada destacada con el sonido de su rareza. | Vigente | 013 RF-2 a RF-4; 019 RF-3, RF-6 |
 | RN-162 | En los móviles que lo permiten (Android), una rara o mejor vibra; más en legendaria y secreta. | Vigente | 013 RF-9 |
 | RN-163 | El sonido está activado por defecto. El botón de silencio de la apertura y de «Abrir todos» corta sonido y vibración, y se recuerda en ese dispositivo. | Vigente | 013 RF-7, RF-8, RF-10 |
 | RN-164 | Ninguna página del coleccionista ni pública carga más de 250 kB de JavaScript comprimido al abrirse; la integración continua falla si alguna se pasa. | Vigente | 013 RF-11, RF-12 |
@@ -249,7 +249,7 @@ Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto e
 | Cartas por sobre | 1 a 10 (5 por defecto) |
 | Probabilidad de holo (rara o mejor) | 20 % por defecto, configurable |
 | Protección de mala suerte | N de 0 a 100, 10 por defecto |
-| «Abrir todos» | hasta 50 sobres |
+| «Abrir todos» | hasta 50 sobres; ráfaga de 6 s como mucho; hasta 10 destacadas |
 | Nota de moderación | hasta 300 caracteres |
 | Espera entre revisiones de un álbum oculto | 7 días |
 | JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
