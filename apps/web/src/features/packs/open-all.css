@@ -85,3 +85,144 @@
     mix-blend-mode: overlay;
   }
 }
+
+/* ---------- Spec 019: ráfaga, foco y resumen (solo transform y opacity) ---------- */
+.oa-burst,
+.oa-focus {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 16px 0 24px;
+}
+.oa-burst__counter {
+  font-weight: 800;
+  font-size: 14px;
+  color: rgba(246, 243, 251, 0.62);
+}
+.oa-burst__stack {
+  position: relative;
+  width: 150px;
+  aspect-ratio: 2 / 3;
+}
+.oa-burst__pack {
+  position: absolute;
+  inset: 0;
+  transform: translate(calc(var(--i, 0) * 6px), calc(var(--i, 0) * -6px)) rotate(calc(var(--i, 0) * -3deg));
+}
+.oa-burst__pack > * {
+  width: 100%;
+}
+.oa-burst__pack--torn {
+  z-index: 5;
+  animation: oaTear 0.45s ease-in forwards;
+}
+@keyframes oaTear {
+  to {
+    opacity: 0;
+    transform: translateY(-120px) rotate(18deg) scale(0.9);
+  }
+}
+.oa-burst__falling {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  min-height: 100px;
+}
+.oa-burst__card {
+  width: 62px;
+  overflow: hidden;
+  border-radius: 8px;
+  opacity: 0;
+  animation: oaFall 0.5s cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+.oa-burst__card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 700 / 991;
+  object-fit: cover;
+}
+@keyframes oaFall {
+  from {
+    opacity: 0;
+    transform: translateY(-140px) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.oa-focus__card {
+  width: min(72vw, 300px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.oa-focus__ribbon {
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-weight: 900;
+  color: #2a0e1f;
+  background: #9cc2ff;
+  animation: oaPop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+.oa-focus__ribbon.rarity-epic {
+  background: #c9a7ff;
+}
+.oa-focus__ribbon.rarity-legendary {
+  background: #ffd36e;
+}
+.oa-focus__ribbon.rarity-secret {
+  background: linear-gradient(90deg, #ffb3d1, #ffe08a, #9ff2cf, #8fd2ff, #d3b0ff);
+}
+@keyframes oaPop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.oa-group__title {
+  font-weight: 800;
+  font-size: 15px;
+}
+.oa-group__title.rarity-legendary {
+  color: #ffd36e;
+}
+.oa-group__title.rarity-epic {
+  color: #c9a7ff;
+}
+.oa-group__title.rarity-rare {
+  color: #7cc8ff;
+}
+.oa-group__title.rarity-secret {
+  color: #ff9ecb;
+}
+.oa-card__copies,
+.oa-card__new {
+  position: absolute;
+  left: 6px;
+  z-index: 1;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.oa-card__copies {
+  bottom: 6px;
+  color: #f6f3fb;
+  background: rgba(26, 18, 38, 0.9);
+}
+.oa-card__new {
+  top: 6px;
+  color: #0f2a20;
+  background: #7ef0c9;
+}
+@media (prefers-reduced-motion: reduce) {
+  .oa-burst__pack--torn,
+  .oa-burst__card,
+  .oa-focus__ribbon {
+    animation: none;
+    opacity: 1;
+  }
+}

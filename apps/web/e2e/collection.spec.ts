@@ -4,7 +4,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import path from "node:path";
-import { LAB, choose, createPublishedSet, dismissCelebration, giftPacks, login } from "./helpers";
+import { LAB, choose, createPublishedSet, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
 
 const shot = (p: Page, name: string, fullPage = false) =>
   p.screenshot({ path: `test-results/screens/${test.info().project.name}/s006-${name}.png`, fullPage });
@@ -19,8 +19,7 @@ test("colección y álbum público", async ({ browser }) => {
   await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-ALB1"] >> text=Abrir un sobre').getAttribute("href");
   await fan.goto(`${href}/todos`);
-  await fan.click('[data-testid="open-all"]');
-  await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(2);
+  expect(await openAllAndSkip(fan)).toBe(2);
 
   await test.step("RF-1: «Mi colección» lista la colección con su progreso", async () => {
     await fan.click("header >> text=Mi colección");
