@@ -3,6 +3,7 @@ import { RARITIES } from "@/domain/catalog/card-rules";
 import { listPublicOdds } from "@/server/services/collections";
 import { formatDate, formatPercent } from "@/i18n/format";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+import { CloseButton } from "@/features/shell/CloseButton";
 import { getDict, getLocale } from "@/i18n/server";
 
 export async function generateMetadata() {
@@ -19,6 +20,8 @@ export default async function DropRatesPage() {
   const pct = (x: number) => formatPercent(locale, x);
   return (
     <main className="min-h-dvh bg-ui-bg px-4 py-12 text-ui-text">
+      {/* Página suelta, sin la barra del coleccionista: la X la cierra sin depender del botón «atrás» del navegador. */}
+      <CloseButton className="fixed left-4 top-4 z-50" />
       <LocaleToggle className="fixed right-4 top-4 z-50" />
       <div className="mx-auto max-w-4xl space-y-10">
         <header className="space-y-3">
