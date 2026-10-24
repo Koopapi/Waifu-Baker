@@ -20,7 +20,8 @@ Respeta `docs/constitution.md` y `docs/reglas-de-negocio.md`. Parte de las specs
   pasa a la imagen fija sin tocar cada pantalla (RF-2, RF-8).
 - **Holo (RF-5)**: la misma imagen fija con el acabado arcoíris por encima en CSS donde se marca la holo (las
   cuadrículas ya llevan `binder-card--holo` y `oa-card--holo`); sin imágenes aparte.
-- `composeCard` (marco de Pencil) deja de usarse para cartas; se borra junto con sus marcos al final.
+- `composeCard` (marco de Pencil) solo queda para las cartas sin capas anteriores a la spec 017 (quitar todas las capas
+  de una de ellas la devuelve a su imagen de Pencil, spec 016 RF-14); se retirará cuando no quede ninguna.
 - **Cuándo se genera (RF-3, RF-4)**: al crear la carta desde la chica, al guardar capas, al cambiar la rareza y al
   regenerar la colección; si falla, el guardado no se hace y se devuelve `flatten_failed`.
 
