@@ -88,7 +88,7 @@ const roundMask = Buffer.from(
   `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" rx="${RADIUS}" fill="#fff"/></svg>`,
 );
 
-function watermarkSvg(w: number, h: number) {
+export function watermarkSvg(w: number, h: number) {
   const rows = Array.from({ length: 9 }, (_, i) => {
     const y = 60 + i * 100;
     const x = i % 2 ? -40 : 20;

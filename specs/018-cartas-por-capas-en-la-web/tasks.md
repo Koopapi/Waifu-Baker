@@ -7,7 +7,7 @@
   «Cartas por capas en la web (spec 018)» de `waifubaker.pen`).
 
 ## Entrega 2 — Imagen fija
-- [ ] **T2 — Renderizador** (`flatten.ts` con `playwright-core` y `carta-capas.js`): foto de la carta en reposo a 2×,
+- [x] **T2 — Renderizador** (`flatten.ts` con `playwright-core` y `carta-capas.js`): foto de la carta en reposo a 2×,
   tamaños y marca de agua · RF-1.
 - [ ] **T3 — Acabado holo** en CSS sobre la imagen fija donde se marca la holo · RF-5.
 - [ ] **T4 — Generación al crear, guardar capas, cambiar rareza y regenerar**; fallo que no guarda · RF-2 a RF-4.
