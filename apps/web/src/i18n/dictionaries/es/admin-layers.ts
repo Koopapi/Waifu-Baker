@@ -87,6 +87,16 @@ export const adminLayers: typeof en = {
     autoNote: "Marco, partículas y sello siguen a la rareza mientras no los cambies a mano.",
     manualNote: "Cambiaste el estilo a mano: al cambiar la rareza solo se actualizan el marco y el sello. «Aplicar estilo de la rareza» lo vuelve automático.",
   },
+  pending: {
+    warning: (n: number) => `${n === 1 ? "1 carta tiene" : `${n} cartas tienen`} cambios de capas pendientes de revisión 18+ (los coleccionistas ven la versión revisada):`,
+    saved: "Guardado como cambio pendiente de revisión 18+: los coleccionistas siguen viendo la versión revisada.",
+    badge: "Cambio de capas pendiente",
+    current: "Vigente (la ven los coleccionistas)",
+    proposed: "Pendiente",
+    approve: "Aprobar: personaje claramente adulto",
+    discard: "Descartar el cambio",
+    discarded: "Cambio descartado: la carta sigue como estaba.",
+  },
   notAssembledCard: (number: number, missing: string) =>
     `Carta ${String(number).padStart(3, "0")}: no está armada (falta ${missing
       .split(",")

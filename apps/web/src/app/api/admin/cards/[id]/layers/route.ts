@@ -42,7 +42,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   if (!parsed.success) return Response.json({ ok: false, code: "bad_request" }, { status: 400 });
   try {
     const r = await saveCardLayers(db, getCardStore(), g.session.user.id, g.id, { config: parsed.data.config, expectedVersion: parsed.data.version, force: parsed.data.force });
-    return Response.json({ ok: true, layers: r.card.layers, version: r.card.version, repeated: r.repeated });
+    // Spec 018, RF-18: en una 18+ publicada lo guardado queda pendiente; el editor sigue sobre eso.
+    return Response.json({ ok: true, layers: r.card.layersPending ?? r.card.layers, pending: Boolean(r.card.layersPending), version: r.card.version, repeated: r.repeated });
   } catch (e) {
     return fail(e);
   }

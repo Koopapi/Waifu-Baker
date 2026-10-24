@@ -1,7 +1,7 @@
 // Criterios de la spec 018 (las cartas por capas se ven en toda la web): carta viva al revelarla, imagen fija en la
 // bandeja y el resumen, enlaces de capas solo para quien tiene la carta, movimiento reducido.
 import path from "node:path";
-import { expect, test } from "./fixtures";
+import { desktopOnly, expect, test } from "./fixtures";
 import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, tear } from "./helpers";
 
 test("cartas por capas: revelación viva", async ({ browser }) => {
@@ -108,5 +108,50 @@ test("cartas por capas: permiso del giroscopio negado", async ({ browser }) => {
     await sw.click();
     await expect(fan.locator('[data-testid="gyro-denied"]')).toContainText("No diste permiso");
     await expect(sw).toHaveAttribute("aria-checked", "false");
+  });
+});
+
+test("cartas por capas: cambios 18+ pendientes de revisión", async ({ browser }) => {
+  desktopOnly();
+  const admin = await login(browser, "admin-pendiente", true);
+  const setId = await createPublishedSet(admin, "PEND1", ["03.webp", "04.webp"].map((f) => path.join(LAB, f)), 2, undefined, true);
+  const openEditor = async () => {
+    await admin.goto(`/admin/sets/${setId}`);
+    await admin.click('[aria-label="Editar carta 001"]');
+    await expect(admin.locator('[data-testid="layers-editor"]')).toBeVisible();
+  };
+  const addParticlesAndSave = async () => {
+    await openEditor();
+    await admin.locator('[data-testid="layers-editor"]').getByRole("button", { name: "Añadir partículas" }).click();
+    await admin.click('[data-testid="layers-save"]');
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("pendiente de revisión 18+");
+  };
+
+  await test.step("RF-18 y RF-21: el cambio queda pendiente y el panel lo avisa con enlace a la carta", async () => {
+    await addParticlesAndSave();
+    await admin.goto(`/admin/sets/${setId}`);
+    const warn = admin.locator('[data-testid="pending-layers"]');
+    await expect(warn).toContainText("1 carta tiene cambios de capas pendientes de revisión 18+");
+    await expect(warn.locator('a[href="#carta-001"]')).toBeVisible();
+  });
+
+  await test.step("RF-19: aprobarlo lo pasa a vigente y el aviso desaparece", async () => {
+    await admin.click('[aria-label="Editar carta 001"]');
+    const box = admin.locator('[data-testid="pending-layers-review"]');
+    await expect(box).toContainText("Vigente (la ven los coleccionistas)");
+    await box.locator('[data-testid="approve-pending-layers"]').click();
+    await expect(admin.locator('[data-testid="pending-layers-review"]')).toHaveCount(0);
+    await admin.goto(`/admin/sets/${setId}`);
+    await expect(admin.locator('[data-testid="pending-layers"]')).toHaveCount(0);
+  });
+
+  await test.step("RF-20: descartar un cambio pendiente deja la carta como estaba", async () => {
+    await addParticlesAndSave();
+    await admin.goto(`/admin/sets/${setId}`);
+    await admin.click('[aria-label="Editar carta 001"]');
+    await admin.locator('[data-testid="discard-pending-layers"]').click();
+    await expect(admin.locator("text=Cambio descartado")).toBeVisible();
+    await admin.goto(`/admin/sets/${setId}`);
+    await expect(admin.locator('[data-testid="pending-layers"]')).toHaveCount(0);
   });
 });

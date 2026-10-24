@@ -327,7 +327,16 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
       setSelected(defaultSelection(body.layers ?? emptyConfig(card)));
       setVersion(body.version);
       onSaved(body.version);
-      setNotice(method === "DELETE" ? { tone: "success", text: t.removed } : body.repeated?.length ? { tone: "warning", text: `${t.saved} ${t.repeated}` } : { tone: "success", text: t.saved });
+      // Spec 018, RF-18: en una 18+ publicada, lo guardado queda pendiente de revisión.
+      setNotice(
+        method === "DELETE"
+          ? { tone: "success", text: t.removed }
+          : body.pending
+            ? { tone: "warning", text: t.pending.saved }
+            : body.repeated?.length
+              ? { tone: "warning", text: `${t.saved} ${t.repeated}` }
+              : { tone: "success", text: t.saved },
+      );
       router.refresh();
     } finally {
       setBusy(false);

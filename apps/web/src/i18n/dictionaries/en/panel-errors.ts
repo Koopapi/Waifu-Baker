@@ -17,4 +17,5 @@ export const panelErrors: Record<string, Msg> = {
   item_in_use: (p) => `${Number(p.count) === 1 ? "1 card uses" : `${p.count} cards use`} it (${p.sets}): change it there before removing it.`,
   invalid_item_name: "Give the item a name.",
   flatten_failed: "The card image couldn't be generated. Check its layers and try again.",
+  no_pending_layers: "This card has no pending layer changes.",
 };

@@ -22,7 +22,7 @@
 - [x] **T8 — Imágenes fijas** en colección, resumen, «Abrir todos», portada del sobre y zonas públicas · RF-8, RF-15.
 
 ## Entrega 4 — Revisión 18+
-- [ ] **T9 — Cambios pendientes** (guardar, aprobar, descartar) y aviso en el panel · RF-18 a RF-21.
+- [x] **T9 — Cambios pendientes** (guardar, aprobar, descartar) y aviso en el panel · RF-18 a RF-21.
 
 ## Entrega 5 — Cierre
 - [ ] **T10 — E2E en 4 proyectos, comparación visual, presupuesto, reglas de negocio, `DESIGN.md`, validación y

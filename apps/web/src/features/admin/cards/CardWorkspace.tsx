@@ -6,7 +6,7 @@ import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, us
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
-import { bulkUpdateCardsAction, deleteCardAction, reorderCardsAction, reviewCardAction, updateCardAction } from "@/app/admin/sets/card-actions";
+import { bulkUpdateCardsAction, deleteCardAction, discardPendingLayersAction, reorderCardsAction, reviewCardAction, updateCardAction } from "@/app/admin/sets/card-actions";
 import type { ActionState } from "@/server/auth/admin-action";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
@@ -41,7 +41,9 @@ const pct = (locale: Locale, x: number) => formatPercent(locale, x * 100, x < 0.
 
 function ReviewBadge({ card }: { card: CardDTO }) {
   const t = useT().admin.cards;
+  const tl = useAdminLayersT();
   if (card.pendingArtUrl) return <Badge tone="info">{t.pendingArt}</Badge>;
+  if (card.pendingLayersUrl) return <Badge tone="info">{tl.pending.badge}</Badge>;
   return card.adultReviewedAt ? <Badge tone="success">{t.reviewed}</Badge> : <Badge tone="danger">{t.notReviewed}</Badge>;
 }
 
@@ -172,6 +174,14 @@ function CardEditor({
       }
     });
 
+  const discardPending = () =>
+    start(async () => {
+      const r = await discardPendingLayersAction(setId, card.id, card.version);
+      setState(r.ok ? { ...r, message: tl.pending.discarded } : r);
+      if (r.version) onSaved(r.version);
+      if (r.ok) router.refresh();
+    });
+
   const replaceArt = () =>
     start(async () => {
       if (!file) return;
@@ -264,7 +274,31 @@ function CardEditor({
               <p className="flex flex-wrap items-center gap-2 text-sm">
                 {t.review18} <ReviewBadge card={card} />
               </p>
-              {card.adultReviewedAt && !card.pendingArtUrl ? (
+              {/* Spec 018, RF-19 y RF-20: el cambio de capas pendiente, junto a lo vigente, para aprobarlo o descartarlo. */}
+              {card.pendingLayersUrl ? (
+                <div className="space-y-2" data-testid="pending-layers-review">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      [card.midUrl, tl.pending.current],
+                      [card.pendingLayersUrl, tl.pending.proposed],
+                    ].map(([src, label]) => (
+                      <figure key={label} className="space-y-1">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- imagen privada del panel */}
+                        <img src={src ?? ""} alt="" className="aspect-[700/991] w-full rounded-s object-cover" />
+                        <figcaption className="text-xs text-ui-text-3">{label}</figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" onClick={() => review(true)} disabled={pending} data-testid="approve-pending-layers">
+                      {tl.pending.approve}
+                    </Button>
+                    <Button size="sm" variant="secondary" onClick={discardPending} disabled={pending} data-testid="discard-pending-layers">
+                      {tl.pending.discard}
+                    </Button>
+                  </div>
+                </div>
+              ) : card.adultReviewedAt && !card.pendingArtUrl ? (
                 <Button size="sm" variant="secondary" onClick={() => review(false)} disabled={pending}>
                   {t.removeReview}
                 </Button>

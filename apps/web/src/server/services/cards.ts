@@ -16,7 +16,7 @@ import { auditChange, recordAudit } from "./audit";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import type { LayersConfig } from "@/domain/cards/layers";
 import { configFromCharacter, replaceCharacter, retierLayers } from "@/domain/cards/layers-rarity";
-import { characterLayer, layerKey } from "@/domain/cards/layers";
+import { characterLayer, imageKeys, layerKey } from "@/domain/cards/layers";
 import { prepareCharacterImage } from "@/server/cards/character-images";
 import { releaseLayerImages } from "./card-layers";
 import { renderCardFlat, storeFlat } from "@/server/cards/flat-store";
@@ -419,6 +419,13 @@ export async function reviewCard(db: DbLike, store: CardStore, actorUserId: stri
       const keys = await composeAndStore(store, { ...cur, originalKey: cur.pendingOriginalKey, layers }, set.code);
       toDelete.push(cur.originalKey, ...composedKeys(cur));
       patch = { ...patch, ...keys, layers, originalKey: cur.pendingOriginalKey, originalSha256: sha256(pending.body), pendingOriginalKey: null };
+    }
+    // Spec 018, RF-19: aprobar un cambio de capas pendiente lo pasa a vigente, con su imagen fija ya generada.
+    if (reviewed && cur.layersPending && cur.pendingKeys) {
+      const k = cur.pendingKeys;
+      toDelete.push(...composedKeys(cur));
+      layersToRelease.push(...imageKeys(cur.layers));
+      patch = { ...patch, layers: cur.layersPending, keyFull: k.full, keyMid: k.mid, keyThumb: k.thumb, keyPublic: k.public, blurhash: k.blurhash, layersPending: null, pendingKeys: null };
     }
     const [updated] = await tx
       .update(cards)
