@@ -15,5 +15,5 @@ export const panelErrors: Record<string, Msg> = {
       .join(" y ")}).`,
   duplicate_item: (p) => `Esta imagen ya está en la biblioteca («${p.name}»).`,
   item_in_use: (p) => `Lo ${Number(p.count) === 1 ? "usa 1 carta" : `usan ${p.count} cartas`} (${p.sets}): cámbialo en ${Number(p.count) === 1 ? "ella" : "ellas"} antes de quitarlo.`,
-  invalid_name: "Ponle un nombre al elemento.",
+  invalid_item_name: "Ponle un nombre al elemento.",
 };

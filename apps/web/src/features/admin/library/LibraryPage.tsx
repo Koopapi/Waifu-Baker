@@ -10,7 +10,7 @@ import { Button, IconButton } from "@/ui/action/Button";
 import { Tabs } from "@/ui/content/Tabs";
 import { useToast } from "@/ui/feedback/Toast";
 import { TextField } from "@/ui/form/TextField";
-import { Pencil } from "@/ui/icons/glyphs";
+import { Pencil } from "@/ui/icons/admin-glyphs";
 import { useConfirm } from "@/ui/overlay/Confirm";
 
 export interface LibraryItemDTO {

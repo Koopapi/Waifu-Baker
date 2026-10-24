@@ -1,12 +1,13 @@
 # Validación — Spec 017
 
-Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-23. Vitest: 575 de 575 tests en verde. E2E: `pnpm e2e`.
+Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-24. Vitest: 582 de 582 tests en verde. E2E: `pnpm e2e`.
 
-**Veredicto: spec cumplida** (20 de 20 RF con al menos un test en verde).
+**Veredicto: spec cumplida** (21 de 21 RF con al menos un test en verde).
 
-Cierre técnico (23 oct 2026): E2E completo en 4 proyectos (58 en verde, 15 solo de escritorio omitidos en el resto) y
-los del panel de nuevo tras el último cambio; `pnpm budget`: la página más pesada del coleccionista en 205,6 kB (205,8 en
-la spec 016), así que no crece. Falta la demo manual del dueño.
+Cierre técnico (23 oct 2026), con la ampliación de la biblioteca general: E2E del panel en escritorio en verde
+(`card-assembly`, `card-layers`, `admin-panel`, `i18n`, `design-system`; la corrida completa en 4 proyectos, antes de
+la ampliación, dio 58 en verde); `pnpm budget`: la página más pesada del coleccionista en 205,5 kB (205,8 en la spec
+016), así que no crece. Falta la demo manual del dueño.
 
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
@@ -15,10 +16,11 @@ la spec 016), así que no crece. Falta la demo manual del dueño.
 | RF-3 | SI la imagen de chica no tiene ninguna zona transparente, ENTONCES EL SISTEMA la aceptará pero avisará de que | ✓ una_imagen_sin_transparencia_crea_la_carta_con_aviso<br>✓ sin_transparencia_se_acepta_con_aviso | — | Cumplido |
 | RF-4 | CUANDO el administrador sustituya la imagen de chica de una carta, EL SISTEMA mantendrá su encuadre y el resto de | ✓ sustituir_la_chica_conserva_el_encuadre_y_el_resto_de_capas | RF-4: sustituir la chica conserva su encuadre | Cumplido |
 | RF-5 | EL SISTEMA no permitirá quitar la capa de personaje de una carta ni dejarla sin ninguna capa visible (sustituye | ✓ guardar_sin_el_personaje_o_con_el_oculto_se_rechaza<br>✓ una_carta_con_personaje_no_puede_quitar_sus_capas<br>✓ dos_personajes_en_la_misma_carta_se_rechaza<br>✓ una_carta_tiene_como_mucho_un_personaje<br>✓ no_se_puede_quitar_el_personaje | RF-5: la chica no se puede quitar ni ocultar, ni la carta volver a su imagen original | Cumplido |
-| RF-6 | EL SISTEMA permitirá subir fondos a la biblioteca de una colección, verlos y quitarlos. | ✓ subir_y_ver_los_fondos_de_la_coleccion<br>✓ el_mismo_fondo_dos_veces_se_avisa<br>✓ quitar_un_fondo_sin_usar_borra_su_imagen | RF-6: subir un fondo a la biblioteca de la colección | Cumplido |
-| RF-7 | EL SISTEMA aplicará a los fondos las reglas de las capas de imagen de la spec 016 (formato, peso, proporción | ✓ los_fondos_siguen_las_reglas_de_las_capas | — | Cumplido |
-| RF-8 | CUANDO el administrador arme una carta, EL SISTEMA le permitirá elegir un fondo de la biblioteca de su colección | ✓ una_carta_usa_un_fondo_de_la_biblioteca<br>✓ no_se_puede_usar_un_fondo_de_otra_coleccion<br>✓ poner_un_fondo_lo_coloca_detras_de_todo<br>✓ cambiar_el_fondo_conserva_sus_ajustes | RF-8 y RF-9: la carta usa el fondo de la biblioteca y ya no se puede quitar<br>RF-8: un fondo propio de esta carta | Cumplido |
-| RF-9 | SI un fondo de la biblioteca está en uso, ENTONCES EL SISTEMA no permitirá quitarlo e indicará cuántas cartas lo | ✓ un_fondo_en_uso_no_se_quita_y_dice_cuantas_cartas_lo_usan<br>✓ dejar_de_usar_un_fondo_no_borra_la_imagen_de_la_biblioteca | RF-8 y RF-9: la carta usa el fondo de la biblioteca y ya no se puede quitar | Cumplido |
+| RF-6 | EL SISTEMA tendrá una biblioteca de elementos común a todas las colecciones, con cuatro tipos (fondos, sellos de | ✓ subir_fondos_sellos_y_adornos_y_verlos_por_tipo<br>✓ quitar_y_renombrar<br>✓ los_errores_del_panel_no_pisan_codigos_del_diccionario_general<br>✓ el_nombre_se_limpia_y_tiene_un_limite | RF-6 y RF-7: subir fondos, sellos y adornos a la biblioteca general | Cumplido |
+| RF-7 | EL SISTEMA aplicará a los fondos y a las capas de adorno las reglas de las capas de imagen de la spec 016 | ✓ fondos_y_adornos_con_las_reglas_del_lienzo_y_sellos_con_las_del_sello<br>✓ la_misma_imagen_no_se_guarda_dos_veces<br>✓ fondos_y_adornos_siguen_las_reglas_del_lienzo_y_los_sellos_las_del_sello | RF-6 y RF-7: subir fondos, sellos y adornos a la biblioteca general | Cumplido |
+| RF-8 | CUANDO el administrador arme una carta, EL SISTEMA le permitirá tomar de la biblioteca su fondo, su sello y | ✓ una_carta_usa_elementos_de_la_biblioteca_sin_copiarlos<br>✓ poner_un_fondo_lo_coloca_detras_de_todo<br>✓ cambiar_el_fondo_conserva_sus_ajustes | RF-8 y RF-9: la carta usa el fondo de la biblioteca y ya no se puede quitar<br>RF-8: un fondo propio de esta carta<br>RF-8: añadir de la biblioteca un adorno y el sello a la carta | Cumplido |
+| RF-9 | SI una imagen de la biblioteca está en uso, ENTONCES EL SISTEMA no permitirá quitarla e indicará cuántas cartas | ✓ una_imagen_en_uso_no_se_quita_y_dice_cuantas_cartas_y_colecciones<br>✓ dejar_de_usar_una_imagen_de_la_biblioteca_no_la_borra<br>✓ las_particulas_guardadas_no_tienen_uso_y_se_quitan_siempre<br>✓ las_particulas_guardadas_se_copian_sin_semilla_ni_posicion<br>✓ el_uso_cuenta_cartas_y_colecciones_por_imagen | RF-8 y RF-9: la carta usa el fondo de la biblioteca y ya no se puede quitar | Cumplido |
+| RF-21 | CUANDO el administrador elija «Guardar en la biblioteca» en el fondo, el sello de imagen, una capa de adorno o | ✓ guardar_en_la_biblioteca_una_capa_o_el_sello_de_una_carta<br>✓ una_capa_de_la_carta_se_guarda_como_fondo_o_adorno_y_la_chica_no | RF-21: guardar en la biblioteca unas partículas de la carta | Cumplido |
 | RF-10 | EL SISTEMA permitirá mover, escalar y girar cada capa de imagen en el editor, arrastrando sobre la vista | ✓ cada_capa_de_imagen_lleva_rol_y_encuadre_opcionales | RF-10 a RF-12: encuadrar a la chica con números, teclado y arrastre, y restablecer | Cumplido |
 | RF-11 | EL SISTEMA limitará la escala entre el 10 % y el 400 % y el giro entre −180° y 180°, y permitirá restablecer el | ✓ escala_entre_10_y_400_por_ciento_y_giro_entre_menos_180_y_180<br>✓ restablecer_el_encuadre_de_una_capa<br>✓ valores_fuera_de_rango_o_no_numericos_se_acotan | — | Cumplido |
 | RF-12 | EL SISTEMA dibujará el encuadre de cada capa sin perder el parallax ni el brillo de la carta por capas. | ✓ el_encuadre_es_un_transform_de_la_imagen<br>✓ sin_encuadre_la_capa_se_dibuja_como_antes<br>✓ el_encuadre_va_en_la_imagen_y_el_parallax_en_la_capa | RF-10 a RF-12: encuadrar a la chica con números, teclado y arrastre, y restablecer | Cumplido |

@@ -27,7 +27,7 @@ export interface LibraryItemView {
 
 function validName(raw: string) {
   const name = libraryName(raw);
-  if (!name) throw new AdminError("invalid_name", "Ponle un nombre al elemento.");
+  if (!name) throw new AdminError("invalid_item_name", "Ponle un nombre al elemento.");
   return name;
 }
 

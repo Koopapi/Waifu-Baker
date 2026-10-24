@@ -39,14 +39,14 @@
 ## Entrega 6 — Ampliación: biblioteca general de elementos
 - [x] **T14 — Maquetas en Pencil** de la página «Biblioteca» y del editor con la biblioteca · RF-6, RF-8, RF-9, RF-21 ·
   Hecho: aprobadas por el dueño el 23 oct 2026.
-- [ ] **T15 — Dominio, migración `0013` y servicio** de la biblioteca · RF-6, RF-7, RF-9, RF-21 · Hecho cuando: tests de
+- [x] **T15 — Dominio, migración `0013` y servicio** de la biblioteca · RF-6, RF-7, RF-9, RF-21 · Hecho cuando: tests de
   unidad e integración en verde (subir por tipo, duplicados, uso por cartas y colecciones, quitar, renombrar, partículas
   copiadas, guardar desde una carta, la carta acepta claves de la biblioteca y no las borra).
-- [ ] **T16 — Página «Biblioteca»** (ruta de subida, acciones, menú) y la colección sin su sección de fondos · RF-6, RF-9.
-- [ ] **T17 — Editor**: fondo y sello de la biblioteca, ventana «Añadir de la biblioteca», «Guardar en la biblioteca» ·
+- [x] **T16 — Página «Biblioteca»** (ruta de subida, acciones, menú) y la colección sin su sección de fondos · RF-6, RF-9.
+- [x] **T17 — Editor**: fondo y sello de la biblioteca, ventana «Añadir de la biblioteca», «Guardar en la biblioteca» ·
   RF-8, RF-21.
 - [ ] **T18 — Siembra, E2E, reglas de negocio, `DESIGN.md`, peso y validación** · Todos · Hecho cuando: `validation.md`
-  21 de 21 y demo manual del dueño.
+  21 de 21 y demo manual del dueño. (Hecho todo menos la demo manual del dueño.)
 
 ## Cobertura
 RF-1 T6 · RF-2 T4 · RF-3 T4 · RF-4 T6 · RF-5 T2, T8 · RF-6 T7, T15, T16 · RF-7 T7, T15 · RF-8 T8, T17 · RF-9 T7, T15, T16 · RF-10 T2, T8 ·

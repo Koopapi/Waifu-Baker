@@ -94,7 +94,7 @@ describe("spec 017 — biblioteca general de elementos", () => {
       const f = await image("fondo", 120);
       await renameLibraryItem(tx, admin.id, f.id, "  Cielo rosa ");
       expect((await listLibrary(tx))[0].name).toBe("Cielo rosa");
-      await expect(renameLibraryItem(tx, admin.id, f.id, "   ")).rejects.toMatchObject({ code: "invalid_name" });
+      await expect(renameLibraryItem(tx, admin.id, f.id, "   ")).rejects.toMatchObject({ code: "invalid_item_name" });
       await removeLibraryItem(tx, store, admin.id, f.id);
       expect(await listLibrary(tx)).toEqual([]);
       expect(await store.get(f.key!)).toBeNull();

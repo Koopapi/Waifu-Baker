@@ -35,13 +35,23 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await expect(admin.locator('[data-testid="layers-remove"]')).toHaveCount(0);
   });
 
-  await test.step("RF-6: subir un fondo a la biblioteca de la colección", async () => {
-    await admin.goto(`/admin/sets/${setId}`);
-    // La colección de prueba ya trae su «Fondo de prueba», que usan sus dos cartas.
-    await expect(admin.locator('[data-testid="background-item"]', { hasText: "Fondo de prueba" })).toContainText("En 2 cartas");
-    await admin.setInputFiles('[data-testid="backgrounds-input"]', path.join(YUKI, "yuki_1_fondo.webp"));
-    const item = admin.locator('[data-testid="background-item"]', { hasText: "yuki_1_fondo" });
-    await expect(item).toContainText("Sin usar");
+  await test.step("RF-6 y RF-7: subir fondos, sellos y adornos a la biblioteca general", async () => {
+    await admin.goto("/admin/library");
+    // El «Fondo de prueba» con el que se arman las colecciones de prueba ya está, y lo usa esta colección.
+    await expect(admin.locator('[data-testid="library-item"]', { hasText: "Fondo de prueba" })).toContainText("ARM1");
+    await admin.setInputFiles('[data-testid="library-input"]', path.join(YUKI, "yuki_1_fondo.webp"));
+    await expect(admin.locator('[data-testid="library-item"]', { hasText: "yuki_1_fondo" })).toContainText("Sin usar");
+    await admin.getByRole("tab", { name: /Sellos/ }).click();
+    await admin.setInputFiles('[data-testid="library-input"]', path.join(YUKI, "yuki_ssr.webp"));
+    await expect(admin.locator('[data-testid="library-item"]', { hasText: "yuki_ssr" })).toBeVisible();
+    await admin.getByRole("tab", { name: /Adornos/ }).click();
+    await admin.setInputFiles('[data-testid="library-input"]', path.join(YUKI, "yuki_5_insignia.webp"));
+    const adorno = admin.locator('[data-testid="library-item"]', { hasText: "yuki_5_insignia" });
+    await expect(adorno).toContainText("Sin usar");
+    await adorno.getByRole("button", { name: /^Renombrar/ }).click();
+    await admin.fill('[data-testid="library-rename-input"]', "Insignia de Yuki");
+    await admin.getByRole("button", { name: "Guardar", exact: true }).click();
+    await expect(admin.locator('[data-testid="library-item"]', { hasText: "Insignia de Yuki" })).toBeVisible();
   });
 
   await test.step("RF-8 y RF-9: la carta usa el fondo de la biblioteca y ya no se puede quitar", async () => {
@@ -53,10 +63,10 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await expect(editor.locator('[data-testid="layer-row"]').first()).toContainText("Fondo");
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
-    await admin.goto(`/admin/sets/${setId}`);
-    const item = admin.locator('[data-testid="background-item"]', { hasText: "yuki_1_fondo" });
-    await expect(item.locator('[data-testid="background-uses"]')).toContainText("En 1 carta");
-    await expect(item.getByRole("button", { name: /^Quitar el fondo/ })).toHaveCount(0);
+    await admin.goto("/admin/library");
+    const item = admin.locator('[data-testid="library-item"]', { hasText: "yuki_1_fondo" });
+    await expect(item.locator('[data-testid="library-item-uses"]')).toContainText("En 1 carta · ARM1");
+    await expect(item.getByRole("button", { name: /^Quitar/ })).toHaveCount(0);
   });
 
   await test.step("RF-10 a RF-12: encuadrar a la chica con números, teclado y arrastre, y restablecer", async () => {
@@ -140,5 +150,35 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await expect(editor.locator('[data-testid="layer-row"]').nth(2)).toContainText("Chica");
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
+  });
+
+  await test.step("RF-8: añadir de la biblioteca un adorno y el sello a la carta", async () => {
+    const editor = await openEditor(admin, setId);
+    const rows = await editor.locator('[data-testid="layer-row"]').count();
+    await editor.locator('[data-testid="library-picker-open"]').click();
+    const picker = admin.locator('[data-testid="library-picker"]');
+    await picker.getByRole("button", { name: "Elegir Insignia de Yuki" }).click();
+    await picker.locator('[data-testid="library-picker-add"]').click();
+    await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(rows + 1);
+    await expect(editor.locator('[data-testid="layer-row"]').last()).toContainText("De la biblioteca");
+    await editor.locator('[data-testid="library-picker-open"]').click();
+    await picker.getByRole("button", { name: "Sellos" }).click();
+    await picker.getByRole("button", { name: "Elegir yuki_ssr" }).click();
+    await picker.locator('[data-testid="library-picker-add"]').click();
+    await expect(editor.getByRole("button", { name: "Elegir yuki_ssr" })).toHaveAttribute("aria-pressed", "true");
+    await admin.click('[data-testid="layers-save"]');
+    await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
+  });
+
+  await test.step("RF-21: guardar en la biblioteca unas partículas de la carta", async () => {
+    const editor = admin.locator('[data-testid="layers-editor"]');
+    await editor.getByRole("button", { name: "Añadir partículas" }).click();
+    await editor.locator('[data-testid="layer-row"]').last().locator('[data-testid="layer-save-to-library"]').click();
+    await admin.fill('[data-testid="save-to-library-name"]', "Destellos de prueba");
+    await admin.click('[data-testid="save-to-library-submit"]');
+    await expect(admin.locator('[data-testid="save-to-library"]')).toHaveCount(0);
+    await admin.goto("/admin/library");
+    await admin.getByRole("tab", { name: /Partículas/ }).click();
+    await expect(admin.locator('[data-testid="library-item"]', { hasText: "Destellos de prueba" })).toBeVisible();
   });
 });

@@ -15,5 +15,5 @@ export const panelErrors: Record<string, Msg> = {
       .join(" and ")}).`,
   duplicate_item: (p) => `This image is already in the library ("${p.name}").`,
   item_in_use: (p) => `${Number(p.count) === 1 ? "1 card uses" : `${p.count} cards use`} it (${p.sets}): change it there before removing it.`,
-  invalid_name: "Give the item a name.",
+  invalid_item_name: "Give the item a name.",
 };

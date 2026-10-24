@@ -23,7 +23,6 @@ import { Link as PhLink2 } from "@phosphor-icons/react/dist/ssr/Link";
 import { CircleNotch as PhLoaderCircle } from "@phosphor-icons/react/dist/ssr/CircleNotch";
 import { SignOut as PhLogOut } from "@phosphor-icons/react/dist/ssr/SignOut";
 import { List as PhMenu } from "@phosphor-icons/react/dist/ssr/List";
-import { PencilSimple as PhPencil } from "@phosphor-icons/react/dist/ssr/PencilSimple";
 import { Package as PhPackage } from "@phosphor-icons/react/dist/ssr/Package";
 import { Percent as PhPercent } from "@phosphor-icons/react/dist/ssr/Percent";
 import { Plus as PhPlus } from "@phosphor-icons/react/dist/ssr/Plus";
@@ -47,7 +46,7 @@ export interface GlyphProps extends IconProps {
 }
 export type Glyph = React.ForwardRefExoticComponent<GlyphProps & React.RefAttributes<SVGSVGElement>>;
 
-function duotone(Icon: React.ComponentType<IconProps & React.RefAttributes<SVGSVGElement>>, name: string): Glyph {
+export function duotone(Icon: React.ComponentType<IconProps & React.RefAttributes<SVGSVGElement>>, name: string): Glyph {
   const G = forwardRef<SVGSVGElement, GlyphProps>(function Glyph({ strokeWidth, weight = "duotone", ...rest }, ref) {
     void strokeWidth;
     return <Icon ref={ref} weight={weight} {...rest} />;
@@ -78,7 +77,6 @@ export const LoaderCircle = duotone(PhLoaderCircle, "LoaderCircle");
 export const LogOut = duotone(PhLogOut, "LogOut");
 export const Menu = duotone(PhMenu, "Menu");
 export const Package = duotone(PhPackage, "Package");
-export const Pencil = duotone(PhPencil, "Pencil");
 export const Percent = duotone(PhPercent, "Percent");
 export const Plus = duotone(PhPlus, "Plus");
 export const Repeat = duotone(PhRepeat, "Repeat");

@@ -48,6 +48,11 @@ describe("spec 008 — idiomas", () => {
     expect(Object.keys(panelErrorsEs).sort()).toEqual(Object.keys(panelErrorsEn).sort());
   });
 
+  it("test_s017_rf6_los_errores_del_panel_no_pisan_codigos_del_diccionario_general", () => {
+    // getDict() suma los del panel encima de los generales: un código repetido cambiaría otro mensaje.
+    expect(Object.keys(panelErrorsEs).filter((k) => k in dictionaries.es.errors)).toEqual([]);
+  });
+
   it("test_s008_rf10_cada_codigo_de_error_tiene_traduccion_en_los_dos_idiomas", () => {
     const codes = new Set<string>();
     for (const f of walk(path.join(SRC, "server")).filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts"))) {

@@ -555,17 +555,6 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
                         {label}
                         {isImageLayer(l) && libraryKeys.has(l.key) && <span className="ml-2 text-xs font-normal text-ui-text-3">· {t.pick.fromLibrary}</span>}
                       </span>
-                      {/* Spec 017 (ampliación), RF-21: lo propio de la carta se puede guardar en la biblioteca (la chica no). */}
-                      {(isImageLayer(l) ? kindForLayer(l) && !libraryKeys.has(l.key) : true) && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => setSaveTarget(isImageLayer(l) ? { kind: kindForLayer(l)!, key: l.key, name: `${label} · ${cardLabel}` } : { kind: "particulas", particles: l, name: `${l.particulas} · ${cardLabel}` })}
-                          data-testid="layer-save-to-library"
-                        >
-                          {t.pick.save}
-                        </Button>
-                      )}
                       <Checkbox label={t.visible} checked={l.visible !== false} disabled={locked} onCheckedChange={(v) => setLayer(i, { visible: v })} />
                       <IconButton label={`${t.moveDown} · ${label}`} size="sm" disabled={i === 0} onClick={() => move(i, i - 1)}>
                         <ArrowUp className="size-4" aria-hidden />
@@ -577,6 +566,17 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
                         <Trash2 className="size-4" aria-hidden />
                       </IconButton>
                     </div>
+                    {/* Spec 017 (ampliación), RF-21: lo propio de la carta se puede guardar en la biblioteca (la chica no). */}
+                    {(isImageLayer(l) ? kindForLayer(l) && !libraryKeys.has(l.key) : true) && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => setSaveTarget(isImageLayer(l) ? { kind: kindForLayer(l)!, key: l.key, name: `${label} · ${cardLabel}` } : { kind: "particulas", particles: l, name: `${l.particulas} · ${cardLabel}` })}
+                        data-testid="layer-save-to-library"
+                      >
+                        {t.pick.save}
+                      </Button>
+                    )}
                     <div className="grid gap-3 sm:grid-cols-4">
                       {!isImageLayer(l) && (
                         <Select label={t.particleType} value={l.particulas} onValueChange={(v) => setLayer(i, { particulas: v as (typeof PARTICLE_TYPES)[number] })} options={PARTICLE_TYPES.map((p) => ({ value: p, label: p }))} />
