@@ -2,7 +2,7 @@
 // tras recargar → «Abrir todos» → la colección refleja las cartas y las repetidas suman.
 import { expect, test } from "./fixtures";
 import path from "node:path";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, tear } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, tear, openAllAndSkip } from "./helpers";
 
 test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
@@ -76,10 +76,10 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
 
   await test.step("RF-18: «Abrir todos» abre el resto y muestra todas las cartas", async () => {
     await fan.click('[data-testid="group-COL1"] >> text=Abrir todos (2)');
-    await fan.click('[data-testid="open-all"]');
-    await expect(fan.locator('[data-testid="open-all-summary"]')).toContainText("2 sobres abiertos · 4 cartas");
-    await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(4);
-    await expect(fan.locator('[data-testid="open-all-grid"] li').first()).toContainText("Rara");
+    // Spec 019: tras la animación (saltada), el resumen con sus totales y la rareza más alta primero.
+    expect(await openAllAndSkip(fan)).toBe(4);
+    await expect(fan.locator('[data-testid="open-all-result"] h2')).toHaveText("Abriste 2 sobres");
+    await expect(fan.locator('[data-testid="open-all-result"] h3').first()).toContainText("Raras");
     await fan.waitForTimeout(800);
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-3-abrir-todos.png`, fullPage: true });
     await fan.goto("/sobres");

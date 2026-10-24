@@ -1,5 +1,5 @@
-import { expect, type Browser, type Locator, type Page } from "@playwright/test";
-import { DESKTOP } from "./fixtures";
+import type { Browser, Locator, Page } from "@playwright/test";
+import { DESKTOP, expect } from "./fixtures";
 import path from "node:path";
 
 export const LAB = path.resolve(__dirname, "../public/lab");
@@ -176,4 +176,20 @@ export async function untickAdmin(page: Page) {
 export async function tickAll(scope: Locator) {
   const boxes = scope.locator('input[type="checkbox"]');
   for (let i = 0; i < (await boxes.count()); i++) await boxes.nth(i).setChecked(true);
+}
+
+/**
+ * Spec 019: «Abrir todos» y saltar la animación (ráfaga y foco) hasta el resumen. Devuelve el número de cartas del lote
+ * según los totales del resumen.
+ */
+export async function openAllAndSkip(page: Page): Promise<number> {
+  await page.click('[data-testid="open-all"]');
+  const result = page.locator('[data-testid="open-all-result"]');
+  const skip = page.locator('[data-testid="open-all-skip"]');
+  await expect(result.or(skip).first()).toBeVisible({ timeout: 30_000 });
+  while (!(await result.isVisible())) {
+    if (await skip.isVisible()) await skip.click().catch(() => {});
+    await page.waitForTimeout(100);
+  }
+  return Number(await page.locator('[data-testid="open-all-totals"] dd').first().textContent());
 }

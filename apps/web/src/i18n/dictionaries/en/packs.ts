@@ -42,6 +42,17 @@ export const packs = {
     summaryPity: (n: number) => ` · ${n} guaranteed by the protection`,
     holoSuffix: " · holo",
     backToMineButton: "Back to my packs",
+    // Spec 019: burst, focus on the highlights and grouped summary.
+    burstCounter: (i: number, n: number) => `Pack ${i} of ${n}`,
+    skip: "Skip",
+    focusCounter: (i: number, n: number) => `Highlight ${i} of ${n}`,
+    next: "Next",
+    toSummary: "See summary",
+    focusHint: "Tap the card or \"Next\" to see the next one",
+    openedTitle: (n: number) => `You opened ${n} ${plural(n, "pack", "packs")}`,
+    totals: { cards: "Cards", fresh: "New", holo: "Holo" },
+    group: { common: "Commons", uncommon: "Uncommons", rare: "Rares", epic: "Epics", legendary: "Legendaries", secret: "Secrets" },
+    copies: (n: number) => `×${n}`,
   },
   opener: {
     openAnother: (n: number) => `Open another (${n})`,

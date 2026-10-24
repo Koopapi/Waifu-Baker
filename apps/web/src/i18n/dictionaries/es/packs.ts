@@ -41,6 +41,17 @@ export const packs: typeof en = {
     summaryPity: (n) => ` · ${n} ${plural(n, "garantizada", "garantizadas")} por la protección`,
     holoSuffix: " · holo",
     backToMineButton: "Volver a mis sobres",
+    // Spec 019: ráfaga, foco en las destacadas y resumen agrupado.
+    burstCounter: (i, n) => `Sobre ${i} de ${n}`,
+    skip: "Saltar",
+    focusCounter: (i, n) => `Destacada ${i} de ${n}`,
+    next: "Siguiente",
+    toSummary: "Ver resumen",
+    focusHint: "Toca la carta o «Siguiente» para pasar a la próxima",
+    openedTitle: (n) => `Abriste ${n} ${plural(n, "sobre", "sobres")}`,
+    totals: { cards: "Cartas", fresh: "Nuevas", holo: "Holo" },
+    group: { common: "Comunes", uncommon: "Poco comunes", rare: "Raras", epic: "Épicas", legendary: "Legendarias", secret: "Secretas" },
+    copies: (n) => `×${n}`,
   },
   opener: {
     openAnother: (n) => `Abrir otro (${n})`,
