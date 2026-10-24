@@ -233,10 +233,6 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
           <span key={i} className="sparkle" style={{ left: `${x}%`, top: `${y}%`, "--s": `${size}px`, "--c": color, "--d": `${delay}s` } as React.CSSProperties} />
         ))}
       </div>
-      <p className="hint" aria-live="polite">
-        {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
-      </p>
-
       <div className="stage__center">{(phase === "idle" || phase === "torn") && <PackMesh key={packKey} onTorn={onTorn} onCommit={onCommit} art={packArt} reducedMotion={reduced} label={packLabel} />}</div>
 
       <div className="cards">
@@ -301,16 +297,23 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
         </div>
       )}
 
-      <div className="hud">
-        {extraHud}
-        <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} variant="ghost" className="hud__sound" data-testid="sound-toggle" />
-        {tilt.gyroAvailable && tilt.mode !== "gyro" && (
-          <button type="button" className="hud__btn" onClick={() => void tilt.requestGyro()}>
-            {t.packs.stage.enableGyro}
-          </button>
-        )}
-        {debug && <span className="hud__chip">{t.packs.stage.tiltMode(tilt.mode)}</span>}
-        {debug && reduced && <span className="hud__chip">{t.packs.stage.reducedMotion}</span>}
+      {/* La pista va en el mismo bloque que los botones, encima: aunque los botones ocupen dos renglones (teléfono), no
+          se enciman. */}
+      <div className="stage__bottom">
+        <p className="hint" aria-live="polite">
+          {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
+        </p>
+        <div className="hud">
+          {extraHud}
+          <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} variant="ghost" className="hud__sound" data-testid="sound-toggle" />
+          {tilt.gyroAvailable && tilt.mode !== "gyro" && (
+            <button type="button" className="hud__btn" onClick={() => void tilt.requestGyro()}>
+              {t.packs.stage.enableGyro}
+            </button>
+          )}
+          {debug && <span className="hud__chip">{t.packs.stage.tiltMode(tilt.mode)}</span>}
+          {debug && reduced && <span className="hud__chip">{t.packs.stage.reducedMotion}</span>}
+        </div>
       </div>
     </div>
   );
