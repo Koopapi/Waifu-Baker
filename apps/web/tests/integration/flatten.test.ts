@@ -58,7 +58,7 @@ describe("spec 018 — imagen fija", () => {
     expect(await meanDiff(a, b)).toBeLessThan(0.5);
   }, SLOW);
 
-  it("test_s018_rf1_salen_los_tamanos_y_la_publica_lleva_marca_de_agua", async () => {
+  it("test_s018_rf1_rf15_salen_los_tamanos_y_la_publica_lleva_marca_de_agua", async () => {
     const out = await renderFlatCard(config, await images());
     for (const size of ["full", "mid", "thumb", "public"] as const) {
       const meta = await sharp(out[size]).metadata();

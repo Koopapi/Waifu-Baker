@@ -9,7 +9,7 @@ export function SectionSkeleton({ variant = "cards" }: { variant?: "cards" | "li
       {variant === "cards" ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {Array.from({ length: 10 }, (_, i) => (
-            <Skeleton key={i} className="aspect-[5/7] rounded-xl" />
+            <Skeleton key={i} className="aspect-[700/991] rounded-xl" />
           ))}
         </div>
       ) : (

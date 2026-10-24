@@ -82,9 +82,9 @@ function Tile({
       <button type="button" onClick={sortable ? undefined : onOpen} className={`block w-full ${sortable ? "cursor-grab" : "cursor-pointer"} ${focusRing}`} aria-label={t.editAria(pad(card.number))}>
         {card.thumbUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- recurso privado servido por la API del panel
-          <img src={card.thumbUrl} alt="" className="aspect-[63/88] w-full object-cover" draggable={false} />
+          <img src={card.thumbUrl} alt="" className="aspect-[700/991] w-full object-cover" draggable={false} />
         ) : (
-          <div className="grid aspect-[63/88] place-items-center text-xs text-ui-text-3">{t.processing}</div>
+          <div className="grid aspect-[700/991] place-items-center text-xs text-ui-text-3">{t.processing}</div>
         )}
       </button>
       {!sortable && (
