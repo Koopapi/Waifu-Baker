@@ -16,7 +16,7 @@
   ahora ocupa su capa de personaje (spec 017, RF-4).
 
 ## Entrega 3 — Carta viva
-- [ ] **T5 — Capas firmadas** (`/api/cards/[id]/live` y `/api/cards/layer`) con dueño y doble control 18+ · RF-16, RF-17.
+- [x] **T5 — Capas firmadas** (`/api/cards/[id]/live` y `/api/cards/layer`) con dueño y doble control 18+ · RF-16, RF-17.
 - [ ] **T6 — Revelación viva** en la apertura · RF-6, RF-9, RF-14.
 - [ ] **T7 — Ficha viva** con el interruptor del giroscopio · RF-7, RF-10 a RF-13.
 - [ ] **T8 — Imágenes fijas** en colección, resumen, «Abrir todos», portada del sobre y zonas públicas · RF-8, RF-15.

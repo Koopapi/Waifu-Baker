@@ -5,4 +5,6 @@ import { setFlattener } from "@/server/cards/flat-store";
 import { fastFlatten } from "./fast-flatten";
 
 setFlattener(fastFlatten);
+// Para firmar enlaces de imagen y de capas (spec 018) hace falta un secreto; en los tests vale uno fijo.
+process.env.AUTH_SECRET ??= "secreto-de-los-tests";
 afterAll(() => closeFlattenBrowser());
