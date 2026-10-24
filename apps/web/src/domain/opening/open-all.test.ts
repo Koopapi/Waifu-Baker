@@ -1,19 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { burstPlan, groupByRarity, highlights, MAX_HIGHLIGHTS, throttleSounds, type LotCard } from "./open-all";
+import { BURST_END_MS, burstPlan, groupByRarity, highlights, MAX_HIGHLIGHTS, soundGate, type LotCard } from "./open-all";
 
 const card = (number: number, rarity: LotCard["rarity"], o: Partial<LotCard> = {}): LotCard => ({ key: `k${number}-${Math.random()}`, number, rarity, holo: false, isNew: false, qtyAfter: 1, ...o });
 
 describe("spec 019 — ráfaga", () => {
   it("test_s019_rf2_la_rafaga_no_pasa_de_6_segundos_y_va_pausada_con_pocos_sobres", () => {
     expect(burstPlan(2)).toEqual({ interval: 600, total: 1200 });
-    expect(burstPlan(10)).toEqual({ interval: 600, total: 6000 });
-    expect(burstPlan(50)).toEqual({ interval: 120, total: 6000 });
-    for (const n of [1, 7, 23, 37, 50]) expect(burstPlan(n).total).toBeLessThanOrEqual(6000);
+    expect(burstPlan(9)).toEqual({ interval: 600, total: 5400 });
+    expect(burstPlan(50)).toEqual({ interval: 108, total: 5400 });
+    // Con la pausa final (y el margen para pintar), la ráfaga completa no pasa de 6 s.
+    for (const n of [1, 7, 23, 37, 50]) expect(burstPlan(n).total + BURST_END_MS).toBeLessThan(6000);
   });
 
   it("test_s019_rf3_como_mucho_un_sonido_cada_120_ms", () => {
-    expect(throttleSounds([0, 50, 100, 130, 200, 260, 300], 120)).toEqual([0, 130, 260]);
-    expect(throttleSounds([], 120)).toEqual([]);
+    const gate = soundGate(120);
+    expect([0, 0.2, 50, 100, 130, 200, 260, 300].filter((t) => gate(t))).toEqual([0, 130, 260]);
   });
 });
 

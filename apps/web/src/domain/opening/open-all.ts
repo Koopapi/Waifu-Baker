@@ -14,19 +14,33 @@ export interface LotCard {
 }
 
 export const BURST_MAX_MS = 6000;
+/** Pausa tras el último sobre, para que se vean caer sus cartas. */
+export const BURST_END_MS = 450;
+/** Margen para el pintado del navegador: la ráfaga completa queda holgada por debajo de 6 s. */
+const BURST_MARGIN_MS = 150;
 const BURST_SLOW_MS = 600;
 
-/** RF-2: intervalo entre sobres: pausado (600 ms) con pocos y más rápido con muchos, sin pasar de 6 s en total. */
+/**
+ * RF-2: intervalo entre sobres: pausado (600 ms) con pocos y más rápido con muchos. `total` es lo que tardan en
+ * rasgarse; con la pausa final y el margen no pasa de 6 s.
+ */
 export function burstPlan(packs: number) {
-  const interval = Math.min(BURST_SLOW_MS, Math.floor(BURST_MAX_MS / Math.max(1, packs)));
+  const budget = BURST_MAX_MS - BURST_END_MS - BURST_MARGIN_MS;
+  const interval = Math.min(BURST_SLOW_MS, Math.floor(budget / Math.max(1, packs)));
   return { interval, total: interval * packs };
 }
 
-/** RF-3: de los momentos de los rasgados (ms), los que suenan sin pasar de un sonido cada `gap` ms. */
-export function throttleSounds(times: number[], gap: number): number[] {
-  const out: number[] = [];
-  for (const t of times) if (out.length === 0 || t - out[out.length - 1] >= gap) out.push(t);
-  return out;
+/**
+ * RF-3: puerta del sonido de la ráfaga: dice si un rasgado en el momento `now` (ms) puede sonar sin pasar de un sonido
+ * cada `gap` ms, y si suena lo apunta.
+ */
+export function soundGate(gap: number) {
+  let last = -Infinity;
+  return (now: number) => {
+    if (now - last < gap) return false;
+    last = now;
+    return true;
+  };
 }
 
 const rank = (r: Rarity) => RARITIES.indexOf(r);

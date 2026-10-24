@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { OpenAllCard } from "@/app/sobres/actions";
-import { burstPlan, throttleSounds } from "@/domain/opening/open-all";
+import { BURST_END_MS, burstPlan, soundGate } from "@/domain/opening/open-all";
 import { sound } from "@/features/sound/engine";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
@@ -20,24 +20,34 @@ export function OpenAllBurst({ packs, cards, pack, onDone, onSkip }: { packs: nu
   const done = useRef(onDone);
   done.current = onDone;
   const { interval } = burstPlan(packs);
-  // RF-3: qué rasgados suenan, calculado de antemano con el mismo ritmo.
-  const audible = useMemo(() => new Set(throttleSounds(Array.from({ length: packs }, (_, i) => i * interval), SOUND_GAP_MS)), [packs, interval]);
+  // El inicio, el avance y la puerta del sonido viven fuera del efecto: si React lo vuelve a montar (modo estricto en
+  // desarrollo), la ráfaga sigue donde iba en vez de empezar otra vez.
+  const start = useRef<number | null>(null);
+  const step = useRef(0);
+  const gate = useRef(soundGate(SOUND_GAP_MS));
 
   useEffect(() => {
-    let n = 0;
-    const tick = () => {
-      if (audible.has(n * interval)) sound.play("tear");
-      n += 1;
-      setTorn(n);
-      if (n >= packs) {
-        window.clearInterval(id);
-        window.setTimeout(() => done.current(), 450);
+    start.current ??= performance.now();
+    let raf = 0;
+    let end = 0;
+    // El avance sale del tiempo transcurrido (no de contar ticks): aunque el navegador vaya cargado, no se retrasa.
+    const frame = (now: number) => {
+      const due = Math.min(packs, Math.floor((now - start.current!) / interval) + 1);
+      if (due > step.current) {
+        // RF-3: como mucho un rasgado cada 120 ms, medido en tiempo real.
+        if (gate.current(now)) sound.play("tear");
+        step.current = due;
+        setTorn(due);
       }
+      if (step.current >= packs) end = window.setTimeout(() => done.current(), BURST_END_MS);
+      else raf = requestAnimationFrame(frame);
     };
-    const id = window.setInterval(tick, interval);
-    tick();
-    return () => window.clearInterval(id);
-  }, [packs, interval, audible]);
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(end);
+    };
+  }, [packs, interval]);
 
   const falling = cards.filter((c) => c.pack === torn - 1);
   const left = Math.max(0, packs - torn);
