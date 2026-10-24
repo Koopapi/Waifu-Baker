@@ -26,7 +26,10 @@ export const collection = {
     holo: "Holo",
     version: "Version",
     firstObtained: (date: string) => `You first got it on ${date}.`,
-    aiHint: "AI-generated illustration. Move your mouse or tilt your phone to see the shine.",
+    aiHint: "AI-generated illustration. Move your mouse or drag the card with your finger to tilt it.",
+    gyro: "Move with the phone",
+    gyroHint: "The card follows your phone's tilt. When off, drag it with your finger.",
+    gyroDenied: "You didn't allow the phone's motion; the card tilts with your finger.",
   },
   album: {
     moderation: {

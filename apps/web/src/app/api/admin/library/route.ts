@@ -15,7 +15,8 @@ const IMAGE_KINDS = ["fondo", "sello", "adorno"] as const;
 export async function POST(req: Request) {
   const session = await adminFromRequest("/api/admin/library");
   if (!session) return notFoundResponse();
-  const form = await req.formData();
+  const form = await req.formData().catch(() => null);
+  if (!form) return Response.json({ ok: false, code: "bad_request" }, { status: 400 });
   const file = form.get("file");
   const kind = IMAGE_KINDS.find((k) => k === form.get("kind"));
   if (!(file instanceof File) || !kind) {

@@ -55,3 +55,21 @@ body {
     transition-duration: 0.001ms !important;
   }
 }
+
+/*
+ * Spec 018, RF-5: acabado arcoíris de la versión holo sobre la imagen fija de la carta (cuadrículas, resúmenes,
+ * miniaturas). Va en ::before y posicionado: se pinta encima de la imagen (no posicionada) y debajo de las etiquetas
+ * posicionadas que vienen después en el orden del documento.
+ */
+.holo-finish {
+  position: relative;
+}
+.holo-finish::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  mix-blend-mode: soft-light;
+  background: linear-gradient(115deg, rgba(255, 122, 168, 0.75) 0%, rgba(255, 211, 110, 0.7) 22%, rgba(138, 240, 196, 0.7) 44%, rgba(110, 200, 255, 0.75) 66%, rgba(199, 155, 255, 0.75) 88%);
+}

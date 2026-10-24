@@ -3,6 +3,7 @@
 import { adminAction, type ActionState } from "@/server/auth/admin-action";
 import { getCardStore } from "@/server/cards/store-instance";
 import { bulkUpdateCards, deleteCard, regenerateSet, reorderCards, reviewCard, simulatePack, updateCard, type CardPatch } from "@/server/services/cards";
+import { discardPendingLayers } from "@/server/services/card-layers";
 import { requireAdmin } from "@/server/auth/require-admin";
 import { db } from "@/db/client";
 import { translateError } from "@/i18n/errors";
@@ -107,4 +108,14 @@ export async function simulatePackAction(setId: string): Promise<{ ok: boolean; 
     if (isAdminError(e)) return { ok: false, error: translateError(await getDict(), e) };
     throw e;
   }
+}
+
+/** Spec 018, RF-20: descarta el cambio de capas pendiente de revisión 18+. */
+export async function discardPendingLayersAction(setId: string, cardId: string, version: number): Promise<ActionState & { version?: number }> {
+  let saved: number | undefined;
+  const r = await adminAction("discardPendingLayers", paths(setId), async ({ db, actorId }) => {
+    const c = await discardPendingLayers(db, getCardStore(), actorId, cardId, { expectedVersion: version });
+    saved = c.version;
+  });
+  return { ...r, version: saved };
 }

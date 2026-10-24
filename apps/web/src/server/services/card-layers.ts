@@ -10,6 +10,8 @@ import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
 import { recordAudit } from "./audit";
 import { libraryKeysAmong } from "./library";
+import { renderCardFlat, storeFlat } from "@/server/cards/flat-store";
+import { composeCard } from "@/server/cards/compose";
 
 type CardRow = typeof cards.$inferSelect;
 const sha256 = (b: Buffer) => createHash("sha256").update(b).digest("hex");
@@ -98,24 +100,42 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
   const requested = validConfig(input.config);
   let previous: LayersConfig | null = null;
   let temps: string[] = [];
+  let oldFlat: string[] = [];
   let setId = "";
   const card = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
     if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
     if (cur.version !== input.expectedVersion && !input.force) throw staleVersion();
-    validConfig(requested, cur.layers);
+    // Spec 018, RF-18: en una colección 18+ publicada, el cambio queda pendiente de revisión; se edita sobre lo pendiente.
+    const [set] = await tx.select({ isAdult: sets.isAdult, status: sets.status }).from(sets).where(eq(sets.id, cur.setId));
+    const pendingMode = set.isAdult && set.status !== "draft";
+    const base = pendingMode ? (cur.layersPending ?? cur.layers) : cur.layers;
+    validConfig(requested, base);
     setId = cur.setId;
-    const settled = await settleKeys(tx, store, cur.setId, settleAutoStyle(cur.layers, requested, rarityTier(cur.rarity)));
+    const config = settleAutoStyle(base, requested, rarityTier(cur.rarity));
+    // Spec 018, RF-3 y RF-4: la imagen fija se saca antes de guardar nada; si falla, la carta no cambia.
+    const flat = await renderCardFlat(store, config);
+    const settled = await settleKeys(tx, store, cur.setId, config);
     temps = settled.temps;
-    previous = cur.layers;
+    const flatKeys = await storeFlat(store, cur, flat);
+    let change: Partial<CardRow>;
+    if (pendingMode) {
+      previous = cur.layersPending;
+      oldFlat = pendingFlatKeys(cur.pendingKeys);
+      change = { layersPending: settled.config, pendingKeys: { full: flatKeys.keyFull, mid: flatKeys.keyMid, thumb: flatKeys.keyThumb, public: flatKeys.keyPublic, blurhash: flatKeys.blurhash } };
+    } else {
+      previous = cur.layers;
+      oldFlat = [cur.keyFull, cur.keyMid, cur.keyThumb, cur.keyPublic].filter((k): k is string => Boolean(k));
+      change = { layers: settled.config, ...flatKeys };
+    }
     const [updated] = await tx
       .update(cards)
-      .set({ layers: settled.config, version: cur.version + 1, updatedAt: sql`now()` })
+      .set({ ...change, version: cur.version + 1, updatedAt: sql`now()` })
       .where(eq(cards.id, cardId))
       .returning();
     await recordAudit(tx, {
       actorUserId,
-      action: cur.layers ? "card_layers_update" : "card_layers_add",
+      action: pendingMode ? "card_layers_pending" : cur.layers ? "card_layers_update" : "card_layers_add",
       entityType: "card",
       entityId: cardId,
       before: { layers: cur.layers },
@@ -125,7 +145,38 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
     return updated;
   });
   await releaseLayerImages(db, store, setId, [...imageKeys(previous), ...temps]);
-  return { card, repeated: repeatedImages(card.layers!) };
+  await deleteUnusedFlat(store, card, oldFlat);
+  return { card, repeated: repeatedImages((card.layersPending ?? card.layers)!) };
+}
+
+/** Las claves de la imagen fija pendiente de revisión (spec 018). */
+const pendingFlatKeys = (k: CardRow["pendingKeys"]) => (k ? [k.full, k.mid, k.thumb, k.public] : []);
+
+/** Las imágenes fijas llevan el id de la carta en la clave: las que ya no usa ni lo vigente ni lo pendiente, se borran. */
+async function deleteUnusedFlat(store: CardStore, card: CardRow, keys: string[]) {
+  const inUse = new Set([card.keyFull, card.keyMid, card.keyThumb, card.keyPublic, ...pendingFlatKeys(card.pendingKeys)]);
+  await Promise.all(keys.filter((k) => !inUse.has(k)).map((k) => store.delete(k)));
+}
+
+/** Spec 018, RF-20: descarta el cambio de capas pendiente de revisión; la carta sigue como estaba. */
+export async function discardPendingLayers(db: DbLike, store: CardStore, actorUserId: string, cardId: string, input: { expectedVersion: number }) {
+  let pending: CardRow | null = null;
+  const card = await db.transaction(async (tx) => {
+    const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
+    if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
+    if (cur.version !== input.expectedVersion) throw staleVersion();
+    if (!cur.layersPending) throw new AdminError("no_pending_layers", "Esta carta no tiene cambios de capas pendientes.");
+    pending = cur;
+    const [updated] = await tx.update(cards).set({ layersPending: null, pendingKeys: null, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(cards.id, cardId)).returning();
+    await recordAudit(tx, { actorUserId, action: "card_layers_discard", entityType: "card", entityId: cardId, before: { layers: cur.layersPending } });
+    return updated;
+  });
+  const old = pending as CardRow | null;
+  if (old) {
+    await releaseLayerImages(db, store, old.setId, imageKeys(old.layersPending));
+    await deleteUnusedFlat(store, card, pendingFlatKeys(old.pendingKeys));
+  }
+  return card;
 }
 
 /**
@@ -134,6 +185,7 @@ export async function saveCardLayers(db: DbLike, store: CardStore, actorUserId: 
  */
 export async function removeCardLayers(db: DbLike, store: CardStore, actorUserId: string, cardId: string, input: { expectedVersion: number; force?: boolean }) {
   let previous: LayersConfig | null = null;
+  let oldFlat: string[] = [];
   let setId = "";
   const card = await db.transaction(async (tx) => {
     const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
@@ -143,19 +195,27 @@ export async function removeCardLayers(db: DbLike, store: CardStore, actorUserId
     if (!cur.originalKey) throw new AdminError("layers_required", "Esta carta se creó desde capas: necesita al menos una capa de imagen visible.");
     setId = cur.setId;
     previous = cur.layers;
-    const [updated] = await tx.update(cards).set({ layers: null, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(cards.id, cardId)).returning();
+    // Spec 016, RF-14 (cartas anteriores a la spec 017): vuelve a la imagen compuesta con el marco de Pencil.
+    const original = await store.get(cur.originalKey);
+    if (!original) throw new AdminError("missing_original", "No se encontró la imagen original de la carta.", { what: "original" });
+    const [set] = await tx.select({ code: sets.code }).from(sets).where(eq(sets.id, cur.setId));
+    const composed = await storeFlat(store, cur, await composeCard(original.body, { number: cur.number, rarity: cur.rarity, setCode: set.code }));
+    oldFlat = [cur.keyFull, cur.keyMid, cur.keyThumb, cur.keyPublic].filter((k): k is string => Boolean(k));
+    const [updated] = await tx.update(cards).set({ layers: null, ...composed, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(cards.id, cardId)).returning();
     await recordAudit(tx, { actorUserId, action: "card_layers_remove", entityType: "card", entityId: cardId, before: { layers: cur.layers }, after: { layers: null } });
     return updated;
   });
   await releaseLayerImages(db, store, setId, imageKeys(previous));
+  await deleteUnusedFlat(store, card, oldFlat);
   return card;
 }
 
 /** RF-20: la configuración guardada y la versión de la carta, para recargar el editor tras un conflicto. */
 export async function getCardLayers(db: DbLike, cardId: string) {
-  const [cur] = await db.select({ layers: cards.layers, version: cards.version, originalKey: cards.originalKey }).from(cards).where(eq(cards.id, cardId));
+  const [cur] = await db.select({ layers: cards.layers, pending: cards.layersPending, version: cards.version, originalKey: cards.originalKey }).from(cards).where(eq(cards.id, cardId));
   if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
-  return { layers: cur.layers, version: cur.version, hasOriginal: Boolean(cur.originalKey) };
+  // Spec 018, RF-18: si hay un cambio pendiente de revisión, el editor sigue sobre él.
+  return { layers: cur.pending ?? cur.layers, pending: Boolean(cur.pending), version: cur.version, hasOriginal: Boolean(cur.originalKey) };
 }
 
 /**

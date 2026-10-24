@@ -64,6 +64,8 @@ export interface CartaInstancia {
   ocultarSello(): void;
   entrar(): void;
   habilitarGiroscopio(): Promise<boolean>;
+  /** Waifu Baker, spec 018: deja de seguir la inclinación del teléfono. */
+  deshabilitarGiroscopio(): void;
   destruir(): void;
 }
 

@@ -35,7 +35,8 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     const img = fan.locator(".card3d img").first();
     firstImage = (await img.getAttribute("src"))!;
     expect(firstImage).toMatch(/^\/api\/cards\/img\?c=.+&s=mid&e=\d+&sig=[0-9a-f]{64}$/);
-    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(750);
+    // Spec 018: la imagen fija de la carta por capas (700 × 991).
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(700);
     await fan.locator('.card3d[role="button"]').first().click();
     await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
     await fan.locator('.card3d[role="button"]').first().click();

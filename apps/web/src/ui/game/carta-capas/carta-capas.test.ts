@@ -59,3 +59,10 @@ describe("spec 017 — encuadre de cada capa", () => {
     expect(src).toMatch(/capas\[i\]\.style\.transform = 'translate3d\(/);
   });
 });
+
+describe("spec 018 — giroscopio", () => {
+  it("test_s018_rf12_el_giroscopio_se_puede_activar_y_apagar", () => {
+    expect(src).toMatch(/habilitarGiroscopio: function/);
+    expect(src).toMatch(/deshabilitarGiroscopio: function \(\) \{\s*global\.removeEventListener\('deviceorientation', onOri\);/);
+  });
+});

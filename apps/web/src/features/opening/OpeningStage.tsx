@@ -13,6 +13,7 @@ import { Confetti, type ConfettiBurst } from "@/ui/game/Confetti";
 import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
 import { sound, useSoundMuted } from "@/features/sound/engine";
+import { useReducedMotion } from "@/ui/hooks/useReducedMotion";
 import "./opening.css";
 
 type Phase = "idle" | "torn" | "fanned" | "summary";
@@ -25,18 +26,6 @@ const SPARKLES: [number, number, number, string, number][] = [
   [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
 ];
 const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "secret"];
-
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-  return reduced;
-}
 
 interface StageProps {
   /** Fuente de cartas del sobre. Por defecto, datos falsos del laboratorio. */
@@ -61,11 +50,13 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
   const [revealed, setRevealed] = useState(0);
   const [packKey, setPackKey] = useState(0);
   const [flash, setFlash] = useState<Rarity | null>(null);
+  // Spec 018, RF-6: la carta recién revelada se ve viva mientras está en el centro.
+  const [liveIndex, setLiveIndex] = useState<number | null>(null);
   // Spec 014, RF-13: confeti y celebración al revelar una rara o mejor.
   const [burst, setBurst] = useState<ConfettiBurst | null>(null);
   const [party, setParty] = useState<Rarity | null>(null);
   const flipping = useRef(false);
-  const reduced = usePrefersReducedMotion();
+  const reduced = useReducedMotion();
   const tilt = useTiltSource();
   const stage = useRef<HTMLDivElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);
@@ -168,9 +159,12 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
         window.setTimeout(() => setFlash(null), 400);
       }
       el.classList.add("card3d--revealed");
+      // RF-6 y RF-14: viva (con su entrada y el sello que salta) salvo con movimiento reducido; se queda algo más.
+      const live = !reduced && Boolean(card.live);
+      if (live) setLiveIndex(i);
       const pos = trayLayout(i, el);
       gsap.to(el, {
-        delay: reduced ? 0.4 : 1.1,
+        delay: reduced ? 0.4 : live ? 1.9 : 1.1,
         duration: reduced ? 0.2 : 0.55,
         ease: "power2.inOut",
         x: pos.x,
@@ -179,6 +173,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
         rotation: 0,
         onComplete: () => {
           el.classList.remove("card3d--revealed");
+          setLiveIndex(null);
           flipping.current = false;
           setRevealed(i + 1);
           if (i + 1 === cards.length) setPhase("summary");
@@ -208,6 +203,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
 
   const reset = () => {
     setError(null);
+    setLiveIndex(null);
     setCards([]);
     setRevealed(0);
     setPhase("idle");
@@ -253,6 +249,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
             tiltTarget={tilt.target}
             style={{ zIndex: cards.length - i }}
             onClick={phase === "fanned" && i === revealed ? flipTop : undefined}
+            showLive={liveIndex === i}
           />
         ))}
       </div>
@@ -277,7 +274,7 @@ export function OpeningStage({ draw, packLabel, packArt, extraHud, onFinished, r
             <div className="summary__grid">
               {cards.map((c, i) => (
                 <div key={i} className={`summary__row rarity-${c.rarity}`}>
-                  <span className="summary__thumb">
+                  <span className={`summary__thumb ${c.holo ? "holo-finish" : ""}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
                     <img src={c.image} alt="" draggable={false} />
                   </span>
