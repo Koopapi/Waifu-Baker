@@ -1,4 +1,4 @@
-import type { Browser, Locator, Page } from "@playwright/test";
+import { expect, type Browser, type Locator, type Page } from "@playwright/test";
 import { DESKTOP } from "./fixtures";
 import path from "node:path";
 
@@ -152,8 +152,14 @@ export async function tear(page: Page) {
  */
 export async function choose(scope: Page | Locator, label: string | RegExp, option: string | RegExp) {
   const page = "page" in scope && typeof scope.page === "function" ? (scope as Locator).page() : (scope as Page);
-  await scope.getByRole("combobox", { name: label }).click();
-  await page.getByRole("option", { name: option }).first().click();
+  const item = page.getByRole("option", { name: option }).first();
+  // Un clic antes de que la página termine de hidratarse no abre la lista (pasa en los ejecutores lentos de la CI):
+  // se vuelve a pulsar hasta que aparece.
+  await expect(async () => {
+    if (!(await item.isVisible())) await scope.getByRole("combobox", { name: label }).click();
+    await expect(item).toBeVisible({ timeout: 3_000 });
+  }).toPass({ timeout: 60_000 });
+  await item.click();
 }
 
 /** Spec 011: marca o desmarca una casilla del sistema de diseño (casilla nativa con su etiqueta). */
