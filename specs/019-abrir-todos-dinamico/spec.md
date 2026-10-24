@@ -1,6 +1,6 @@
 # Spec 019 — «Abrir todos» dinámico
 
-Estado: propuesta, pendiente de aprobación del dueño.
+Estado: aprobada por el dueño el 23 oct 2026.
 
 ## Contexto y objetivo
 «Abrir todos» (spec 004, RF-18) abre de una vez hasta 50 sobres de una colección y muestra las cartas en una cuadrícula
