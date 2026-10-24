@@ -54,8 +54,7 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 - Copias de seguridad (spec 007): `pnpm backup` hace una copia cifrada en `BACKUP_DIR`; `pnpm backup:restore [archivo]`
   la restaura en `<bd>_restore` y `var/restore/cards` y la compara con su manifiesto. Necesitan `pg_dump`/`pg_restore`.
   Las tareas periódicas (Patreon, cuentas vencidas, copia diaria) se activan con `SCHEDULER=1`.
-- CI: `.github/workflows/ci.yml` corre lint, tipos, peso, Vitest y E2E de escritorio en cada push a `main` y
-  `pruebas` y en cada PR.
+- CI: `.github/workflows/ci.yml` corre lint, tipos, Vitest y E2E de escritorio en cada push a `main`.
 - Compilación de producción: `NEXT_DIST_DIR=.next-prod pnpm build` (no pisa `pnpm dev`).
 - Validación RF por RF: `node scripts/rf-coverage.mjs ../../specs/<spec>` (escribe `validation.md`; los tests
   se nombran `test_s<NNN>_rfN_*` —la 003 puede omitir `s003_`— y cada E2E declara su spec en la
@@ -91,12 +90,8 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
 - Cualquier cambio de comportamiento del motor entra primero por la spec.
 
 ## Al terminar cualquier tarea
-- Ejecuta `pnpm test` (y, si tocaste la interfaz, los E2E de esa zona en escritorio:
-  `pnpm e2e <archivo> --project=chromium-desktop`) y confirma en tu respuesta que todo pasa.
-- Pruebas por tandas (decisión del dueño, 23 oct 2026): una spec cierra con sus tests, los E2E de su zona en
-  escritorio y la demo del dueño. La corrida completa (`pnpm e2e`, 4 dispositivos, ~1 h) y la prueba en un teléfono
-  real se hacen por tandas: cada 2 o 3 specs o antes de pasar `pruebas` a `main`. Se puede abrir la spec siguiente
-  mientras tanto; durante una corrida E2E no se toca `apps/web` (rompe su servidor), sí specs, planes y maquetas.
+- Ejecuta `pnpm test` (y `pnpm e2e` si tocaste la interfaz) y confirma en tu respuesta que
+  todo pasa.
 
 ## Reglas de negocio
 
