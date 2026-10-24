@@ -26,7 +26,9 @@
 
 ## Entrega 5 — Cierre
 - [ ] **T10 — E2E en 4 proyectos, comparación visual, presupuesto, reglas de negocio, `DESIGN.md`, validación y
-  checklist en teléfono** · Todos · Hecho cuando: `validation.md` 21 de 21 y demo manual del dueño.
+  checklist en teléfono** · Todos · Hecho cuando: `validation.md` 21 de 21 y demo manual del dueño. (Hecho todo menos
+  la prueba en teléfono y la demo del dueño. La comparación visual no hace falta: la imagen fija sale del mismo
+  `carta-capas.js`.)
 
 ## Cobertura
 RF-1 T2, T3 · RF-2 T4, T8 · RF-3 T4 · RF-4 T4 · RF-5 T2, T3 · RF-6 T6 · RF-7 T7 · RF-8 T8 · RF-9 T6 · RF-10 T7 ·
