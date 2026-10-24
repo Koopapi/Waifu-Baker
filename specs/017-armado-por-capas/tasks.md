@@ -32,8 +32,8 @@
 - [x] **T12 — Demo y colecciones de prueba armadas** · RF-20.
 
 ## Entrega 5 — Cierre
-- [ ] **T13 — E2E del panel, presupuesto, reglas de negocio, `DESIGN.md` y validación** (hecho todo menos la demo
-  manual del dueño) · Todos · Hecho cuando:
+- [x] **T13 — E2E del panel, presupuesto, reglas de negocio, `DESIGN.md` y validación** (demo manual aprobada por
+  el dueño el 23 oct 2026) · Todos · Hecho cuando:
   `validation.md` 20 de 20, `pnpm budget` sin cambios en el coleccionista y demo manual del dueño.
 
 ## Entrega 6 — Ampliación: biblioteca general de elementos
@@ -45,8 +45,8 @@
 - [x] **T16 — Página «Biblioteca»** (ruta de subida, acciones, menú) y la colección sin su sección de fondos · RF-6, RF-9.
 - [x] **T17 — Editor**: fondo y sello de la biblioteca, ventana «Añadir de la biblioteca», «Guardar en la biblioteca» ·
   RF-8, RF-21.
-- [ ] **T18 — Siembra, E2E, reglas de negocio, `DESIGN.md`, peso y validación** · Todos · Hecho cuando: `validation.md`
-  21 de 21 y demo manual del dueño. (Hecho todo menos la demo manual del dueño.)
+- [x] **T18 — Siembra, E2E, reglas de negocio, `DESIGN.md`, peso y validación** · Todos · Hecho: `validation.md`
+  21 de 21 y demo manual aprobada por el dueño el 23 oct 2026 («Cerremos este»).
 
 ## Cobertura
 RF-1 T6 · RF-2 T4 · RF-3 T4 · RF-4 T6 · RF-5 T2, T8 · RF-6 T7, T15, T16 · RF-7 T7, T15 · RF-8 T8, T17 · RF-9 T7, T15, T16 · RF-10 T2, T8 ·

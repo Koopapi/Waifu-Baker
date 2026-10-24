@@ -7,7 +7,9 @@ Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-10-24. Vitest: 582 de 58
 Cierre técnico (23 oct 2026), con la ampliación de la biblioteca general: E2E del panel en escritorio en verde
 (`card-assembly`, `card-layers`, `admin-panel`, `i18n`, `design-system`; la corrida completa en 4 proyectos, antes de
 la ampliación, dio 58 en verde); `pnpm budget`: la página más pesada del coleccionista en 205,5 kB (205,8 en la spec
-016), así que no crece. Falta la demo manual del dueño.
+016), así que no crece.
+
+Cierre: el dueño probó la demo y cerró la spec el 23 oct 2026 («Cerremos este y sigamos con lo que falta»).
 
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
