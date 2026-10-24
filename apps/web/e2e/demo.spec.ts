@@ -11,7 +11,8 @@ test("demo: portada con papeles, coleccionista y cambio a administrador", async 
   await test.step("RF-12: la demo se llena con su colección, el coleccionista y el administrador", async () => {
     const r = await page.request.post("/api/demo/seed");
     expect(r.status()).toBe(200);
-    expect(await r.json()).toMatchObject({ seeded: true, cards: 10 });
+    // Spec 017, RF-20: las 10 del manifiesto y la de Yuki (chica recortada) del paquete de Bruno, todas armadas.
+    expect(await r.json()).toMatchObject({ seeded: true, cards: 11 });
     // Una segunda vez no duplica nada.
     expect((await page.request.post("/api/demo/seed")).status()).toBe(409);
   });

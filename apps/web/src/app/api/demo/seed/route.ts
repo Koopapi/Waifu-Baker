@@ -27,6 +27,12 @@ export async function POST() {
     if (!full.startsWith(artDir + path.sep)) throw new Error(`Ruta fuera del taller: ${file}`);
     return readFile(full);
   };
-  const r = await seedDemo(db, getCardStore(), { manifest, readImage, now: new Date() });
-  return Response.json({ seeded: true, cards: manifest.cards.length, ...r });
+  // Spec 017, RF-20: la carta de Yuki del paquete de Bruno, armada con su chica recortada (si el repositorio la trae).
+  const sampleDir = path.resolve(process.cwd(), "../../docs/waifu-baker/waifu-baker/codigo/carta-capas/cartas");
+  const sampleConfig = await readFile(path.join(sampleDir, "yuki.json"), "utf8").catch(() => null);
+  const sample = sampleConfig
+    ? { name: "Yuki", character: "Yuki", rarity: "legendary" as const, config: JSON.parse(sampleConfig), readFile: (f: string) => readFile(path.join(sampleDir, "yuki", path.basename(f))) }
+    : undefined;
+  const r = await seedDemo(db, getCardStore(), { manifest, readImage, now: new Date(), sample });
+  return Response.json({ seeded: true, cards: manifest.cards.length + (sample ? 1 : 0), ...r });
 }

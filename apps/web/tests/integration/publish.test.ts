@@ -4,6 +4,8 @@ import { cards, dropTables, packs, sets } from "@/db/schema";
 import { createCharacter } from "@/server/services/characters";
 import { archiveSet, createSet, publishSet, saveOdds } from "@/server/services/collections";
 import { bulkUpdateCards, uploadCardImage } from "@/server/services/cards";
+import { saveCardLayers } from "@/server/services/card-layers";
+import { assembleSetCards } from "@/server/services/dev-seed";
 import { inRollback } from "./db";
 import { makeAdmin } from "./factories";
 import { MIME, testImage } from "./images";
@@ -25,6 +27,8 @@ async function readySet(tx: Tx) {
   await bulkUpdateCards(tx, store, admin.id, set.id, { [a.id]: a.version }, { characterId: ch.id, rarity: "common" });
   await bulkUpdateCards(tx, store, admin.id, set.id, { [b.id]: b.version }, { characterId: ch.id, rarity: "rare" });
   for (const c of [a, b]) await tx.update(cards).set({ name: `Carta ${c.number}`, status: "ready" }).where(eq(cards.id, c.id));
+  // Spec 017: las dos cartas armadas (la imagen como chica sobre un fondo de la biblioteca).
+  await assembleSetCards(tx, store, admin.id, set.id);
   const fresh = async () => (await tx.select().from(sets).where(eq(sets.id, set.id)))[0];
   await saveOdds(tx, admin.id, set.id, (await fresh()).version, { slots: [W({ common: 100 }), W({ rare: 100 })], holoChance: 0.2 });
   return { admin, set, store, fresh };
@@ -75,6 +79,29 @@ describe("RF-6, RF-7 y RF-21 publicar", () => {
       await expect(
         saveOdds(tx, admin.id, set.id, (await fresh()).version, { slots: [W({ common: 100 }), W({ rare: 100 })], holoChance: 0.5 }),
       ).rejects.toMatchObject({ code: "locked" });
+    });
+  });
+});
+
+describe("spec 017 — publicar solo con cartas armadas", () => {
+  it("test_s017_rf15_una_carta_sin_fondo_impide_publicar_y_dice_cual", async () => {
+    await inRollback(async (tx) => {
+      const { admin, set, store, fresh } = await readySet(tx);
+      const [first] = await tx.select().from(cards).where(eq(cards.setId, set.id)).orderBy(asc(cards.number));
+      const sinFondo = { ...first.layers!, capas: first.layers!.capas.filter((l) => !("rol" in l && l.rol === "fondo")) };
+      await saveCardLayers(tx, store, admin.id, first.id, { config: sinFondo, expectedVersion: first.version });
+      const r = await publishSet(tx, admin.id, set.id, (await fresh()).version);
+      expect(r.problems).toEqual([expect.objectContaining({ code: "card_not_assembled", target: { kind: "card", id: first.id, number: 1 }, params: { number: 1, missing: "fondo" } })]);
+      expect((await fresh()).status).toBe("draft");
+    });
+  });
+
+  it("test_s017_rf16_con_las_cartas_armadas_siguen_las_demas_comprobaciones", async () => {
+    await inRollback(async (tx) => {
+      const { admin, set, fresh } = await readySet(tx);
+      await tx.update(cards).set({ characterId: null }).where(eq(cards.setId, set.id));
+      const r = await publishSet(tx, admin.id, set.id, (await fresh()).version);
+      expect(r.problems.map((p) => p.code)).toEqual(["card_incomplete", "card_incomplete"]);
     });
   });
 });

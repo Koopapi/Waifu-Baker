@@ -18,6 +18,17 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import type { LayersConfig } from "@/domain/cards/layers";
+import type { ParticlePreset } from "@/domain/cards/library";
+
+/** Spec 016: imagen plana de una configuración pendiente de revisión, en sus cuatro tamaños. */
+export interface PendingFlatKeys {
+  full: string;
+  mid: string;
+  thumb: string;
+  public: string;
+  blurhash: string;
+}
 
 export const userRole = pgEnum("user_role", ["user", "admin"]);
 export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]);
@@ -119,6 +130,11 @@ export const cards = pgTable(
     promptSha256: text("prompt_sha256"),
     sourceJob: text("source_job"),
     version: integer("version").notNull().default(1),
+    // Spec 016: configuración por capas vigente (null = carta sin capas) y la pendiente de revisión (18+ publicada),
+    // con la imagen plana de lo pendiente. La imagen plana vigente va en key_* como la compuesta.
+    layers: jsonb("layers").$type<LayersConfig>(),
+    layersPending: jsonb("layers_pending").$type<LayersConfig>(),
+    pendingKeys: jsonb("pending_keys").$type<PendingFlatKeys>(),
     ...timestamps,
   },
   (t) => [
@@ -126,6 +142,27 @@ export const cards = pgTable(
     uniqueIndex("cards_set_sha_uq").on(t.setId, t.originalSha256),
     index("cards_set_rarity_idx").on(t.setId, t.rarity),
   ],
+);
+
+export const libraryKind = pgEnum("library_kind", ["fondo", "sello", "adorno", "particulas"]);
+
+/**
+ * Spec 017, RF-6 a RF-9 y RF-21: biblioteca general de elementos, común a todas las colecciones. Las imágenes viven en
+ * `library/<sha>.webp` (o en la clave que ya tenían los fondos de antes); las partículas guardadas, en `particles`.
+ * Una imagen está «en uso» si su clave aparece en la configuración por capas de alguna carta.
+ */
+export const libraryItems = pgTable(
+  "library_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: libraryKind("kind").notNull(),
+    name: text("name").notNull(),
+    key: text("key"),
+    sha256: text("sha256"),
+    particles: jsonb("particles").$type<ParticlePreset>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("library_items_sha_uq").on(t.sha256).where(sql`${t.sha256} is not null`)],
 );
 
 export const dropTables = pgTable(

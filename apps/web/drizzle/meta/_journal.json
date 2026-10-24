@@ -78,6 +78,34 @@
       "when": 1792385836062,
       "tag": "0010_premios",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792618255170,
+      "tag": "0011_card_layers",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792787514610,
+      "tag": "0012_set_backgrounds",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792797588346,
+      "tag": "0013_library_items",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792797588716,
+      "tag": "0014_drop_set_backgrounds",
+      "breakpoints": true
     }
   ]
 }

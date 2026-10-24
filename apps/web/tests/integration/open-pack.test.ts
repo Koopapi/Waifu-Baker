@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { characters, dropTables, packOpenings, packs, pityCounters, sets, userCards, users } from "@/db/schema";
+import { characters, dropTables, libraryItems, packOpenings, packs, pityCounters, sets, userCards, users } from "@/db/schema";
 import { drawPackWithPity } from "@/domain/catalog/draw";
 import { hmacRng } from "@/domain/random";
 import { getOpeningResult, openAllPacks, openPack } from "@/server/services/packs";
@@ -95,6 +95,8 @@ describe("RF-6 una sola vez", () => {
       await db.delete(packs).where(eq(packs.setId, set.id));
       await db.execute(sql`delete from audit_log`);
       await db.delete(sets).where(eq(sets.id, set.id));
+      // Spec 017: el fondo de prueba va a la biblioteca general, que no se borra con la colección.
+      await db.delete(libraryItems);
       await db.delete(characters).where(eq(characters.slug, "personaje-conc1"));
       await db.delete(users).where(inArray(users.id, [fan.id, admin.id]));
       await other.sql.end();

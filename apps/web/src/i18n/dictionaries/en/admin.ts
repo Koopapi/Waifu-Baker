@@ -11,6 +11,7 @@ export const admin = {
     overview: "Overview",
     sets: "Sets",
     characters: "Characters",
+    library: "Library",
     tiers: "Patreon tiers",
     users: "Users",
     albums: "Albums",
@@ -194,6 +195,8 @@ export const admin = {
     regenerate: "Regenerate images",
     updated: (n: number) => `${n} ${plural(n, "card", "cards")} updated.`,
     saved: "Card saved.",
+    // Spec 016, RF-25: el sello de imagen de una carta con capas no cambia solo con la rareza.
+    layersSealReview: (n: number) => (n === 1 ? "It has an image seal on its layers: check that it still fits the new rarity." : `${n} cards have an image seal on their layers: check that it still fits the new rarity.`),
     orderSaved: "Order saved.",
     deleted: "Card deleted.",
     regenerated: (n: number) => `${n} ${plural(n, "card", "cards")} regenerated with the current frame.`,
@@ -205,8 +208,6 @@ export const admin = {
     sessionExpired: "Session expired: please sign in again.",
     connectionLost: "Connection lost. You can drop this file again.",
     locked: "Set published: cards can no longer be added (RF-8).",
-    dropHere: "Drop the set's images here",
-    hint: "PNG, JPEG or WebP · up to 20 MB · at least 600 px wide · or click to choose",
     uploading: "Uploading…",
     finished: "Upload finished",
     summary: (done: number, failed: number) => `${done} succeeded${failed ? ` · ${failed} failed` : ""}`,
@@ -371,6 +372,7 @@ export const admin = {
     reasonHint: "Kept in the history: support, giveaway, compensation…",
     gifted: (n: number) => `${n} ${plural(n, "pack", "packs")} gifted.`,
   },
+  // Spec 016: editor de cartas por capas.
   api: {
     missingSetOrFile: "The set or the file is missing.",
     missingFileOrVersion: "The file or the card version is missing.",

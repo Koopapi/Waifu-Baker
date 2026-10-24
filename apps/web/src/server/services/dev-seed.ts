@@ -1,5 +1,7 @@
 import { eq } from "drizzle-orm";
-import { sets, users } from "@/db/schema";
+import sharp from "sharp";
+import { cards, sets, users } from "@/db/schema";
+import { missingParts, setBackground, STORED_LAYER } from "@/domain/cards/layers";
 import type { Rarity } from "@/domain/catalog/card-rules";
 import type { Slot } from "@/domain/catalog/odds";
 import type { CardStore } from "@/server/ports/card-store";
@@ -7,7 +9,9 @@ import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
 import { createCharacter } from "./characters";
 import { reviewCard, updateCard, uploadCardImage, type UploadFile } from "./cards";
+import { saveCardLayers } from "./card-layers";
 import { createSet, publishSet, saveOdds } from "./collections";
+import { ensureLibraryImage } from "./library";
 import { upsertUserFromLogin } from "./users";
 import { giftPacks } from "./users-admin";
 
@@ -30,6 +34,29 @@ export interface SeedSetInput {
 
 const setVersion = async (db: DbLike, setId: string) => (await db.select({ v: sets.version }).from(sets).where(eq(sets.id, setId)))[0].v;
 
+/** Fondo liso con un degradado del tamaño del lienzo, para armar las cartas de prueba. */
+async function testBackground(hue: number) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${STORED_LAYER.width}" height="${STORED_LAYER.height}">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="hsl(${hue},70%,72%)"/><stop offset="1" stop-color="hsl(${(hue + 60) % 360},65%,40%)"/>
+    </linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>`;
+  return sharp(Buffer.from(svg)).png().toBuffer();
+}
+
+/**
+ * Spec 017, RF-20: arma las cartas de una colección de prueba. Toma (o sube) un fondo de la biblioteca general y lo pone
+ * a cada carta que no tenga fondo; la ilustración completa queda como chica (mientras no haya recortes).
+ */
+export async function assembleSetCards(db: DbLike, store: CardStore, actorUserId: string, setId: string, hue = 320) {
+  const bg = await ensureLibraryImage(db, store, actorUserId, "fondo", { body: await testBackground(hue), mime: "image/png", filename: "Fondo de prueba.png" });
+  const rows = await db.select().from(cards).where(eq(cards.setId, setId));
+  for (const c of rows) {
+    if (!c.layers || !missingParts(c.layers).includes("fondo")) continue;
+    await saveCardLayers(db, store, actorUserId, c.id, { config: setBackground(c.layers, bg.key!), expectedVersion: c.version });
+  }
+  return bg;
+}
+
 /** Crea personaje y colección, sube las cartas, las completa (y revisa si es 18+), guarda probabilidades y publica. */
 export async function seedPublishedSet(db: DbLike, store: CardStore, actorUserId: string, input: SeedSetInput) {
   const characters = new Map<string, string>();
@@ -48,6 +75,7 @@ export async function seedPublishedSet(db: DbLike, store: CardStore, actorUserId
     // RF-18 de la spec 003: en una colección 18+ cada carta pasa la revisión de personaje adulto.
     if (input.isAdult) await reviewCard(db, store, actorUserId, updated.id, updated.version, true);
   }
+  await assembleSetCards(db, store, actorUserId, set.id);
   await saveOdds(db, actorUserId, set.id, await setVersion(db, set.id), { slots: input.slots, holoChance: (input.holoPercent ?? 0) / 100 });
   const { problems } = await publishSet(db, actorUserId, set.id, await setVersion(db, set.id));
   if (problems.length) throw new Error(`No se pudo publicar ${input.code}: ${problems.map((p) => p.message).join(" ")}`);

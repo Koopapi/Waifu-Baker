@@ -11,7 +11,7 @@ sólidos va en tinta oscura (`--ui-on-accent`). Sustituye a la paleta «Cereza»
 
 ### Premios con vida (spec 015, 18 oct 2026)
 
-Lámina «Premios (spec 015)», debajo de la kawaii. Lo pequeño vuela y lo grande se celebra: `FlightLayer` pinta las
+Lámina «Premios (spec 015) y cartas por capas (spec 016)», debajo de la kawaii (rehecha el 23 oct 2026: la primera versión se perdió al cerrar Pencil sin guardar). Lo pequeño vuela y lo grande se celebra: `FlightLayer` pinta las
 pegatinas que vuelan en arco (Web Animations API, solo `transform` y `opacity`) hasta los elementos con
 `data-fly-target` («packs» en la navegación, «cookies» en los contadores), que rebotan al recibirlas; los contadores
 (`Badge` con `count`, `AnimatedCounter`) suben como un marcador. `Celebration` es un diálogo kawaii (píldora de
@@ -110,12 +110,13 @@ cualquier componente nuevo se añada a esta tabla.
 | SoundToggle | SoundToggle |
 | RingTimer | RingTimer (anillo de «Recompensas» y «Mis sobres», lámina «Kawaii (spec 014)») |
 | Sticker | Sobre, Carta, Galleta, Regalo, Reloj, Colección, Racha y Perfil (lámina «Kawaii (spec 014)») |
-| FlightLayer | Premio que vuela (lámina «Premios (spec 015)») |
-| Celebration | Celebración (lámina «Premios (spec 015)») |
-| Confetti | Confeti (lámina «Premios (spec 015)») |
+| FlightLayer | Premio que vuela (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Celebration | Celebración (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Confetti | Confeti (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
-| CartaCapas | Sin versión en Pencil: carta por capas del paquete de diseño (`docs/waifu-baker/waifu-baker/codigo/carta-capas`) |
+| CartaCapas | Carta por capas (componente) con los cinco escalones N, R, SR, SSR y UR (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Armado por capas | Editor de la carta (chica, fondo, sello, adornos y partículas de la biblioteca o propios, encuadre, estilo automático, exportar e importar, «Guardar en la biblioteca»), página «Biblioteca» con pestañas por tipo, ventana «Añadir de la biblioteca» y aviso de cartas sin armar (lámina «Armado de cartas por capas (spec 017)») |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
 de la demo (`pnpm showcase`). Se regeneran tras cada cambio visible.

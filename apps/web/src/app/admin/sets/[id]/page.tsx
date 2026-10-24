@@ -9,6 +9,7 @@ import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
+import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
@@ -17,7 +18,9 @@ import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
 import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
-import { getDict } from "@/i18n/server";
+import { getDict, getLocale } from "@/i18n/server";
+import { adminLayersDictionaries } from "@/i18n/admin-layers";
+import { missingParts } from "@/domain/cards/layers";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
 import { Card } from "@/ui/content/Card";
@@ -27,7 +30,7 @@ import { EditSetForm } from "../forms";
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters, packArts] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id])]);
+  const [overview, characters, packArts, library] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listLibrary(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -59,9 +62,14 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
     adultReviewedAt: c.adultReviewedAt ? c.adultReviewedAt.toISOString() : null,
     pendingArtUrl: assetUrl(c.pendingOriginalKey),
     chance: chances.get(c.id) ?? 0,
+    layers: c.layers,
+    hasOriginal: Boolean(c.originalKey),
   }));
   const unreviewed = set.isAdult ? cards.filter((c) => !c.adultReviewedAt || c.pendingArtUrl).length : 0;
   const incomplete = cards.filter((c) => c.status !== "ready").length;
+  // Spec 017, RF-15: cartas sin chica o sin fondo, enlazadas, antes de intentar publicar.
+  const notAssembled = cards.filter((c) => missingParts(c.layers).length > 0);
+  const tl = adminLayersDictionaries[await getLocale()];
 
   return (
     <div className="space-y-8">
@@ -96,6 +104,14 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         }
       >
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
+      </Card>
+
+      {/* Spec 017 (ampliación): los elementos para armar las cartas viven en la biblioteca general. */}
+      <Card className="flex flex-wrap items-center justify-between gap-3" data-testid="library-link">
+        <p className="text-sm text-ui-text-3">{tl.library.setNote}</p>
+        <Button size="sm" variant="secondary" asChild>
+          <Link href="/admin/library">{tl.library.goTo}</Link>
+        </Button>
       </Card>
 
       <Card title={t.pack.title}>
@@ -143,19 +159,38 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
             {counts.none > 0 && <Badge>{t.noRarityCount(counts.none)}</Badge>}
           </div>
         </div>
-        {(gaps.length > 0 || incomplete > 0 || unreviewed > 0) && cards.length > 0 && (
+        {(gaps.length > 0 || incomplete > 0 || unreviewed > 0 || notAssembled.length > 0) && cards.length > 0 && (
           <div data-testid="set-warnings">
             <Alert tone="warning">
               <ul className="space-y-1">
                 {gaps.length > 0 && <li>{t.gaps(gaps.map((g) => tt.common.rarity[g]).join(", "))}</li>}
                 {incomplete > 0 && <li>{t.incomplete(incomplete)}</li>}
                 {unreviewed > 0 && <li>{t.unreviewed(unreviewed)}</li>}
+                {notAssembled.length > 0 && (
+                  <li data-testid="not-assembled">
+                    {tl.notAssembled(notAssembled.length)}{" "}
+                    {notAssembled.map((c, i) => (
+                      <span key={c.id}>
+                        {i > 0 && ", "}
+                        <a href={`#carta-${String(c.number).padStart(3, "0")}`} className="underline underline-offset-4">
+                          {String(c.number).padStart(3, "0")}
+                        </a>
+                      </span>
+                    ))}
+                  </li>
+                )}
               </ul>
             </Alert>
           </div>
         )}
         <Dropzone setId={set.id} disabled={!perms.canAdd} />
-        <CardWorkspace setId={set.id} cards={cards} characters={characters.map((c) => ({ id: c.id, name: c.name }))} perms={perms} />
+        <CardWorkspace
+          setId={set.id}
+          cards={cards}
+          characters={characters.map((c) => ({ id: c.id, name: c.name }))}
+          library={library.map((i) => ({ id: i.id, kind: i.kind, name: i.name, key: i.key, url: assetUrl(i.key), particles: i.particles }))}
+          perms={perms}
+        />
       </section>
     </div>
   );

@@ -137,6 +137,15 @@ export const errors: Record<string, Msg> = {
   too_narrow: (p) => `The image is ${p.width} px wide; the minimum is ${p.min} px.`,
   unreadable: "The image couldn't be read: the file seems to be damaged.",
 
+  // Spec 016: layered cards.
+  layer_too_narrow: (p) => `The layer is ${p.width} px wide; the minimum is ${p.min} px.`,
+  layer_ratio: (p) => `The layer is ${p.width} × ${p.height}; it must have the canvas ratio (${p.expected}).`,
+  too_many_layers: (p) => `A card takes at most ${p.max ?? 8} image layers (particles don't count).`,
+  no_visible_layer: "At least one visible image layer is needed.",
+  invalid_layers: (p) => `The layer setup is not valid${p.path ? ` (${p.path})` : ""}.`,
+  layer_missing: "One of the layers is no longer available: upload it again.",
+  layers_required: "This card was created from layers and has no original image: it needs at least one visible image layer.",
+
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>
     `The pack has ${p.packSize} ${plural(p.packSize, "card", "cards")} but there ${plural(p.slots, "is", "are")} ${p.slots} drop rate ${plural(p.slots, "slot", "slots")}.`,

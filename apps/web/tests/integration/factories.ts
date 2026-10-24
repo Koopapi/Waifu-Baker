@@ -3,6 +3,7 @@ import { cards, sets } from "@/db/schema";
 import { createCharacter } from "@/server/services/characters";
 import { createSet, publishSet, saveOdds } from "@/server/services/collections";
 import { uploadCardImage } from "@/server/services/cards";
+import { assembleSetCards } from "@/server/services/dev-seed";
 import type { Rarity } from "@/domain/catalog/card-rules";
 import { MIME, testImage } from "./images";
 import { tempStore } from "./store";
@@ -35,6 +36,8 @@ export async function createPublishedSet(
       .set({ rarity, characterId: ch.id, name: `Carta ${i + 1}`, status: "ready", ...(opts.isAdult ? { adultReviewedAt: new Date(), adultReviewedBy: adminId } : {}) })
       .where(eq(cards.id, c.id));
   }
+  // Spec 017, RF-15 y RF-20: solo se publican cartas armadas (chica y fondo).
+  await assembleSetCards(db, store, adminId, set.id);
   const ver = async () => (await db.select().from(sets).where(eq(sets.id, set.id)))[0].version;
   await saveOdds(db, adminId, set.id, await ver(), {
     slots: opts.slots.map((s) => ({ ...ZERO, ...s })),
