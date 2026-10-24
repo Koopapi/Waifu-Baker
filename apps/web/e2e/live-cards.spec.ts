@@ -10,7 +10,8 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
   const fan = await login(browser, `viva-${tag}`, false, "/sobres");
   const admin = await login(browser, `admin-viva-${tag}`, true);
   const code = `LV${tag.slice(0, 4).toUpperCase()}`;
-  await createPublishedSet(admin, code, ["07.webp", "08.webp"].map((f) => path.join(LAB, f)), 2);
+  // La 002 es rara y siempre holo (100 %): sirve para el acabado y el brillo holo.
+  await createPublishedSet(admin, code, ["07.webp", "08.webp"].map((f) => path.join(LAB, f)), 2, 100);
   await giftPacks(admin, `viva-${tag}`, code, 1);
 
   let layerUrl = "";
@@ -75,6 +76,29 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
       await expect(sw).toHaveAttribute("aria-checked", "false");
     }
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-ficha-viva.png` });
+  });
+
+  if (!reduced && test.info().project.name === "chromium-desktop") {
+    await test.step("RF-10: la carta viva se inclina con el ratón y se balancea sola si nadie la toca", async () => {
+      const card = fan.locator('[data-testid="card-sheet-art"] .cc-card');
+      const transform = () => card.evaluate((el) => (el as HTMLElement).style.transform);
+      // Balanceo en reposo: cambia solo con el tiempo.
+      const a = await transform();
+      await fan.waitForTimeout(700);
+      expect(await transform()).not.toBe(a);
+      // Con el ratón encima, se inclina hacia él.
+      const box = (await card.boundingBox())!;
+      await fan.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.2, { steps: 6 });
+      await expect.poll(transform).toMatch(/rotateY\(\d/);
+    });
+  }
+
+  await test.step("RF-5 y RF-9: la holo lleva su acabado en la miniatura y su brillo en la ficha viva", async () => {
+    await fan.keyboard.press("Escape");
+    await expect(fan.locator('[data-slot="2"] button')).toHaveClass(/holo-finish/);
+    await fan.click('[aria-label="Ver carta 002"]');
+    const art = fan.locator('[data-testid="card-sheet-art"]');
+    await expect(art.locator(reduced ? ".holo-finish" : ".cc-card.cc-con-holo")).toHaveCount(1);
   });
 });
 
