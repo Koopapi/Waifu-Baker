@@ -1,8 +1,9 @@
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { and, desc, eq } from "drizzle-orm";
-import { cards, packs, userCards, userRewards } from "@/db/schema";
+import { cards, characters, expeditionProfiles, packs, userCards, userRewards } from "@/db/schema";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
+import { ROLES, TERRAINS, defaultZoneLoot } from "@/domain/expeditions/rules";
 import type { Slot } from "@/domain/catalog/odds";
 import { DEMO_USERS } from "@/domain/demo/mode";
 import type { DemoManifest } from "@/domain/demo/manifest";
@@ -14,6 +15,9 @@ import { parseCreatorConfig, withKeys } from "@/domain/cards/layers-io";
 import { stageLayerImage } from "@/server/cards/layer-images";
 import { saveCardLayers } from "./card-layers";
 import { seedPublishedSet } from "./dev-seed";
+import { updateCharacter } from "./characters";
+import { saveZone } from "./expedition-zones";
+import { sendExpedition } from "./expeditions";
 import { acceptTerms } from "./legal";
 import { ackOpenings, openPack } from "./packs";
 import { adjustCookies } from "./rewards";
@@ -133,6 +137,7 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
   const rank = (r: string | null) => RARITIES.indexOf((r ?? "common") as Rarity);
   const best = (await featurableCards(db, fan.id)).sort((a, b) => rank(b.rarity) - rank(a.rarity) || a.number - b.number).slice(0, 3);
   await setFeatured(db, fan.id, best.map((c) => c.cardId));
+  await seedDemoExpeditions(db, admin.id, fan.id, now);
 
   return { setId, adminId: admin.id, collectorId: fan.id };
 }
@@ -145,4 +150,30 @@ export async function demoCollectorCards(db: DbLike, userId: string) {
     .innerJoin(cards, eq(cards.id, userCards.cardId))
     .where(eq(userCards.userId, userId))
     .orderBy(cards.number, desc(userCards.holo));
+}
+
+/** Zonas de la demo (spec 020): 2 abiertas y 2 con niebla, como la versión 1 de Bruno. */
+export const DEMO_ZONES = [
+  { name: "Calles de Puerto Miel", terrain: "city", difficulty: 30, fragmentsRequired: 0 },
+  { name: "Bosque de los Susurros", terrain: "forest", difficulty: 30, fragmentsRequired: 0 },
+  { name: "Costa Coral", terrain: "coast", difficulty: 55, fragmentsRequired: 5 },
+  { name: "Ruinas de Velmora", terrain: "ruins", difficulty: 80, fragmentsRequired: 10 },
+] as const;
+
+/**
+ * Spec 020: Expediciones en la demo. Terreno y rol para cada personaje, las 4 zonas, 6 fragmentos y dos equipos: uno ya
+ * de vuelta (listo para reclamar) y otro en camino.
+ */
+async function seedDemoExpeditions(db: DbLike, adminId: string, fanId: string, now: Date) {
+  const chars = await db.select({ id: characters.id }).from(characters).orderBy(characters.name);
+  for (const [i, c] of chars.entries()) await updateCharacter(db, adminId, c.id, { terrain: TERRAINS[i % 2], role: ROLES[i % ROLES.length] });
+  const zones = [];
+  for (const [i, z] of DEMO_ZONES.entries()) {
+    zones.push(await saveZone(db, adminId, { ...z, sortOrder: i + 1, active: true, loot: defaultZoneLoot(z.difficulty) }));
+  }
+  await db.insert(expeditionProfiles).values({ userId: fanId, fragments: 6 }).onConflictDoUpdate({ target: expeditionProfiles.userId, set: { fragments: 6 } });
+  const owned = await db.select({ cardId: userCards.cardId, holo: userCards.holo }).from(userCards).where(eq(userCards.userId, fanId)).orderBy(userCards.cardId, userCards.holo);
+  const [a, b, c] = owned;
+  if (a) await sendExpedition(db, fanId, { zoneId: zones[0].id, durationMin: 30, cards: [a] }, new Date(now.getTime() - 40 * 60 * 1000));
+  if (b && c) await sendExpedition(db, fanId, { zoneId: zones[1].id, durationMin: 120, cards: [b, c] }, now);
 }

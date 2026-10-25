@@ -101,6 +101,11 @@ export async function assembleSet(page: Page, code: string) {
   await seed(page, { action: "assembleSet", setCode: code });
 }
 
+/** Spec 020: una zona de Expediciones con el botín por defecto. */
+export async function createZone(page: Page, zone: { name: string; terrain: string; difficulty: number; fragmentsRequired: number; sortOrder: number }) {
+  await seed(page, { action: "zone", ...zone });
+}
+
 export async function giftPacks(page: Page, userName: string, code: string, count: number) {
   await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E" });
 }

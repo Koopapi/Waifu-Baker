@@ -2,8 +2,10 @@
 
 .xmap {
   position: relative;
+  /* Ancho fijo al contenedor: con la proporción y la altura mínima, el navegador lo ensancharía en el teléfono. */
+  width: 100%;
   aspect-ratio: 16 / 10;
-  min-height: 300px;
+  min-height: 320px;
   overflow: hidden;
   border: 1px solid var(--ui-line);
   border-radius: var(--radius-l);

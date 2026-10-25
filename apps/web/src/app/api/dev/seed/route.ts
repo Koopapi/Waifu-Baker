@@ -10,6 +10,8 @@ import { isAdminError } from "@/server/errors";
 import { eq } from "drizzle-orm";
 import { sets } from "@/db/schema";
 import { assembleSetCards, seedGift, seedPublishedSet } from "@/server/services/dev-seed";
+import { TERRAINS, defaultZoneLoot } from "@/domain/expeditions/rules";
+import { saveZone } from "@/server/services/expedition-zones";
 
 export const runtime = "nodejs";
 
@@ -39,6 +41,7 @@ const Body = z.discriminatedUnion("action", [
     reason: z.string(),
   }),
   z.object({ action: z.literal("assembleSet"), setCode: z.string().min(1) }),
+  z.object({ action: z.literal("zone"), name: z.string().min(1), terrain: z.enum(TERRAINS), difficulty: z.number().int(), fragmentsRequired: z.number().int(), sortOrder: z.number().int() }),
 ]);
 
 /**
@@ -47,6 +50,7 @@ const Body = z.discriminatedUnion("action", [
  * - `publishedSet`: crea personaje y colección, sube las cartas, las completa y publica → `{ setId }`.
  * - `gift`: regala sobres de una colección a un usuario de desarrollo por su nombre → `{ userId }`.
  * - `assembleSet` (spec 017): pone un fondo de la biblioteca a las cartas sin fondo de una colección → `{ setId }`.
+ * - `zone` (spec 020): crea una zona de Expediciones con el botín por defecto → `{ zoneId }`.
  */
 export async function POST(req: Request) {
   if (!allowed()) return notFoundResponse();
@@ -61,6 +65,10 @@ export async function POST(req: Request) {
       if (!set) return Response.json({ error: "not_found" }, { status: 404 });
       await assembleSetCards(db, getCardStore(), session.user.id, set.id);
       return Response.json({ setId: set.id });
+    }
+    if (b.action === "zone") {
+      const z = await saveZone(db, session.user.id, { ...b, active: true, loot: defaultZoneLoot(b.difficulty) });
+      return Response.json({ zoneId: z.id });
     }
     if (b.action === "gift") {
       const userId = await seedGift(db, session.user.id, b);
