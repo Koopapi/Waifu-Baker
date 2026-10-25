@@ -133,6 +133,8 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
     expect(await packsOf(fan, "PAT1A")).toBe(3);
     await expect(fan.locator('[data-testid="group-PAT1A"]')).toContainText(es.packs.mine.locked.slice(0, 20));
     await fan.goto("/cuenta");
+    // Los 3 sobres del tier 18+ llegan con su celebración (spec 015); en la CI puede salir aquí y no en «Mis sobres».
+    await dismissCelebration(fan, 20_000);
     await tick(fan.locator('[data-testid="declare-adult"]'), es.account.adult.confirm);
     await fan.click(`text=${es.account.adult.submit}`);
     await expect(fan.locator(`text=${es.account.adult.verified}`)).toBeVisible();
