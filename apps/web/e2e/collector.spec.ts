@@ -64,11 +64,15 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     await fan.waitForLoadState("networkidle");
     await tear(fan);
     await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    // Al llegar al resumen se marca la apertura como vista (acción en segundo plano): se espera su respuesta antes de
+    // salir, o WebKit la corta al navegar y la apertura sigue pendiente.
+    const acked = fan.waitForResponse((r) => r.request().method() === "POST" && Boolean(r.request().headers()["next-action"]));
     for (let k = 0; k < 2; k++) {
       await fan.locator('.card3d[role="button"]').first().click();
       await expect(fan.locator(`.stage[data-revealed="${k + 1}"]`)).toBeVisible();
     }
     await expect(fan.locator(".summary")).toBeVisible();
+    await acked;
     await fan.goto("/sobres");
     await expect(fan.locator('[data-testid="pending-opening"]')).toHaveCount(0);
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
