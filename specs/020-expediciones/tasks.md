@@ -11,13 +11,13 @@
 - [x] T5 Servicio del panel: zonas, botín, terreno y rol, simulador y probabilidades públicas, con tests. RF: 26 a 30.
 
 ## Entrega 2: pantallas
-- [ ] T6 Maquetas en Pencil (mapa, preparar, reporte, panel).
-- [ ] T7 Navegación «Juegos» con contador y `/juegos`. RF: 1, 2.
-- [ ] T8 `/juegos/expediciones`: mapa, espacios, preparar, enviar, cancelar, reclamar y reporte. RF: 3 a 24.
-- [ ] T9 Ficha de carta con vínculo y vuelta; Probabilidades. RF: 25, 26.
-- [ ] T10 Panel: terreno y rol en Personajes y `/admin/expediciones`. RF: 27 a 30.
+- [x] T6 Maquetas en Pencil (mapa, preparar, reporte, panel).
+- [x] T7 Navegación «Juegos» con contador y `/juegos`. RF: 1, 2.
+- [x] T8 `/juegos/expediciones`: mapa, espacios, preparar, enviar, cancelar, reclamar y reporte. RF: 3 a 24.
+- [x] T9 Ficha de carta con vínculo y vuelta; Probabilidades. RF: 25, 26.
+- [x] T10 Panel: terreno y rol en Personajes y `/admin/expediciones`. RF: 27 a 30.
 
 ## Entrega 3: cierre
-- [ ] T11 Semillas de demo y desarrollo con zonas; rutas del calentamiento del E2E.
-- [ ] T12 E2E de la spec en los 4 proyectos y suite completa; `pnpm budget`.
-- [ ] T13 `validation.md`, `dispositivo.md`, reglas de negocio y roadmap.
+- [x] T11 Semillas de demo y desarrollo con zonas; rutas del calentamiento del E2E.
+- [x] T12 E2E de la spec en los 4 proyectos y suite completa; `pnpm budget`.
+- [x] T13 `validation.md`, `dispositivo.md`, reglas de negocio y roadmap.
