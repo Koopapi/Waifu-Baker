@@ -21,6 +21,9 @@ export interface BinderSlotDTO {
     firstObtainedAt: string;
     thumb: string;
     mid: string;
+    /** Spec 020, RF-25: vínculo de su personaje y hora de vuelta si está de expedición (por versión). */
+    bondLevel: number;
+    away: { normal: string | null; holo: string | null };
   } | null;
 }
 

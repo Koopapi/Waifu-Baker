@@ -1,6 +1,8 @@
 import { db } from "@/db/client";
 import { RARITIES } from "@/domain/catalog/card-rules";
 import { listPublicOdds } from "@/server/services/collections";
+import { publicZoneOdds } from "@/server/services/expedition-zones";
+import { gamesDictionaries } from "@/i18n/games";
 import { formatDate, formatPercent } from "@/i18n/format";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { getDict, getLocale } from "@/i18n/server";
@@ -14,8 +16,9 @@ export const dynamic = "force-dynamic";
 
 /** RF-21: probabilidades públicas, congeladas al publicar cada colección. */
 export default async function DropRatesPage() {
-  const rows = await listPublicOdds(db);
+  const [rows, zones] = await Promise.all([listPublicOdds(db), publicZoneOdds(db)]);
   const [t, locale] = await Promise.all([getDict(), getLocale()]);
+  const tg = gamesDictionaries[locale];
   const pct = (x: number) => formatPercent(locale, x);
   return (
     <main className="min-h-dvh bg-ui-bg px-4 py-12 text-ui-text">
@@ -72,6 +75,41 @@ export default async function DropRatesPage() {
             </div>
           </section>
         ))}
+        {/* Spec 020, RF-26: probabilidad de encontrar un sobre al volver de una expedición, por zona y duración. */}
+        {zones.length > 0 && (
+          <section className="space-y-3" data-testid="expedition-odds">
+            <h2 className="text-xl font-semibold">{tg.odds.heading}</h2>
+            <p className="text-sm text-ui-text-2">{tg.odds.intro}</p>
+            <div className="overflow-x-auto rounded-l border border-ui-line">
+              <table className="w-full text-sm">
+                <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
+                  <tr>
+                    <th className="px-3 py-2 text-left">{tg.odds.zone}</th>
+                    {zones[0].chances.map((c) => (
+                      <th key={c.duration} className="px-3 py-2 text-right">
+                        {tg.duration(c.duration)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {zones.map((z) => (
+                    <tr key={z.id} className="border-t border-ui-line">
+                      <td className="px-3 py-2">
+                        {z.name} <span className="text-ui-text-3">· {tg.terrain[z.terrain]}</span>
+                      </td>
+                      {z.chances.map((c) => (
+                        <td key={c.duration} className="px-3 py-2 text-right tabular-nums">
+                          {pct(Math.round(c.packChance * 10_000) / 100)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );
