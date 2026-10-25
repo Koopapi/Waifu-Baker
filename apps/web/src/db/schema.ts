@@ -20,6 +20,8 @@ import {
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import type { LayersConfig } from "@/domain/cards/layers";
 import type { ParticlePreset } from "@/domain/cards/library";
+import type { PickedPhrase } from "@/domain/expeditions/report";
+import type { DurationLoot, Rating, ZoneLoot } from "@/domain/expeditions/rules";
 
 /** Spec 016: imagen plana de una configuración pendiente de revisión, en sus cuatro tamaños. */
 export interface PendingFlatKeys {
@@ -36,7 +38,11 @@ export const rarity = pgEnum("rarity", ["common", "uncommon", "rare", "epic", "l
 export const cardVariant = pgEnum("card_variant", ["normal", "holo", "alt"]);
 export const cardStatus = pgEnum("card_status", ["draft", "ready"]);
 export const albumModeration = pgEnum("album_moderation", ["none", "hidden", "review_requested", "review_rejected"]);
-export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo", "free", "daily"]);
+export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo", "free", "daily", "expedition"]);
+/** Spec 020: terreno y rol de las personajes en Expediciones. */
+export const expeditionTerrain = pgEnum("expedition_terrain", ["city", "forest", "coast", "ruins", "mountain"]);
+export const expeditionRole = pgEnum("expedition_role", ["gatherer", "cartographer", "treasure_hunter"]);
+export const expeditionStatus = pgEnum("expedition_status", ["active", "claimed", "cancelled"]);
 export const packStatus = pgEnum("pack_status", ["sealed", "opened", "void"]);
 
 const timestamps = {
@@ -76,6 +82,9 @@ export const characters = pgTable("characters", {
   bio: text("bio").notNull().default(""),
   identityTags: text("identity_tags").notNull().default(""),
   refImageId: text("ref_image_id"),
+  /** Spec 020, RF-27: terreno y rol en Expediciones (sin asignar = sin bonus de terreno ni efecto de rol). */
+  terrain: expeditionTerrain("terrain"),
+  role: expeditionRole("role"),
   ...timestamps,
 });
 
@@ -416,3 +425,136 @@ export const appSettings = pgTable("app_settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   updatedBy: uuid("updated_by").references(() => users.id),
 });
+
+/** Spec 020, RF-28 y RF-29: zonas del mapa de Expediciones, con su botín fijo por duración (calificación «Bien»). */
+export const expeditionZones = pgTable("expedition_zones", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  terrain: expeditionTerrain("terrain").notNull(),
+  difficulty: integer("difficulty").notNull(),
+  /** 0 = abierta desde el inicio (RF-4). */
+  fragmentsRequired: integer("fragments_required").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  imageKey: text("image_key"),
+  active: boolean("active").notNull().default(true),
+  loot: jsonb("loot").$type<ZoneLoot>().notNull(),
+  ...timestamps,
+});
+
+/** Spec 020: fragmentos de mapa y expediciones completadas de cada coleccionista. */
+export const expeditionProfiles = pgTable(
+  "expedition_profiles",
+  {
+    userId: uuid("user_id")
+      .primaryKey()
+      .references(() => users.id),
+    fragments: integer("fragments").notNull().default(0),
+    completed: integer("completed").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [check("expedition_profiles_fragments_non_negative", sql`${t.fragments} >= 0`)],
+);
+
+/** Spec 020, RF-5: zonas con niebla que cada coleccionista ya abrió. */
+export const expeditionZoneUnlocks = pgTable(
+  "expedition_zone_unlocks",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    zoneId: uuid("zone_id")
+      .notNull()
+      .references(() => expeditionZones.id, { onDelete: "cascade" }),
+    unlockedAt: timestamp("unlocked_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.zoneId] })],
+);
+
+/** Una carta del equipo congelada al enviar (RF-17). */
+export interface ExpeditionMember {
+  cardId: string;
+  holo: boolean;
+  characterId: string | null;
+  name: string;
+  rarity: string;
+  terrain: string | null;
+  role: string | null;
+  bondLevel: number;
+}
+
+/** Lo que pasó al reclamar (RF-20 a RF-24); se devuelve igual si se reclama otra vez. */
+export interface ExpeditionResult {
+  loot: DurationLoot;
+  packWon: boolean;
+  packId: string | null;
+  phrases: PickedPhrase[];
+  bonds: { characterId: string; xp: number; level: number; before: number }[];
+}
+
+/** Spec 020: una expedición, con su calificación y botín congelados al enviar (RF-15 a RF-24). */
+export const expeditions = pgTable(
+  "expeditions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    zoneId: uuid("zone_id")
+      .notNull()
+      .references(() => expeditionZones.id),
+    zoneName: text("zone_name").notNull(),
+    zoneTerrain: expeditionTerrain("zone_terrain").notNull(),
+    durationMin: integer("duration_min").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    power: doublePrecision("power").notNull(),
+    difficulty: integer("difficulty").notNull(),
+    rating: text("rating").$type<Rating>().notNull(),
+    loot: jsonb("loot").$type<DurationLoot>().notNull(),
+    team: jsonb("team").$type<ExpeditionMember[]>().notNull(),
+    status: expeditionStatus("status").notNull().default("active"),
+    seed: text("seed"),
+    result: jsonb("result").$type<ExpeditionResult>(),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+  },
+  (t) => [index("expeditions_user_status_idx").on(t.userId, t.status)],
+);
+
+/** Spec 020, RF-8: una carta (por versión) solo puede estar en una expedición en curso, también ante peticiones a la vez. */
+export const expeditionCards = pgTable(
+  "expedition_cards",
+  {
+    expeditionId: uuid("expedition_id")
+      .notNull()
+      .references(() => expeditions.id),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => cards.id),
+    holo: boolean("holo").notNull().default(false),
+    active: boolean("active").notNull().default(true),
+  },
+  (t) => [
+    primaryKey({ columns: [t.expeditionId, t.cardId, t.holo] }),
+    uniqueIndex("expedition_cards_busy_uq").on(t.userId, t.cardId, t.holo).where(sql`${t.active}`),
+  ],
+);
+
+/** Spec 020: vínculo de cada coleccionista con cada personaje (experiencia acumulada). */
+export const characterBonds = pgTable(
+  "character_bonds",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    characterId: uuid("character_id")
+      .notNull()
+      .references(() => characters.id, { onDelete: "cascade" }),
+    xp: integer("xp").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.characterId] })],
+);

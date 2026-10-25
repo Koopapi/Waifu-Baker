@@ -18,4 +18,27 @@ export const panelErrors: Record<string, Msg> = {
   invalid_item_name: "Ponle un nombre al elemento.",
   flatten_failed: "No se pudo generar la imagen de la carta. Revisa sus capas y vuelve a intentarlo.",
   no_pending_layers: "Esta carta no tiene cambios de capas pendientes.",
+  // Spec 020: Expediciones (coleccionista y panel).
+  invalid_terrain: "Ese terreno no existe.",
+  invalid_role: "Ese rol no existe.",
+  invalid_zone: (p) =>
+    ({
+      name: "El nombre de la zona es obligatorio y admite hasta 40 caracteres.",
+      terrain: "Ese terreno no existe.",
+      difficulty: "La dificultad va de 1 a 1000.",
+      fragments: "Los fragmentos para abrirla van de 0 a 999.",
+      order: "El orden va de 0 a 99.",
+      loot: "El botín de cada duración necesita galletas (0 a 10 000), fragmentos (0 a 100) y una probabilidad de sobre de 0 a 100 %.",
+    })[String(p.field)] ?? "La zona no es válida.",
+  invalid_team: "El equipo lleva de 1 a 3 cartas distintas.",
+  invalid_duration: "La duración debe ser 30 min, 2 h u 8 h.",
+  zone_locked: "Esa zona sigue con niebla: ábrela con fragmentos de mapa.",
+  no_free_slot: (p) => `Tus ${p.slots} espacios están ocupados: reclama o cancela una expedición.`,
+  card_not_owned: "Esa carta no está en tu colección.",
+  card_busy: "Esa carta ya está en otra expedición.",
+  expedition_not_active: "Esa expedición ya terminó.",
+  expedition_returned: "El equipo ya volvió: reclama su botín.",
+  not_returned: "El equipo todavía no ha vuelto.",
+  pack_not_pending: "Esa expedición no tiene un sobre por elegir.",
+  not_enough_fragments: (p) => `Te faltan fragmentos de mapa: tienes ${p.have} de ${p.need}.`,
 };

@@ -1,5 +1,6 @@
 import { asc, count, eq, sql } from "drizzle-orm";
 import { cards, characters } from "@/db/schema";
+import { ROLES, TERRAINS, type Role, type Terrain } from "@/domain/expeditions/rules";
 import { slugify } from "@/domain/text/slug";
 import type { DbLike } from "@/server/db-types";
 import { AdminError, isUniqueViolation } from "@/server/errors";
@@ -35,15 +36,20 @@ export async function updateCharacter(
   db: DbLike,
   actorUserId: string,
   id: string,
-  patch: { name?: string; bio?: string; identityTags?: string },
+  patch: { name?: string; bio?: string; identityTags?: string; terrain?: Terrain | null; role?: Role | null },
 ) {
   return db.transaction(async (tx) => {
     const [cur] = await tx.select().from(characters).where(eq(characters.id, id)).for("update");
     if (!cur) throw new AdminError("not_found", "El personaje no existe.", { entity: "character" });
+    // Spec 020, RF-27: terreno y rol de Expediciones (null = sin asignar).
+    if (patch.terrain != null && !TERRAINS.includes(patch.terrain)) throw new AdminError("invalid_terrain", "Ese terreno no existe.");
+    if (patch.role != null && !ROLES.includes(patch.role)) throw new AdminError("invalid_role", "Ese rol no existe.");
     const next = {
       name: patch.name === undefined ? cur.name : cleanName(patch.name),
       bio: patch.bio === undefined ? cur.bio : patch.bio.trim(),
       identityTags: patch.identityTags === undefined ? cur.identityTags : patch.identityTags.trim(),
+      terrain: patch.terrain === undefined ? cur.terrain : patch.terrain,
+      role: patch.role === undefined ? cur.role : patch.role,
     };
     const [u] = await tx.update(characters).set({ ...next, updatedAt: sql`now()` }).where(eq(characters.id, id)).returning();
     await auditChange(tx, {
@@ -51,7 +57,7 @@ export async function updateCharacter(
       action: "character_update",
       entityType: "character",
       entityId: id,
-      before: { name: cur.name, bio: cur.bio, identityTags: cur.identityTags },
+      before: { name: cur.name, bio: cur.bio, identityTags: cur.identityTags, terrain: cur.terrain, role: cur.role },
       after: next,
     });
     return u;
@@ -79,6 +85,8 @@ export async function listCharacters(db: DbLike) {
       slug: characters.slug,
       bio: characters.bio,
       identityTags: characters.identityTags,
+      terrain: characters.terrain,
+      role: characters.role,
       cardCount: count(cards.id),
     })
     .from(characters)

@@ -22,8 +22,8 @@ async function activeUser(db: DbLike, userId: string) {
   return u;
 }
 
-/** RF-4, RF-7 y RF-9: solo colecciones SFW publicadas. */
-async function claimableSet(db: DbLike, setId: string | null | undefined) {
+/** RF-4, RF-7 y RF-9: solo colecciones SFW publicadas (también para el sobre de Expediciones, spec 020). */
+export async function claimableSet(db: DbLike, setId: string | null | undefined) {
   if (!setId) throw new AppError("choose_set", "Elige una colección.");
   const [s] = await db.select().from(sets).where(eq(sets.id, setId));
   if (!s || s.status !== "published" || s.isAdult) throw new AppError("set_not_claimable", "Esa colección no está disponible para sobres gratis. Elige otra.");

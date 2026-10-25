@@ -60,6 +60,8 @@ export const errors: Record<string, Msg> = {
       character: "This character doesn't exist.",
       chosen_character: "The selected character no longer exists.",
       pack: "That pack doesn't exist.",
+      zone: "This zone doesn't exist.",
+      expedition: "This expedition doesn't exist.",
       card: "This card doesn't exist.",
       selected_cards: "Some of the selected cards no longer exist.",
     })[String(p.entity)] ?? "Not found.",
