@@ -45,6 +45,8 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
     window.scrollTo(0, 0);
   });
   await page.waitForLoadState("networkidle");
+  // La escena de apertura se carga aparte y, mientras tanto, solo hay un fondo: se revisa ya cargada.
+  await page.locator('[data-testid="stage-loading"]').waitFor({ state: "detached", timeout: 60_000 });
   const found = await page.evaluate(() => {
     const out: string[] = [];
     const root = document.documentElement;
