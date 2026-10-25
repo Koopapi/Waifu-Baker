@@ -17,9 +17,9 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-24.04
-    # Vitest y el E2E de escritorio ya pasan de 55 min en los ejecutores de GitHub (más lentos que un Mac); con 60
-    # se cancelaba a medias desde la spec 017.
-    timeout-minutes: 90
+    # Vitest y el E2E de escritorio pasan de 90 min en los ejecutores de GitHub (más lentos que un Mac) desde las
+    # specs 018 y 019; con menos se cancelaba a medias.
+    timeout-minutes: 150
     services:
       postgres:
         image: postgres:16
