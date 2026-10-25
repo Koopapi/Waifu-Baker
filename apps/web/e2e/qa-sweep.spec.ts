@@ -75,7 +75,9 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
     return out;
   });
   for (const issue of found) problems.push({ page: url, viewport: vp.name, issue });
-  await page.screenshot({ path: `test-results/sweep/${shotName}-${vp.name}.png`, fullPage: true });
+  // `caret: "initial"`: para ocultar el cursor, Playwright escribe `caret-color` en cada campo; si React aún está
+  // hidratando (pasa en la CI), lo ve como un desajuste del HTML del servidor y lo avisa por consola.
+  await page.screenshot({ path: `test-results/sweep/${shotName}-${vp.name}.png`, fullPage: true, caret: "initial" });
 }
 
 test("barrido de calidad de todas las páginas", async ({ browser }) => {
