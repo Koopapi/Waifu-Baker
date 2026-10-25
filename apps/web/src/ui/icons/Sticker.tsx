@@ -2,7 +2,7 @@
 // las pegatinas de la lámina «Kawaii (spec 014)» de Pencil. SVG en línea: sin imágenes y nítido a cualquier tamaño.
 import { cx } from "../variants";
 
-export const STICKERS = ["pack", "card", "cookie", "gift", "clock", "collection", "streak", "profile"] as const;
+export const STICKERS = ["pack", "card", "cookie", "gift", "clock", "collection", "streak", "profile", "map"] as const;
 export type StickerName = (typeof STICKERS)[number];
 
 const INK = "var(--ui-k-tinta)";
@@ -88,6 +88,16 @@ const DRAWINGS: Record<StickerName, () => React.ReactNode> = {
       <path transform="translate(12 4)" d="M20 0 C28 12 40 18 40 34 C40 46 31 54 20 54 C9 54 0 46 0 34 C0 24 8 20 10 10 C14 16 16 18 18 20 C18 12 18 6 20 0 Z" fill="var(--ui-k-llama)" {...out} />
       <path transform="translate(22 28)" d="M10 0 C15 7 20 10 20 18 C20 24 15 28 10 28 C5 28 0 24 0 18 C0 12 5 10 10 0 Z" fill="var(--ui-k-limon)" />
       <Face cx={32} cy={40} />
+    </>
+  ),
+  // Spec 020: «Juegos» (Expediciones). Un mapa doblado con el camino y una chincheta en forma de corazón.
+  map: () => (
+    <>
+      <path d="M8 16 L24 10 L40 16 L56 10 L56 50 L40 56 L24 50 L8 56 Z" fill="var(--ui-k-celeste)" {...out} />
+      <path d="M24 10 L24 50 M40 16 L40 56" stroke="var(--ui-k-celeste-claro)" strokeWidth={3} />
+      <path d="M14 46 C20 38 26 42 30 34 S42 26 48 22" fill="none" stroke="var(--ui-k-blanco)" strokeWidth={2.5} strokeLinecap="round" strokeDasharray="1 5" />
+      <path transform="translate(39 8) scale(1.2)" d={HEART} fill="var(--ui-k-chicle)" {...out} strokeWidth={4} />
+      <ellipse cx={18} cy={30} rx={3} ry={1.5} fill={BLUSH} />
     </>
   ),
   profile: () => (

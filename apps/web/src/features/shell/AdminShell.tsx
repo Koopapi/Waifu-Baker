@@ -45,6 +45,7 @@ export async function AdminShell({ userId, children }: { userId: string; childre
             { href: "/admin/sets", label: n.sets, icon: "sets" },
             { href: "/admin/characters", label: n.characters, icon: "characters" },
             { href: "/admin/library", label: n.library, icon: "library" },
+            { href: "/admin/expediciones", label: n.expeditions, icon: "expeditions" },
           ],
         },
         {

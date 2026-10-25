@@ -1,0 +1,314 @@
+/* Spec 020: mapa, equipos y armado de Expediciones. Solo se anima `transform` y `opacity` (constitución, principio 9). */
+
+.xmap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-l);
+  background:
+    radial-gradient(120% 90% at 30% 25%, color-mix(in srgb, var(--ui-k-lavanda) 28%, transparent) 0%, transparent 60%),
+    radial-gradient(80% 70% at 80% 80%, color-mix(in srgb, var(--ui-k-menta) 14%, transparent) 0%, transparent 70%),
+    var(--ui-rail);
+}
+
+.xmap__paths {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: color-mix(in srgb, var(--ui-k-blanco) 22%, transparent);
+  stroke-width: 0.7;
+  stroke-dasharray: 1.5 2.2;
+  stroke-linecap: round;
+}
+
+.xmap__pin {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  translate: -50% -28px;
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease;
+}
+.xmap__pin:hover,
+.xmap__pin:focus-visible {
+  transform: scale(1.08);
+}
+.xmap__pin:focus-visible {
+  outline: none;
+}
+.xmap__pin:focus-visible .xmap__dot {
+  outline: 3px solid var(--ui-accent);
+  outline-offset: 3px;
+}
+
+.xmap__dot {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--ui-k-blanco);
+  border-radius: 999px;
+  font-size: 22px;
+  box-shadow: var(--shadow-2);
+}
+.xmap__pin--city .xmap__dot {
+  background: var(--ui-k-chicle);
+}
+.xmap__pin--forest .xmap__dot {
+  background: var(--ui-k-menta);
+}
+.xmap__pin--coast .xmap__dot {
+  background: var(--ui-k-celeste);
+}
+.xmap__pin--ruins .xmap__dot {
+  background: var(--ui-k-lavanda);
+}
+.xmap__pin--mountain .xmap__dot {
+  background: var(--ui-k-limon);
+}
+.xmap__pin--fog {
+  opacity: 0.75;
+}
+.xmap__pin--fog .xmap__dot {
+  background: color-mix(in srgb, var(--ui-k-blanco) 14%, transparent);
+  color: var(--ui-text);
+}
+.xmap__pin--out .xmap__dot {
+  animation: xmap-bob 2.4s ease-in-out infinite;
+}
+
+.xmap__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 140px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--tinta, #0b0912) 80%, transparent);
+  line-height: 1.15;
+}
+.xmap__name {
+  max-width: 124px;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ui-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.xmap__state {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ui-text-2);
+}
+.xmap__pin--out .xmap__state {
+  color: var(--ui-k-limon);
+}
+
+@keyframes xmap-bob {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.xteam {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-m);
+  background: var(--ui-raised);
+}
+.xteam--back {
+  border-color: color-mix(in srgb, var(--ui-k-menta) 60%, transparent);
+  background: color-mix(in srgb, var(--ui-k-menta) 10%, var(--ui-raised));
+}
+.xteam__cards {
+  display: flex;
+}
+.xteam__card {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 38px;
+  margin-left: -8px;
+  border: 2px solid var(--ui-bg);
+  border-radius: 6px;
+  background: var(--ui-k-lavanda);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ui-k-tinta);
+}
+.xteam__card:first-child {
+  margin-left: 0;
+}
+
+.xpack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1.5px solid color-mix(in srgb, var(--ui-k-limon) 55%, transparent);
+  border-radius: var(--radius-m);
+  background: color-mix(in srgb, var(--ui-k-limon) 8%, transparent);
+}
+
+.xslot {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 700 / 991;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.xslot--empty {
+  border: 2px dashed var(--ui-line);
+}
+.xslot__card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.xslot__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.xslot__name {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 16px 8px 6px;
+  background: linear-gradient(transparent, color-mix(in srgb, #0b0912 85%, transparent));
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ui-text);
+}
+
+.xbar {
+  position: relative;
+  height: 10px;
+  overflow: visible;
+  border-radius: 999px;
+  background: var(--ui-hover);
+}
+.xbar__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ui-k-menta), var(--ui-k-celeste));
+  transform-origin: left;
+  transition: transform 400ms ease;
+}
+.xbar__mark {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 16px;
+  background: var(--ui-text);
+}
+
+.xrating {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.xrating--hard {
+  background: var(--ui-danger);
+  color: var(--ui-on-accent);
+}
+.xrating--normal {
+  background: var(--ui-k-limon);
+  color: var(--ui-k-tinta);
+}
+.xrating--good {
+  background: var(--ui-k-celeste);
+  color: var(--ui-k-tinta);
+}
+.xrating--excellent {
+  background: var(--ui-k-menta);
+  color: var(--ui-k-tinta);
+}
+
+.xdur {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-m);
+  background: var(--ui-nav);
+  text-align: left;
+}
+.xdur--on {
+  border: 2px solid var(--ui-accent);
+  background: var(--ui-accent-soft, color-mix(in srgb, var(--ui-accent) 20%, transparent));
+}
+
+.xpick {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border: 2px solid var(--ui-line);
+  border-radius: var(--radius-m);
+  background: var(--ui-nav);
+  text-align: left;
+  transition: transform var(--duration-fast) ease;
+}
+.xpick:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+.xpick:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.xpick--on {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 2px var(--ui-accent);
+}
+.xpick__img {
+  display: block;
+  aspect-ratio: 700 / 991;
+  width: 100%;
+  object-fit: cover;
+}
+.xpick__body {
+  padding: 4px 6px 6px;
+}
+
+.xreport__line {
+  opacity: 0;
+  animation: xreport-in 360ms ease forwards;
+}
+@keyframes xreport-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xmap__pin,
+  .xpick,
+  .xbar__fill {
+    transition: none;
+  }
+  .xmap__pin--out .xmap__dot {
+    animation: none;
+  }
+  .xreport__line {
+    opacity: 1;
+    animation: none;
+  }
+}

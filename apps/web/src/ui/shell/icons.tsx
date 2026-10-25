@@ -10,6 +10,7 @@ import {
   Plus,
   Settings,
   Shield,
+  Sparkles,
   UserRound,
   UsersRound,
   type Glyph,
@@ -27,6 +28,8 @@ export const ICONS = {
   album: "card",
   rewards: "gift",
   account: "profile",
+  // Spec 020: el espacio de juegos.
+  games: "map",
   odds: Percent,
   overview: ChartColumn,
   metrics: Activity,
@@ -37,6 +40,7 @@ export const ICONS = {
   users: UserRound,
   tiers: Link2,
   settings: Settings,
+  expeditions: Sparkles,
   admin: Shield,
   plus: Plus,
 } satisfies Record<string, StickerName | Glyph>;
