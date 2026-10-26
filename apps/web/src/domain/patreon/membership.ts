@@ -71,3 +71,13 @@ export function hasAdultTier(s: Pick<MemberState, "entitledTierIds">, rules: Rul
   const tiers = new Set(s.entitledTierIds);
   return rules.some((r) => r.active && r.setIsAdult && tiers.has(r.patreonTierId));
 }
+
+/**
+ * Spec 021: patron = membresía activa con el último cobro pagado y al menos una regla activa con sobres para alguno
+ * de sus tiers. Un tier sin reglas (por ejemplo «Free») no hace patron a nadie.
+ */
+export function isPatron(s: MemberState | null, rules: RuleForGrant[]) {
+  if (!s || !isPaidActive(s)) return false;
+  const tiers = new Set(s.entitledTierIds);
+  return rules.some((r) => r.active && r.packsPerMonth > 0 && tiers.has(r.patreonTierId));
+}

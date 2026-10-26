@@ -14,6 +14,9 @@ export type DurationMin = (typeof DURATIONS)[number];
 export const isDuration = (n: unknown): n is DurationMin => DURATIONS.includes(n as DurationMin);
 
 export const SLOTS = 2;
+/** Spec 021, RF-13: el patron tiene un espacio más. */
+export const PATRON_SLOTS = 3;
+export const slotsFor = (patron: boolean) => (patron ? PATRON_SLOTS : SLOTS);
 export const TEAM_MAX = 3;
 
 /** RF-11: con el terreno a ×1.5, una carta en su terreno supera a otra dos rarezas por encima fuera del suyo. */

@@ -3,6 +3,7 @@ import { RARITIES } from "@/domain/catalog/card-rules";
 import { listPublicOdds } from "@/server/services/collections";
 import { publicZoneOdds } from "@/server/services/expedition-zones";
 import { gamesDictionaries } from "@/i18n/games";
+import { Badge } from "@/ui/content/Badge";
 import { formatDate, formatPercent } from "@/i18n/format";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { getDict, getLocale } from "@/i18n/server";
@@ -31,8 +32,12 @@ export default async function DropRatesPage() {
         {rows.length === 0 && <p className="text-ui-text-3">{t.site.dropRates.empty}</p>}
         {rows.map(({ set, odds }) => (
           <section key={set.id} className="space-y-3">
-            <h2 className="text-xl font-semibold">
+            <h2 className="flex flex-wrap items-center gap-2 text-xl font-semibold">
               {set.name} <span className="font-mono text-sm text-ui-text-3">{set.code}</span>
+              {/* Spec 021, RF-10: gratis o con la suscripción. */}
+              <span data-testid={`how-${set.code}`}>
+                <Badge tone={set.isFree ? "success" : "accent"}>{set.isFree ? t.site.dropRates.how.free : t.site.dropRates.how.patreon}</Badge>
+              </span>
             </h2>
             <p className="text-sm text-ui-text-3">
               {t.site.dropRates.published({

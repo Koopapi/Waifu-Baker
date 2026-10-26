@@ -39,7 +39,7 @@ const min = (n: number) => new Date(T0.getTime() + n * 60_000);
 
 async function world(db: DbLike, tag = "EXP") {
   const admin = await makeAdmin(db, `admin-${tag}`);
-  const sfw = await createPublishedSet(db, admin.id, { code: `${tag}1`, rarities: ["common", "rare", "epic", "legendary"], slots: [{ common: 100 }] });
+  const sfw = await createPublishedSet(db, admin.id, { code: `${tag}1`, isFree: true, rarities: ["common", "rare", "epic", "legendary"], slots: [{ common: 100 }] });
   const adult = await createPublishedSet(db, admin.id, { code: `${tag}1A`, rarities: ["common"], slots: [{ common: 100 }], isAdult: true });
   const fan = await upsertUserFromLogin(db, { patreonUserId: `fan-${tag}`, displayName: "Fan", role: "user" });
   const [common, rare, epic, legendary] = sfw.cards;
@@ -287,7 +287,7 @@ describe("spec 020 — cancelar y reclamar", () => {
   it("test_s020_rf22_con_varias_colecciones_sfw_el_coleccionista_elige_la_del_sobre", async () => {
     await inRollback(async (tx) => {
       const w = await world(tx);
-      const other = await createPublishedSet(tx, w.admin.id, { code: "EXP2", rarities: ["common"], slots: [{ common: 100 }] });
+      const other = await createPublishedSet(tx, w.admin.id, { code: "EXP2", isFree: true, rarities: ["common"], slots: [{ common: 100 }] });
       const loot = { ...defaultZoneLoot(30), "30": { cookies: 5, fragments: 1, packChance: 1 } };
       await saveZone(tx, w.admin.id, { id: w.city.id, name: "Puerto Miel", terrain: "city", difficulty: 30, fragmentsRequired: 0, sortOrder: 1, active: true, loot });
       const e = await send(tx, w.fan.id, w.city.id, [{ cardId: w.common.id }], 30);

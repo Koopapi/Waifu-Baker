@@ -7,6 +7,8 @@ import { requireUser } from "@/server/auth/require-user";
 import { cardImageUrl } from "@/server/cards/image-urls";
 import { myBinder } from "@/server/services/collection";
 import { expeditionInfoForCards } from "@/server/services/expeditions";
+import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
+import { PatreonNotice } from "@/features/economy/PatreonNotice";
 import { Alert } from "@/ui/feedback/Alert";
 import { BinderView, type BinderSlotDTO } from "@/features/collection/BinderView";
 
@@ -15,7 +17,7 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
   const { setId } = await params;
   if (!z.string().uuid().safeParse(setId).success) notFound();
   const user = await requireUser(`/coleccion/${setId}`);
-  const [b, t] = await Promise.all([myBinder(db, user.id, setId), getDict()]);
+  const [b, t, patron] = await Promise.all([myBinder(db, user.id, setId), getDict(), isPatronUser(db, user.id)]);
   if (!b) notFound();
   const info = await expeditionInfoForCards(
     db,
@@ -52,6 +54,8 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
           )}
         </div>
       </div>
+      {/* Spec 021, RF-9: cómo se consigue una colección de Patreon. */}
+      {!b.locked && !b.set.isFree && !patron && <PatreonNotice text={t.collection.patreon.notice} linkLabel={t.collection.patreon.link} url={patreonPageUrl()} />}
       {b.locked ? (
         <Alert tone="warning">{t.collection.adultLocked}</Alert>
       ) : (

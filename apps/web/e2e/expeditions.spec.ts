@@ -42,7 +42,7 @@ async function pickAndSend(dialog: Locator, index: number, duration: 30 | 120) {
 
 test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sobre, zona con niebla y ficha", async ({ browser, request }) => {
   const admin = await login(browser, "admin-expe", true);
-  const setId = await createPublishedSet(admin, "EXPE", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
+  const setId = await createPublishedSet(admin, "EXPE", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
   await giftPacks(admin, "fan-expe", "EXPE", 2);
 
   await test.step("RF-27: el administrador asigna terreno y rol a la personaje", async () => {

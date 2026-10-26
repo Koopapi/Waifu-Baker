@@ -8,6 +8,7 @@ import { cardChances } from "@/domain/catalog/odds";
 import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
+import { FreeToggle } from "@/features/admin/sets/FreeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
 import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
@@ -87,6 +88,9 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           </h1>
           <StatusBadge status={set.status} />
           <AdultBadge adult={set.isAdult} />
+          <span data-testid="free-badge">
+            <Badge tone={set.isFree ? "success" : "accent"}>{set.isFree ? t.free.badgeFree : t.free.badgePatreon}</Badge>
+          </span>
         </div>
       </div>
 
@@ -127,6 +131,11 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
             .filter((c) => c.rarity)
             .map((c) => ({ id: c.id, label: `${String(c.number).padStart(3, "0")} · ${c.name || "—"} · ${tt.common.rarity[c.rarity!]}` }))}
         />
+      </Card>
+
+      {/* Spec 021, RF-1 a RF-3: gratuita o de Patreon. */}
+      <Card className="space-y-3" title={t.free.title}>
+        <FreeToggle setId={set.id} isFree={set.isFree} isAdult={set.isAdult} />
       </Card>
 
       <Card className="space-y-3" title={t.welcome.title}>

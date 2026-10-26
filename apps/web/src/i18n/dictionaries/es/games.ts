@@ -47,6 +47,9 @@ export const games: typeof en = {
     pendingPack: "Tu equipo encontró un sobre: elige su colección.",
     noCards: "Necesitas cartas para mandar de expedición. Abre un sobre primero.",
     noZones: "Todavía no hay zonas en el mapa. ¡Vuelve pronto!",
+    thirdSlot: "Tercer espacio",
+    thirdSlotHint: "Llega con la suscripción de Patreon.",
+    thirdSlotLink: "Ver en Patreon",
     goToPacks: "Ir a Mis sobres",
   },
   prepare: {

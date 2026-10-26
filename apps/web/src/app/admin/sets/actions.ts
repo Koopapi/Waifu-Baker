@@ -1,7 +1,7 @@
 "use server";
 
 import { adminAction, type ActionState } from "@/server/auth/admin-action";
-import { archiveSet, createSet, publishSet, saveOdds, updateSet } from "@/server/services/collections";
+import { archiveSet, createSet, publishSet, saveOdds, setFreeSet, updateSet } from "@/server/services/collections";
 import type { Problem } from "@/domain/catalog/odds";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { getDict } from "@/i18n/server";
@@ -70,6 +70,14 @@ export async function setWelcomeSetAction(setId: string, makeWelcome: boolean): 
   return adminAction("setWelcomeSet", ["/admin/sets", `/admin/sets/${setId}`], async ({ db, actorId }) => {
     await setWelcomeSet(db, actorId, makeWelcome ? setId : null);
     return (await getDict()).admin.set.welcome.made;
+  });
+}
+
+/** Spec 021, RF-1: gratuita (fuentes gratis) o de Patreon. */
+export async function setFreeSetAction(setId: string, free: boolean): Promise<ActionState> {
+  return adminAction("setFreeSet", ["/admin/sets", `/admin/sets/${setId}`, "/drop-rates"], async ({ db, actorId }) => {
+    await setFreeSet(db, actorId, setId, free);
+    return (await getDict()).admin.set.free.made;
   });
 }
 

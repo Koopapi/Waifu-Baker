@@ -13,13 +13,15 @@ const badgeClasses = variants({
       info: "bg-ui-info/20 text-ui-info-text",
       /** Spec 015, RF-8: «¡Nuevo!», amarillo limón con borde blanco, como una pegatina. */
       new: "rounded-full border-2 border-k-blanco bg-k-limon font-display text-[13px] font-bold text-k-tinta shadow-[var(--shadow-sticker)]",
+      /** Spec 021, RF-11: la insignia de patron, chicle con borde blanco, como una pegatina. */
+      patron: "rounded-full border-2 border-k-blanco bg-k-chicle font-display text-[12px] font-bold text-k-tinta shadow-[var(--shadow-sticker)]",
     },
   },
   defaults: { tone: "neutral" },
 });
 
 export interface BadgeProps {
-  tone?: "neutral" | "accent" | "success" | "warning" | "danger" | "info" | "new";
+  tone?: "neutral" | "accent" | "success" | "warning" | "danger" | "info" | "new" | "patron";
   /** Contador redondo (avisos sin leer, sobres sin abrir): 99+ a partir de 100. */
   count?: number;
   children?: React.ReactNode;

@@ -29,6 +29,7 @@ const Body = z.discriminatedUnion("action", [
     characterName: z.string(),
     packSize: z.number().int(),
     isAdult: z.boolean().default(false),
+    isFree: z.boolean().default(false),
     cards: z.array(z.object({ image: z.string().regex(/^[\w-]+\.webp$/), name: z.string(), rarity: Rarity })).min(1),
     slots: z.array(z.partialRecord(Rarity, z.number())),
     holoPercent: z.number().min(0).max(100).optional(),

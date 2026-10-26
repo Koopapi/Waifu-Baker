@@ -76,7 +76,7 @@ async function seed<T>(page: Page, data: Record<string, unknown>): Promise<T> {
 }
 
 /** Colección publicada de 2 cartas por sobre: ranura 1 común, ranura 2 rara (la carta `rareIndex`). */
-export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number, adult = false) {
+export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number, adult = false, free = false) {
   const { setId } = await seed<{ setId: string }>(page, {
     action: "publishedSet",
     code,
@@ -84,6 +84,8 @@ export async function createPublishedSet(page: Page, code: string, images: strin
     characterName: `Personaje ${code}`,
     packSize: 2,
     isAdult: adult,
+    // Spec 021: gratuita = sale en el sobre cada 12 h, el día 7 y las expediciones.
+    isFree: free,
     // Como en el panel, las cartas se numeran por nombre de archivo.
     cards: images.map((img) => path.basename(img)).sort().map((image, i) => ({
       image,

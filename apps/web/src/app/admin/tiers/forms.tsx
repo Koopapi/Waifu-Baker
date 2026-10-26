@@ -62,7 +62,7 @@ export function AddRuleForm({ tierId, tierName, sets, anyPublished }: { tierId: 
         options={sets.map((s) => ({ value: s.id, label: `${s.code} · ${s.name}${s.isAdult ? " (18+)" : ""}` }))}
         className="min-w-64"
       />
-      <TextField label={t.packsAria(tierName)} hideLabel name="packsPerMonth" type="number" min={1} max={50} defaultValue={3} fieldClassName="w-24" />
+      <TextField label={t.packsAria(tierName)} hideLabel name="packsPerMonth" type="number" min={1} max={50} defaultValue={8} fieldClassName="w-24" />
       <span>{t.packsPerMonth}</span>
       <SubmitButton>{t.addSet}</SubmitButton>
       <FormMessage state={state} />

@@ -27,6 +27,8 @@ export const site = {
       `Bad-luck protection: if you open ${n} packs in a row from this set without any Epic or better card, the next one brings at least one (it replaces the card in the last slot). The counter is yours and for this set only.`,
     noPity: "This set has no bad-luck protection.",
     slot: "Slot",
+    // Spec 021, RF-10: how each set is obtained.
+    how: { free: "Free", patreon: "With the subscription" },
   },
   notFound: {
     title: "Page not found",

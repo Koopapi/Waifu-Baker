@@ -94,6 +94,17 @@ export const admin = {
       removed: "Hand-made pack removed: the composed pack is back.",
       uploadFailed: "The image could not be uploaded.",
     },
+    free: {
+      title: "Free or Patreon",
+      isFree: "Free set: it comes out in the free pack every 12 h, on day 7 of the streak, in expeditions and in the shop.",
+      isPatreon: "Patreon set: it comes with the subscription (and as the welcome pack if you choose it).",
+      make: "Mark as free",
+      remove: "Mark as Patreon",
+      adultNo: "An 18+ set can't be free.",
+      made: "Set updated.",
+      badgeFree: "Free",
+      badgePatreon: "Patreon",
+    },
     welcome: {
       title: "Welcome pack",
       isWelcome: "This is the welcome set: everyone gets 1 pack of it the first time they sign in.",

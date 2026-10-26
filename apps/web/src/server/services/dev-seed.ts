@@ -10,7 +10,7 @@ import { AdminError } from "@/server/errors";
 import { createCharacter } from "./characters";
 import { reviewCard, updateCard, uploadCardImage, type UploadFile } from "./cards";
 import { saveCardLayers } from "./card-layers";
-import { createSet, publishSet, saveOdds } from "./collections";
+import { createSet, publishSet, saveOdds, setFreeSet } from "./collections";
 import { ensureLibraryImage } from "./library";
 import { upsertUserFromLogin } from "./users";
 import { giftPacks } from "./users-admin";
@@ -25,6 +25,8 @@ export interface SeedSetInput {
   characterName: string;
   packSize: number;
   isAdult: boolean;
+  /** Spec 021: gratuita (sale en las fuentes gratis); por defecto, de Patreon. */
+  isFree?: boolean;
   /** `character`: personaje de la carta; si falta, el de la colección (`characterName`). */
   cards: { file: UploadFile; name: string; rarity: Rarity; character?: string }[];
   slots: Partial<Slot>[];
@@ -65,6 +67,7 @@ export async function seedPublishedSet(db: DbLike, store: CardStore, actorUserId
     return characters.get(name)!;
   };
   const set = await createSet(db, actorUserId, { code: input.code, name: input.name, isAdult: input.isAdult, packSize: input.packSize });
+  if (input.isFree) await setFreeSet(db, actorUserId, set.id, true);
   for (const c of input.cards) {
     const uploaded = await uploadCardImage(db, store, actorUserId, set.id, c.file);
     const updated = await updateCard(db, store, actorUserId, uploaded.id, uploaded.version, {

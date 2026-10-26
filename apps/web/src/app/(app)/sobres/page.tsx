@@ -14,6 +14,8 @@ import { getDict } from "@/i18n/server";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
 import { EmptyState } from "@/ui/feedback/EmptyState";
+import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
+import { PatreonNotice } from "@/features/economy/PatreonNotice";
 
 export async function generateMetadata() {
   return { title: (await getDict()).packs.meta.myPacks };
@@ -37,6 +39,9 @@ export default async function MisSobresPage() {
   const sets = plainSets.map((s) => ({ ...s, art: art.get(s.id) ?? { coverVersion: null, packImage: null } }));
   const total = groups.reduce((a, g) => a + g.sealed, 0);
   const t = await getDict();
+  // Spec 021, RF-9.
+  const patron = await isPatronUser(db, user.id);
+  const patreonUrl = patreonPageUrl();
 
   return (
     <main className="mx-auto grid max-w-6xl gap-6 px-4 py-6 md:px-8 lg:grid-cols-[minmax(0,1fr)_340px]">
@@ -97,6 +102,8 @@ export default async function MisSobresPage() {
                         <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
                       </div>
                     </div>
+                    {/* Spec 021, RF-9: cómo conseguir más sobres de una colección de Patreon. */}
+                    {!g.isFree && !g.locked && !patron && <PatreonNotice compact text={t.packs.mine.patreonMore} linkLabel={t.collection.patreon.link} url={patreonUrl} />}
                     {g.locked ? (
                       <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
                     ) : (

@@ -14,6 +14,8 @@ export const collection: typeof en = {
   },
   viewCollection: "Ver la colección",
   adultLocked: "Colección 18+: verifica tu edad con un tier adulto de Patreon para ver estas cartas.",
+  // Spec 021, RF-9: cómo se consigue una colección de Patreon.
+  patreon: { notice: "Esta colección llega con la suscripción de Patreon.", link: "Ver los tiers en Patreon" },
   progress: (owned, total) => `${owned} de ${total} cartas`,
   binder: {
     modes: { all: "Todas", owned: "Las que tengo", missing: "Me faltan", holo: "Holo" },

@@ -7,6 +7,7 @@ import { now } from "@/server/clock";
 import { expeditionsHome } from "@/server/services/expeditions";
 import { packArtForSets } from "@/server/services/pack-art";
 import { claimableSets } from "@/server/services/rewards";
+import { patreonPageUrl } from "@/server/services/patron";
 import { ExpeditionsView, type ExpeditionsDTO } from "@/features/games/ExpeditionsView";
 
 export async function generateMetadata() {
@@ -26,6 +27,8 @@ export default async function ExpeditionsPage() {
     serverNow: at.toISOString(),
     profile: home.profile,
     slots: home.slots,
+    patron: home.patron,
+    patreonUrl: patreonPageUrl(),
     zones: home.zones.map((z) => ({
       id: z.id,
       name: z.name,

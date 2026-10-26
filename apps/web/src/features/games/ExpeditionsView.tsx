@@ -69,6 +69,9 @@ export interface ExpeditionsDTO {
   serverNow: string;
   profile: { fragments: number; completed: number };
   slots: number;
+  /** Spec 021, RF-13 y RF-15: el patron tiene 3 espacios; a los demás se les dice cómo. */
+  patron: boolean;
+  patreonUrl: string;
   zones: ZoneDTO[];
   expeditions: ExpeditionDTO[];
   pendingPacks: { id: string; zoneName: string }[];
@@ -285,6 +288,22 @@ export function ExpeditionsView({ data }: { data: ExpeditionsDTO }) {
           </span>
         </div>
         {data.expeditions.length === 0 && <p className="text-sm text-ui-text-3">{t.expeditions.noTeams}</p>}
+        {!data.patron && (
+          <div className="xteam opacity-90" data-testid="third-slot-locked">
+            <span className="text-xl" aria-hidden>
+              🔒
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">{t.expeditions.thirdSlot}</span>
+              <span className="block text-xs text-ui-text-3">
+                {t.expeditions.thirdSlotHint}{" "}
+                <a href={data.patreonUrl} target="_blank" rel="noreferrer" className="font-bold text-ui-accent-text underline underline-offset-4" data-testid="patreon-link">
+                  {t.expeditions.thirdSlotLink} →
+                </a>
+              </span>
+            </span>
+          </div>
+        )}
         <ul className="space-y-2">
           {data.expeditions.map((e) => {
             const ready = new Date(e.endsAt).getTime() <= new Date(data.serverNow).getTime();

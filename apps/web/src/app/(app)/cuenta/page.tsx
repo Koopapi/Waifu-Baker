@@ -10,6 +10,7 @@ import { accountSummary } from "@/server/services/account";
 import { now } from "@/server/clock";
 import { cookieHistory, rewardsSummary } from "@/server/services/rewards";
 import { DeclareAdultForm, DeleteAccountButton } from "@/features/account/AccountForms";
+import { PatronBadge } from "@/features/economy/PatronBadge";
 
 /** Spec 001: RF-21 (suscripción), RF-18 a RF-20 (edad) y RF-22 (borrar cuenta). */
 export default async function CuentaPage() {
@@ -23,7 +24,11 @@ export default async function CuentaPage() {
   const status = t.statusLabel[s.patronStatus ?? "none"] ?? t.statusLabel.none;
   return (
     <main className="mx-auto max-w-2xl space-y-8 px-4 py-6 md:px-8">
-      <h1 className="text-3xl font-bold">{t.title}</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-3xl font-bold">{t.title}</h1>
+        {/* Spec 021, RF-11 y RF-12: la insignia mientras la membresía esté activa. */}
+        {s.patron && <PatronBadge label={t.patronBadge} />}
+      </div>
 
       {album && album.moderation !== "none" && (
         <div data-testid="account-album-hidden">

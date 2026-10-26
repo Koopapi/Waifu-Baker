@@ -47,6 +47,9 @@ export const games = {
     pendingPack: "Your team found a pack: choose its collection.",
     noCards: "You need cards to send on expeditions. Open a pack first.",
     noZones: "There are no zones on the map yet. Come back soon!",
+    thirdSlot: "Third slot",
+    thirdSlotHint: "Comes with the Patreon subscription.",
+    thirdSlotLink: "See on Patreon",
     goToPacks: "Go to My packs",
   },
   prepare: {

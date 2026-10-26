@@ -11,11 +11,14 @@ import { getMyAlbum } from "@/server/services/album";
 import { myCollections } from "@/server/services/collection";
 import { packArtForSets } from "@/server/services/pack-art";
 import { cardImageUrl } from "@/server/cards/image-urls";
+import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
+import { PatreonNotice } from "@/features/economy/PatreonNotice";
 
 /** RF-1 y RF-4: colecciones del usuario con su progreso. */
 export default async function MiColeccionPage() {
   const user = await requireUser("/coleccion");
-  const [cols, album, t] = await Promise.all([myCollections(db, user.id), getMyAlbum(db, user.id), getDict()]);
+  const [cols, album, t, patron] = await Promise.all([myCollections(db, user.id), getMyAlbum(db, user.id), getDict(), isPatronUser(db, user.id)]);
+  const patreonUrl = patreonPageUrl();
   const art = await packArtForSets(db, cols.map((c) => c.setId));
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-8">
@@ -39,7 +42,9 @@ export default async function MiColeccionPage() {
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {cols.map((c, i) => (
-            <li key={c.setId} data-testid={`collection-${c.code}`} className="card-in" style={{ "--i": i } as React.CSSProperties}>
+            <li key={c.setId} data-testid={`collection-${c.code}`} className="card-in space-y-2" style={{ "--i": i } as React.CSSProperties}>
+              {/* Spec 021, RF-9: cómo se consigue una colección de Patreon (fuera del enlace: un enlace no va dentro de otro). */}
+              {!c.locked && !c.isFree && !patron && <PatreonNotice compact text={t.collection.patreon.notice} linkLabel={t.collection.patreon.link} url={patreonUrl} />}
               {c.locked ? (
                 <Card as="div" className="space-y-2">
                   <p className="font-mono text-xs text-ui-text-3">{c.code}</p>
