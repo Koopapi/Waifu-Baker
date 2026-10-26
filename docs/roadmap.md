@@ -120,3 +120,8 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   tiers de 8 (8 + 8 el 18+), patron con insignia, cosméticos exclusivos y tercer espacio. Entran como **spec 021
   economía** (motor, antes de la tienda); la tienda pasa a la 022, Street pop a la 023, publicar a la 024 y el piloto a
   la 025. Recomendación pendiente: empezar la prueba de una OC ya y publicar la beta antes de la 023.
+- 26 oct 2026: spec 021 «economía» implementada y validada (16/16 RF, 668 tests, E2E 78 en verde en los 4 proyectos;
+  PR #27). Hallazgo de la prueba de la spec 006: en desarrollo React incluye en la página los datos que esperan los
+  componentes de servidor, así que una página pública solo debe consultar lo mínimo (la consulta de patron leía el
+  identificador de Patreon y salía en el álbum público; corregido). Pendiente: demo del dueño. La spec 022 (tienda)
+  está redactada sobre la 021 y espera aprobación.
