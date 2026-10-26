@@ -258,12 +258,27 @@ y su RNG; no hay forma de pagar para avanzar.
 | RN-215 | La página de Probabilidades publica la probabilidad de sobre de cada zona activa y duración. | Vigente | 020 RF-26 |
 | RN-216 | El administrador asigna terreno y rol a cada personaje y crea y edita zonas (nombre, terreno, dificultad 1 a 1000, fragmentos 0 a 999, orden, imagen, activa) con su botín por duración (galletas 0 a 10 000, fragmentos 0 a 100, sobre 0 a 100 %); el simulador muestra calificación, botín y sobres al día con 2 espacios. | Vigente | 020 RF-27 a RF-30 |
 
+## 20. Economía: colecciones gratuitas y de Patreon
+
+Decisiones del dueño del 25 oct 2026 para poder monetizar (`docs/economia.md`). Mandan sobre las reglas anteriores de
+las fuentes gratis (RN-20 a RN-23 siguen; RN-100 y siguientes de la spec 009 y RN-213 de la 020 se leen con RN-218).
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-217 | Cada colección es **gratuita** o **de Patreon** (de Patreon por defecto); lo decide el administrador y se ve en el panel. Una colección 18+ nunca es gratuita; pasar a 18+ una gratuita le quita la marca. | Vigente | 021 RF-1 a RF-3 |
+| RN-218 | **Lo gratis solo da gratis**: el sobre cada 12 h, el del día 7 y el sobre de expedición solo salen de colecciones gratuitas publicadas. Sin ninguna, esas fuentes no conceden, conservan lo pendiente y lo explican. | Vigente | 021 RF-4 a RF-7 |
+| RN-219 | La colección de bienvenida puede ser gratuita o de Patreon (la probadita de las OCs). | Vigente | 021 RF-8 |
+| RN-220 | A quien no es patron, cada colección de Patreon que ve (lista, álbum de la colección, «Mis sobres») le dice que llega con la suscripción, con enlace a la página de Patreon (`PATREON_PAGE_URL`). Probabilidades indica cómo se consigue cada colección. | Vigente | 021 RF-9, RF-10 |
+| RN-221 | **Patron** = membresía de Patreon activa y pagada en un tier con reglas de sobres (un tier «Free» no cuenta). Tiene insignia en su cuenta y en su álbum público mientras dure; se quita en la siguiente lectura de la membresía. | Vigente | 021 RF-11, RF-12 |
+| RN-222 | El patron tiene 3 espacios de expedición en lugar de 2 (excepción deliberada a «sin ventajas por pagar»). Al dejar de serlo, las que están fuera terminan y no envía otra hasta tener menos de 2 en curso. A quien no es patron se le dice cómo conseguir el tercero. | Vigente | 021 RF-13 a RF-15 |
+| RN-223 | Al añadir una regla de tier, el panel propone 8 sobres al mes. Valores de arranque: SFW 8; 18+: 8 SFW + 8 adultos. | Vigente | 021 RF-16 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
 |---|---|
 | Sobre de bienvenida | 1, de la colección elegida en el panel |
-| Sobres al mes por regla de tier | 1 a 50 |
+| Sobres al mes por regla de tier | 1 a 50 (8 por defecto) |
 | Regalo del panel | 1 a 20 sobres, motivo de 3 a 200 caracteres |
 | Cartas por sobre | 1 a 10 (5 por defecto) |
 | Probabilidad de holo (rara o mejor) | 20 % por defecto, configurable |
@@ -287,7 +302,7 @@ y su RNG; no hay forma de pagar para avanzar.
 | Código de colección | 2 a 8 letras o números |
 | Idioma por defecto | inglés |
 | Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |
-| Expediciones | 2 espacios; equipos de 1 a 3 cartas; 30 min, 2 h u 8 h; vínculo hasta nivel 10 |
+| Expediciones | 2 espacios (3 el patron); equipos de 1 a 3 cartas; 30 min, 2 h u 8 h; vínculo hasta nivel 10 |
 | Racha diaria | 10, 10, 15, 15, 20, 20 galletas y un sobre el día 7; 1 día de gracia |
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
 | Edad mínima de la web | 16 o 18 años, la elige el administrador (16 por defecto); 18+ y tier adulto para el contenido adulto |
