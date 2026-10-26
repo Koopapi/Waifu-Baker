@@ -48,7 +48,7 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
     }).toPass({ timeout: 30_000 });
   });
 
-  await test.step("RF-8: la bienvenida es la colección de Patreon (la probadita) y el tier SFW da sobres de ella", async () => {
+  await test.step("RF-8 y RF-16: la bienvenida es la colección de Patreon (la probadita) y la regla del tier SFW propone 8 sobres", async () => {
     await admin.goto(`/admin/sets/${patreon}`);
     await admin.waitForLoadState("networkidle");
     await admin.click(`text=${es.admin.set.welcome.make}`);
