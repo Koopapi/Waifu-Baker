@@ -14,4 +14,4 @@ La constitución (principio 9) pide 60 fps en Pixel 6a e iPhone 12. La firma el 
 | 7 | Con «Reducir movimiento» activado | El mapa no se mueve, las frases salen todas a la vez y nada vuela | |
 | 8 | Revisar textos y el mapa en inglés y español | Nada se corta ni se sale | |
 
-Firma del dueño: ____________ Fecha: ____________
+Probado por el dueño en su teléfono (demo por túnel HTTPS, giroscopio incluido): «todo funcionó correctamente». Fecha: 25 oct 2026.
