@@ -71,6 +71,8 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
       ["18+ (desarrollo)", "PAT1A · Colección PAT1A (18+)"],
     ]) {
       await choose(admin, es.admin.tiers.setAria(tier), label);
+      // Spec 021 (RF-16): el panel propone 8 sobres al mes; esta prueba cuenta con 3.
+      await admin.locator(`form:has(label:text-is("${es.admin.tiers.setAria(tier)}")) input[name="packsPerMonth"]`).fill("3");
       await admin.locator(`form:has(label:text-is("${es.admin.tiers.setAria(tier)}")) >> text=${es.admin.tiers.addSet}`).click();
       await expect(admin.locator(`text=${es.admin.tiers.saved}`).first()).toBeVisible();
     }

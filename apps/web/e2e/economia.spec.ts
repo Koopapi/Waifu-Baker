@@ -51,6 +51,12 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
     await admin.waitForLoadState("networkidle");
     await admin.click(`text=${es.admin.set.welcome.make}`);
     await expect(admin.locator(`text=${es.admin.set.welcome.isWelcome}`)).toBeVisible();
+    await expect(admin.locator('[data-testid="toast"][data-kind="success"]')).toBeVisible();
+    // Tras guardar, la página pide sus datos de nuevo y en WebKit esa recarga puede cortar la navegación siguiente.
+    await expect(async () => {
+      await admin.goto("/admin/sets");
+      await expect(admin.locator('[data-testid="welcome-badge"]')).toHaveCount(1, { timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
     await admin.goto("/admin/tiers");
     await admin.waitForLoadState("networkidle");
     await choose(admin, es.admin.tiers.setAria("SFW (desarrollo)"), "ECO2 · Colección ECO2");

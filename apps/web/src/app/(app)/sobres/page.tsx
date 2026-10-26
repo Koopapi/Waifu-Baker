@@ -102,8 +102,6 @@ export default async function MisSobresPage() {
                         <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
                       </div>
                     </div>
-                    {/* Spec 021, RF-9: cómo conseguir más sobres de una colección de Patreon. */}
-                    {!g.isFree && !g.locked && !patron && <PatreonNotice compact text={t.packs.mine.patreonMore} linkLabel={t.collection.patreon.link} url={patreonUrl} />}
                     {g.locked ? (
                       <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
                     ) : (
@@ -118,6 +116,8 @@ export default async function MisSobresPage() {
                         )}
                       </div>
                     )}
+                    {/* Spec 021, RF-9: cómo conseguir más sobres de una colección de Patreon (al final: las pruebas cuentan los enlaces de abrir). */}
+                    {!g.isFree && !g.locked && !patron && <PatreonNotice compact text={t.packs.mine.patreonMore} linkLabel={t.collection.patreon.link} url={patreonUrl} />}
                   </div>
                 </div>
               </li>
