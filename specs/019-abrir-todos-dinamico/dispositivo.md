@@ -10,4 +10,4 @@ La constitución (principio 9) pide 60 fps en Pixel 6a e iPhone 12. La firma el 
 | 4 | Revisar el resumen | Grupos por rareza con su cuenta, repetidas con «×N», nuevas y holo marcadas, totales arriba | |
 | 5 | Con «Reducir movimiento» activado | Sin ráfaga; el foco con imágenes fijas | |
 
-Firma del dueño: ____________ Fecha: ____________
+Probado por el dueño en su teléfono (demo por túnel HTTPS, giroscopio incluido): «todo funcionó correctamente». Fecha: 25 oct 2026.

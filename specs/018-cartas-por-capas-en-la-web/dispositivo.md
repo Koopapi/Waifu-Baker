@@ -16,4 +16,4 @@ Con la demo abierta en el teléfono (misma red Wi-Fi que la computadora: `http:/
 | 7 | Una carta holo (si hay) | Brillo arcoíris encima, en la viva y en la miniatura | |
 | 8 | Activar «Reducir movimiento» del teléfono y abrir la ficha | Se ve la imagen fija, sin animación | |
 
-Firma del dueño: ____________ Fecha: ____________
+Probado por el dueño en su teléfono (demo por túnel HTTPS, giroscopio incluido): «todo funcionó correctamente». Fecha: 25 oct 2026.
