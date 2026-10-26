@@ -38,8 +38,10 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
     await admin.click(`text=${es.admin.set.free.make}`);
     await expect(admin.locator('[data-testid="free-toggle"]')).toContainText(es.admin.set.free.isFree);
     await expect(admin.locator('[data-testid="toast"][data-kind="success"]')).toBeVisible();
+    const saved = admin.waitForResponse((r) => r.request().method() === "POST" && Boolean(r.request().headers()["next-action"]));
     await admin.click(`text=${es.admin.set.free.remove}`);
     await expect(admin.locator('[data-testid="free-toggle"]')).toContainText(es.admin.set.free.isPatreon);
+    await saved;
     await expect(async () => {
       await admin.goto("/admin/sets");
       await expect(admin.getByText(es.admin.set.free.badgeFree, { exact: true })).toHaveCount(1, { timeout: 2_000 });
@@ -81,10 +83,14 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
   await test.step("RF-4: el sobre gratis solo ofrece la colección gratuita", async () => {
     await fan.goto("/recompensas");
     const panel = fan.locator('[data-testid="free-pack"]');
-    await panel.getByRole("combobox", { name: es.rewards.free.chooseSet }).click();
-    await expect(fan.getByRole("option", { name: "ECO1 · Colección ECO1" }).first()).toBeVisible();
+    const option = fan.getByRole("option", { name: "ECO1 · Colección ECO1" }).first();
+    // Un clic antes de que la página termine de hidratarse no abre la lista: se vuelve a pulsar hasta que aparece.
+    await expect(async () => {
+      if (!(await option.isVisible())) await panel.getByRole("combobox", { name: es.rewards.free.chooseSet }).click();
+      await expect(option).toBeVisible({ timeout: 3_000 });
+    }).toPass({ timeout: 60_000 });
     await expect(fan.getByRole("option", { name: /ECO2/ })).toHaveCount(0);
-    await fan.getByRole("option", { name: "ECO1 · Colección ECO1" }).first().click();
+    await option.click();
     await panel.getByRole("button", { name: es.rewards.free.claim }).click();
     await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.rewards.fx.sr.gotPack);
     await fan.goto("/sobres");

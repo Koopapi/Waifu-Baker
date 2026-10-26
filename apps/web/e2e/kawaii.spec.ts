@@ -130,6 +130,8 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await shot(fan, "5-recompensas");
     await fan.goto("/sobres");
     await expect(fan.locator('[role="progressbar"]').first()).toBeVisible();
+    // En WebKit, «Mis sobres» aún puede estar recargando (marca los sobres como vistos) y cortaría la navegación siguiente.
+    await fan.waitForLoadState("networkidle");
   });
 
   await test.step("RF-18 y RF-20: «Mi colección» con portada y datos; el contador no tapa el símbolo", async () => {
