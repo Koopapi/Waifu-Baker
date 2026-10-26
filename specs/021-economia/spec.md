@@ -1,6 +1,6 @@
 # Spec 021 — Economía: colecciones gratuitas y de Patreon, probadita y beneficios de patron
 
-Estado: borrador para aprobación del dueño (25 oct 2026).
+Estado: aprobada por el dueño el 25 oct 2026, con las decisiones derivadas.
 
 ## Contexto y objetivo
 Hoy cualquier colección publicada sale en todas las fuentes gratis (sobre cada 12 h, día 7, expediciones), así que un
@@ -103,7 +103,7 @@ espacio con membresía simulada y su pérdida; demo manual del dueño.
 - Probaditas: bienvenida (OCs) y 1 sobre de Patreon a la semana en la tienda (spec 022).
 - Tiers: 8 SFW; 18+: 8 SFW + 8 adultos.
 - Patron: insignia, cosméticos exclusivos (spec 022) y tercer espacio de expedición; sin acceso anticipado.
-- Derivadas, para que el dueño las confirme al aprobar: de Patreon por defecto al crear una colección; la insignia se
+- Derivadas, confirmadas por el dueño al aprobar: de Patreon por defecto al crear una colección; la insignia se
   quita en la siguiente lectura de la membresía (hasta 15 minutos, spec 001); con 3 expediciones en curso al dejar el
   tier, terminan las tres.
 
