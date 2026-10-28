@@ -1,6 +1,6 @@
 # Spec 022 — Rarezas y sobres plata y gold
 
-Estado: borrador para aprobación del dueño (28 oct 2026).
+Estado: aprobada por el dueño el 28 oct 2026, con las decisiones derivadas.
 
 ## Contexto y objetivo
 La economía versión 2 (`docs/economia.md`, 27 oct 2026) cambia la base de todo lo demás: pasa de seis rarezas a cinco
@@ -81,7 +81,7 @@ mala suerte solo en plata, plata y gold visibles en la web, Probabilidades y pan
 - Plata garantiza rara o mejor; gold, épica o mejor.
 - Los dos sobres tienen el mismo número de cartas (5 por defecto).
 - Protección de mala suerte solo en plata, sin cambios.
-- Derivadas, para que el dueño las confirme al aprobar: poco común pasa a común y secreta a EX; los 5 marcos nuevos se
+- Derivadas, confirmadas por el dueño al aprobar: poco común pasa a común y secreta a EX; los 5 marcos nuevos se
   diseñan en Pencil dentro de esta spec y se aprueban con las maquetas; la probabilidad de holo se fija por tabla y vale
   para todas las rarezas; hasta las specs 023 y 026, todas las fuentes actuales dan sobres plata.
 
