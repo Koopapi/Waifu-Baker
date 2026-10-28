@@ -125,3 +125,11 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   componentes de servidor, así que una página pública solo debe consultar lo mínimo (la consulta de patron leía el
   identificador de Patreon y salía en el álbum público; corregido). Pendiente: demo del dueño. La spec 022 (tienda)
   está redactada sobre la 021 y espera aprobación.
+- 27 oct 2026: **economía versión 2** definida por el dueño (`docs/economia.md`): 5 rarezas con holo (común plana; rara,
+  épica, legendaria y EX con parallax y efectos crecientes), sobres plata y gold, galletas (cosméticos y relojes) y
+  diamantes (sobres; solo se ganan), botín de expedición al azar, repetidas para subir de nivel o hacer polvo y fabricar,
+  y cuatro tiers de Patreon (booster y premium 1 a 3). Decisiones: los diamantes nunca se compran con dinero; EX es la
+  rareza máxima y sigue siendo sugerente; se quita la separación de colecciones gratuitas y de Patreon de la spec 021
+  (se quedan la insignia y los 3 equipos); cualquier tier de pago desbloquea el 18+. La spec 022 «tienda» queda
+  sustituida. Nuevo orden: 022 rarezas y sobres plata/gold, 023 monedas y recompensas, 024 tiendas, 025 repetidas,
+  026 tiers de Patreon; después Street pop (027), publicar (028) y piloto (029).

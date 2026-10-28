@@ -1,68 +1,109 @@
-# Economía de Waifu Baker
+# Economía de Waifu Baker (versión 2)
 
-Decisiones del dueño del 25 de octubre de 2026, tomadas para que el juego se pueda monetizar: lo gratis retiene y hace
-de anzuelo; lo que se paga es lo que vale. Manda sobre cualquier spec anterior que diga otra cosa (009, 020).
+Definida por el dueño el 27 de octubre de 2026. Sustituye a la versión del 25 de octubre (spec 021): ya no hay
+colecciones gratuitas y de Patreon; la diferencia la marcan el tipo de sobre (plata o gold), las dos monedas y los
+tiers. Manda sobre cualquier spec anterior que diga otra cosa.
 
 ## Principios
 
-1. **Las galletas nunca se compran con dinero**, ni se venden, ni se intercambian (constitución, principio 7).
-2. **Lo gratis solo da gratis.** Toda fuente gratuita de sobres entrega sobres de colecciones marcadas como gratuitas.
-3. **Las colecciones de OCs son de Patreon.** Llegan con la suscripción; fuera de ella solo hay dos probaditas.
-4. **El patron se nota, pero no gana el juego.** Sus extras son de aspecto y comodidad; el sorteo, las probabilidades y
-   la rara garantizada son iguales para todos. Única excepción, decidida a propósito: el tercer espacio de expedición.
+1. **Nada del juego se compra con dinero fuera de Patreon.** Galletas y diamantes solo se ganan; no se venden, no se
+   cambian por dinero y no se intercambian (constitución, principio 7). Así no hay venta de sobres al azar por dinero.
+2. **Todos los sobres son de todas las colecciones** publicadas que el coleccionista puede ver (las 18+, con el doble
+   filtro).
+3. **Contenido:** sugerente, nunca explícito, también en la rareza EX; personajes inequívocamente adultos.
+4. **El patron se nota y avanza más cómodo**, pero el sorteo y las probabilidades publicadas son iguales para todos.
 
-## Colecciones
+## Rarezas
 
-| Tipo | Quién lo marca | Cómo se consigue |
+Cinco rarezas, cada una con su versión holo. Sustituyen a las seis anteriores.
+
+| Rareza | Cómo se ve | Antes |
 |---|---|---|
-| **Gratuita** (fan art de promoción, siempre SFW) | El administrador, en la colección | Sobre gratis cada 12 h, sobre del día 7, sobres de expedición, sobres baratos de la tienda |
-| **De Patreon** (OCs; SFW y 18+) | Por defecto | Sobres de la suscripción cada cobro; probaditas: el sobre de bienvenida y 1 sobre a la semana en la tienda, caro |
+| Común | Carta plana (sin parallax) | común y poco común |
+| Rara | Parallax | rara |
+| Épica | Parallax con efectos | épica |
+| Legendaria | Parallax con efectos dorados | legendaria |
+| EX | La más alta; parallax con el máximo de efectos | secreta |
 
-La colección de bienvenida es la de OCs SFW: el recién llegado toca lo bueno y quiere más.
+La holo existe en todas las rarezas, también en la común.
 
-## Fuentes de sobres
+## Sobres
 
-| Fuente | Colecciones | Cuánto |
-|---|---|---|
-| Bienvenida (001) | La elegida en el panel (OCs SFW) | 1 en toda la vida de la cuenta |
-| Suscripción (001) | De Patreon, según el tier | SFW: 8 al mes · 18+: 8 SFW + 8 adultos al mes |
-| Sobre gratis (009) | Gratuitas | 1 cada 12 h, hasta 2 acumulados |
-| Día 7 de la racha (009) | Gratuitas | 1 cada 7 días |
-| Expediciones (020) | Gratuitas | Al azar, con probabilidad publicada por zona y duración |
-| Tienda (022) | Gratuitas | 300 galletas, hasta 3 en 7 días |
-| Tienda (022) | De Patreon | 500 galletas, hasta 1 en 7 días |
-
-Los valores de precio, tope y sobres por tier se ajustan en el panel; estos son los de arranque.
-
-## Galletas
-
-- **Entran** por la racha diaria (90 cada 6 días), por Expediciones (botín fijo por zona y duración) y por ajustes del
-  administrador.
-- **Salen** por la tienda: cosméticos, sobres y «Volver ya» de Expediciones.
-- Un jugador activo gana del orden de 100 a 200 al día; un sobre gratuito cuesta 2 días de juego y uno de Patreon, 3 a 5.
-
-## Beneficios de patron
-
-Patron = coleccionista con un tier activo que tenga reglas de sobres (un tier «Free» no cuenta).
-
-| Beneficio | Dónde se ve |
+| Tipo | Para qué |
 |---|---|
-| Sobres de la suscripción | «Mis sobres», cada cobro |
-| Insignia de patron | Su cuenta y su álbum público, mientras el tier esté activo |
-| Cosméticos exclusivos | Línea de la tienda que no se compra con galletas; se equipan mientras haya tier activo |
-| Tercer espacio de expedición | 3 equipos a la vez en lugar de 2; al dejar el tier, terminan los que estén fuera |
+| **Plata** | El básico. |
+| **Gold** | Mayor probabilidad de legendaria y EX. |
 
-No hay acceso anticipado a sets (decidido en contra el 25 oct 2026).
+Cada colección publica dos tablas de probabilidad, una por tipo de sobre.
 
-## Cómo se convierte un jugador gratis
+| Fuente | Qué da |
+|---|---|
+| Temporizador | 2 sobres plata cada 24 h (premium: 3) |
+| Racha de 7 días | 1 sobre gold el día 7 (los días 1 a 6, galletas, como hoy) |
+| Expediciones | Sobre plata (poco común) y sobre gold (muy raro), al azar |
+| Tienda de diamantes | Sobres plata y gold |
+| Tiers de Patreon | Booster mensual |
+| Bienvenida | 1 sobre al entrar por primera vez |
 
-1. Entra por el fan art (gratis, reconocible) y recibe de bienvenida un sobre de OCs.
-2. Vuelve por el sobre cada 12 h, la racha y las expediciones; junta galletas y las gasta en cosméticos y sobres gratuitos.
-3. Cada colección de Patreon que ve (lista, álbum, «Mis sobres», probabilidades) le dice que llega con la suscripción,
-   con enlace a Patreon; una vez a la semana puede comprar una probadita con galletas.
-4. Al suscribirse: 8 sobres de OCs al mes, insignia, cosméticos exclusivos y el tercer espacio.
+## Monedas
 
-## Pendiente de confirmar fuera del código
+| Moneda | Se gana con | Se gasta en |
+|---|---|---|
+| **Galletas** | Racha diaria, expediciones | Tienda de galletas: cosméticos y relojes |
+| **Diamantes** | Expediciones (muy raro) | Tienda de diamantes: sobres plata y gold |
+| **Polvo** | Convertir cartas repetidas | Fabricar una carta concreta que falte |
 
-- Reglas de Patreon sobre mecánicas al azar en páginas 18+ (anotado por Bruno): preguntar antes de lanzar.
-- Precios de los tiers: los fija el dueño en Patreon.
+## Expediciones
+
+Siguen como en la spec 020 (zonas, terreno, rol, calificación, vínculo), pero el botín pasa a ser al azar, con
+probabilidades publicadas por zona y duración: galletas, fragmentos de mapa (raro), sobre plata (poco común), sobre gold
+(muy raro) y diamantes (muy raro). La calificación y los roles mejoran las probabilidades o las cantidades.
+
+- **Vínculo:** sube de nivel con las expediciones (como en la 020).
+- **Relojes** (tienda de galletas): acortan una expedición en curso.
+- Patron: 3 equipos en vez de 2.
+
+## Tiendas
+
+**Tienda de galletas:** fondos (del álbum), fundas (de las cartas), marcos para el avatar, fondo de las colecciones y
+relojes para expediciones. Los cosméticos solo cambian el aspecto.
+
+**Tienda de diamantes:** sobres plata y sobres gold.
+
+## Cartas repetidas
+
+- **Subir de nivel:** cada copia repetida de la misma carta sube su nivel; cada nivel da +5 % de poder en
+  expediciones, hasta nivel 5. La holo lleva su propio nivel.
+- **Convertir en polvo:** las repetidas se convierten en polvo según su rareza; con polvo se fabrica una carta concreta
+  que falte (más cara cuanto más rara). No se fabrican cartas EX ni la carta del mes.
+
+## Tiers de Patreon
+
+Cualquier tier de pago, con la edad declarada, desbloquea las colecciones 18+.
+
+| Beneficio | Booster | Premium 1 | Premium 2 | Premium 3 |
+|---|---|---|---|---|
+| Booster mensual | 10 plata + 3 gold | 10 plata + 3 gold | 10 plata + 3 gold | 12 plata + 4 gold |
+| Insignia de premium | | ✓ | ✓ | ✓ |
+| 3 equipos de expedición | | ✓ | ✓ | ✓ |
+| +1 sobre plata al día en el temporizador | | ✓ | ✓ | ✓ |
+| Cosmético exclusivo del mes | | ✓ | ✓ | ✓ |
+| 3 escudos de racha al mes | | ✓ | ✓ | ✓ |
+| Encuestas exclusivas en Patreon | | | voto ×2 | voto ×3 |
+| Carta del mes coleccionable única | | | | ✓ |
+
+Las encuestas se hacen en Patreon, fuera de la web. El **escudo de racha** salva un día sin reclamar sin perder la
+racha. La **carta del mes** se entrega a quien tenga Premium 3 activo ese mes y no se consigue de otra forma.
+
+## Valores por fijar en las specs
+
+Se proponen con un simulador y el dueño los ajusta en el panel: probabilidades de los sobres plata y gold, precios en
+diamantes, probabilidades y cantidades del botín de expedición, precios de los cosméticos y relojes, polvo por
+rareza y coste de fabricar.
+
+## Fuera, por ahora
+
+- Comprar galletas o diamantes con dinero.
+- Contenido explícito.
+- Intercambio entre jugadores.
+- Premio por completar una colección.
