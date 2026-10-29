@@ -128,7 +128,8 @@ export async function giftPacks(page: Page, userName: string, code: string, coun
 export async function tear(page: Page) {
   await page.waitForSelector(".pack__strip");
   await page.waitForLoadState("networkidle");
-  if (await page.locator(".pack__cta").isVisible()) {
+  // Spec 023: «Abrir sin deslizar» está siempre; con movimiento reducido es la única forma de abrir.
+  if (await page.locator(".tear--reduced").count()) {
     await page.click(".pack__cta");
     return;
   }
@@ -211,4 +212,27 @@ export async function openAllAndSkip(page: Page): Promise<number> {
     await page.waitForTimeout(100);
   }
   return Number(await page.locator('[data-testid="open-all-totals"] dd').first().textContent());
+}
+
+/** Spec 023: revela (voltea y presenta) la carta de arriba del mazo. */
+export async function revealTop(page: Page) {
+  await page.locator('.card3d[role="button"]').first().click();
+  await expect(page.locator('[data-testid="reveal-info"]')).toBeVisible();
+}
+
+/** Spec 023: aparta la carta presentada (con la última, llega el resumen). */
+export async function dismissTop(page: Page) {
+  await page.locator('.card3d[role="button"]').first().click();
+  await expect(page.locator('[data-testid="reveal-info"]')).toHaveCount(0);
+}
+
+/** Spec 023: revela y aparta todas las cartas del mazo hasta el resumen. */
+export async function openDeck(page: Page) {
+  await expect(page.locator('.stage[data-phase="deck"]')).toBeVisible();
+  const n = await page.locator(".card3d").count();
+  for (let k = 0; k < n; k++) {
+    await revealTop(page);
+    await dismissTop(page);
+  }
+  await expect(page.locator(".summary")).toBeVisible();
 }

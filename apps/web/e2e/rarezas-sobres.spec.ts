@@ -5,7 +5,7 @@
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, choose, createPublishedSet, dismissCelebration, giftPacks, login, openAllAndSkip, tear } from "./helpers";
+import { choose, createPublishedSet, dismissCelebration, giftPacks, LAB, login, openAllAndSkip, openDeck, tear } from "./helpers";
 
 const es = dictionaries.es;
 
@@ -31,13 +31,10 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
     await expect(gold.getByLabel(es.admin.odds.pityAria)).toHaveCount(0);
     await admin.click('[data-testid="simulate-gold-link"]');
     await admin.waitForURL(/simulate\?k=gold$/);
-    await expect(admin.locator(".pack")).toContainText(`GOLD · ${code}`);
+    // Spec 023: el simulador usa el mismo sobre, con su foil gold.
+    await expect(admin.locator('[data-testid="tear-pack"] .pack-shell[data-kind="gold"]')).toBeVisible();
     await tear(admin);
-    await expect(admin.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    for (let i = 1; i <= 2; i++) {
-      await admin.locator('.card3d[role="button"]').first().click();
-      if (i < 2) await expect(admin.locator(`.stage[data-revealed="${i}"]`)).toBeVisible();
-    }
+    await openDeck(admin);
     await expect(admin.locator(".summary__row")).toHaveCount(2);
     for (const row of await admin.locator(".summary__row").all()) await expect(row).toContainText(`${code} carta gold`);
   });
@@ -69,12 +66,7 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
     await fan.waitForURL(/\?k=gold$/);
     await expect(fan.locator('[data-testid="pack-kind"][data-kind="gold"]')).toBeVisible();
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    for (let i = 1; i <= 2; i++) {
-      await fan.locator('.card3d[role="button"]').first().click();
-      if (i < 2) await expect(fan.locator(`.stage[data-revealed="${i}"]`)).toBeVisible();
-    }
-    await expect(fan.locator(".summary")).toBeVisible();
+    await openDeck(fan);
     for (const row of await fan.locator(".summary__row").all()) await expect(row).toContainText(`${code} carta gold`);
   });
 

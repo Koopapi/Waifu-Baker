@@ -5,7 +5,7 @@ import type { Locator, Page } from "@playwright/test";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, choose, createPublishedSet, giftPacks, login, tear } from "./helpers";
+import { choose, createPublishedSet, dismissTop, giftPacks, LAB, login, revealTop, tear } from "./helpers";
 
 const es = dictionaries.es;
 
@@ -37,10 +37,11 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   await test.step("RF-5, RF-8 y RF-19: «Mis sobres» muestra el sobre compuesto con la portada y el plural correcto", async () => {
     await fan.goto("/packs");
     await expect(fan.getByText("Tienes 3 sobres sin abrir.")).toBeVisible();
-    const art = fan.locator('[data-testid="group-KAW1"] .pack-art');
+    // Spec 023: el sobre nuevo (`PackShell`) con la portada en su ventana y una línea de dientes.
+    const art = fan.locator('[data-testid="group-KAW1"] .pack-shell');
     await expect(art.locator('img[src*="k=cover"]')).toBeVisible();
     await expect.poll(() => art.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
-    await expect(art.locator(".pack-art__teeth")).toHaveCount(2);
+    await expect(art.locator(".pack-shell__teeth")).toHaveCount(1);
     // El texto de los botones de apertura cabe en el botón, también en pantalla ancha (dos columnas de tarjetas).
     const fits = async () => {
       const buttons = await fan.locator('[data-testid="group-KAW1"] a').all();
@@ -61,11 +62,11 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await admin.locator('[data-testid="pack-image-input"]').setInputFiles(path.join(LAB, "05.webp"));
     await expect(admin.getByText(es.admin.set.pack.uploaded)).toBeVisible();
     await fan.goto("/packs");
-    await expect(fan.locator('[data-testid="group-KAW1"] .pack-art--custom img[src*="k=pack"]')).toBeVisible();
+    await expect(fan.locator('[data-testid="group-KAW1"] .pack-shell__window img[src*="k=pack"]')).toBeVisible();
     await admin.getByRole("button", { name: es.admin.set.pack.remove }).click();
     await expect(admin.getByText(es.admin.set.pack.removed)).toBeVisible();
     await fan.goto("/packs");
-    await expect(fan.locator('[data-testid="group-KAW1"] .pack-art--custom')).toHaveCount(0);
+    await expect(fan.locator('[data-testid="group-KAW1"] .pack-shell__window img[src*="k=pack"]')).toHaveCount(0);
   });
 
   await test.step("RF-1 a RF-4 y RF-24: estilo kawaii con pegatinas y botones con relieve", async () => {
@@ -78,12 +79,13 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
 
   await test.step("RF-8, RF-9, RF-11 y RF-15: la apertura con el sobre de la colección, destellos y agitado", async () => {
     await fan.locator('[data-testid="group-KAW1"]').getByRole("link", { name: es.packs.mine.openOne }).click();
-    await expect(fan.locator('[data-testid="pack-art"]')).toBeVisible();
+    // Spec 023: el sobre nuevo (con la imagen de la colección) se agita al tocar la tira sin arrastrar.
+    await expect(fan.locator('[data-testid="tear-pack"] .pack-shell')).toBeVisible();
     await expect(fan.locator(".sparkle").first()).toBeAttached();
     await fan.waitForLoadState("networkidle");
-    if (!(await fan.locator(".pack__cta").isVisible())) {
-      await fan.locator('[data-testid="pack-art"]').click();
-      await expect(fan.locator(".pack--shake")).toBeAttached();
+    if (!(await fan.locator(".tear--reduced").count())) {
+      await fan.locator(".tear__hit").click();
+      await expect(fan.locator(".tear--shake")).toBeAttached();
     }
     // El texto de ayuda no se monta sobre el selector de idioma ni sobre los botones.
     const hint = fan.locator(".hint");
@@ -94,21 +96,22 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
 
   await test.step("RF-9, RF-10, RF-12 a RF-14: dorso kawaii, brillo antes de la rara, confeti y resumen con miniaturas", async () => {
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
     await expect(fan.locator(".card3d__backart b").first()).toHaveText("WB");
-    // Primera carta (común): sin brillo ni confeti.
+    // Primera carta (común, el mazo va de menor a mayor rareza): sin brillo ni confeti.
     await expect(fan.locator(".card3d--tease")).toHaveCount(0);
-    await fan.locator('.card3d[role="button"]').first().click();
-    await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
+    await revealTop(fan);
     // Sin recuadro de foco al tocar.
     expect(await fan.locator(".card3d").first().evaluate((el) => getComputedStyle(el).outlineStyle)).toBe("none");
+    await dismissTop(fan);
     // Segunda carta (rara): brilla antes de voltearse y lanza confeti al revelarse.
     await expect(fan.locator(".card3d--tease")).toHaveCount(1);
     await shot(fan, "3-brillo");
-    await fan.locator('.card3d[role="button"]').first().click();
+    await revealTop(fan);
     const reduced = test.info().project.name === "reduced-motion";
     if (!reduced) await expect(fan.locator('[data-testid="confetti"]')).toBeAttached();
     await expect(fan.locator('[data-testid="celebration"]')).toHaveCount(0);
+    await dismissTop(fan);
     await expect(fan.locator(".summary")).toBeVisible();
     await expect(fan.locator(".summary__thumb img")).toHaveCount(2);
     await expect(fan.locator(".summary__row").first()).toContainText("¡Nueva!");
@@ -117,7 +120,7 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
 
   await test.step("RF-8: «Abrir todos» muestra el mismo sobre", async () => {
     await fan.goto(`/packs/${setId}/all`);
-    await expect(fan.locator(".pack-art img[src*='k=cover']")).toBeVisible();
+    await expect(fan.locator(".pack-shell img[src*='k=cover']")).toBeVisible();
   });
 
   await test.step("RF-16 y RF-17: recompensas con anillo y racha de pegatinas sin desbordes", async () => {

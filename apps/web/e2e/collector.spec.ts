@@ -2,7 +2,7 @@
 // tras recargar → «Abrir todos» → la colección refleja las cartas y las repetidas suman.
 import { expect, test } from "./fixtures";
 import path from "node:path";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, tear, openAllAndSkip } from "./helpers";
+import { createPublishedSet, dismissCelebration, giftPacks, LAB, login, openAllAndSkip, openDeck, tear } from "./helpers";
 
 test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
@@ -31,16 +31,13 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-16, RF-11 y RF-20: abrir un sobre con la animación y las cartas reales", async () => {
     await fan.click('[data-testid="group-COL1"] >> text=Abrir un sobre');
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
     const img = fan.locator(".card3d img").first();
     firstImage = (await img.getAttribute("src"))!;
     expect(firstImage).toMatch(/^\/api\/cards\/img\?c=.+&s=mid&e=\d+&sig=[0-9a-f]{64}$/);
     // Spec 018: la imagen fija de la carta por capas (700 × 991).
     await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(700);
-    await fan.locator('.card3d[role="button"]').first().click();
-    await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
-    await fan.locator('.card3d[role="button"]').first().click();
-    await expect(fan.locator(".summary")).toBeVisible();
+    await openDeck(fan);
     await expect(fan.locator(".summary__row")).toHaveCount(2);
     await expect(fan.locator(".summary__row").first()).toContainText("¡Nueva!");
     await expect(fan.locator('[data-testid="open-another"]')).toHaveText("Abrir otro (3)");
@@ -55,23 +52,19 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-17: recargar a mitad de una apertura la recupera sin abrir otro sobre", async () => {
     await fan.click('[data-testid="open-another"]');
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
     await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
     await fan.click('[data-testid="pending-opening"]');
     // En WebKit, la navegación del enlace puede seguir en curso: se espera a que termine antes de seguir.
     await fan.waitForURL(/\?pack=/);
     await fan.waitForLoadState("networkidle");
-    await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    // Spec 023, RF-22: se retoma directamente en el mazo, sin volver a rasgar.
+    await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
     // Al llegar al resumen se marca la apertura como vista (acción en segundo plano): se espera su respuesta antes de
     // salir, o WebKit la corta al navegar y la apertura sigue pendiente.
     const acked = fan.waitForResponse((r) => r.request().method() === "POST" && Boolean(r.request().headers()["next-action"]));
-    for (let k = 0; k < 2; k++) {
-      await fan.locator('.card3d[role="button"]').first().click();
-      await expect(fan.locator(`.stage[data-revealed="${k + 1}"]`)).toBeVisible();
-    }
-    await expect(fan.locator(".summary")).toBeVisible();
+    await openDeck(fan);
     await acked;
     await fan.goto("/packs");
     await expect(fan.locator('[data-testid="pending-opening"]')).toHaveCount(0);
@@ -115,11 +108,14 @@ test("teclado: abrir un sobre y voltear las cartas sin ratón", async ({ browser
   await fan.waitForLoadState("networkidle");
   await fan.locator(".pack__strip").focus();
   await fan.keyboard.press("Enter");
-  await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+  await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
   await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
-  await fan.keyboard.press("Enter");
-  await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
-  await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
+  // Spec 023, RF-19: Intro o Espacio revelan la de arriba y, otra vez, la apartan.
+  for (const key of ["Enter", " ", "Enter"]) {
+    await fan.keyboard.press(key);
+    await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
+  }
+  await expect(fan.locator('[data-testid="reveal-info"]')).toBeVisible();
   await fan.keyboard.press(" ");
   await expect(fan.locator(".summary")).toBeVisible();
 });
