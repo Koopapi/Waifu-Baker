@@ -41,11 +41,10 @@ export const common = {
   toast: { rewardClaimed: "Claimed!", saved: "All set", failed: "That didn’t work", opened: "Cards revealed" },
   rarity: {
     common: "Common",
-    uncommon: "Uncommon",
     rare: "Rare",
     epic: "Epic",
     legendary: "Legendary",
-    secret: "Secret",
+    ex: "EX",
   },
   aiNotice: "Card illustrations are AI-generated. Cards are digital, have no monetary value and cannot be traded.",
   sessionExpired: "Your session has expired: please sign in again.",

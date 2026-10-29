@@ -52,7 +52,7 @@ export const packs = {
     focusHint: "Tap the card or \"Next\" to see the next one",
     openedTitle: (n: number) => `You opened ${n} ${plural(n, "pack", "packs")}`,
     totals: { cards: "Cards", fresh: "New", holo: "Holo" },
-    group: { common: "Commons", uncommon: "Uncommons", rare: "Rares", epic: "Epics", legendary: "Legendaries", secret: "Secrets" },
+    group: { common: "Commons", rare: "Rares", epic: "Epics", legendary: "Legendaries", ex: "EX" },
     copies: (n: number) => `×${n}`,
   },
   opener: {

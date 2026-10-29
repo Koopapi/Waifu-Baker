@@ -19,8 +19,11 @@ export const PATRON_SLOTS = 3;
 export const slotsFor = (patron: boolean) => (patron ? PATRON_SLOTS : SLOTS);
 export const TEAM_MAX = 3;
 
-/** RF-11: con el terreno a ×1.5, una carta en su terreno supera a otra dos rarezas por encima fuera del suyo. */
-export const RARITY_POWER: Record<Rarity, number> = { common: 10, uncommon: 12, rare: 14, epic: 17, legendary: 20, secret: 24 };
+/**
+ * RF-11: con el terreno a ×1.5, una carta en su terreno supera a otra dos rarezas por encima fuera del suyo. Spec 022:
+ * cinco rarezas (15 > 14, 18 > 17, 21 > 20).
+ */
+export const RARITY_POWER: Record<Rarity, number> = { common: 10, rare: 12, epic: 14, legendary: 17, ex: 20 };
 export const TERRAIN_BONUS = 1.5;
 export const HOLO_BONUS = 1.15;
 export const BOND_BONUS_PER_LEVEL = 0.02;
