@@ -108,7 +108,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
     await toggle(fan, "en").click();
     await expect(fan.locator("h1")).toHaveText(en.collection.title);
     await fan.click('[data-testid="collection-I18N"] a');
-    await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText(en.collection.progress(2, 3));
+    await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText(en.collection.progress(2, 4));
     await expect(fan.locator('[data-testid="binder-grid"] img[alt="I18N carta 003"]')).toHaveCount(1);
   });
 
