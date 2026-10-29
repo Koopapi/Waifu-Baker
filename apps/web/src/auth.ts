@@ -1,5 +1,6 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { CredentialsSignin } from "next-auth";
 import type { Provider } from "next-auth/providers";
 import { db } from "@/db/client";
 import { isDevLoginEnabled, parseAdminIds, resolveRole, type Role } from "@/domain/auth/access";
@@ -10,6 +11,9 @@ import { syncOnLogin } from "@/server/services/membership";
 import { upsertUserFromLogin } from "@/server/services/users";
 import { grantWelcomePack } from "@/server/services/welcome";
 import { authLogger } from "@/server/auth/logger";
+import { adminPatreonId, verifyAdminCode } from "@/server/services/admin-accounts";
+import { ADMIN_STEP_COOKIE } from "@/server/auth/admin-step";
+import { now } from "@/server/clock";
 
 declare module "next-auth" {
   interface Session {
@@ -43,6 +47,31 @@ if (devLoginEnabled) {
   );
 }
 
+/** Spec 024: el motivo por el que no se aceptó el código del administrador. */
+export class AdminCodeError extends CredentialsSignin {
+  constructor(readonly reason: "invalid" | "locked" | "expired") {
+    super();
+    this.code = reason;
+  }
+}
+
+// Spec 024, RF-14: administradores con usuario, contraseña y código de Telegram. La contraseña ya se comprobó en el
+// paso anterior (cookie `wb_admin_step`); aquí se comprueba el código y se abre la sesión.
+providers.push(
+  Credentials({
+    id: "admin",
+    name: "Administrador",
+    credentials: { code: { label: "Código" } },
+    async authorize(c, request) {
+      const cookie = request.headers.get("cookie") ?? "";
+      const pending = decodeURIComponent(cookie.match(new RegExp(`(?:^|; )${ADMIN_STEP_COOKIE}=([^;]+)`))?.[1] ?? "");
+      const r = await verifyAdminCode(db, { pending, code: String(c?.code ?? ""), now: now() });
+      if (r.status !== "ok") throw new AdminCodeError(r.status);
+      return { id: adminPatreonId(r.username), name: r.username, adminUserId: r.userId } as { id: string; name: string };
+    },
+  }),
+);
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   session: { strategy: "jwt" },
@@ -50,6 +79,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/login" },
   callbacks: {
     async jwt({ token, user, account }) {
+      if (account && user && account.provider === "admin") {
+        // Spec 024: la cuenta de administrador ya existe con su usuario del juego; sin Patreon ni bienvenida.
+        token.uid = (user as { adminUserId?: string }).adminUserId;
+        token.role = "admin";
+        return token;
+      }
       if (account && user) {
         const patreonUserId = account.provider === "dev" ? String(user.id) : account.providerAccountId;
         const role = resolveRole({

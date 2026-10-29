@@ -75,7 +75,7 @@ describe("spec 007 — copias de seguridad", () => {
   it("test_s007_rf16_una_copia_fallida_queda_registrada", async () => {
     const { runBackup, backupStatus } = await import("@/server/services/backups");
     await inRollback(async (tx) => {
-      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: "/no/existe", outDir: "/tmp/wb-it-out", passphrase: null });
+      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: "/no/existe", outDir: "/tmp/wb-it-out", passphrase: null, r2: null });
       expect(r.ok).toBe(false);
       const s = await backupStatus(tx);
       expect(s.lastFailure?.error).toMatch(/BACKUP_PASSPHRASE/);
@@ -89,7 +89,7 @@ describe("spec 007 — copias de seguridad", () => {
     const { runBackup, backupStatus } = await import("@/server/services/backups");
     const dir = await mkdtemp(path.join(tmpdir(), "wb-it-ok-"));
     await inRollback(async (tx) => {
-      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: path.join(dir, "cards"), outDir: path.join(dir, "out"), passphrase: "clave-de-prueba-larga" });
+      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: path.join(dir, "cards"), outDir: path.join(dir, "out"), passphrase: "clave-de-prueba-larga", r2: null });
       expect(r.ok).toBe(true);
       const s = await backupStatus(tx);
       expect(s.lastOk?.file).toMatch(/^wb-backup-.*\.wbk$/);

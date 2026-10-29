@@ -53,6 +53,9 @@ export const errors: Record<string, Msg> = {
   patreon_unavailable: "Patreon no está configurado o no respondió. Inténtalo más tarde.",
 
   // Genéricos con varios significados: un parámetro distingue cada caso.
+  // Spec 024: cuentas de administrador (comandos del servidor).
+  invalid_username: "Usuario no válido: de 3 a 32 letras minúsculas, números, punto o guion.",
+  username_taken: "Ya existe un administrador con ese usuario.",
   not_found: (p) =>
     ({
       user: "El usuario no existe.",
