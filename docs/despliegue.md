@@ -60,11 +60,12 @@ Variables de entorno (las marcadas con † también como variables de compilaci�
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` | los del bot | los mismos |
 | `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | los de R2 | vacías (pruebas no copia fuera) |
 | `SITE_NOINDEX` † | — | `1` |
+| `SITE_BASIC_AUTH` | — | `usuario:contraseña` compartidos (en el gestor) |
 | `CONTACT_EMAIL` | `hola@waifubaker.com` | igual |
 | `DEV_LOGIN`, `DEMO_MODE` | **nunca** | **nunca** |
 
-Pruebas lleva además autenticación básica en el proxy (etiquetas de Traefik de la aplicación en Coolify): usuario y
-contraseña compartidos, guardados en el gestor.
+Pruebas pide además una contraseña compartida (autenticación básica de la propia web con `SITE_BASIC_AUTH`); la
+comprobación de salud `/api/health` queda libre.
 
 Patreon: en el portal de clientes de Patreon, añadir `https://waifubaker.com/api/auth/callback/patreon` (y la de
 pruebas) como URL de redirección.
