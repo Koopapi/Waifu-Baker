@@ -822,7 +822,8 @@
 }
 .tear__tilt {
   position: relative;
-  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  /* Al tirar, el sobre se inclina hacia ese lado, como sujetándolo con la otra mano (--tug: -1 a 1). */
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) rotate(calc(var(--tug, 0) * 3.5deg)) translateX(calc(var(--tug, 0) * 2.4cqw));
   transform-style: preserve-3d;
 }
 .tear .tear__shell {
@@ -832,27 +833,109 @@
   position: absolute;
   inset: 0 0 auto;
   height: 17.6cqw;
+  transform-style: preserve-3d;
+}
+/* El blanco del papel que asoma en el corte (una tira blanca un poco más ancha, debajo de la de foil). */
+.tear__fiber {
+  background: #fffaf2 !important;
+  border-color: #fffaf2 !important;
+}
+.tear__fiber > *,
+.tear__fiber::after {
+  visibility: hidden;
+}
+.tear__fiber--rest {
+  clip-path: var(--rest-fiber, none);
 }
 .tear__rest {
   clip-path: var(--rest-clip, none);
 }
+.tear__fly {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* La tira arrancada se levanta y se curva hacia quien mira; por debajo se oscurece. */
+.tear__peel {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--cut, 50%) 100%;
+  transform: translateY(calc(var(--tear, 0) * -5cqw)) rotate(calc(var(--tug, 0) * 15deg)) rotateX(calc(var(--tear, 0) * -32deg));
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 calc(var(--tear, 0) * 4cqw) 3cqw rgb(0 0 0 / 0.45));
+}
+.tear__fiber--flap {
+  clip-path: var(--flap-fiber, none);
+}
 .tear__flap {
   clip-path: var(--flap-clip, none);
-  transform-origin: var(--cut, 50%) 100%;
-  transform: rotate(calc(var(--tear, 0) * 16deg)) translateY(calc(var(--tear, 0) * -7cqw));
-  filter: drop-shadow(0 3cqw 3cqw rgb(0 0 0 / 0.45));
+  filter: brightness(calc(1 - var(--tear, 0) * 0.28));
 }
-.tear--rtl .tear__flap {
-  transform: rotate(calc(var(--tear, 0) * -16deg)) translateY(calc(var(--tear, 0) * -7cqw));
+/* Trocitos de papel y foil que saltan en el punto de rotura y caen. */
+.tear__flake {
+  position: absolute;
+  width: var(--s);
+  height: calc(var(--s) * 0.7);
+  margin: calc(var(--s) * -0.35) 0 0 calc(var(--s) * -0.5);
+  border-radius: 1px;
+  background: #fffaf2;
+  pointer-events: none;
+  animation: tear-flake 0.75s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
 }
-/* RF-8: al completarse, la tira se arranca y cae fuera de la pantalla. */
-.tear--off .tear__flap {
-  transition: transform 0.5s cubic-bezier(0.4, 0, 0.8, 0.6), opacity 0.5s 0.1s;
-  transform: translate(-30cqw, 160cqw) rotate(-70deg);
-  opacity: 0;
+.tear__flake--foil {
+  background: linear-gradient(135deg, var(--strip-a), var(--strip-c));
 }
-.tear--off.tear--rtl .tear__flap {
-  transform: translate(30cqw, 160cqw) rotate(70deg);
+@keyframes tear-flake {
+  40% {
+    transform: translate(calc(var(--dx) * 0.6), var(--dy)) rotate(calc(var(--rot) * 0.4));
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), calc(var(--dy) + 90px)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+/* Al abrirse: un destello sale de la boca del sobre y el sobre rebota un poco. */
+.tear__burst {
+  position: absolute;
+  left: 50%;
+  top: 17.6cqw;
+  width: 130cqw;
+  height: 70cqw;
+  margin: -35cqw 0 0 -65cqw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(223 230 245 / 0.55) 40%, transparent 72%);
+  pointer-events: none;
+  animation: tear-burst 0.9s ease-out forwards;
+}
+.tear__burst.pack-shell--gold {
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(255 226 122 / 0.65) 38%, transparent 72%);
+}
+@keyframes tear-burst {
+  from {
+    opacity: 0;
+    transform: scale(0.2, 0.1);
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.25, 1);
+  }
+}
+.tear--off .tear__shell {
+  transform-origin: 50% 100%;
+  animation: tear-pop 0.5s ease-out;
+}
+@keyframes tear-pop {
+  30% {
+    transform: scale(1.03, 0.95);
+  }
+  65% {
+    transform: scale(0.99, 1.02);
+  }
 }
 /* La zona de agarre: un poco más grande que la tira, para el dedo. */
 .tear .tear__hit.pack__strip {
@@ -1045,12 +1128,13 @@
   .reveal-info__foot {
     animation: none;
   }
-  .tear-wrap,
-  .tear--off .tear__flap {
+  .tear-wrap {
     transition: none;
   }
-  .tear--off .tear__flap {
-    opacity: 0;
+  .tear--off .tear__shell,
+  .tear__burst,
+  .tear__flake {
+    animation: none;
   }
 }
 
