@@ -30,7 +30,7 @@ export const errors: Record<string, Msg> = {
   unknown: "Algo ha fallado. Inténtalo de nuevo.",
   welcome_not_allowed: "Solo una colección SFW publicada puede ser la de bienvenida.",
   choose_set: "Elige una colección.",
-  set_not_claimable: "Esa colección no está disponible para sobres gratis. Elige otra.",
+  set_not_claimable: "Esa colección no es gratuita: elige otra.",
   invalid_min_age: "La edad mínima solo puede ser 16 o 18 años.",
   album_hidden: "Tu álbum está oculto: cambia el alias y pide una revisión.",
   invalid_moderation_reason: "Elige un motivo de la lista.",

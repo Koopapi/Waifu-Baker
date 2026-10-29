@@ -21,7 +21,8 @@ async function apart(a: Locator, b: Locator) {
 test("demo kawaii: sobres, apertura con suspense, recompensas y colección", async ({ browser }) => {
   const admin = await login(browser, "admin-kawaii", true);
   // 3 cartas: 001 y 002 comunes y 003 rara; cada sobre trae 2 cartas, la segunda rara.
-  const setId = await createPublishedSet(admin, "KAW1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
+  // Spec 021: gratuita, como la colección de fan art de la demo (sale en las recompensas y sin aviso de Patreon).
+  const setId = await createPublishedSet(admin, "KAW1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
   await giftPacks(admin, "fan-kawaii", "KAW1", 3);
   const fan = await login(browser, "fan-kawaii", false, "/sobres");
 
@@ -129,6 +130,8 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await shot(fan, "5-recompensas");
     await fan.goto("/sobres");
     await expect(fan.locator('[role="progressbar"]').first()).toBeVisible();
+    // En WebKit, «Mis sobres» aún puede estar recargando (marca los sobres como vistos) y cortaría la navegación siguiente.
+    await fan.waitForLoadState("networkidle");
   });
 
   await test.step("RF-18 y RF-20: «Mi colección» con portada y datos; el contador no tapa el símbolo", async () => {

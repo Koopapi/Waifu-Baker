@@ -10,6 +10,7 @@ import {
   cardPower,
   lootFor,
   rateTeam,
+  slotsFor,
   teamPower,
   type TeamMember,
 } from "./rules";
@@ -94,5 +95,12 @@ describe("spec 020 — vínculo", () => {
   it("test_s020_rf20_la_experiencia_depende_de_la_duracion", () => {
     expect(DURATIONS).toEqual([30, 120, 480]);
     expect(DURATIONS.map((d) => BOND_XP[d])).toEqual([4, 12, 30]);
+  });
+});
+
+describe("spec 021 — espacios de patron", () => {
+  it("test_s021_rf13_el_patron_tiene_3_espacios_y_el_resto_2", () => {
+    expect(slotsFor(false)).toBe(2);
+    expect(slotsFor(true)).toBe(3);
   });
 });

@@ -24,7 +24,8 @@ async function claimDaily(p: Page) {
 
 test("sobres gratis con espera y recompensa diaria", async ({ browser, request }) => {
   const admin = await login(browser, "admin-rewards", true);
-  await createPublishedSet(admin, "FREE1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
+  // Spec 021: solo las colecciones gratuitas salen en el sobre cada 12 h y el día 7.
+  await createPublishedSet(admin, "FREE1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
   const fan = await login(browser, "fan-rewards", false, "/sobres");
   await reload(fan);
 

@@ -79,6 +79,12 @@ las cartas apiladas, en menta al volver. Preparar es una ventana con 3 huecos, l
 dificultad, la calificación como pastilla de color (Difícil rojo, Normal limón, Bien celeste, Excelente menta), las tres
 duraciones con su botín y el selector de cartas con filtros. El reporte saca las frases una a una.
 
+**Economía (spec 021, tablero «Economía (spec 021)»):** insignia de patron como pegatina chicle con corazón y borde
+blanco (`Badge` tono `patron`), junto al nombre en la cuenta y el álbum público. Aviso «llega con la suscripción» en
+acento suave con icono de destellos y enlace a Patreon, debajo de la tarjeta de colección, en el álbum de la colección
+y compacto en «Mis sobres»; en Expediciones, el tercer espacio bloqueado con candado. En el panel, etiqueta «Gratuita»
+(verde) o «Patreon» (acento) y un botón para cambiarla.
+
 ## Sistema de diseño (spec 011)
 
 El código vive en `apps/web/src/ui` y el diseño en `Waifu Baker/waifubaker.pen`, lámina «Sistema de diseño

@@ -23,9 +23,10 @@ import {
 import type { Rarity } from "@/domain/catalog/card-rules";
 import { hmacRng } from "@/domain/random";
 import { phraseCount, pickPhrases, rollPack } from "@/domain/expeditions/report";
-import { BOND_XP, SLOTS, TEAM_MAX, bondLevel, isDuration, lootFor, rateTeam, teamPower, type Role, type TeamMember, type Terrain } from "@/domain/expeditions/rules";
+import { BOND_XP, TEAM_MAX, bondLevel, isDuration, lootFor, rateTeam, slotsFor, teamPower, type Role, type TeamMember, type Terrain } from "@/domain/expeditions/rules";
 import type { DbLike } from "@/server/db-types";
 import { AppError, isUniqueViolation } from "@/server/errors";
+import { isPatronUser } from "./patron";
 import { claimableSet, claimableSets } from "./rewards";
 
 export interface CardChoice {
@@ -91,6 +92,8 @@ const openZoneIds = async (db: DbLike, userId: string) =>
 /** RF-3, RF-4 y RF-10: lo que ve el coleccionista en Expediciones. */
 export async function expeditionsHome(db: DbLike, userId: string, now: Date) {
   const user = await activeUser(db, userId);
+  // Spec 021, RF-13: el patron tiene un espacio más.
+  const patron = await isPatronUser(db, userId);
   const [zones, unlocked, [profile], mine, owned, busy] = await Promise.all([
     db.select().from(expeditionZones).where(eq(expeditionZones.active, true)).orderBy(asc(expeditionZones.sortOrder), asc(expeditionZones.name)),
     openZoneIds(db, userId),
@@ -124,7 +127,8 @@ export async function expeditionsHome(db: DbLike, userId: string, now: Date) {
       loot: z.loot,
       open: z.fragmentsRequired === 0 || unlocked.has(z.id),
     })),
-    slots: SLOTS,
+    slots: slotsFor(patron),
+    patron,
     expeditions: active.map((e) => ({ ...e, ready: e.endsAt.getTime() <= now.getTime() })),
     /** RF-22: reclamadas con sobre ganado y sin colección elegida. */
     pendingPacks: mine.filter((e) => e.status === "claimed" && e.result?.packWon && !e.result.packId),
@@ -160,8 +164,10 @@ export async function sendExpedition(db: DbLike, userId: string, input: { zoneId
       const [zone] = await tx.select().from(expeditionZones).where(eq(expeditionZones.id, input.zoneId));
       if (!zone || !zone.active) throw new AppError("not_found", "La zona no existe.", { entity: "zone" });
       if (zone.fragmentsRequired > 0 && !(await openZoneIds(tx, userId)).has(zone.id)) throw new AppError("zone_locked", "Esa zona sigue con niebla: ábrela con fragmentos de mapa.");
+      // Spec 021, RF-13 y RF-14: 3 espacios para el patron; al dejar de serlo, con 2 o más en curso no se envía otra.
+      const slots = slotsFor(await isPatronUser(tx, userId));
       const [{ n }] = await tx.select({ n: count() }).from(expeditions).where(and(eq(expeditions.userId, userId), eq(expeditions.status, "active")));
-      if (n >= SLOTS) throw new AppError("no_free_slot", `Tus ${SLOTS} espacios están ocupados: reclama o cancela una expedición.`, { slots: SLOTS });
+      if (n >= slots) throw new AppError("no_free_slot", `Tus ${slots} espacios están ocupados: reclama o cancela una expedición.`, { slots });
 
       const owned = await ownedCards(tx, userId, adultUnlocked(user));
       const picked = input.cards.map((c) => {

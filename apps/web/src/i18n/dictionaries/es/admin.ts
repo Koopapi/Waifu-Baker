@@ -94,6 +94,17 @@ export const admin: typeof en = {
       removed: "Sobre hecho a mano quitado: vuelve el sobre compuesto.",
       uploadFailed: "No se pudo subir la imagen.",
     },
+    free: {
+      title: "Gratuita o de Patreon",
+      isFree: "Colección gratuita: sale en el sobre cada 12 h, el día 7 de la racha, las expediciones y la tienda.",
+      isPatreon: "Colección de Patreon: llega con la suscripción (y como sobre de bienvenida si la eliges).",
+      make: "Marcar como gratuita",
+      remove: "Marcar como de Patreon",
+      adultNo: "Una colección 18+ no puede ser gratuita.",
+      made: "Colección actualizada.",
+      badgeFree: "Gratuita",
+      badgePatreon: "Patreon",
+    },
     welcome: {
       title: "Sobre de bienvenida",
       isWelcome: "Es la colección de bienvenida: todos reciben 1 sobre de ella la primera vez que entran.",

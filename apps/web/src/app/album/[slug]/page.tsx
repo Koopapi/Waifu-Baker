@@ -6,6 +6,7 @@ import { db } from "@/db/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { getDict } from "@/i18n/server";
 import { publicAlbum } from "@/server/services/album";
+import { PatronBadge } from "@/features/economy/PatronBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -44,9 +45,12 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
       </header>
       <main className="mx-auto max-w-6xl space-y-10 px-4 pb-16 pt-6 sm:px-6">
         <section className="space-y-3 text-center">
-          <h1 className="text-4xl font-extrabold" data-testid="album-alias">
-            {a.alias}
-          </h1>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <h1 className="text-4xl font-extrabold" data-testid="album-alias">
+              {a.alias}
+            </h1>
+            {a.patron && <PatronBadge label={t.account.patronBadge} />}
+          </div>
           <p className="text-ui-text-2" data-testid="album-totals">
             {t.collection.publicAlbum.totals(a.totals.owned, a.totals.total, pct)}
           </p>

@@ -37,6 +37,7 @@ export async function myCollections(db: DbLike, userId: string) {
       code: s.code,
       name: s.name,
       isAdult: s.isAdult,
+      isFree: s.isFree,
       locked: s.isAdult && !verified,
       progress: { owned: distinct, total: totals.filter((t) => t.setId === s.id).length },
       stats: {

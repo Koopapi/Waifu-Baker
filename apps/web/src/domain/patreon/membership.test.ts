@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cycleKey, entitledPacks, grantKeys, hasAdultTier, isVoidableCharge, type MemberState, type RuleForGrant } from "./membership";
+import { cycleKey, entitledPacks, grantKeys, hasAdultTier, isPatron, isVoidableCharge, type MemberState, type RuleForGrant } from "./membership";
 
 const base: MemberState = {
   memberId: "m1",
@@ -64,5 +64,24 @@ describe("spec 001 — membresía y concesiones", () => {
   it("test_s001_rf18_el_tier_adulto_es_el_que_da_una_coleccion_18", () => {
     expect(hasAdultTier(base, rules)).toBe(false);
     expect(hasAdultTier({ ...base, entitledTierIds: ["adult"] }, rules)).toBe(true);
+  });
+});
+
+describe("spec 021 — patron", () => {
+  const base = { memberId: "m", patreonUserId: "u", patronStatus: "active_patron" as const, lastChargeDate: new Date("2026-10-01"), lastChargeStatus: "Paid", nextChargeDate: new Date("2026-11-01"), entitledTierIds: ["sfw"] };
+  const rules = [{ patreonTierId: "sfw", setId: "s", packsPerMonth: 8, active: true, setIsAdult: false, setGrantable: true }];
+
+  it("test_s021_rf11_es_patron_con_membresia_pagada_y_una_regla_con_sobres", () => {
+    expect(isPatron(base, rules)).toBe(true);
+  });
+
+  it("test_s021_rf11_rf12_no_es_patron_sin_enlace_con_cobro_pendiente_reembolsado_o_tier_sin_reglas", () => {
+    expect(isPatron(null, rules)).toBe(false);
+    expect(isPatron({ ...base, patronStatus: "declined_patron" }, rules)).toBe(false);
+    expect(isPatron({ ...base, patronStatus: "former_patron" }, rules)).toBe(false);
+    expect(isPatron({ ...base, lastChargeStatus: "Refunded" }, rules)).toBe(false);
+    expect(isPatron({ ...base, entitledTierIds: ["free"] }, rules)).toBe(false);
+    expect(isPatron(base, [{ ...rules[0], active: false }])).toBe(false);
+    expect(isPatron(base, [{ ...rules[0], packsPerMonth: 0 }])).toBe(false);
   });
 });

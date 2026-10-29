@@ -1,0 +1,2 @@
+ALTER TABLE "sets" ADD COLUMN "is_free" boolean DEFAULT false NOT NULL;--> statement-breakpoint
+ALTER TABLE "sets" ADD CONSTRAINT "sets_free_not_adult" CHECK (not ("sets"."is_free" and "sets"."is_adult"));

@@ -27,6 +27,7 @@ export const site: typeof en = {
       `Protección de mala suerte: si abres ${n} sobres seguidos de esta colección sin ninguna carta Épica o superior, el siguiente trae al menos una (sustituye a la carta de la última ranura). El contador es tuyo y de esta colección.`,
     noPity: "Esta colección no tiene protección de mala suerte.",
     slot: "Ranura",
+    how: { free: "Gratis", patreon: "Con la suscripción" },
   },
   notFound: {
     title: "Página no encontrada",

@@ -91,7 +91,8 @@ export async function updateSet(db: DbLike, actorUserId: string, setId: string, 
     }
     const [updated] = await tx
       .update(sets)
-      .set({ ...next, version: cur.version + 1, updatedAt: sql`now()` })
+      // Spec 021, RF-2: una colección 18+ nunca es gratuita.
+      .set({ ...next, ...(next.isAdult ? { isFree: false } : {}), version: cur.version + 1, updatedAt: sql`now()` })
       .where(and(eq(sets.id, setId), eq(sets.version, expectedVersion)))
       .returning();
     if (next.isAdult !== cur.isAdult) {
@@ -123,6 +124,7 @@ export async function listSets(db: DbLike) {
       status: sets.status,
       packSize: sets.packSize,
       isWelcome: sets.isWelcome,
+      isFree: sets.isFree,
       updatedAt: sets.updatedAt,
       cardCount: count(cards.id),
     })
@@ -130,6 +132,19 @@ export async function listSets(db: DbLike) {
     .leftJoin(cards, eq(cards.setId, sets.id))
     .groupBy(sets.id)
     .orderBy(asc(sets.code));
+}
+
+/** Spec 021, RF-1 y RF-2: gratuita (sale en las fuentes gratis) o de Patreon; una 18+ nunca puede ser gratuita. */
+export async function setFreeSet(db: DbLike, actorUserId: string, setId: string, free: boolean) {
+  return db.transaction(async (tx) => {
+    const [cur] = await tx.select().from(sets).where(eq(sets.id, setId)).for("update");
+    if (!cur) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
+    if (free && cur.isAdult) throw new AdminError("free_adult", "Una colección 18+ no puede ser gratuita.");
+    if (cur.isFree === free) return cur;
+    const [u] = await tx.update(sets).set({ isFree: free, updatedAt: sql`now()` }).where(eq(sets.id, setId)).returning();
+    await recordAudit(tx, { actorUserId, action: "set.free", entityType: "set", entityId: setId, before: { isFree: cur.isFree }, after: { isFree: free } });
+    return u;
+  });
 }
 
 export async function getSet(db: DbLike, setId: string) {

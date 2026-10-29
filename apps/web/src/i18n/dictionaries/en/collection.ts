@@ -13,6 +13,8 @@ export const collection = {
   },
   viewCollection: "View collection",
   adultLocked: "18+ set: verify your age with an adult Patreon tier to see these cards.",
+  // Spec 021, RF-9: how a Patreon set is obtained.
+  patreon: { notice: "This set comes with the Patreon subscription.", link: "See the tiers on Patreon" },
   progress: (owned: number, total: number) => `${owned} of ${total} cards`,
   binder: {
     modes: { all: "All", owned: "Owned", missing: "Missing", holo: "Holo" },

@@ -96,6 +96,8 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
     characterName: manifest.cards[0].character,
     packSize: DEMO_SLOTS.length,
     isAdult: false,
+    // Spec 021: el fan art es la colección gratuita; en la demo también es la de bienvenida (la probadita).
+    isFree: true,
     cards: files,
     slots,
     holoPercent: 20,

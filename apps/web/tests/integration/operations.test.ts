@@ -106,7 +106,7 @@ describe("spec 007 — métricas", () => {
     const { activateAlbum } = await import("@/server/services/album");
     await inRollback(async (tx) => {
       const admin = await makeAdmin(tx);
-      const set = await createPublishedSet(tx, admin.id, { code: "MET1", rarities: ["common"], slots: [{ common: 100 }] });
+      const set = await createPublishedSet(tx, admin.id, { code: "MET1", isFree: true, rarities: ["common"], slots: [{ common: 100 }] });
       const fan = await upsertUserFromLogin(tx, { patreonUserId: "p-met", displayName: "Met", role: "user" });
       const now = new Date();
       await trackActivity(tx, fan.id, now);

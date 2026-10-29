@@ -2,6 +2,7 @@
 export const account = {
   title: "My account",
   subscription: "Patreon subscription",
+  patronBadge: "Patron",
   tier: "Tier",
   noTier: "No paid tier",
   status: "Status",

@@ -41,4 +41,5 @@ export const panelErrors: Record<string, Msg> = {
   not_returned: "The team hasn't come back yet.",
   pack_not_pending: "That expedition has no pack to choose.",
   not_enough_fragments: (p) => `You need more map fragments: you have ${p.have} of ${p.need}.`,
+  free_adult: "An 18+ set can't be free.",
 };

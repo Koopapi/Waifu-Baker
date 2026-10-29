@@ -17,6 +17,7 @@ export const packs: typeof en = {
     emptyLink: "Mira qué puede salir",
     locked: "Colección 18+. Para abrir estos sobres necesitas verificar tu edad con un tier adulto de Patreon. Tus sobres se conservan mientras tanto.",
     openOne: "Abrir un sobre",
+    patreonMore: "Más sobres de esta colección llegan con la suscripción.",
     openAll: (n) => `Abrir todos (${n})`,
   },
   actions: {

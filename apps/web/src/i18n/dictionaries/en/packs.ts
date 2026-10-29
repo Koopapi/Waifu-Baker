@@ -17,6 +17,7 @@ export const packs = {
     emptyLink: "See what you can get",
     locked: "18+ set. To open these packs you need to verify your age with an adult Patreon tier. Your packs are kept in the meantime.",
     openOne: "Open a pack",
+    patreonMore: "More packs of this set come with the subscription.",
     openAll: (n: number) => `Open all (${n})`,
   },
   actions: {

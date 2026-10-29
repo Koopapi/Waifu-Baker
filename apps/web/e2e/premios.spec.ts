@@ -41,7 +41,7 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
   const reduced = test.info().project.name === "reduced-motion";
   const admin = await login(browser, "admin-premios", true);
   // 3 cartas: 001 y 002 comunes y 003 rara; cada sobre trae 2 cartas.
-  const setId = await createPublishedSet(admin, "PRM1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
+  const setId = await createPublishedSet(admin, "PRM1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
   await giftPacks(admin, "fan-premios", "PRM1", 2);
   const fan = await login(browser, "fan-premios", false, "/sobres", { keepCelebration: true });
   const dialog = fan.locator('[data-testid="celebration-dialog"]');

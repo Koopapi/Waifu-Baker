@@ -30,7 +30,7 @@ export const errors: Record<string, Msg> = {
   unknown: "Something went wrong. Please try again.",
   welcome_not_allowed: "Only a published SFW set can be the welcome set.",
   choose_set: "Choose a set.",
-  set_not_claimable: "That set is not available for free packs. Choose another one.",
+  set_not_claimable: "That set isn't free: pick another one.",
   invalid_min_age: "The minimum age can only be 16 or 18.",
   album_hidden: "Your album is hidden: change the alias and request a review.",
   invalid_moderation_reason: "Choose a reason from the list.",

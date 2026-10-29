@@ -4,6 +4,7 @@ import { albums, cards, sets, userCards, users } from "@/db/schema";
 import { buildBinder } from "@/domain/collection/binder";
 import { validateAlias, validateFeatured } from "@/domain/collection/album-rules";
 import type { DbLike } from "@/server/db-types";
+import { isPatronUser } from "./patron";
 import { AppError } from "@/server/errors";
 
 const B62 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -120,6 +121,8 @@ export async function publicAlbum(db: DbLike, slug: string) {
   return {
     slug: row.album.slug,
     alias: row.album.alias,
+    // Spec 021, RF-11: la insignia de patron en el álbum público.
+    patron: await isPatronUser(db, userId),
     featured,
     collections,
     totals: {

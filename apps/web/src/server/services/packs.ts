@@ -218,7 +218,7 @@ export async function listMyPacks(db: DbLike, userId: string) {
   if (!user) return [];
   const verified = Boolean(user.isAdultDeclared && user.adultVerifiedAt);
   const rows = await db
-    .select({ setId: sets.id, code: sets.code, name: sets.name, isAdult: sets.isAdult, status: sets.status, sealed: count(packs.id) })
+    .select({ setId: sets.id, code: sets.code, name: sets.name, isAdult: sets.isAdult, isFree: sets.isFree, status: sets.status, sealed: count(packs.id) })
     .from(packs)
     .innerJoin(sets, eq(sets.id, packs.setId))
     .where(and(eq(packs.userId, userId), eq(packs.status, "sealed")))

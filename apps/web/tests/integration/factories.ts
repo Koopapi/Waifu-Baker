@@ -1,7 +1,7 @@
 import { asc, eq } from "drizzle-orm";
 import { cards, sets } from "@/db/schema";
 import { createCharacter } from "@/server/services/characters";
-import { createSet, publishSet, saveOdds } from "@/server/services/collections";
+import { createSet, publishSet, saveOdds, setFreeSet } from "@/server/services/collections";
 import { uploadCardImage } from "@/server/services/cards";
 import { assembleSetCards } from "@/server/services/dev-seed";
 import type { Rarity } from "@/domain/catalog/card-rules";
@@ -24,9 +24,11 @@ const ZERO = { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0
 export async function createPublishedSet(
   db: DbLike,
   adminId: string,
-  opts: { code: string; rarities: Rarity[]; slots: Partial<Record<Rarity, number>>[]; holoChance?: number; pity?: number; isAdult?: boolean; store?: CardStore },
+  opts: { code: string; rarities: Rarity[]; slots: Partial<Record<Rarity, number>>[]; holoChance?: number; pity?: number; isAdult?: boolean; isFree?: boolean; store?: CardStore },
 ) {
   const set = await createSet(db, adminId, { code: opts.code, name: opts.code, isAdult: Boolean(opts.isAdult), packSize: opts.slots.length });
+  // Spec 021: solo las colecciones gratuitas salen en las fuentes gratis.
+  if (opts.isFree) await setFreeSet(db, adminId, set.id, true);
   const store = opts.store ?? tempStore();
   const ch = await createCharacter(db, adminId, { name: `Personaje ${opts.code}` });
   for (const [i, rarity] of opts.rarities.entries()) {
