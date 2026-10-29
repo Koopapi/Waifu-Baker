@@ -45,6 +45,8 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
     window.scrollTo(0, 0);
   });
   await page.waitForLoadState("networkidle");
+  // La escena de apertura se carga aparte y, mientras tanto, solo hay un fondo: se revisa ya cargada.
+  await page.locator('[data-testid="stage-loading"]').waitFor({ state: "detached", timeout: 60_000 });
   const found = await page.evaluate(() => {
     const out: string[] = [];
     const root = document.documentElement;
@@ -75,7 +77,9 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
     return out;
   });
   for (const issue of found) problems.push({ page: url, viewport: vp.name, issue });
-  await page.screenshot({ path: `test-results/sweep/${shotName}-${vp.name}.png`, fullPage: true });
+  // `caret: "initial"`: para ocultar el cursor, Playwright escribe `caret-color` en cada campo; si React aún está
+  // hidratando (pasa en la CI), lo ve como un desajuste del HTML del servidor y lo avisa por consola.
+  await page.screenshot({ path: `test-results/sweep/${shotName}-${vp.name}.png`, fullPage: true, caret: "initial" });
 }
 
 test("barrido de calidad de todas las páginas", async ({ browser }) => {

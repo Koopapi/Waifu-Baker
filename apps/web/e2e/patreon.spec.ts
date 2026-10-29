@@ -7,7 +7,7 @@ import path from "node:path";
 import { signPatreonBody } from "../src/domain/patreon/webhook-signature";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, choose, createPublishedSet, login, tick } from "./helpers";
+import { LAB, choose, createPublishedSet, dismissCelebration, login, tick } from "./helpers";
 
 const es = dictionaries.es;
 const SECRET = "e2e-webhook-secret";
@@ -37,6 +37,8 @@ const webhook = (api: APIRequestContext, body: string, signature: string) =>
 const packsOf = async (p: Page, code: string) => {
   await p.goto("/sobres");
   await p.waitForLoadState("networkidle");
+  // Los sobres recién llegados abren su celebración, que deja inerte el resto de la página (spec 015, RF-6).
+  await dismissCelebration(p);
   const g = p.locator(`[data-testid="group-${code}"]`);
   return (await g.count()) ? Number((await g.locator("span.tabular-nums").first().innerText()).replace("x", "")) : 0;
 };
@@ -131,6 +133,8 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
     expect(await packsOf(fan, "PAT1A")).toBe(3);
     await expect(fan.locator('[data-testid="group-PAT1A"]')).toContainText(es.packs.mine.locked.slice(0, 20));
     await fan.goto("/cuenta");
+    // Los 3 sobres del tier 18+ llegan con su celebración (spec 015); en la CI puede salir aquí y no en «Mis sobres».
+    await dismissCelebration(fan, 20_000);
     await tick(fan.locator('[data-testid="declare-adult"]'), es.account.adult.confirm);
     await fan.click(`text=${es.account.adult.submit}`);
     await expect(fan.locator(`text=${es.account.adult.verified}`)).toBeVisible();
