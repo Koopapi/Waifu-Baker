@@ -23,6 +23,8 @@ async function dragStrip(page: Page, dx: number) {
 }
 
 test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", async ({ browser }) => {
+  // Recorre el rasgado, el mazo, la reanudación y «Abrir todos»: pasa de los 3 minutos por defecto.
+  test.setTimeout(480_000);
   const project = test.info().project.name;
   const desktop = project === "chromium-desktop";
   const tag = project.replace(/[^a-z0-9]/g, "");
@@ -98,11 +100,13 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
   });
 
   await test.step("RF-20: «Abrir todos» usa el sobre nuevo", async () => {
+    // Quedaba 1 sellado (el segundo ya se rasgó al retomar) y se regalan 2 más: 3 sobres de 2 cartas.
     await giftPacks(admin, fanName, code, 2);
     await fan.goto("/sobres");
-    await fan.click(`[data-testid="group-${code}"] >> text=${es.packs.mine.openAll(2)}`);
+    await dismissCelebration(fan);
+    await fan.click(`[data-testid="group-${code}"] >> text=${es.packs.mine.openAll(3)}`, { timeout: 30_000 });
     await expect(fan.locator(".pack-shell").first()).toBeVisible();
-    expect(await openAllAndSkip(fan)).toBe(4);
+    expect(await openAllAndSkip(fan)).toBe(6);
   });
 
 });
