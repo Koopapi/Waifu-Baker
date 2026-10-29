@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
 
 const VIEWPORTS = [
   { name: "escritorio", width: 1360, height: 950 },
@@ -127,8 +127,7 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await run(fan, cFan, `/sobres/${setId}/todos`, "fan-abrir-todos");
   await fan.setViewportSize({ width: 1360, height: 950 });
   await fan.goto(`/sobres/${setId}/todos`);
-  await fan.click('[data-testid="open-all"]');
-  await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(8);
+  expect(await openAllAndSkip(fan)).toBe(8);
   await run(fan, cFan, "/sobres", "fan-sobres-vacio");
   await run(fan, cFan, "/coleccion", "fan-coleccion");
   await run(fan, cFan, `/coleccion/${setId}`, "fan-binder");

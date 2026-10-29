@@ -14,6 +14,8 @@ import { isAdminError } from "@/server/errors";
 import { openLimiter } from "@/server/rate-limits";
 import { ackOpenings, getOpeningResult, openAllPacks, openPack, type OpeningResult } from "@/server/services/packs";
 import { liveCardConfig } from "@/server/services/live-card";
+import type { LiveCard } from "@/domain/cards/live";
+import { highlights } from "@/domain/opening/open-all";
 
 type Ok<T> = { ok: true } & T;
 type Fail = { ok: false; error: string; code?: string };
@@ -90,6 +92,10 @@ export interface OpenAllCard {
   qtyAfter: number;
   pity: boolean;
   image: string;
+  /** Spec 019, RF-1: de qué sobre del lote salió (0 = el primero), para la ráfaga. */
+  pack: number;
+  /** Spec 019, RF-6: la carta viva, solo en las destacadas del foco. */
+  live?: LiveCard | null;
 }
 
 /** RF-18 y RF-19: abre hasta 50 sobres de la colección, cada uno con sus reglas. */
@@ -101,11 +107,11 @@ export async function openAllPacksAction(setId: string): Promise<Ok<{ packs: num
   try {
     const results = await openAllPacks(db, { userId, setId, country: await country() });
     await ackOpenings(db, userId, results.map((r) => r.packId));
-    return {
-      ok: true,
-      packs: results.length,
-      cards: results.flatMap((r) =>
-        r.cards.map((c, i) => ({
+    const cardIds = new Map<string, string>();
+    const cards: OpenAllCard[] = results.flatMap((r, pack) =>
+      r.cards.map((c, i) => {
+        cardIds.set(`${r.packId}-${i}`, c.cardId);
+        return {
           key: `${r.packId}-${i}`,
           name: c.name || t.packs.actions.cardFallback(String(c.number).padStart(3, "0")),
           number: c.number,
@@ -115,9 +121,15 @@ export async function openAllPacksAction(setId: string): Promise<Ok<{ packs: num
           qtyAfter: c.qtyAfter,
           pity: c.pity,
           image: cardImageUrl(c.cardId, "mid", userId),
-        })),
-      ),
-    };
+          pack,
+        };
+      }),
+    );
+    // Spec 019, RF-6: solo las destacadas (como mucho 10) llevan su carta viva.
+    const featured = highlights(cards);
+    const lives = await Promise.all(featured.map((c) => liveCardConfig(db, userId, cardIds.get(c.key)!)));
+    const liveByKey = new Map(featured.map((c, i) => [c.key, lives[i]]));
+    return { ok: true, packs: results.length, cards: cards.map((c) => ({ ...c, live: liveByKey.get(c.key) })) };
   } catch (e) {
     return fail(e);
   }

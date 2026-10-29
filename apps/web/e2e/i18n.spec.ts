@@ -7,7 +7,7 @@ import { translateError } from "../src/i18n/errors";
 import { formatDate } from "../src/i18n/format";
 import { dictionaries } from "../src/i18n/index";
 import { DESKTOP, expect, test } from "./fixtures";
-import { LAB, acceptGate, createPublishedSet, dismissCelebration, giftPacks, login, untickAdmin } from "./helpers";
+import { LAB, acceptGate, createPublishedSet, dismissCelebration, giftPacks, login, untickAdmin, openAllAndSkip } from "./helpers";
 
 const en = dictionaries.en;
 const es = dictionaries.es;
@@ -100,8 +100,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
   await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-I18N"] >> text=Abrir un sobre').getAttribute("href");
   await fan.goto(`${href}/todos`);
-  await fan.click('[data-testid="open-all"]');
-  await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(2);
+  expect(await openAllAndSkip(fan)).toBe(2);
 
   await test.step("RF-3 y RF-9: el coleccionista cambia a inglés; los nombres de las cartas no se traducen", async () => {
     await fan.goto("/coleccion");

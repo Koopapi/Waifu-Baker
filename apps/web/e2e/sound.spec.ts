@@ -3,10 +3,10 @@
 // silencio también recordado allí) suena una sola vez, con la mejor carta.
 import type { Page } from "@playwright/test";
 import path from "node:path";
-import { openAllFinale, revealSound, vibrationPattern } from "../src/domain/opening/feedback";
+import { revealSound, vibrationPattern } from "../src/domain/opening/feedback";
 import type { Rarity } from "../src/domain/catalog/card-rules";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, giftPacks, login, tear } from "./helpers";
+import { LAB, createPublishedSet, giftPacks, login, openAllAndSkip, tear } from "./helpers";
 
 type Log = { sounds: string[]; vibes: string[] };
 
@@ -67,19 +67,16 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
     expect(await log(fan)).toEqual({ sounds: [], vibes: [] });
   });
 
-  await test.step("RF-5, RF-8 y RF-9: «Abrir todos» suena y vibra una sola vez, con la mejor carta", async () => {
+  // Spec 019, RF-3 (sustituye a la RF-5 de esta spec): la ráfaga suena con rasgados y el foco con la rareza de cada
+  // destacada. Aquí se comprueba que el silencio corta todo eso.
+  await test.step("RF-8 y RF-9: con el sonido apagado, «Abrir todos» no suena ni vibra", async () => {
     await fan.goto(`${href}/todos`);
     await fan.waitForLoadState("networkidle");
     const toggle = fan.locator('[data-testid="sound-toggle"]');
+    // Viene silenciado del paso anterior (el silencio se recuerda en el dispositivo).
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
-    await toggle.click();
-    await expect(toggle).toHaveAttribute("aria-pressed", "false");
-    await fan.click('[data-testid="open-all"]');
-    await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(6);
-    const rarities = (await fan.locator(".oa-card").evaluateAll((cs) => cs.map((c) => c.className.match(/rarity-(\w+)/)![1]))) as Rarity[];
-    const finale = openAllFinale(rarities)!;
-    await expect.poll(async () => (await log(fan)).sounds).toEqual([finale.sound]);
+    expect(await openAllAndSkip(fan)).toBe(6);
     await fan.waitForTimeout(500);
-    expect(await log(fan)).toEqual({ sounds: [finale.sound], vibes: finale.vibration ? [finale.vibration.join(",")] : [] });
+    expect(await log(fan)).toEqual({ sounds: [], vibes: [] });
   });
 });
