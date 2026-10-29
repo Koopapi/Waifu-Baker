@@ -46,7 +46,7 @@ describe("acabado", () => {
   });
 
   it("test_s010_rf9_cada_seccion_tiene_su_esqueleto_de_carga", () => {
-    for (const dir of ["app/(app)/sobres", "app/(app)/coleccion", "app/(app)/coleccion/[setId]", "app/(app)/cuenta", "app/(app)/recompensas", "app/admin"]) {
+    for (const dir of ["app/(app)/packs", "app/(app)/collection", "app/(app)/collection/[setId]", "app/(app)/account", "app/(app)/rewards", "app/admin"]) {
       expect(existsSync(path.join(SRC, dir, "loading.tsx")), dir).toBe(true);
     }
   });

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { openAllPacksAction, type OpenAllCard } from "@/app/sobres/actions";
+import { openAllPacksAction, type OpenAllCard } from "@/app/packs/actions";
 import { highlights } from "@/domain/opening/open-all";
 import { sound, useSoundMuted } from "@/features/sound/engine";
 import { useT } from "@/i18n/client";
@@ -67,7 +67,7 @@ export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { se
           {/* Spec 014, RF-8: el mismo sobre de la colección. */}
           {phase === "idle" && <PackShell {...shell} className="w-[96px] sm:w-[120px]" />}
           <div>
-            <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-ui-text">
+            <Link href="/packs" className="text-sm text-ui-text-3 hover:text-ui-text">
               {t.packs.openAll.backToMine}
             </Link>
             <h1 className="flex flex-wrap items-center gap-3 font-display text-3xl font-semibold">
@@ -93,7 +93,7 @@ export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { se
         <>
           <OpenAllSummary packs={opened} cards={cards} />
           <Button variant="secondary" asChild>
-            <Link href="/sobres">{t.packs.openAll.backToMineButton}</Link>
+            <Link href="/packs">{t.packs.openAll.backToMineButton}</Link>
           </Button>
         </>
       )}

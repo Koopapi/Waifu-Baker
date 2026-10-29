@@ -1,6 +1,6 @@
 "use client";
 
-import type { OpenAllCard } from "@/app/sobres/actions";
+import type { OpenAllCard } from "@/app/packs/actions";
 import { groupByRarity } from "@/domain/opening/open-all";
 import { useT } from "@/i18n/client";
 

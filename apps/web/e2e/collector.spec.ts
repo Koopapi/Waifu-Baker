@@ -7,13 +7,13 @@ import { createPublishedSet, dismissCelebration, giftPacks, LAB, login, openAllA
 test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
     const anon = await (await browser.newContext()).newPage();
-    await anon.goto("/sobres");
-    await expect(anon).toHaveURL(/\/login\?next=%2Fsobres/);
+    await anon.goto("/packs");
+    await expect(anon).toHaveURL(/\/login\?next=%2Fpacks/);
     await anon.context().close();
   });
 
-  const fan = await login(browser, "coleccionista-e2e", false, "/sobres");
-  await expect(fan).toHaveURL(/\/sobres$/);
+  const fan = await login(browser, "coleccionista-e2e", false, "/packs");
+  await expect(fan).toHaveURL(/\/packs$/);
   await expect(fan.locator("text=No tienes sobres sin abrir.")).toBeVisible();
 
   const admin = await login(browser, "admin-e2e-2", true);
@@ -21,7 +21,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await giftPacks(admin, "coleccionista-e2e", "COL1", 4);
 
   await test.step("RF-1: «Mis sobres» muestra los sobres por colección", async () => {
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await dismissCelebration(fan);
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x4");
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-1-mis-sobres.png` });
@@ -53,7 +53,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     await fan.click('[data-testid="open-another"]');
     await tear(fan);
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
     await fan.click('[data-testid="pending-opening"]');
     // En WebKit, la navegación del enlace puede seguir en curso: se espera a que termine antes de seguir.
@@ -66,7 +66,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     const acked = fan.waitForResponse((r) => r.request().method() === "POST" && Boolean(r.request().headers()["next-action"]));
     await openDeck(fan);
     await acked;
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="pending-opening"]')).toHaveCount(0);
     await expect(fan.locator('[data-testid="group-COL1"]')).toContainText("x2");
   });
@@ -79,7 +79,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     await expect(fan.locator('[data-testid="open-all-result"] h3').first()).toContainText("Raras");
     await fan.waitForTimeout(800);
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-3-abrir-todos.png`, fullPage: true });
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator("text=No tienes sobres sin abrir.")).toBeVisible();
   });
 
@@ -98,11 +98,11 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
 
 test("teclado: abrir un sobre y voltear las cartas sin ratón", async ({ browser }) => {
   test.skip(test.info().project.name !== "chromium-desktop", "solo en escritorio");
-  const fan = await login(browser, "teclado-e2e", false, "/sobres");
+  const fan = await login(browser, "teclado-e2e", false, "/packs");
   const admin = await login(browser, "admin-teclado", true);
   await createPublishedSet(admin, "KEY1", ["01.webp", "02.webp"].map((f) => path.join(LAB, f)), 2);
   await giftPacks(admin, "teclado-e2e", "KEY1", 1);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   await dismissCelebration(fan);
   await fan.click('[data-testid="group-KEY1"] >> text=Abrir un sobre');
   await fan.waitForLoadState("networkidle");

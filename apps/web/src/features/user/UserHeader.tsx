@@ -13,13 +13,13 @@ export async function UserHeader({ name, isAdmin }: { name: string; isAdmin: boo
         {t.common.brand}
       </Link>
       <nav className="flex flex-wrap items-center gap-4 text-sm">
-        <Link href="/sobres" className="text-ui-text-2 hover:text-ui-text">
+        <Link href="/packs" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.myPacks}
         </Link>
-        <Link href="/coleccion" className="text-ui-text-2 hover:text-ui-text">
+        <Link href="/collection" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.myCollection}
         </Link>
-        <Link href="/cuenta" className="text-ui-text-2 hover:text-ui-text">
+        <Link href="/account" className="text-ui-text-2 hover:text-ui-text">
           {t.common.nav.myAccount}
         </Link>
         <Link href="/drop-rates" className="text-ui-text-2 hover:text-ui-text">

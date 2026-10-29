@@ -22,7 +22,7 @@ test("demo: portada con papeles, coleccionista y cambio a administrador", async 
     await expect(page.locator(`text=${es.site.demo.enterCollector}`)).toBeVisible();
     await expect(page.locator(`text=${es.site.demo.enterAdmin}`)).toBeVisible();
     await page.click('[data-testid="demo-enter-collector"]');
-    await page.waitForURL(/\/sobres$/);
+    await page.waitForURL(/\/packs$/);
     // Spec 015, RF-6: los 3 sobres de muestra se celebran como regalo la primera vez que entra.
     const celebration = page.locator('[data-testid="celebration-dialog"]');
     await expect(celebration).toBeVisible();
@@ -39,6 +39,6 @@ test("demo: portada con papeles, coleccionista y cambio a administrador", async 
     await page.waitForURL(/\/admin$/);
     await expect(page.locator('[data-testid="demo-switch"]')).toContainText(es.site.demo.roles.collector);
     await page.click('[data-testid="demo-switch"]');
-    await page.waitForURL(/\/sobres$/);
+    await page.waitForURL(/\/packs$/);
   });
 });

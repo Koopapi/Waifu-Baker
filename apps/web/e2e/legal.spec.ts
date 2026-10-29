@@ -12,19 +12,19 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
   const page = await (await browser.newContext()).newPage();
 
   await test.step("RF-1: tras entrar, un usuario nuevo debe confirmar edad y términos", async () => {
-    await page.goto("/login?next=%2Fsobres");
+    await page.goto("/login?next=%2Fpacks");
     await page.fill('input[name="name"]', "nuevo-legal");
     await untickAdmin(page);
     await page.click("text=Entrar (desarrollo)");
-    await page.waitForURL(/\/bienvenida\?next=%2Fsobres/);
+    await page.waitForURL(/\/welcome\?next=%2Fpacks/);
     await expect(page.locator("h1")).toHaveText(es.gate.title);
     await expect(page.locator(`text=${es.gate.age(16)}`)).toBeVisible();
   });
 
   await test.step("RF-2: sin aceptar no ve su colección ni su cuenta, pero sí las páginas públicas", async () => {
-    for (const p of ["/coleccion", "/cuenta", "/sobres"]) {
+    for (const p of ["/collection", "/account", "/packs"]) {
       await page.goto(p);
-      await expect(page).toHaveURL(/\/bienvenida/);
+      await expect(page).toHaveURL(/\/welcome/);
     }
     await page.goto("/legal/terms");
     await expect(page.locator("h1")).toHaveText(es.docs.terms.title);
@@ -33,12 +33,12 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
   });
 
   await test.step("RF-1: al aceptar vuelve a donde iba", async () => {
-    await page.goto("/bienvenida?next=%2Fcoleccion");
+    await page.goto("/welcome?next=%2Fcollection");
     await tickAll(page.locator('[data-testid="gate-form"]'));
     await page.click(`[data-testid="gate-form"] >> text=${es.gate.submit}`);
-    await page.waitForURL(/\/coleccion$/);
-    await page.goto("/sobres");
-    await expect(page).toHaveURL(/\/sobres$/);
+    await page.waitForURL(/\/collection$/);
+    await page.goto("/packs");
+    await expect(page).toHaveURL(/\/packs$/);
   });
 
   const anon = await (await browser.newContext({ storageState: { cookies: [], origins: [] } })).newPage();
@@ -86,7 +86,7 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
 
   await test.step("RF-11 y RF-17: el administrador ve las métricas de 30 días y el estado de las copias", async () => {
     const admin = await login(browser, "admin-legal", true);
-    await admin.goto("/admin/metricas");
+    await admin.goto("/admin/metrics");
     await expect(admin.locator('[data-testid="metrics"] tbody tr[data-day]')).toHaveCount(30);
     const today = new Date().toISOString().slice(0, 10);
     const row = admin.locator(`tr[data-day="${today}"] td`);

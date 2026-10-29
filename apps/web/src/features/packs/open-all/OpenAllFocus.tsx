@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { OpenAllCard } from "@/app/sobres/actions";
+import type { OpenAllCard } from "@/app/packs/actions";
 import { confettiCount, revealSound, vibrationPattern } from "@/domain/opening/feedback";
 import { sound } from "@/features/sound/engine";
 import { useT } from "@/i18n/client";

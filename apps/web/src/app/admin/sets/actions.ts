@@ -85,7 +85,7 @@ export async function setFreeSetAction(setId: string, free: boolean): Promise<Ac
 
 /** Spec 014, RF-6: elige (o vuelve a la automática, con `null`) la carta de portada del sobre. */
 export async function setCoverAction(setId: string, cardId: string | null): Promise<ActionState> {
-  return adminAction("setCover", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
+  return adminAction("setCover", [`/admin/sets/${setId}`, "/packs"], async ({ db, actorId }) => {
     await setCoverCard(db, actorId, setId, cardId);
     return (await getDict()).admin.set.pack.coverSaved;
   });
@@ -93,7 +93,7 @@ export async function setCoverAction(setId: string, cardId: string | null): Prom
 
 /** Spec 014, RF-7: quita el sobre hecho a mano. */
 export async function removePackImageAction(setId: string): Promise<ActionState> {
-  return adminAction("removePackImage", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
+  return adminAction("removePackImage", [`/admin/sets/${setId}`, "/packs"], async ({ db, actorId }) => {
     await removePackImage(db, getCardStore(), actorId, setId);
     return (await getDict()).admin.set.pack.removed;
   });

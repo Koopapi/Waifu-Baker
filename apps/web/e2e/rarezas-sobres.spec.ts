@@ -14,7 +14,7 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
   const tag = test.info().project.name.replace(/[^a-z0-9]/g, "");
   const code = `RS${tag.slice(0, 4).toUpperCase()}`;
   const fanName = `fan-rs-${tag}`;
-  const fan = await login(browser, fanName, false, "/sobres");
+  const fan = await login(browser, fanName, false, "/packs");
   const admin = await login(browser, `admin-rs-${tag}`, true);
   // 001 y 002 comunes, 003 rara; el ayudante añade la 004, legendaria, que solo sale en los gold (tabla gold: todo legendaria).
   const setId = await createPublishedSet(admin, code, ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
@@ -50,7 +50,7 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
   });
 
   await test.step("RF-19: «Mis sobres» separa plata y gold, cada uno con su etiqueta", async () => {
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await dismissCelebration(fan);
     const silver = fan.locator(`[data-testid="group-${code}"]`);
     const gold = fan.locator(`[data-testid="group-${code}-gold"]`);
@@ -71,9 +71,9 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
   });
 
   await test.step("RF-19: «Abrir todos» de los plata dice PLATA", async () => {
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await fan.click(`[data-testid="group-${code}"] >> text=${es.packs.mine.openAll(2)}`);
-    await fan.waitForURL(new RegExp(`/sobres/${setId}/todos$`));
+    await fan.waitForURL(new RegExp(`/packs/${setId}/all$`));
     await expect(fan.locator('h1 [data-testid="pack-kind"]')).toHaveText(es.common.packKind.silver);
     expect(await openAllAndSkip(fan)).toBe(4);
   });
@@ -89,7 +89,7 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
   });
 
   await test.step("RF-4 a RF-9: la común se ve plana y la legendaria viva con su sello", async () => {
-    await fan.goto(`/coleccion/${setId}`);
+    await fan.goto(`/collection/${setId}`);
     const art = fan.locator('[data-testid="card-sheet-art"]');
     // La común que haya salido (la 001 o la 002).
     const common = fan.locator('[aria-label="Ver carta 001"], [aria-label="Ver carta 002"]').first();

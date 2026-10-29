@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { acceptTermsAction } from "@/app/bienvenida/actions";
+import { acceptTermsAction } from "@/app/welcome/actions";
 import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";
 import { Checkbox } from "@/ui/form/Choice";

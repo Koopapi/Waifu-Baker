@@ -21,7 +21,7 @@ export async function requireUser(next: string) {
     if (u) {
       // Spec 007, RF-1 a RF-3: sin edad confirmada o con términos antiguos, primero la bienvenida.
       // Spec 010, RF-18: también si la edad mínima subió después de confirmar.
-      if (needsAcceptance(u, undefined, await getMinAge(db))) redirect(`/bienvenida?next=${encodeURIComponent(next)}`);
+      if (needsAcceptance(u, undefined, await getMinAge(db))) redirect(`/welcome?next=${encodeURIComponent(next)}`);
       // Spec 001, RF-3: membresía al día si la última lectura tiene más de 15 minutos.
       await refreshIfStale(db, getPatreonClient().client, u.id);
       await trackActivity(db, u.id, now());

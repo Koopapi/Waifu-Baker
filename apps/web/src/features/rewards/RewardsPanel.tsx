@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { claimDailyAction, claimFreePackAction, type RewardActionState } from "@/app/sobres/rewards-actions";
+import { claimDailyAction, claimFreePackAction, type RewardActionState } from "@/app/packs/rewards-actions";
 import { FREE_INTERVAL_MS } from "@/domain/rewards/free-packs";
 import { PackArt, type PackArtData } from "@/features/packs/PackArt";
 import { useCelebrations } from "@/features/rewards/celebrations";

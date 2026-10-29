@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { markCelebratedAction } from "@/app/sobres/arrivals-actions";
+import { markCelebratedAction } from "@/app/packs/arrivals-actions";
 import { arrivalsKey, type ArrivalOrigin } from "@/domain/rewards/arrivals";
 import { PackArt, type PackArtData } from "@/features/packs/PackArt";
 import { useCelebrations } from "@/features/rewards/celebrations";
@@ -32,7 +32,7 @@ export function ArrivalsCelebration({ group }: { group: ArrivalsGroupDTO | null 
       detail: group.sets.map((s) => (s.count > 1 ? `${s.name} ×${s.count}` : s.name)).join(" · "),
       count: group.total,
       art: <PackArt setId={first.setId} code={first.code} name={first.name} art={first.art} className="w-[min(180px,26dvh)]" />,
-      primary: { label: t.goToPacks, href: "/sobres" },
+      primary: { label: t.goToPacks, href: "/packs" },
       onShown: () => void markCelebratedAction(group.ids),
     });
     // Solo al cargar con este grupo; las traducciones no cambian de clave.

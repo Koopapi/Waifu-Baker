@@ -23,10 +23,10 @@ describe("spec 015 — cola de celebraciones", () => {
   });
 
   it("test_s015_rf9_las_rutas_de_apertura_son_las_de_un_sobre_y_abrir_todos", () => {
-    expect(isOpeningRoute("/sobres/abc-123")).toBe(true);
-    expect(isOpeningRoute("/sobres/abc-123/todos")).toBe(true);
-    expect(isOpeningRoute("/sobres")).toBe(false);
-    expect(isOpeningRoute("/recompensas")).toBe(false);
-    expect(isOpeningRoute("/coleccion/abc")).toBe(false);
+    expect(isOpeningRoute("/packs/abc-123")).toBe(true);
+    expect(isOpeningRoute("/packs/abc-123/all")).toBe(true);
+    expect(isOpeningRoute("/packs")).toBe(false);
+    expect(isOpeningRoute("/rewards")).toBe(false);
+    expect(isOpeningRoute("/collection/abc")).toBe(false);
   });
 });

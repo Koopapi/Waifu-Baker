@@ -10,21 +10,21 @@ const shot = (p: Page, name: string, fullPage = false) =>
   p.screenshot({ path: `test-results/screens/${test.info().project.name}/s006-${name}.png`, fullPage });
 
 test("colección y álbum público", async ({ browser }) => {
-  const fan = await login(browser, "album-e2e", false, "/sobres");
+  const fan = await login(browser, "album-e2e", false, "/packs");
   const admin = await login(browser, "admin-e2e-3", true);
   // 3 cartas: 001 y 002 comunes, 003 rara y siempre holo (y la 004, legendaria, solo en los sobres gold: spec 022).
   // Un sobre plata de 2 → una común y la legendaria quedan sin conseguir.
   await createPublishedSet(admin, "ALB1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, 100);
   await giftPacks(admin, "album-e2e", "ALB1", 1);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-ALB1"] >> text=Abrir un sobre').getAttribute("href");
-  await fan.goto(`${href}/todos`);
+  await fan.goto(`${href}/all`);
   expect(await openAllAndSkip(fan)).toBe(2);
 
   await test.step("RF-1: «Mi colección» lista la colección con su progreso", async () => {
     await fan.click("header >> text=Mi colección");
-    await expect(fan).toHaveURL(/\/coleccion$/);
+    await expect(fan).toHaveURL(/\/collection$/);
     await expect(fan.locator('[data-testid="collection-ALB1"] [data-testid="progress"]')).toHaveText("2/4");
     await shot(fan, "1-mi-coleccion");
   });
@@ -35,7 +35,7 @@ test("colección y álbum público", async ({ browser }) => {
     await fan.waitForLoadState("networkidle");
     await expect(async () => {
       await fan.click('[data-testid="collection-ALB1"] a');
-      await expect(fan).toHaveURL(/\/coleccion\/[0-9a-f-]{36}$/, { timeout: 10_000 });
+      await expect(fan).toHaveURL(/\/collection\/[0-9a-f-]{36}$/, { timeout: 10_000 });
     }).toPass({ timeout: 60_000 });
     await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText("2 de 4 cartas");
     const grid = fan.locator('[data-testid="binder-grid"]');
@@ -92,7 +92,7 @@ test("colección y álbum público", async ({ browser }) => {
 
   let url = "";
   await test.step("RF-8 y RF-9: el álbum empieza privado y se activa con un alias", async () => {
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
     await expect(fan.locator('[data-testid="album-status"] h2')).toHaveText("Tu álbum es privado");
     await fan.fill('input[name="alias"]', "x");
     await fan.click("text=Activar álbum público");
@@ -164,9 +164,9 @@ test("colección y álbum público", async ({ browser }) => {
     expect(await anon.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
     await shot(anon, "7-album-movil", true);
     await fan.setViewportSize({ width: 390, height: 844 });
-    await fan.goto(`${new URL(fan.url()).origin}/coleccion`);
+    await fan.goto(`${new URL(fan.url()).origin}/collection`);
     await fan.click('[data-testid="collection-ALB1"] a');
-    await fan.waitForURL(/\/coleccion\/[0-9a-f-]{36}$/);
+    await fan.waitForURL(/\/collection\/[0-9a-f-]{36}$/);
     await expect(fan.locator('[data-testid="binder-grid"] li')).toHaveCount(4);
     await expect
       .poll(() => fan.locator('[data-testid="binder-grid"] img').evaluateAll((els) => els.map((e) => [(e as HTMLImageElement).naturalWidth, e.getBoundingClientRect().height])))
@@ -179,7 +179,7 @@ test("colección y álbum público", async ({ browser }) => {
     const own = test.info().project.use.viewport ?? { width: 1360, height: 950 };
     await fan.setViewportSize(own);
     await anon.setViewportSize(own);
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
   });
 
   await test.step("RF-10: desactivar lo oculta y reactivar recupera el mismo enlace", async () => {

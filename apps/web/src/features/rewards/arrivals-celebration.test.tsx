@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import { ArrivalsCelebration } from "./ArrivalsCelebration";
 
 // La acción de servidor arrastra next-auth; aquí solo importa que se llame al mostrarse.
-vi.mock("@/app/sobres/arrivals-actions", () => ({ markCelebratedAction: vi.fn(), markPacksSeenAction: vi.fn() }));
+vi.mock("@/app/packs/arrivals-actions", () => ({ markCelebratedAction: vi.fn(), markPacksSeenAction: vi.fn() }));
 
 const src = (f: string) => readFileSync(path.resolve(__dirname, "../..", f), "utf8");
 
@@ -29,7 +29,7 @@ describe("spec 015 — celebración de llegadas al entrar", () => {
   });
 
   it("test_s015_rf8_mis_sobres_marca_las_llegadas_nuevas_y_las_da_por_vistas", () => {
-    const page = src("app/(app)/sobres/page.tsx");
+    const page = src("app/(app)/packs/page.tsx");
     expect(page).toContain("newArrivalsBySet(db, user.id)");
     expect(page).toContain('<Badge tone="new">{t.rewards.fx.newPacks(');
     expect(page).toContain("<MarkPacksSeen />");

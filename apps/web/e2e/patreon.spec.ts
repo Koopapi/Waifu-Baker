@@ -35,7 +35,7 @@ const webhook = (api: APIRequestContext, body: string, signature: string) =>
   api.post("/api/webhooks/patreon", { data: body, headers: { "content-type": "application/json", "x-patreon-signature": signature, "x-patreon-event": "members:update" } });
 
 const packsOf = async (p: Page, code: string) => {
-  await p.goto("/sobres");
+  await p.goto("/packs");
   await p.waitForLoadState("networkidle");
   // Los sobres recién llegados abren su celebración, que deja inerte el resto de la página (spec 015, RF-6).
   await dismissCelebration(p);
@@ -78,7 +78,7 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
     }
   });
 
-  const fan = await login(browser, "fan-patreon", false, "/sobres");
+  const fan = await login(browser, "fan-patreon", false, "/packs");
   const pid = "dev:fan-patreon";
 
   await test.step("RF-6: al entrar por primera vez recibe 1 sobre de bienvenida", async () => {
@@ -109,7 +109,7 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
   });
 
   await test.step("RF-21: «Mi cuenta» muestra tier, estado, sobres al mes y último cobro", async () => {
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await expect(fan.locator('[data-testid="account-tiers"]')).toHaveText("SFW (desarrollo)");
     await expect(fan.locator('[data-testid="account-status"]')).toHaveText(es.account.statusLabel.active_patron);
     await expect(fan.locator('[data-testid="account-packs"]')).toHaveText("3");
@@ -134,25 +134,25 @@ test("cuentas con Patreon: bienvenida, sobres por cobro, reembolso, 18+ y borrad
     await webhook(request, upgrade.body, upgrade.signature);
     expect(await packsOf(fan, "PAT1A")).toBe(3);
     await expect(fan.locator('[data-testid="group-PAT1A"]')).toContainText(es.packs.mine.locked.slice(0, 20));
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     // Los 3 sobres del tier 18+ llegan con su celebración (spec 015); en la CI puede salir aquí y no en «Mis sobres».
     await dismissCelebration(fan, 20_000);
     await tick(fan.locator('[data-testid="declare-adult"]'), es.account.adult.confirm);
     await fan.click(`text=${es.account.adult.submit}`);
     await expect(fan.locator(`text=${es.account.adult.verified}`)).toBeVisible();
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-PAT1A"] >> text=Abrir un sobre')).toBeVisible();
   });
 
   await test.step("RF-22 y RF-23: borra su cuenta y la recupera al volver antes de 30 días", async () => {
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await fan.click('[data-testid="delete-account"]');
     // Spec 011, RF-12: confirmación en el modal propio.
     await fan.click('[data-testid="confirm-accept"]');
     await fan.waitForURL((u) => u.pathname === "/");
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan).toHaveURL(/\/login/);
-    const back = await login(browser, "fan-patreon", false, "/sobres");
+    const back = await login(browser, "fan-patreon", false, "/packs");
     expect(await packsOf(back, "PAT1A")).toBe(3);
     expect(await packsOf(back, "PAT1")).toBe(1);
   });

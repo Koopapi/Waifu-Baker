@@ -72,7 +72,11 @@ describe("spec 024 — acceso del equipo", () => {
       const linkUrl = (s2 as { linkUrl: string }).linkUrl;
       expect(linkUrl).toMatch(/^https:\/\/t\.me\/waifubaker_admin_bot\?start=[0-9a-f]{24}$/);
       expect(await checkTelegramLink(tx, bot, { pending, now: T0 })).toEqual({ status: "waiting" });
-      bot.updates = [{ updateId: 7, chatId: "555", text: `/start ${new URL(linkUrl).searchParams.get("start")}` }];
+      // Si Telegram pierde el código del enlace (chat ya abierto), un «/start» suelto no vincula…
+      bot.updates = [{ updateId: 6, chatId: "555", text: "/start" }];
+      expect(await checkTelegramLink(tx, bot, { pending, now: T0 })).toEqual({ status: "waiting" });
+      // …pero el código enviado a mano sí (el enlace con «/start <código>» lo cubre `ready`).
+      bot.updates = [{ updateId: 7, chatId: "555", text: new URL(linkUrl).searchParams.get("start")! }];
       expect(await checkTelegramLink(tx, bot, { pending, now: at(1) })).toEqual({ status: "ok", next: "code" });
       // RF-17: el código llega a ese chat y abre la sesión una sola vez.
       expect(bot.sent.at(-1)!.chatId).toBe("555");

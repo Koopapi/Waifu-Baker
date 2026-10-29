@@ -9,7 +9,7 @@ import {
   claimExpeditionAction,
   sendExpeditionAction,
   unlockZoneAction,
-} from "@/app/(app)/juegos/expediciones/actions";
+} from "@/app/(app)/games/expeditions/actions";
 import type { ExpeditionResult } from "@/db/schema";
 import type { Rarity } from "@/domain/catalog/card-rules";
 import { BOND_XP, type DurationMin, type Rating, type Role, type Terrain, type ZoneLoot } from "@/domain/expeditions/rules";
@@ -268,7 +268,7 @@ export function ExpeditionsView({ data }: { data: ExpeditionsDTO }) {
 
       {noCards ? (
         <Alert tone="info" title={t.expeditions.noCards}>
-          <Link href="/sobres" className="font-semibold underline">
+          <Link href="/packs" className="font-semibold underline">
             {t.expeditions.goToPacks}
           </Link>
         </Alert>

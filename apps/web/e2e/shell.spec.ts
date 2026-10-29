@@ -22,7 +22,7 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   expect((await page.request.post("/api/demo/seed")).status()).toBe(200);
   await page.goto("/");
   await page.click('[data-testid="demo-enter-collector"]');
-  await page.waitForURL(/\/sobres$/);
+  await page.waitForURL(/\/packs$/);
   // Spec 015: los sobres de muestra se celebran al entrar; aquí no va de eso.
   await dismissCelebration(page);
   const nav = page.locator('[data-testid="app-nav"]');
@@ -31,8 +31,8 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
     await openNav(page);
     const rail = page.locator('[data-testid="collection-rail"]');
     await expect(rail.locator(`a[aria-label="${sh.home}"]`)).toBeVisible();
-    await expect(rail.locator('a[href^="/coleccion/"]')).toHaveCount(1);
-    await expect(rail.locator('a[href^="/coleccion/"] img')).toBeVisible();
+    await expect(rail.locator('a[href^="/collection/"]')).toHaveCount(1);
+    await expect(rail.locator('a[href^="/collection/"] img')).toBeVisible();
   });
 
   await test.step("RF-2: el panel lista las secciones con la actual resaltada", async () => {
@@ -45,7 +45,7 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   await test.step("RF-3: cambiar de sección no recarga la página completa", async () => {
     await page.evaluate(() => ((window as unknown as { __sameDocument: boolean }).__sameDocument = true));
     await nav.locator(`a:has-text("${es.common.nav.myCollection}")`).click();
-    await page.waitForURL(/\/coleccion$/);
+    await page.waitForURL(/\/collection$/);
     await expect(page.locator('[data-testid="section-title"]')).toHaveText(es.common.nav.myCollection);
     expect(await page.evaluate(() => (window as unknown as { __sameDocument?: boolean }).__sameDocument)).toBe(true);
   });
@@ -73,19 +73,19 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
     await page.keyboard.press("Escape");
     await expect(tabs).toBeVisible();
     await tabs.locator(`a:has-text("${sh.tabs.rewards}")`).click();
-    await page.waitForURL(/\/recompensas$/);
+    await page.waitForURL(/\/rewards$/);
     await expect(tabs.locator('a[aria-current="page"]')).toHaveText(new RegExp(sh.tabs.rewards));
   });
 
   await test.step("RF-8 (sustituido por la spec 015, RF-15): al reclamar no hay aviso emergente; el premio vuela y se anuncia", async () => {
-    await page.goto("/recompensas");
+    await page.goto("/rewards");
     await page.locator('[data-testid="free-pack"]').getByRole("button", { name: es.rewards.free.claim }).click();
     await expect(page.locator('[data-testid="reward-announce"]')).toHaveText(es.rewards.fx.sr.gotPack);
     await expect(page.locator('[data-testid="toast"]')).toHaveCount(0);
   });
 
   await test.step("RF-7 y RF-10: estados al pasar el ratón y animaciones según el movimiento reducido", async () => {
-    await page.goto("/sobres");
+    await page.goto("/packs");
     const section = page.locator(".section-in").first();
     const duration = await section.evaluate((el) => parseFloat(getComputedStyle(el).animationDuration));
     if (info.project.name === "reduced-motion") expect(duration).toBeLessThan(0.01);
@@ -99,7 +99,7 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   });
 
   await test.step("RF-11: se navega con teclado y el foco se ve", async () => {
-    await page.goto("/sobres");
+    await page.goto("/packs");
     await page.keyboard.press("Tab");
     const outline = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
@@ -120,7 +120,7 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   });
 
   await test.step("RF-17 y RF-19: el administrador sube la edad mínima a 18 y los textos la muestran", async () => {
-    await page.goto("/admin/ajustes");
+    await page.goto("/admin/settings");
     await expect(page.locator('[data-testid="min-age-current"]')).toHaveText(es.admin.settings.minAge.current(16));
     await page.locator('[data-testid="min-age-form"]').getByRole("radio", { name: "18+" }).click();
     await page.locator(`[data-testid="min-age-form"] button:has-text("${es.admin.settings.minAge.save}")`).click();
@@ -134,11 +134,11 @@ test("estructura: barra, panel, cajón, pestañas, avisos, movimiento y edad mí
   await test.step("RF-18: el coleccionista que confirmó 16 debe confirmar 18 para seguir", async () => {
     await page.goto("/admin");
     await page.click('[data-testid="demo-switch"]');
-    await page.waitForURL(/\/bienvenida/);
+    await page.waitForURL(/\/welcome/);
     await expect(page.locator(`text=${es.legal.gate.ageRaised(18)}`)).toBeVisible();
     await expect(page.locator(`text=${es.legal.gate.age(18)}`)).toBeVisible();
     await tickAll(page.locator('[data-testid="gate-form"]'));
     await page.click('[data-testid="gate-form"] button[type="submit"]');
-    await page.waitForURL(/\/sobres$/);
+    await page.waitForURL(/\/packs$/);
   });
 });

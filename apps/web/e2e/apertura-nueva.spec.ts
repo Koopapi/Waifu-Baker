@@ -30,12 +30,12 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
   const tag = project.replace(/[^a-z0-9]/g, "");
   const code = `AN${tag.slice(0, 4).toUpperCase()}`;
   const fanName = `fan-an-${tag}`;
-  const fan = await login(browser, fanName, false, "/sobres");
+  const fan = await login(browser, fanName, false, "/packs");
   const admin = await login(browser, `admin-an-${tag}`, true);
   // 001 y 002 comunes, 003 rara (la 004 legendaria solo sale en los gold); sobres plata de 2: una común y la rara.
   await createPublishedSet(admin, code, ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
   await giftPacks(admin, fanName, code, 3);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   await dismissCelebration(fan);
 
   await test.step("RF-1 a RF-3 y RF-5: «Mis sobres» muestra el sobre nuevo con su etiqueta", async () => {
@@ -92,7 +92,7 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
     await fan.click('[data-testid="open-another"]');
     await tear(fan);
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await fan.click('[data-testid="pending-opening"]');
     await fan.waitForURL(/\?pack=/);
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
@@ -102,7 +102,7 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
   await test.step("RF-20: «Abrir todos» usa el sobre nuevo", async () => {
     // Quedaba 1 sellado (el segundo ya se rasgó al retomar) y se regalan 2 más: 3 sobres de 2 cartas.
     await giftPacks(admin, fanName, code, 2);
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await dismissCelebration(fan);
     await fan.click(`[data-testid="group-${code}"] >> text=${es.packs.mine.openAll(3)}`, { timeout: 30_000 });
     await expect(fan.locator(".pack-shell").first()).toBeVisible();

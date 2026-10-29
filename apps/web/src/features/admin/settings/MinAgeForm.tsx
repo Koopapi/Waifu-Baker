@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { setMinAgeAction } from "@/app/admin/ajustes/actions";
+import { setMinAgeAction } from "@/app/admin/settings/actions";
 import { MIN_AGE_OPTIONS } from "@/domain/legal/documents";
 import { useT } from "@/i18n/client";
 import type { ActionState } from "@/server/auth/admin-action";

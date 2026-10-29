@@ -15,7 +15,7 @@ export async function login(browser: Browser, name: string, admin: boolean, next
   await page.click("text=Entrar (desarrollo)");
   // Se espera al destino final (o a la bienvenida): en WebKit hay pasos intermedios tras el login.
   const target = next.split("?")[0];
-  await page.waitForURL((u) => u.pathname.startsWith(target) || u.pathname.startsWith("/bienvenida"));
+  await page.waitForURL((u) => u.pathname.startsWith(target) || u.pathname.startsWith("/welcome"));
   await page.waitForLoadState("networkidle");
   await acceptGate(page);
   if (!opts.keepCelebration) await dismissCelebration(page);
@@ -45,23 +45,23 @@ export async function dismissCelebration(page: Page, timeout = 1500) {
 export async function acceptGate(page: Page) {
   const here = new URL(page.url());
   if (here.pathname.startsWith("/admin")) return;
-  const next = here.pathname.startsWith("/bienvenida")
+  const next = here.pathname.startsWith("/welcome")
     ? (here.searchParams.get("next") ?? "/")
     : here.pathname + here.search;
   try {
-    await page.goto(`/bienvenida?next=${encodeURIComponent(next)}`);
+    await page.goto(`/welcome?next=${encodeURIComponent(next)}`);
   } catch (e) {
     // La redirección de la propia web a la bienvenida puede llegar justo a la vez: va al mismo sitio.
     if (!String(e).includes("interrupted by another navigation")) throw e;
     await page.waitForLoadState("load");
   }
   // En una carga completa, la redirección del servidor ya ha ocurrido cuando `goto` termina.
-  if (new URL(page.url()).pathname.startsWith("/bienvenida")) {
+  if (new URL(page.url()).pathname.startsWith("/welcome")) {
     const gate = page.locator('[data-testid="gate-form"]');
     await gate.waitFor({ state: "visible" });
     await tickAll(gate);
     await gate.locator('button[type="submit"]').click();
-    await page.waitForURL((u) => !u.pathname.startsWith("/bienvenida"));
+    await page.waitForURL((u) => !u.pathname.startsWith("/welcome"));
   }
   await page.waitForLoadState("networkidle");
 }

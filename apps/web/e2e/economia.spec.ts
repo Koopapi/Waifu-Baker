@@ -69,11 +69,11 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
   });
 
   await giftPacks(admin, "fan-eco", "ECO2", 1);
-  const fan = await login(browser, "fan-eco", false, "/sobres");
+  const fan = await login(browser, "fan-eco", false, "/packs");
   const pid = "dev:fan-eco";
 
   await test.step("RF-9: en «Mis sobres» la colección de Patreon dice cómo conseguir más, con enlace", async () => {
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     const group = fan.locator('[data-testid="group-ECO2"]');
     await expect(group).toContainText("x2");
     await expect(group.locator('[data-testid="patreon-notice"]')).toContainText(es.packs.mine.patreonMore);
@@ -81,7 +81,7 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
   });
 
   await test.step("RF-4: el sobre gratis solo ofrece la colección gratuita", async () => {
-    await fan.goto("/recompensas");
+    await fan.goto("/rewards");
     const panel = fan.locator('[data-testid="free-pack"]');
     const option = fan.getByRole("option", { name: "ECO1 · Colección ECO1" }).first();
     // Un clic antes de que la página termine de hidratarse no abre la lista: se vuelve a pulsar hasta que aparece.
@@ -93,17 +93,17 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
     await option.click();
     await panel.getByRole("button", { name: es.rewards.free.claim }).click();
     await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.rewards.fx.sr.gotPack);
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-ECO1"]')).toContainText("x1");
     await expect(fan.locator('[data-testid="group-ECO1"] [data-testid="patreon-notice"]')).toHaveCount(0);
   });
 
   await test.step("RF-9: la lista de colecciones y el álbum de la colección de Patreon avisan y enlazan", async () => {
-    await fan.goto(`/sobres/${patreon}/todos`);
+    await fan.goto(`/packs/${patreon}/all`);
     expect(await openAllAndSkip(fan)).toBe(4);
-    await fan.goto("/coleccion");
+    await fan.goto("/collection");
     await expect(fan.locator('[data-testid="collection-ECO2"] [data-testid="patreon-notice"]')).toContainText(es.collection.patreon.notice);
-    await fan.goto(`/coleccion/${patreon}`);
+    await fan.goto(`/collection/${patreon}`);
     await expect(fan.locator('[data-testid="patreon-notice"] [data-testid="patreon-link"]')).toHaveAttribute("href", /patreon\.com/);
   });
 
@@ -114,7 +114,7 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
   });
 
   await test.step("RF-15: el jugador gratis ve el tercer espacio bloqueado, con enlace", async () => {
-    await fan.goto("/juegos/expediciones");
+    await fan.goto("/games/expeditions");
     await expect(fan.locator('[data-testid="slots"]')).toHaveText(g.expeditions.slots(0, 2));
     await expect(fan.locator('[data-testid="third-slot-locked"] [data-testid="patreon-link"]')).toHaveAttribute("href", /patreon\.com/);
     await expect(fan.locator('[data-testid="patron-badge"]')).toHaveCount(0);
@@ -122,17 +122,17 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
 
   await test.step("RF-11 y RF-13: con la membresía activa aparece la insignia y hay 3 espacios", async () => {
     await patreonSays(request, pid, {}, "paid");
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await expect(fan.locator('[data-testid="patron-badge"]')).toBeVisible();
-    await fan.goto("/juegos/expediciones");
+    await fan.goto("/games/expeditions");
     await expect(fan.locator('[data-testid="slots"]')).toHaveText(g.expeditions.slots(0, 3));
     await expect(fan.locator('[data-testid="third-slot-locked"]')).toHaveCount(0);
-    await fan.goto("/coleccion");
+    await fan.goto("/collection");
     await expect(fan.locator('[data-testid="collection-ECO2"] [data-testid="patreon-notice"]')).toHaveCount(0);
   });
 
   await test.step("RF-11: la insignia también sale en el álbum público", async () => {
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
     await fan.click(`text=${es.collection.album.activate}`);
     await expect(fan.locator('[data-testid="album-url"]')).toBeVisible();
     const albumUrl = new URL(await fan.locator('[data-testid="album-url"]').inputValue()).pathname;
@@ -144,9 +144,9 @@ test("economía: colecciones gratuitas y de Patreon, avisos, probabilidades e in
 
   await test.step("RF-12 y RF-14: al perder la membresía se van la insignia y el tercer espacio", async () => {
     await patreonSays(request, pid, { patronStatus: "former_patron" }, "left");
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await expect(fan.locator('[data-testid="patron-badge"]')).toHaveCount(0);
-    await fan.goto("/juegos/expediciones");
+    await fan.goto("/games/expeditions");
     await expect(fan.locator('[data-testid="slots"]')).toHaveText(g.expeditions.slots(0, 2));
     await expect(fan.locator('[data-testid="third-slot-locked"]')).toBeVisible();
   });
