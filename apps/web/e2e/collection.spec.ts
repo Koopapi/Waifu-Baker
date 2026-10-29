@@ -43,7 +43,8 @@ test("colección y álbum público", async ({ browser }) => {
     const missing = grid.locator('li[data-missing="true"]');
     await expect(missing).toHaveCount(2);
     await expect(missing.locator("img")).toHaveCount(0);
-    await expect(missing).not.toContainText("ALB1 carta");
+    // Las dos siluetas (la común sin conseguir y la legendaria de los gold) no revelan su nombre.
+    for (const i of [0, 1]) await expect(missing.nth(i)).not.toContainText("ALB1 carta");
     const img = grid.locator('[data-slot="3"] img');
     await expect(img).toHaveAttribute("src", /^\/api\/cards\/img\?c=.+&s=thumb&/);
     await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(300);
@@ -57,8 +58,9 @@ test("colección y álbum público", async ({ browser }) => {
     await fan.click("text=Las que tengo");
     await expect(items).toHaveCount(2);
     await fan.click('[data-testid="binder-filters"] >> text=Holo');
-    await expect(items).toHaveCount(1);
-    await expect(items.first()).toHaveAttribute("data-slot", "3");
+    // Spec 022: el holo vale para todas las rarezas; con 100 % las dos cartas que tengo (la común y la rara) son holo.
+    await expect(items).toHaveCount(2);
+    await expect(fan.locator('[data-testid="binder-grid"] li[data-slot="3"]')).toHaveCount(1);
     await fan.click('[data-testid="binder-filters"] >> text=Todas');
     await choose(fan, "Filtrar por rareza", /^Común$/);
     await expect(items).toHaveCount(1);
