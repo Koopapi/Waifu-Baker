@@ -19,6 +19,7 @@
     "db:studio": "drizzle-kit studio",
     "backup": "node --env-file-if-exists=.env.local scripts/backup.mts",
     "backup:restore": "node --env-file-if-exists=.env.local scripts/backup-restore.mts",
+    "admin": "tsx --env-file-if-exists=.env.local scripts/admin.mts",
     "demo": "node scripts/demo.mts",
     "budget": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/bundle-budget.mts",
     "showcase": "node scripts/showcase.mjs"

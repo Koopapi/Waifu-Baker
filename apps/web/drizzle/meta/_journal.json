@@ -127,6 +127,13 @@
       "when": 1793233729683,
       "tag": "0017_rarezas_y_sobres",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793253432113,
+      "tag": "0018_admin_accounts",
+      "breakpoints": true
     }
   ]
 }

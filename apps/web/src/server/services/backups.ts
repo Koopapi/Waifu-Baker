@@ -4,12 +4,15 @@ import { desc, eq, sql } from "drizzle-orm";
 import { backupRuns } from "@/db/schema";
 import { createBackup, pruneBackups } from "@/server/backup/core";
 import type { DbLike } from "@/server/db-types";
+import { r2ConfigFromEnv, uploadToR2, type R2Config } from "@/server/backup/r2";
 
 export interface BackupConfig {
   databaseUrl: string;
   cardsDir: string;
   outDir: string | null;
   passphrase: string | null;
+  /** Spec 024, RF-23: copia fuera del servidor (Cloudflare R2); `null` = solo en el disco. */
+  r2: R2Config | null;
 }
 
 export function backupConfigFromEnv(env = process.env): BackupConfig {
@@ -18,6 +21,7 @@ export function backupConfigFromEnv(env = process.env): BackupConfig {
     cardsDir: env.CARD_STORE_DIR ?? path.resolve(process.cwd(), "var/cards"),
     outDir: env.BACKUP_DIR?.trim() || null,
     passphrase: env.BACKUP_PASSPHRASE?.trim() || null,
+    r2: r2ConfigFromEnv(env),
   };
 }
 
@@ -29,6 +33,8 @@ export async function runBackup(db: DbLike, cfg: BackupConfig, now = new Date())
     if (!cfg.passphrase) throw new Error("Falta BACKUP_PASSPHRASE: no se hacen copias sin cifrar.");
     const r = await createBackup({ databaseUrl: cfg.databaseUrl, cardsDir: cfg.cardsDir, outDir: cfg.outDir, passphrase: cfg.passphrase, now });
     await pruneBackups(cfg.outDir, now);
+    // Spec 024, RF-23: la misma copia cifrada, fuera del servidor.
+    if (cfg.r2) await uploadToR2(cfg.r2, r.file, `copias/${path.basename(r.file)}`, now);
     await db.update(backupRuns).set({ ok: true, finishedAt: sql`now()`, file: path.basename(r.file), bytes: r.bytes }).where(eq(backupRuns.id, row.id));
     return { ok: true as const, ...r };
   } catch (e) {

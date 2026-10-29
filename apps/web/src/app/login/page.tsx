@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth, devLoginEnabled, patreonLoginEnabled, signIn } from "@/auth";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
@@ -53,6 +54,10 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
             </Button>
           </form>
         )}
+        {/* Spec 024: el equipo (administradores) entra con usuario, contraseña y Telegram. */}
+        <Link href="/login/equipo" className="block border-t border-ui-line pt-4 text-center text-xs text-ui-text-3 underline-offset-4 hover:underline">
+          {t.site.login.staffLink}
+        </Link>
       </Card>
     </main>
   );

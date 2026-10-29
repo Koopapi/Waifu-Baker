@@ -1,5 +1,7 @@
 // Spec 001: tareas periódicas en el propio servidor (una sola instancia, local y beta). En el
 // despliegue con varias instancias pasarán a una cola (spec 007).
+import { notifyAdmins } from "@/server/services/admin-accounts";
+import { getTelegram } from "@/server/adapters/telegram";
 import { db } from "@/db/client";
 import { getPatreonClient } from "@/server/patreon/make-client";
 import { purgeExpiredAccounts } from "@/server/services/account";
@@ -23,6 +25,13 @@ async function safely(name: string, fn: () => Promise<unknown>) {
  * Spec 001: revisión de Patreon cada 6 h y borrado de cuentas vencidas cada día. Spec 007: copia de
  * seguridad cada día. Spec 016: limpieza diaria de capas temporales. Se activa con SCHEDULER=1 (PATREON_RECONCILE=1 se sigue aceptando).
  */
+/** Milisegundos hasta la próxima vez que el reloj UTC marque `hour`:00. */
+export function msUntilUtcHour(hour: number, now: Date) {
+  const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), hour));
+  if (next.getTime() <= now.getTime()) next.setUTCDate(next.getUTCDate() + 1);
+  return next.getTime() - now.getTime();
+}
+
 export function startSchedulerIfEnabled() {
   if (g.__wbScheduler || (process.env.SCHEDULER !== "1" && process.env.PATREON_RECONCILE !== "1")) return;
   g.__wbScheduler = true;
@@ -34,9 +43,18 @@ export function startSchedulerIfEnabled() {
   const purge = () => safely("borrado de cuentas vencidas", () => purgeExpiredAccounts(db));
   setTimeout(() => void reconcile(), 60_000);
   setTimeout(() => void purge(), 90_000);
-  const backup = () => safely("copia de seguridad", () => runBackup(db, backupConfigFromEnv()));
-  setTimeout(() => void backup(), 120_000);
-  setInterval(() => void backup(), 24 * HOUR).unref();
+  // Spec 024, RF-23 y RF-24: la copia se hace de madrugada (09:00 UTC, las 3 de la mañana en México) y, si falla, se
+  // avisa por Telegram a los administradores.
+  const backup = () =>
+    safely("copia de seguridad", async () => {
+      const r = await runBackup(db, backupConfigFromEnv());
+      if (!r.ok) await notifyAdmins(db, getTelegram(), `Waifu Baker · la copia de seguridad de esta noche falló: ${r.error}`);
+      return r;
+    });
+  setTimeout(() => {
+    void backup();
+    setInterval(() => void backup(), 24 * HOUR).unref();
+  }, msUntilUtcHour(9, new Date())).unref();
   setInterval(() => void reconcile(), 6 * HOUR).unref();
   setInterval(() => void purge(), 24 * HOUR).unref();
   // Spec 016: capas subidas al editor y nunca guardadas.

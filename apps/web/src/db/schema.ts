@@ -566,3 +566,45 @@ export const characterBonds = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.characterId] })],
 );
+
+/**
+ * Spec 024, RF-14 a RF-21: cuentas de administrador con usuario, contraseña y segundo factor por Telegram. Cada una
+ * tiene su usuario del juego (rol `admin`, `patreon_user_id` = `admin:<usuario>`).
+ */
+export const adminAccounts = pgTable("admin_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  /** La contraseña la puso el servidor (al crearla o restablecerla): hay que cambiarla al entrar. */
+  mustChangePassword: boolean("must_change_password").notNull().default(true),
+  telegramChatId: text("telegram_chat_id"),
+  /** Hash del enlace de vinculación con el bot (`/start <token>`) y su caducidad. */
+  telegramLinkHash: text("telegram_link_hash"),
+  telegramLinkExpiresAt: timestamp("telegram_link_expires_at", { withTimezone: true }),
+  /** Paso de inicio de sesión en curso (contraseña ya comprobada): hash del valor de la cookie y hasta cuándo vale. */
+  pendingHash: text("pending_hash"),
+  pendingUntil: timestamp("pending_until", { withTimezone: true }),
+  failedAttempts: integer("failed_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  ...timestamps,
+});
+
+/** Spec 024, RF-17 y RF-18: los códigos enviados por Telegram (solo su hash), de un uso y con caducidad. */
+export const adminLoginCodes = pgTable(
+  "admin_login_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => adminAccounts.id, { onDelete: "cascade" }),
+    codeHash: text("code_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("admin_login_codes_account_idx").on(t.accountId, t.createdAt)],
+);
