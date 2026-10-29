@@ -6,9 +6,12 @@ en el servidor. Preguntas del 28 oct 2026:
 
 1. **Despliegues:** Coolify en el propio VPS (panel tipo Vercel, $0 extra), elegido tras comparar costes con GitHub
    Actions + Docker (también $0 extra, sin panel).
-2. **Dominio:** el dueño ya tiene dominio. [Nombre por confirmar.]
-3. **Administradores:** usuario y contraseña propios (no Patreon), para él y para Bruno. Se propone segundo factor.
+2. **Dominio:** `waifubaker.com` (DNS hoy en HostGator Brasil).
+3. **Administradores:** usuario y contraseña propios (no Patreon), para él y para Bruno, con segundo factor obligatorio
+   por Telegram.
 4. **Imágenes y copias:** en el disco del VPS, con copia nocturna cifrada fuera (Cloudflare R2: 10 GB gratis al mes).
 
-Valores por defecto (no preguntados): producción empieza con la base vacía; los coleccionistas siguen entrando con
-Patreon; las webs de prueba por PR quedan para más adelante.
+5. **Producción:** empieza en cero; las cartas e imágenes se suben allí.
+6. **Servidor de pruebas:** sí, con la rama `pruebas`, antes de producción. Nada 18+ hasta la confirmación de Contabo.
+
+Valores por defecto (no preguntados): los coleccionistas siguen entrando con Patreon.
