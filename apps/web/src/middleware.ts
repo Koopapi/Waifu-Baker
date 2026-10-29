@@ -12,4 +12,4 @@ export function middleware(req: NextRequest) {
   return NextResponse.next({ request: { headers } });
 }
 
-export const config = { matcher: ["/admin/:path*", "/sobres/:path*", "/coleccion/:path*", "/cuenta/:path*", "/recompensas/:path*", "/lab", "/lab/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/packs/:path*", "/collection/:path*", "/account/:path*", "/rewards/:path*", "/lab", "/lab/:path*"] };

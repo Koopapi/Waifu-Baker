@@ -25,9 +25,9 @@ test("abrir todos: ráfaga, foco en las destacadas y resumen", async ({ browser 
   // 3 cartas y la 003 rara: cada sobre trae 2, con la rara garantizada.
   const setId = await createPublishedSet(admin, `OA${tag.slice(0, 4)}`, ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
   await giftPacks(admin, `fan-oa-${tag}`, `OA${tag.slice(0, 4)}`, 3);
-  const fan = await login(browser, `fan-oa-${tag}`, false, "/sobres");
+  const fan = await login(browser, `fan-oa-${tag}`, false, "/packs");
   await record(fan);
-  await fan.goto(`/sobres/${setId}/todos`);
+  await fan.goto(`/packs/${setId}/all`);
   await fan.waitForLoadState("networkidle");
   // El sonido se activa con el primer gesto (el clic de «Abrir todos»).
   await fan.click('[data-testid="open-all"]');
@@ -79,11 +79,11 @@ test("abrir todos: «Saltar», lote sin destacadas y 50 sobres", async ({ browse
   desktopOnly();
   const admin = await login(browser, "admin-oa-saltar", true);
   const setId = await createPublishedSet(admin, "OASK", ["04.webp", "05.webp", "06.webp"].map((f) => path.join(LAB, f)), 3);
-  const fan = await login(browser, "fan-oa-saltar", false, "/sobres");
+  const fan = await login(browser, "fan-oa-saltar", false, "/packs");
 
   await test.step("RF-9: «Saltar» en la ráfaga lleva directo al resumen", async () => {
     await giftPacks(admin, "fan-oa-saltar", "OASK", 2);
-    await fan.goto(`/sobres/${setId}/todos`);
+    await fan.goto(`/packs/${setId}/all`);
     await fan.click('[data-testid="open-all"]');
     await fan.locator('[data-testid="open-all-burst"] [data-testid="open-all-skip"]').click();
     await expect(fan.locator('[data-testid="open-all-result"]')).toBeVisible();
@@ -93,7 +93,7 @@ test("abrir todos: «Saltar», lote sin destacadas y 50 sobres", async ({ browse
   await test.step("RF-8: un lote sin destacadas pasa de la ráfaga al resumen", async () => {
     // La rara ya no es nueva: no hay destacadas.
     await giftPacks(admin, "fan-oa-saltar", "OASK", 2);
-    await fan.goto(`/sobres/${setId}/todos`);
+    await fan.goto(`/packs/${setId}/all`);
     await fan.click('[data-testid="open-all"]');
     await expect(fan.locator('[data-testid="open-all-result"]')).toBeVisible({ timeout: 10_000 });
     await expect(fan.locator('[data-testid="open-all-focus"]')).toHaveCount(0);
@@ -101,7 +101,7 @@ test("abrir todos: «Saltar», lote sin destacadas y 50 sobres", async ({ browse
 
   await test.step("RF-2: con 50 sobres, la ráfaga se acelera y no pasa de 6 s", async () => {
     for (const n of [20, 20, 10]) await giftPacks(admin, "fan-oa-saltar", "OASK", n);
-    await fan.goto(`/sobres/${setId}/todos`);
+    await fan.goto(`/packs/${setId}/all`);
     await fan.click('[data-testid="open-all"]');
     await expect(fan.locator('[data-testid="burst-counter"]')).toContainText("de 50", { timeout: 30_000 });
     const t0 = Date.now();

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { approveReviewAction, hideAlbumAction, rejectReviewAction } from "@/app/admin/albumes/actions";
+import { approveReviewAction, hideAlbumAction, rejectReviewAction } from "@/app/admin/albums/actions";
 import { MODERATION_REASONS, type ModerationReason } from "@/domain/collection/moderation";
 import { useT } from "@/i18n/client";
 import type { ActionState } from "@/server/auth/admin-action";

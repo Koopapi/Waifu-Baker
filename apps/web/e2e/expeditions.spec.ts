@@ -56,7 +56,7 @@ test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sob
   });
 
   await test.step("RF-28 y RF-29: crea una zona abierta (con sobre seguro a 30 min) y otra con niebla", async () => {
-    await admin.goto("/admin/expediciones");
+    await admin.goto("/admin/expeditions");
     await createZone(admin, { name: "Puerto Miel", terrain: g.terrain.city, difficulty: 10, fragments: 0, order: 1, pack30: 100 });
     await createZone(admin, { name: "Ruinas", terrain: g.terrain.ruins, difficulty: 80, fragments: 1, order: 2, pack30: 1 });
   });
@@ -72,15 +72,15 @@ test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sob
     await expect(result).toContainText(/100\s%/);
   });
 
-  const fan = await login(browser, "fan-expe", false, "/sobres");
-  await fan.goto(`/sobres/${setId}/todos`);
+  const fan = await login(browser, "fan-expe", false, "/packs");
+  await fan.goto(`/packs/${setId}/all`);
   expect(await openAllAndSkip(fan)).toBe(4);
 
   await test.step("RF-1: «Juegos» en la navegación con Expediciones como primer juego", async () => {
-    await fan.goto("/juegos");
-    await expect(fan.locator('a[href="/juegos"]').first()).toBeVisible();
+    await fan.goto("/games");
+    await expect(fan.locator('a[href="/games"]').first()).toBeVisible();
     await fan.locator('[data-testid="game-expeditions"]').click();
-    await fan.waitForURL("**/juegos/expediciones");
+    await fan.waitForURL("**/games/expeditions");
   });
 
   await test.step("RF-3, RF-4 y RF-6: el mapa enseña la zona abierta y la de niebla con los fragmentos que faltan", async () => {
@@ -134,10 +134,10 @@ test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sob
 
   await test.step("RF-2: con el reloj adelantado, «Juegos» cuenta el equipo que volvió", async () => {
     await advance(request, 1);
-    await fan.goto("/juegos/expediciones");
+    await fan.goto("/games/expeditions");
     await fan.waitForLoadState("networkidle");
     await expect(fan.locator('[data-testid="team"]').first()).toHaveAttribute("data-ready", "1");
-    await expect(fan.locator('a[href="/juegos"]').first()).toContainText("1");
+    await expect(fan.locator('a[href="/games"]').first()).toContainText("1");
   });
 
   await test.step("RF-20, RF-21, RF-23 y RF-24: reclama, ve el reporte y el sobre que encontraron", async () => {
@@ -160,12 +160,12 @@ test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sob
     await expect(celebration).toBeVisible();
     await expect(celebration).toContainText(g.report.packTitle);
     await dismissCelebration(fan, 10_000);
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-EXPE"]')).toBeVisible();
   });
 
   await test.step("RF-5: con el fragmento ganado abre la zona con niebla", async () => {
-    await fan.goto("/juegos/expediciones");
+    await fan.goto("/games/expeditions");
     await expect(fan.locator('[data-testid="fragments"]')).toContainText(g.expeditions.fragments(1));
     await fan.locator('[data-testid="fog-zone"][data-zone="Ruinas"] [data-testid="unlock"]').click();
     await expect(pin(fan, "Ruinas")).toHaveAttribute("data-state", "open");
@@ -173,7 +173,7 @@ test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sob
   });
 
   await test.step("RF-25: la ficha de la carta enseña el vínculo de su personaje", async () => {
-    await fan.goto(`/coleccion/${setId}`);
+    await fan.goto(`/collection/${setId}`);
     await fan.locator('[data-testid="binder-grid"] li button').first().click();
     await expect(fan.locator('[data-testid="card-bond"]')).toContainText(g.sheet.bond(1));
   });

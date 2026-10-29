@@ -6,7 +6,7 @@ import { useCallback, useRef, useState } from "react";
 import type { LabCard } from "@/features/opening/fakePack";
 import { liveImageUrls } from "@/domain/cards/live";
 import type { PackArtData } from "@/features/packs/PackArt";
-import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/sobres/actions";
+import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/packs/actions";
 import { useT } from "@/i18n/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import type { PackKind } from "@/domain/catalog/default-odds";
@@ -72,14 +72,14 @@ export function PackOpener({ setId, setCode, setName, art, kind, sealed, resumeP
                 {t.packs.opener.openAnother(remaining)}
               </button>
             )}
-            <Link href="/sobres" className="hud__btn">
+            <Link href="/packs" className="hud__btn">
               {t.packs.opener.backToMine}
             </Link>
           </>
         )}
         extraHud={
           <>
-            <Link href="/sobres" className="hud__btn">
+            <Link href="/packs" className="hud__btn">
               {t.packs.opener.backToMineHud}
             </Link>
             {/* Spec 022, RF-19: plata o gold, a la vista durante toda la apertura. */}

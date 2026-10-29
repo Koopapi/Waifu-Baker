@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveZoneAction, simulateZoneAction, type SimulationState } from "@/app/admin/expediciones/actions";
+import { saveZoneAction, simulateZoneAction, type SimulationState } from "@/app/admin/expeditions/actions";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { DURATIONS, ROLES, TERRAINS, defaultZoneLoot, type DurationMin, type Role, type TeamMember, type Terrain, type ZoneLoot } from "@/domain/expeditions/rules";
 import { FormMessage, SubmitButton } from "@/features/admin/ui";

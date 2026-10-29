@@ -19,7 +19,7 @@ export function current<T>(queue: readonly T[], blocked: boolean): T | null {
   return blocked ? null : (queue[0] ?? null);
 }
 
-/** Las rutas de la apertura (`/sobres/<id>` y `/sobres/<id>/todos`): ahí no sale ninguna celebración. */
+/** Las rutas de la apertura (`/packs/<id>` y `/packs/<id>/all`): ahí no sale ninguna celebración. */
 export function isOpeningRoute(path: string): boolean {
-  return /^\/sobres\/[^/]+(\/todos)?\/?$/.test(path);
+  return /^\/packs\/[^/]+(\/all)?\/?$/.test(path);
 }

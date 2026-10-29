@@ -1,4 +1,4 @@
-// Criterios de la spec 011: sistema de diseño (catálogo /sistema, teclado, foco, avisos, confirmación, movimiento).
+// Criterios de la spec 011: sistema de diseño (catálogo /design-system, teclado, foco, avisos, confirmación, movimiento).
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
 
@@ -7,7 +7,7 @@ const es = dictionaries.es;
 test("sistema de diseño: catálogo, teclado, superposiciones, avisos y acciones optimistas", async ({ browser }, info) => {
   test.setTimeout(240_000);
   const page = await (await browser.newContext()).newPage();
-  await page.goto("/sistema");
+  await page.goto("/design-system");
   await expect(page.locator('[data-testid="catalog"]')).toBeVisible();
 
   await test.step("RF-15: el catálogo muestra todas las familias de componentes", async () => {

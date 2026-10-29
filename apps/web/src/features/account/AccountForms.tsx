@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useTransition } from "react";
-import { declareAdultAction, deactivateAccountAction } from "@/app/(app)/cuenta/actions";
+import { declareAdultAction, deactivateAccountAction } from "@/app/(app)/account/actions";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";

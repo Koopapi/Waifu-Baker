@@ -69,7 +69,7 @@ await step("bienvenida", async () => {
   await page.fill('input[name="name"]', `visita-${device}`);
   await page.locator('form:has(input[name="name"]) input[type="checkbox"]').setChecked(false);
   await page.click('form:has(input[name="name"]) button[type="submit"]');
-  await page.waitForURL(/bienvenida/, { timeout: 30_000 });
+  await page.waitForURL(/welcome/, { timeout: 30_000 });
   await shot("bienvenida", "Bienvenida: edad y términos", "Entrada");
   await ctx.clearCookies();
   await ctx.addCookies([{ name: "wb_locale", value: "es", url: BASE }]);
@@ -78,7 +78,7 @@ await step("bienvenida", async () => {
 // ——— Coleccionista ———
 await go("/");
 await page.click('[data-testid="demo-enter-collector"]');
-await page.waitForURL(/\/sobres/);
+await page.waitForURL(/\/packs/);
 await shot("mis-sobres", "Mis sobres", "Coleccionista");
 if (phone) {
   await openMenu();
@@ -130,15 +130,15 @@ await step("apertura", async () => {
   await shot("apertura-resumen", "Apertura: resumen del sobre", "Apertura de sobres", { wait: 1200 });
 });
 await step("abrir-todos", async () => {
-  await go(`${setHref}/todos`);
+  await go(`${setHref}/all`);
   await page.click('[data-testid="open-all"]');
   await page.waitForSelector('[data-testid="open-all-grid"] li', { timeout: 60_000 });
   await shot("abrir-todos", "Abrir todos de golpe", "Apertura de sobres", { wait: 1500, full: !phone });
 });
-await go("/coleccion");
+await go("/collection");
 await shot("mi-coleccion", "Mi colección", "Coleccionista");
 await step("album", async () => {
-  await page.locator('main a[href^="/coleccion/"]:not([href$="album"])').first().click();
+  await page.locator('main a[href^="/collection/"]:not([href$="album"])').first().click();
   await page.waitForSelector('[data-testid="binder-grid"]');
   await shot("album", "Álbum de la colección", "Coleccionista", { wait: 1500 });
   await page.locator('[data-testid="binder-grid"] li:not([data-missing]) button').first().click();
@@ -146,7 +146,7 @@ await step("album", async () => {
   await shot("ficha-carta", "Ficha de una carta (con holo)", "Coleccionista", { wait: 1500 });
   await page.keyboard.press("Escape");
 });
-await go("/coleccion/album");
+await go("/collection/album");
 await shot("album-publico-ajustes", "Ajustes del álbum público", "Coleccionista", { full: !phone });
 await step("album-publico", async () => {
   const url = await page.locator('[data-testid="album-url"]').inputValue();
@@ -161,14 +161,14 @@ await step("album-publico", async () => {
   console.log(`✓ ${file}`);
   await anon.close();
 });
-await go("/recompensas");
+await go("/rewards");
 await shot("recompensas", "Recompensas: sobre gratis y racha diaria", "Coleccionista");
 await step("recompensa-reclamada", async () => {
   await page.locator('[data-testid="daily"] button:has-text("Reclamar")').click();
   await page.waitForSelector('[data-testid="toast"]');
   await shot("recompensa-reclamada", "Recompensa reclamada (aviso)", "Coleccionista", { wait: 500 });
 });
-await go("/cuenta");
+await go("/account");
 await shot("mi-cuenta", "Mi cuenta", "Coleccionista", { full: !phone });
 await step("confirmar-borrado", async () => {
   await page.click('[data-testid="delete-account"]');
@@ -215,8 +215,8 @@ for (const [p, slug, title] of [
   ["/admin/characters", "admin-personajes", "Panel: personajes"],
   ["/admin/users", "admin-usuarios", "Panel: usuarios"],
   ["/admin/tiers", "admin-tiers", "Panel: tiers de Patreon"],
-  ["/admin/metricas", "admin-metricas", "Panel: métricas y copias"],
-  ["/admin/ajustes", "admin-ajustes", "Panel: ajustes (edad mínima)"],
+  ["/admin/metrics", "admin-metricas", "Panel: métricas y copias"],
+  ["/admin/settings", "admin-ajustes", "Panel: ajustes (edad mínima)"],
 ]) {
   await go(p);
   await shot(slug, title, "Administración");
@@ -229,7 +229,7 @@ await step("ficha-usuario", async () => {
 });
 
 // ——— Sistema de diseño ———
-await go("/sistema");
+await go("/design-system");
 await shot("sistema", "Sistema de diseño (catálogo)", "Sistema de diseño", { full: true, wait: 1200 });
 
 writeFileSync(path.join(dir, "manifest.json"), JSON.stringify({ device, shots }, null, 2));

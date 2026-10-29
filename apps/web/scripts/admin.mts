@@ -20,7 +20,7 @@ try {
   if (cmd === "create") {
     const { password } = await createAdminAccount(db, username);
     console.log(`Cuenta «${username}» creada. Contraseña temporal (se pide cambiarla al entrar):\n\n  ${password}\n`);
-    console.log("Entra en /login/equipo. Esta contraseña no se vuelve a mostrar.");
+    console.log("Entra en /login/team. Esta contraseña no se vuelve a mostrar.");
   } else if (cmd === "reset-password") {
     const { password } = await resetAdminPassword(db, username);
     console.log(`Contraseña temporal nueva para «${username}» (se pide cambiarla al entrar):\n\n  ${password}\n`);

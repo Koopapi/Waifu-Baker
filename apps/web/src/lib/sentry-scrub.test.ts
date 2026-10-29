@@ -6,10 +6,10 @@ describe("spec 007 — avisos de errores", () => {
     const ev = scrubEvent({
       message: "boom",
       user: { id: "9d1c", username: "Nombre Real", ip_address: "1.2.3.4", email: "x@y.z" },
-      request: { url: "http://localhost/sobres", cookies: "authjs.session=abc", headers: { cookie: "x" }, data: "{}", query_string: "a=1" },
+      request: { url: "http://localhost/packs", cookies: "authjs.session=abc", headers: { cookie: "x" }, data: "{}", query_string: "a=1" },
     });
     expect(ev.user).toEqual({ id: "9d1c" });
-    expect(ev.request).toEqual({ url: "http://localhost/sobres" });
+    expect(ev.request).toEqual({ url: "http://localhost/packs" });
     expect(JSON.stringify(ev)).not.toMatch(/Nombre Real|1\.2\.3\.4|session=abc|x@y\.z/);
     expect(scrubEvent({ user: { username: "sin id" } }).user).toBeUndefined();
   });

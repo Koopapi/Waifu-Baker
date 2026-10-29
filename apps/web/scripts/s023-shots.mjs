@@ -23,11 +23,11 @@ for (const kind of ["silver", "gold"]) {
 const page = await (await browser.newContext({ ...devices["iPhone 14"], browserName: undefined })).newPage();
 page.on("pageerror", (e) => console.log("ERROR de página:", e.message));
 await page.context().addCookies([{ name: "wb_locale", value: "es", url: base }]);
-await page.goto(`${base}/login?next=/sobres`);
+await page.goto(`${base}/login?next=/packs`);
 await page.fill('input[name="name"]', "demo-collector");
 await page.locator('form:has(input[name="name"]) input[type="checkbox"]').setChecked(false);
 await page.locator('form:has(input[name="name"]) button[type="submit"]').click();
-await page.waitForURL(/\/sobres/, { timeout: 60_000 });
+await page.waitForURL(/\/packs/, { timeout: 60_000 });
 await page.waitForLoadState("networkidle");
 const dlg = page.locator('[data-testid="celebration-close"]');
 if (await dlg.isVisible().catch(() => false)) await dlg.click();
@@ -41,7 +41,7 @@ if (await pending.isVisible().catch(() => false)) {
   await page.waitForSelector('.stage[data-phase="deck"]', { timeout: 30_000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${out}/0-retomada.png` });
-  await page.goto(`${base}/sobres`);
+  await page.goto(`${base}/packs`);
   await page.waitForLoadState("networkidle");
   if (await dlg.isVisible().catch(() => false)) await dlg.click();
 }

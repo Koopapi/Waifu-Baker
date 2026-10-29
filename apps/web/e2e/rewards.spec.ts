@@ -14,7 +14,7 @@ const es = dictionaries.es.rewards;
 const advance = async (api: APIRequestContext, hours: number) => expect((await api.post("/api/dev/clock", { data: { advanceHours: hours } })).status()).toBe(200);
 
 async function reload(p: Page) {
-  await p.goto("/sobres");
+  await p.goto("/packs");
   await p.waitForLoadState("networkidle");
 }
 
@@ -26,7 +26,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   const admin = await login(browser, "admin-rewards", true);
   // Spec 021: solo las colecciones gratuitas salen en el sobre cada 12 h y el día 7.
   await createPublishedSet(admin, "FREE1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
-  const fan = await login(browser, "fan-rewards", false, "/sobres");
+  const fan = await login(browser, "fan-rewards", false, "/packs");
   await reload(fan);
 
   await test.step("RF-3 y RF-5: un usuario nuevo tiene 1 sobre gratis listo", async () => {
@@ -108,7 +108,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   });
 
   await test.step("RF-16: «Mi cuenta» muestra el saldo y el historial de galletas", async () => {
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await expect(fan.locator('[data-testid="account-cookies"]')).toContainText(es.cookies.balance(90));
     await expect(fan.locator('[data-testid="account-cookies"] li')).toHaveCount(6);
   });

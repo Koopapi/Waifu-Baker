@@ -19,8 +19,8 @@ export async function POST(req: Request) {
   if (!zoneId || !(file instanceof File)) return Response.json({ ok: false, code: "bad_request" }, { status: 400 });
   try {
     await uploadZoneImage(db, getCardStore(), session.user.id, zoneId, { body: Buffer.from(await file.arrayBuffer()), mime: file.type, filename: file.name });
-    revalidatePath("/admin/expediciones");
-    revalidatePath("/juegos/expediciones");
+    revalidatePath("/admin/expeditions");
+    revalidatePath("/games/expeditions");
     return Response.json({ ok: true });
   } catch (e) {
     if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: e.code === "not_found" ? 404 : 422 });

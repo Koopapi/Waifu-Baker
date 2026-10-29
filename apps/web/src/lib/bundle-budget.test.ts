@@ -5,7 +5,7 @@ const manifest = {
   rootMainFiles: ["static/chunks/react.js", "static/chunks/main.js"],
   pages: {
     "/page": ["static/chunks/react.js", "static/chunks/home.js", "static/css/app.css"],
-    "/sobres/[setId]/page": ["static/chunks/opening.js", "static/chunks/home.js"],
+    "/packs/[setId]/page": ["static/chunks/opening.js", "static/chunks/home.js"],
     "/admin/page": ["static/chunks/admin.js"],
   },
 };
@@ -25,18 +25,18 @@ describe("spec 013 — peso de las páginas", () => {
 
   it("test_s013_rf11_mide_las_paginas_del_coleccionista_y_publicas_y_no_el_panel", () => {
     expect(BUDGET_KB).toBe(250);
-    for (const p of ["/page", "/login/page", "/bienvenida/page", "/(app)/sobres/page", "/sobres/[setId]/page", "/sobres/[setId]/todos/page", "/(app)/coleccion/page", "/(app)/coleccion/[setId]/page", "/(app)/coleccion/album/page", "/album/[slug]/page", "/(app)/cuenta/page", "/(app)/recompensas/page", "/drop-rates/page", "/legal/[doc]/page"])
+    for (const p of ["/page", "/login/page", "/welcome/page", "/(app)/packs/page", "/packs/[setId]/page", "/packs/[setId]/all/page", "/(app)/collection/page", "/(app)/collection/[setId]/page", "/(app)/collection/album/page", "/album/[slug]/page", "/(app)/account/page", "/(app)/rewards/page", "/drop-rates/page", "/legal/[doc]/page"])
       expect(BUDGET_PAGES).toContain(p);
     const pages: readonly string[] = BUDGET_PAGES;
-    expect(pages.some((p) => p.startsWith("/admin") || p === "/lab/page" || p === "/sistema/page")).toBe(false);
+    expect(pages.some((p) => p.startsWith("/admin") || p === "/lab/page" || p === "/design-system/page")).toBe(false);
   });
 
   it("test_s013_rf12_lista_las_paginas_que_se_pasan_con_su_peso_y_el_exceso", () => {
-    const r = measurePages(manifest, sizeOf, ["/page", "/sobres/[setId]/page"]);
+    const r = measurePages(manifest, sizeOf, ["/page", "/packs/[setId]/page"]);
     const over = overBudget(r, 250);
-    expect(over.map((o) => o.page)).toEqual(["/sobres/[setId]/page"]);
+    expect(over.map((o) => o.page)).toEqual(["/packs/[setId]/page"]);
     const report = formatReport(r, 250);
-    expect(report).toContain("/sobres/[setId]/page");
+    expect(report).toContain("/packs/[setId]/page");
     expect(report).toContain("260.0 kB");
     expect(report).toContain("+10.0 kB");
   });

@@ -94,16 +94,16 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
   });
 
   // El fan (español por defecto) consigue 2 de 4 cartas (la 4.ª, legendaria, solo sale en los gold) y publica su álbum.
-  const fan = await login(browser, "fan-i18n", false, "/sobres");
+  const fan = await login(browser, "fan-i18n", false, "/packs");
   await giftPacks(adminEs, "fan-i18n", "I18N", 1);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-I18N"] >> text=Abrir un sobre').getAttribute("href");
-  await fan.goto(`${href}/todos`);
+  await fan.goto(`${href}/all`);
   expect(await openAllAndSkip(fan)).toBe(2);
 
   await test.step("RF-3 y RF-9: el coleccionista cambia a inglés; los nombres de las cartas no se traducen", async () => {
-    await fan.goto("/coleccion");
+    await fan.goto("/collection");
     await expect(fan.locator("h1")).toHaveText(es.collection.title);
     await toggle(fan, "en").click();
     await expect(fan.locator("h1")).toHaveText(en.collection.title);
@@ -113,7 +113,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
   });
 
   await test.step("RF-8: el álbum público sale en el idioma de quien lo visita", async () => {
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
     await fan.click(`text=${en.collection.album.activate}`);
     await expect(fan.locator('[data-testid="album-url"]')).toBeVisible();
     const url = await fan.locator('[data-testid="album-url"]').inputValue();

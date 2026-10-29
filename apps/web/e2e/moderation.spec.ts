@@ -17,7 +17,7 @@ const shot = (p: Page, name: string, fullPage = false) =>
 const advance = async (api: APIRequestContext, hours: number) => expect((await api.post("/api/dev/clock", { data: { advanceHours: hours } })).status()).toBe(200);
 
 async function requestReview(fan: Page, alias: string) {
-  await fan.goto("/coleccion/album");
+  await fan.goto("/collection/album");
   await fan.waitForLoadState("networkidle");
   const box = fan.locator('[data-testid="album-moderation"]');
   await box.locator('input[name="alias"]').fill(alias);
@@ -25,19 +25,19 @@ async function requestReview(fan: Page, alias: string) {
 }
 
 async function openDetail(admin: Page) {
-  await admin.goto("/admin/albumes?q=fan-mod");
+  await admin.goto("/admin/albums?q=fan-mod");
   await admin.locator('[data-testid="albums-table"] a').first().click();
-  await expect(admin).toHaveURL(/\/admin\/albumes\/[0-9a-f-]{36}$/);
+  await expect(admin).toHaveURL(/\/admin\/albums\/[0-9a-f-]{36}$/);
   await admin.waitForLoadState("networkidle");
 }
 
 test("moderación de álbumes: ocultar, pedir revisión, rechazar y aprobar", async ({ browser, request }) => {
-  const fan = await login(browser, "fan-mod", false, "/coleccion/album");
+  const fan = await login(browser, "fan-mod", false, "/collection/album");
   const admin = await login(browser, "admin-mod", true);
 
   let url = "";
   await test.step("el dueño activa su álbum público", async () => {
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
     await fan.fill('input[name="alias"]', "Alias Feo");
     await fan.click("text=Activar álbum público");
     await expect(fan.locator("text=Álbum público activado.")).toBeVisible();
@@ -47,12 +47,12 @@ test("moderación de álbumes: ocultar, pedir revisión, rechazar y aprobar", as
   await test.step("RF-1: la sección «Álbumes» lista el álbum con su estado y busca por dueño", async () => {
     await admin.goto("/admin");
     await admin.locator("nav >> text=Álbumes").first().click();
-    await expect(admin).toHaveURL(/\/admin\/albumes$/);
+    await expect(admin).toHaveURL(/\/admin\/albums$/);
     const table = admin.locator('[data-testid="albums-table"]');
     await expect(table).toContainText("Alias Feo");
     await expect(table).toContainText("fan-mod");
     await expect(table).toContainText(ta.status.none);
-    await admin.goto("/admin/albumes?q=nadie");
+    await admin.goto("/admin/albums?q=nadie");
     await expect(admin.locator(`text=${ta.noMatch("nadie")}`)).toBeVisible();
   });
 
@@ -80,11 +80,11 @@ test("moderación de álbumes: ocultar, pedir revisión, rechazar y aprobar", as
   });
 
   await test.step("RF-7: el dueño ve el aviso en «Mi cuenta» y el motivo en los ajustes", async () => {
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     const alert = fan.locator('[data-testid="account-album-hidden"]');
     await expect(alert).toContainText(es.account.albumHidden);
     await alert.getByRole("link", { name: es.account.albumHiddenLink }).click();
-    await expect(fan).toHaveURL(/\/coleccion\/album$/);
+    await expect(fan).toHaveURL(/\/collection\/album$/);
     const box = fan.locator('[data-testid="album-moderation"]');
     await expect(box).toContainText(tm.hiddenBody(tm.reasons.impersonation));
     await expect(box).toContainText(tm.adminNote("Usa el nombre de otra persona."));
@@ -103,7 +103,7 @@ test("moderación de álbumes: ocultar, pedir revisión, rechazar y aprobar", as
   });
 
   await test.step("RF-2 y RF-12: la revisión aparece primero y el administrador la rechaza con una nota", async () => {
-    await admin.goto("/admin/albumes");
+    await admin.goto("/admin/albums");
     await expect(admin.locator('[data-testid="albums-table"]')).toContainText(ta.status.review_requested);
     await openDetail(admin);
     const decision = admin.locator('[data-testid="review-decision"]');
@@ -111,7 +111,7 @@ test("moderación de álbumes: ocultar, pedir revisión, rechazar y aprobar", as
     await decision.getByLabel(ta.rejectNote).fill("Sigue pareciendo otra persona.");
     await decision.getByRole("button", { name: ta.reject }).click();
     await expect(admin.locator(`text=${ta.rejected}`)).toBeVisible();
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
     const box = fan.locator('[data-testid="album-moderation"]');
     await expect(box).toContainText(tm.rejectedTitle);
     await expect(box).toContainText(tm.adminNote("Sigue pareciendo otra persona."));
@@ -142,7 +142,7 @@ test("moderación de álbumes: ocultar, pedir revisión, rechazar y aprobar", as
     const res = await anon.goto(url);
     expect(res?.status()).toBe(200);
     await expect(anon.locator('[data-testid="album-alias"]')).toHaveText("Alias Bueno");
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await expect(fan.locator('[data-testid="account-album-hidden"]')).toHaveCount(0);
   });
 });

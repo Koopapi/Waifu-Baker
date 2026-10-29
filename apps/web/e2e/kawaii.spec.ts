@@ -24,7 +24,7 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   // Spec 021: gratuita, como la colección de fan art de la demo (sale en las recompensas y sin aviso de Patreon).
   const setId = await createPublishedSet(admin, "KAW1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
   await giftPacks(admin, "fan-kawaii", "KAW1", 3);
-  const fan = await login(browser, "fan-kawaii", false, "/sobres");
+  const fan = await login(browser, "fan-kawaii", false, "/packs");
 
   await test.step("RF-6: el administrador elige la portada del sobre", async () => {
     await admin.goto(`/admin/sets/${setId}`);
@@ -35,7 +35,7 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   });
 
   await test.step("RF-5, RF-8 y RF-19: «Mis sobres» muestra el sobre compuesto con la portada y el plural correcto", async () => {
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.getByText("Tienes 3 sobres sin abrir.")).toBeVisible();
     const art = fan.locator('[data-testid="group-KAW1"] .pack-art');
     await expect(art.locator('img[src*="k=cover"]')).toBeVisible();
@@ -60,11 +60,11 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   await test.step("RF-7: un sobre hecho a mano sustituye al compuesto y se puede quitar", async () => {
     await admin.locator('[data-testid="pack-image-input"]').setInputFiles(path.join(LAB, "05.webp"));
     await expect(admin.getByText(es.admin.set.pack.uploaded)).toBeVisible();
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-KAW1"] .pack-art--custom img[src*="k=pack"]')).toBeVisible();
     await admin.getByRole("button", { name: es.admin.set.pack.remove }).click();
     await expect(admin.getByText(es.admin.set.pack.removed)).toBeVisible();
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-KAW1"] .pack-art--custom')).toHaveCount(0);
   });
 
@@ -116,26 +116,26 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   });
 
   await test.step("RF-8: «Abrir todos» muestra el mismo sobre", async () => {
-    await fan.goto(`/sobres/${setId}/todos`);
+    await fan.goto(`/packs/${setId}/all`);
     await expect(fan.locator(".pack-art img[src*='k=cover']")).toBeVisible();
   });
 
   await test.step("RF-16 y RF-17: recompensas con anillo y racha de pegatinas sin desbordes", async () => {
-    await fan.goto("/recompensas");
+    await fan.goto("/rewards");
     await expect(fan.locator('[data-testid="free-pack"] [role="progressbar"]')).toBeVisible();
     const days = fan.locator('[data-testid="streak"] li');
     await expect(days).toHaveCount(7);
     for (const d of await days.all()) expect(await d.evaluate((el) => el.scrollWidth <= el.clientWidth + 1)).toBe(true);
     await expect(fan.locator('[data-testid="streak"] [data-sticker="cookie"]').first()).toBeVisible();
     await shot(fan, "5-recompensas");
-    await fan.goto("/sobres");
+    await fan.goto("/packs");
     await expect(fan.locator('[role="progressbar"]').first()).toBeVisible();
     // En WebKit, «Mis sobres» aún puede estar recargando (marca los sobres como vistos) y cortaría la navegación siguiente.
     await fan.waitForLoadState("networkidle");
   });
 
   await test.step("RF-18 y RF-20: «Mi colección» con portada y datos; el contador no tapa el símbolo", async () => {
-    await fan.goto("/coleccion");
+    await fan.goto("/collection");
     const col = fan.locator('[data-testid="collection-KAW1"]');
     await expect(col.locator('img[src*="k=cover"]')).toBeVisible();
     await expect(col).toContainText(es.collection.stats.best);

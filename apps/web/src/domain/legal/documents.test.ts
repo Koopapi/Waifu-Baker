@@ -22,10 +22,10 @@ describe("spec 007 — aceptación de términos", () => {
   });
 
   it("test_s007_rf2_tras_aceptar_solo_se_vuelve_a_rutas_internas", () => {
-    expect(safeNext("/coleccion")).toBe("/coleccion");
-    expect(safeNext("https://malo.example")).toBe("/sobres");
-    expect(safeNext("//malo.example")).toBe("/sobres");
-    expect(safeNext(null)).toBe("/sobres");
+    expect(safeNext("/collection")).toBe("/collection");
+    expect(safeNext("https://malo.example")).toBe("/packs");
+    expect(safeNext("//malo.example")).toBe("/packs");
+    expect(safeNext(null)).toBe("/packs");
   });
 });
 

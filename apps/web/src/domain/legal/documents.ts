@@ -29,6 +29,6 @@ export function needsAcceptance(
 }
 
 /** Solo rutas internas como destino tras aceptar (evita redirecciones a otros sitios). */
-export function safeNext(next: string | null | undefined, fallback = "/sobres") {
+export function safeNext(next: string | null | undefined, fallback = "/packs") {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : fallback;
 }

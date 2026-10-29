@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { OpenAllCard } from "@/app/sobres/actions";
+import type { OpenAllCard } from "@/app/packs/actions";
 import { BURST_END_MS, burstPlan, soundGate } from "@/domain/opening/open-all";
 import { sound } from "@/features/sound/engine";
 import { useT } from "@/i18n/client";

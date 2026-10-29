@@ -79,7 +79,7 @@ pnpm admin reset-password <usuario>  # nueva temporal y desbloqueo
 pnpm admin reset-telegram <usuario>  # desvincula Telegram (se vuelve a vincular al entrar)
 ```
 
-Al entrar en `https://waifubaker.com/login/equipo` la primera vez: contraseña temporal → contraseña propia → vincular
+Al entrar en `https://waifubaker.com/login/team` la primera vez: contraseña temporal → contraseña propia → vincular
 Telegram con el bot (abrir el enlace y pulsar «Iniciar») → código de 6 cifras. Las siguientes veces: contraseña y
 código. Cinco fallos seguidos bloquean la cuenta 15 minutos (queda en el historial).
 

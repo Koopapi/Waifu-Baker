@@ -36,9 +36,9 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
   // 3 cartas y la 003 rara: cada sobre trae 2, con la rara garantizada.
   await createPublishedSet(admin, "SND1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
   await giftPacks(admin, "fan-sound", "SND1", 5);
-  const fan = await login(browser, "fan-sound", false, "/sobres");
+  const fan = await login(browser, "fan-sound", false, "/packs");
   await record(fan);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   const href = (await fan.locator('[data-testid="group-SND1"] >> text=Abrir un sobre').getAttribute("href"))!;
 
   await test.step("RF-2, RF-3, RF-4 y RF-9: rasgado, un volteo por carta, el nivel de las raras y su vibración", async () => {
@@ -70,7 +70,7 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
   // Spec 019, RF-3 (sustituye a la RF-5 de esta spec): la ráfaga suena con rasgados y el foco con la rareza de cada
   // destacada. Aquí se comprueba que el silencio corta todo eso.
   await test.step("RF-8 y RF-9: con el sonido apagado, «Abrir todos» no suena ni vibra", async () => {
-    await fan.goto(`${href}/todos`);
+    await fan.goto(`${href}/all`);
     await fan.waitForLoadState("networkidle");
     const toggle = fan.locator('[data-testid="sound-toggle"]');
     // Viene silenciado del paso anterior (el silencio se recuerda en el dispositivo).

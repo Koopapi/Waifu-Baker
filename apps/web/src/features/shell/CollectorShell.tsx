@@ -43,12 +43,12 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
   const arrivals = groupArrivals(await pendingArrivals(db, user.id));
   const arrivalsArt = arrivals ? await packArtForSets(db, arrivals.sets.map((x) => x.setId)) : null;
   const arrivalsGroup = arrivals && arrivalsArt ? { ...arrivals, sets: arrivals.sets.map((x) => ({ ...x, art: arrivalsArt.get(x.setId) ?? { coverVersion: null, packImage: null } })) } : null;
-  const packs: NavItem = { href: "/sobres", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed, flyTarget: "packs" };
-  const collection: NavItem = { href: "/coleccion", label: t.common.nav.myCollection, icon: "collection" };
-  const rewards: NavItem = { href: "/recompensas", label: sh.rewards, icon: "rewards", badge: s.rewardsReady };
+  const packs: NavItem = { href: "/packs", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed, flyTarget: "packs" };
+  const collection: NavItem = { href: "/collection", label: t.common.nav.myCollection, icon: "collection" };
+  const rewards: NavItem = { href: "/rewards", label: sh.rewards, icon: "rewards", badge: s.rewardsReady };
   // Spec 020, RF-1 y RF-2: el espacio de juegos, con los equipos que ya volvieron.
-  const games: NavItem = { href: "/juegos", label: sh.games, icon: "games", badge: ready };
-  const account: NavItem = { href: "/cuenta", label: t.common.nav.myAccount, icon: "account" };
+  const games: NavItem = { href: "/games", label: sh.games, icon: "games", badge: ready };
+  const account: NavItem = { href: "/account", label: t.common.nav.myAccount, icon: "account" };
 
   return (
     <AppShell
@@ -57,7 +57,7 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
       header={{ title: t.common.brand, subtitle: s.collections.length ? sh.collections : sh.noCollections }}
       emptyRail={sh.noCollections}
       rail={s.collections.map((c) => ({
-        href: `/coleccion/${c.setId}`,
+        href: `/collection/${c.setId}`,
         label: `${c.name} · ${c.locked ? sh.lockedSet : sh.progress(c.progress.owned, c.progress.total)}`,
         initials: initials(c.name),
         image: c.coverCardId ? cardImageUrl(c.coverCardId, "thumb", user.id) : null,
@@ -65,7 +65,7 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
       }))}
       railExtra={{ href: "/drop-rates", label: t.common.nav.odds, icon: "odds" }}
       groups={[
-        { label: sh.groups.collection, items: [packs, collection, { href: "/coleccion/album", label: sh.album, icon: "album" }, games, rewards] },
+        { label: sh.groups.collection, items: [packs, collection, { href: "/collection/album", label: sh.album, icon: "album" }, games, rewards] },
         {
           label: sh.groups.you,
           items: [
