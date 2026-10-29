@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.7
 # Spec 024: imagen de la web para Coolify (contexto: la raíz del repositorio; Dockerfile: apps/web/Dockerfile).
-# Debian 13 trae el cliente de PostgreSQL 17, que sirve para las copias (pg_dump) de un servidor 16.
+# Debian 13 trae el cliente de PostgreSQL 17, que sirve para las copias (pg_dump) de un servidor 16. `curl` lo usa la
+# comprobación de salud de Coolify (`/api/health`).
 FROM node:24-trixie-slim AS base
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH NEXT_TELEMETRY_DISABLED=1 PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
 RUN corepack enable
@@ -19,7 +20,7 @@ RUN cd apps/web && DATABASE_URL=postgres://build/build AUTH_SECRET=solo-para-com
 FROM base AS run
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends postgresql-client ca-certificates \
+  && apt-get install -y --no-install-recommends postgresql-client ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app /app
 # Spec 018: la imagen fija de las cartas por capas se saca con Chromium (playwright-core).
