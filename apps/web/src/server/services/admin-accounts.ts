@@ -177,7 +177,9 @@ export async function checkTelegramLink(
 ): Promise<{ status: "waiting" | "invalid" | "expired" | "unavailable" } | { status: "ok"; next: "code" }> {
   if (!tg) return { status: "unavailable" };
   const acc = await pendingAccount(db, input.pending, input.now);
-  if (!acc || acc.mustChangePassword) return { status: "invalid" };
+  // Paso caducado (10 min): se avisa como caducado para volver al inicio, no como contraseña incorrecta.
+  if (!acc) return { status: "expired" };
+  if (acc.mustChangePassword) return { status: "invalid" };
   if (acc.telegramChatId) return { status: "ok", next: "code" };
   if (!acc.telegramLinkHash || !acc.telegramLinkExpiresAt || acc.telegramLinkExpiresAt <= input.now) return { status: "expired" };
   let updates;
