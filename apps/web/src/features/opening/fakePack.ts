@@ -19,6 +19,8 @@ export interface LabCard {
   note?: string;
   /** Spec 018, RF-6: la carta viva que se monta al revelarla (sin ella, se ve la imagen fija). */
   live?: LiveCard | null;
+  /** Spec 023: primera copia del coleccionista («¡Nueva!» al revelarla). */
+  isNew?: boolean;
 }
 
 export const RARITY_ORDER: Rarity[] = ["common", "rare", "epic", "legendary", "ex"];

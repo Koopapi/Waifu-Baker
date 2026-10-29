@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import type { LabCard } from "@/features/opening/fakePack";
 import { liveImageUrls } from "@/domain/cards/live";
-import { PackArt, type PackArtData } from "@/features/packs/PackArt";
+import type { PackArtData } from "@/features/packs/PackArt";
 import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/sobres/actions";
 import { useT } from "@/i18n/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
@@ -55,14 +55,15 @@ export function PackOpener({ setId, setCode, setName, art, kind, sealed, resumeP
     if (current.current) void ackOpeningAction([current.current]);
   }, []);
 
-  const nothingLeft = remaining === 0 && !resume.current;
 
   return (
     <>
       <OpeningStage
         draw={draw}
-        packLabel={`${t.common.packKind[kind].toUpperCase()} · ${setCode}`}
-        packArt={<PackArt setId={setId} code={setCode} name={setName} art={art} />}
+        // Spec 023: el sobre nuevo de su tipo; si había una apertura sin terminar, se retoma en el mazo (RF-22).
+        shell={{ setId, code: setCode, name: setName, art, kind, kindLabel: t.common.packKind[kind] }}
+        setLine={`${setCode} · ${setName}`}
+        autoOpen={Boolean(resumePackId)}
         onFinished={onFinished}
         renderSummaryActions={(reset) => (
           <>
@@ -82,8 +83,7 @@ export function PackOpener({ setId, setCode, setName, art, kind, sealed, resumeP
               {t.packs.opener.backToMineHud}
             </Link>
             {/* Spec 022, RF-19: plata o gold, a la vista durante toda la apertura. */}
-            <PackKindTag kind={kind} label={t.common.packKind[kind]} />
-            {nothingLeft && <span className="hud__chip">{t.packs.opener.nothingLeft}</span>}
+            <PackKindTag kind={kind} label={t.common.packKind[kind]} className="fixed left-3 top-3 z-50" />
           </>
         }
       />

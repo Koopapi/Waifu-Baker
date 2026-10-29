@@ -7,9 +7,12 @@ import { OpeningStage } from "@/features/opening/OpeningStage";
 import { simulatePackAction } from "@/app/admin/sets/card-actions";
 import { useT } from "@/i18n/client";
 import type { PackKind } from "@/domain/catalog/default-odds";
+import type { PackArtData } from "@/features/packs/PackArt";
 
 /** Envuelve la escena de apertura con el sorteo real de la colección (sin guardar nada). */
-export function SimulateStage({ setId, kind, label }: { setId: string; kind: PackKind; label: string }) {
+/** Spec 023, RF-21: la misma apertura que ve el coleccionista, con el sobre del tipo elegido. */
+export function SimulateStage({ setId, kind, label, code, name, art }: { setId: string; kind: PackKind; label: string; code: string; name: string; art: PackArtData }) {
+  const kindLabel = useT().common.packKind[kind];
   const t = useT().admin.simulate;
   const failed = t.failed;
   const draw = useCallback(async () => {
@@ -38,7 +41,8 @@ export function SimulateStage({ setId, kind, label }: { setId: string; kind: Pac
     <div className="fixed inset-0 z-50 overflow-hidden bg-ui-rail" data-testid="simulate-focus">
       <OpeningStage
         draw={draw}
-        packLabel={label}
+        shell={{ setId, code, name, art, kind, kindLabel }}
+        setLine={label}
         extraHud={
           <Link href={`/admin/sets/${setId}`} className="hud__btn">
             {t.back}
