@@ -8,7 +8,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
     const anon = await (await browser.newContext()).newPage();
     await anon.goto("/packs");
-    await expect(anon).toHaveURL(/\/login\?next=%2Fsobres/);
+    await expect(anon).toHaveURL(/\/login\?next=%2Fpacks/);
     await anon.context().close();
   });
 
@@ -111,11 +111,18 @@ test("teclado: abrir un sobre y voltear las cartas sin ratón", async ({ browser
   await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
   await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
   // Spec 023, RF-19: Intro o Espacio revelan la de arriba y, otra vez, la apartan.
-  for (const key of ["Enter", " ", "Enter"]) {
-    await fan.keyboard.press(key);
+  // Mientras la carta gira o sale, el mazo ignora las teclas (como los gestos): se espera a que acabe cada paso.
+  const info = fan.locator('[data-testid="reveal-info"]');
+  for (let i = 0; i < 2; i++) {
+    await fan.keyboard.press(i === 0 ? "Enter" : " ");
+    await expect(info).toBeVisible();
     await expect(fan.locator('.card3d[role="button"]')).toBeFocused();
+    await fan.waitForTimeout(1200);
+    await fan.keyboard.press(i === 0 ? " " : "Enter");
+    if (i === 0) {
+      await expect(info).toHaveCount(0);
+      await fan.waitForTimeout(1200);
+    }
   }
-  await expect(fan.locator('[data-testid="reveal-info"]')).toBeVisible();
-  await fan.keyboard.press(" ");
   await expect(fan.locator(".summary")).toBeVisible();
 });
