@@ -1,6 +1,6 @@
 # Spec 023 — Apertura nueva: el sobre se rasga de verdad
 
-Estado: borrador para aprobar (28 oct 2026).
+Estado: aprobada por el dueño el 28 oct 2026, con las decisiones derivadas.
 
 ## Contexto y objetivo
 La apertura es el momento central del juego y hoy se siente plana: el sobre es una imagen que se corta y las cartas
@@ -106,7 +106,7 @@ checklist en teléfono (`dispositivo.md`); demo del dueño.
 - Plata y gold con el mismo arte por ahora; se distinguen por el foil y la etiqueta.
 - Mazo de Bruno con los efectos de revelado de hoy (propuesta, al pedir el dueño «la que se vea más sorprendente»).
 - Alcance: abrir un sobre, «Abrir todos», simulador y «Mis sobres».
-- Derivadas, a confirmar al aprobar: la más rara al final (RF-13); umbral del 60 % y botón «Abrir sin deslizar».
+- Derivadas, confirmadas por el dueño al aprobar: la más rara al final (RF-13); umbral del 60 % y botón «Abrir sin deslizar».
 
 ## Dudas abiertas
 - Ninguna.
