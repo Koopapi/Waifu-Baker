@@ -7,7 +7,7 @@ import path from "node:path";
 import { DAILY_SCHEDULE } from "../src/domain/rewards/daily";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, choose, createPublishedSet, login, tear } from "./helpers";
+import { choose, createPublishedSet, LAB, login, openDeck, tear } from "./helpers";
 
 const es = dictionaries.es.rewards;
 
@@ -42,12 +42,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
     await expect(fan.locator('[data-testid="group-FREE1"]')).toContainText("x1");
     await fan.click('[data-testid="group-FREE1"] >> text=Abrir un sobre');
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    for (let k = 0; k < 2; k++) {
-      await fan.locator('.card3d[role="button"]').first().click();
-      await expect(fan.locator(`.stage[data-revealed="${k + 1}"]`)).toBeVisible();
-    }
-    await expect(fan.locator(".summary")).toBeVisible();
+    await openDeck(fan);
   });
 
   await test.step("RF-5 y RF-6: sin cargas, se ve la cuenta atrás y no se puede reclamar", async () => {

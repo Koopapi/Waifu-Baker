@@ -2,7 +2,7 @@
 // lote → editar probabilidades → simular sobre → publicar → comprobar bloqueos → regalar un sobre.
 import type { Browser, Page } from "@playwright/test";
 import { DESKTOP, desktopOnly, expect, test } from "./fixtures";
-import { assembleSet, choose, tick, untickAdmin } from "./helpers";
+import { assembleSet, choose, openDeck, tick, untickAdmin } from "./helpers";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -146,11 +146,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.mouse.down();
     for (let i = 1; i <= 12; i++) await page.mouse.move(sx + (220 * i) / 12, sy);
     await page.mouse.up();
-    await expect(page.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator('.stage[data-revealed="1"]')).toBeVisible();
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator(".summary")).toBeVisible();
+    // Spec 023: el mazo (de menor a mayor rareza) se revela y se aparte carta a carta.
+    await openDeck(page);
     await expect(page.locator(".summary__row")).toHaveCount(2);
     await expect(page.locator(".summary__row").nth(1)).toContainText("Carta de prueba 010");
     await page.click("text=← Volver a la colección");
