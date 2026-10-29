@@ -14,8 +14,9 @@
   **pruebas** con la rama `pruebas`; despliegue automático al fusionar.
 - Una base Postgres 16 por entorno (gestionada por Coolify, sin puerto público) y un volumen por entorno para las
   imágenes (`CARD_STORE_DIR=/data/cards`) y las copias locales.
-- Pruebas: autenticación básica de Traefik (etiquetas de la aplicación), cabecera `X-Robots-Tag: noindex` y
-  `robots.txt` que lo prohíbe todo (RF-9).
+- Pruebas: autenticación básica en el middleware de la web (`SITE_BASIC_AUTH=usuario:contraseña`, variable de
+  Coolify; `/api/health` queda libre para la comprobación de salud), cabecera `X-Robots-Tag: noindex` y `robots.txt`
+  que lo prohíbe todo (RF-9). Se cambió de etiquetas de Traefik a la web para que el dueño la gestione con una variable.
 - Secretos solo en las variables de entorno de Coolify. Avisos de despliegue por Telegram (notificaciones de Coolify).
 
 ## Imagen de la web (`apps/web/Dockerfile`)
