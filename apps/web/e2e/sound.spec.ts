@@ -6,7 +6,7 @@ import path from "node:path";
 import { revealSound, vibrationPattern } from "../src/domain/opening/feedback";
 import type { Rarity } from "../src/domain/catalog/card-rules";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, giftPacks, login, openAllAndSkip, tear } from "./helpers";
+import { createPublishedSet, giftPacks, LAB, login, openAllAndSkip, openDeck, tear } from "./helpers";
 
 type Log = { sounds: string[]; vibes: string[] };
 
@@ -22,12 +22,8 @@ async function record(page: Page) {
 const log = (page: Page) => page.evaluate(() => (window as unknown as { __wb: Log }).__wb);
 
 async function revealAll(page: Page) {
-  await expect(page.locator('.stage[data-phase="fanned"]')).toBeVisible();
-  const n = await page.locator(".card3d").count();
-  for (let k = 0; k < n; k++) {
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator(k + 1 === n ? ".summary" : `.stage[data-revealed="${k + 1}"]`)).toBeVisible();
-  }
+  // Spec 023: el mazo se revela y se aparte carta a carta hasta el resumen.
+  await openDeck(page);
   return (await page.locator(".summary__row").evaluateAll((rows) => rows.map((r) => r.className.match(/rarity-(\w+)/)![1]))) as Rarity[];
 }
 

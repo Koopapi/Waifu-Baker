@@ -2,7 +2,7 @@
 // bandeja y el resumen, enlaces de capas solo para quien tiene la carta, movimiento reducido.
 import path from "node:path";
 import { desktopOnly, expect, test } from "./fixtures";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, tear } from "./helpers";
+import { createPublishedSet, dismissCelebration, dismissTop, giftPacks, LAB, login, openDeck, revealTop, tear } from "./helpers";
 
 test("cartas por capas: revelación viva", async ({ browser }) => {
   const reduced = test.info().project.name === "reduced-motion";
@@ -21,14 +21,17 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
     await dismissCelebration(fan);
     await fan.click(`[data-testid="group-${code}"] >> text=Abrir un sobre`);
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    // Spec 022, RF-4: la primera, común, se revela plana.
-    await fan.locator('.card3d[role="button"]').first().click();
-    await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
+    await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
+    // Spec 022, RF-4: la primera, común (el mazo va de menor a mayor rareza), se revela plana.
+    await revealTop(fan);
     await expect(fan.locator(".card3d__live")).toHaveCount(0);
-    if (reduced) return;
-    // La segunda, rara, se ve viva.
-    await fan.locator('.card3d[role="button"]').first().click();
+    await dismissTop(fan);
+    // La segunda, rara, se ve viva (con movimiento reducido, la imagen fija).
+    await revealTop(fan);
+    if (reduced) {
+      await expect(fan.locator(".card3d__live")).toHaveCount(0);
+      return;
+    }
     const live = fan.locator(".card3d__live .cc-card");
     await expect(live).toBeVisible();
     // Sus capas cargan (enlaces firmados de la carta) y hace su entrada.
@@ -40,8 +43,8 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
     expect(layerUrl).toMatch(/^\/api\/cards\/layer\?c=.+&k=.+&e=\d+&sig=[0-9a-f]{64}$/);
   });
 
-  await test.step("RF-8: en la bandeja y en el resumen, la imagen fija", async () => {
-    if (reduced) await fan.locator('.card3d[role="button"]').first().click();
+  await test.step("RF-8: al apartarla y en el resumen, la imagen fija", async () => {
+    await dismissTop(fan);
     await expect(fan.locator(".summary")).toBeVisible();
     await expect(fan.locator(".card3d__live")).toHaveCount(0);
     await expect(fan.locator(".summary__thumb img").first()).toHaveAttribute("src", /\/api\/cards\/img\?/);
@@ -125,11 +128,7 @@ test("cartas por capas: permiso del giroscopio negado", async ({ browser }) => {
   await dismissCelebration(fan);
   await fan.click(`[data-testid="group-${code}"] >> text=Abrir un sobre`);
   await tear(fan);
-  for (let i = 1; i <= 2; i++) {
-    await fan.locator('.card3d[role="button"]').first().click();
-    if (i < 2) await expect(fan.locator(`.stage[data-revealed="${i}"]`)).toBeVisible();
-  }
-  await expect(fan.locator(".summary")).toBeVisible();
+  await openDeck(fan);
 
   await test.step("RF-13: si se niega el permiso, el interruptor queda apagado y avisa", async () => {
     await fan.goto("/coleccion");
