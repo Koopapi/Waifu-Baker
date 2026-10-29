@@ -75,12 +75,15 @@ test("colección y álbum público", async ({ browser }) => {
     await expect(sheet).toContainText("Rara");
     await expect(sheet).toContainText("La conseguiste por primera vez");
     await expect(sheet.locator("dd").nth(1)).toHaveText("x1");
-    await expect(sheet.locator('[data-testid="card-sheet-art"] .card3d--holo')).toHaveCount(1);
-    await expect.poll(() => sheet.locator(".card3d img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(750);
+    // Spec 018: la holo lleva el brillo de la carta viva (o el acabado arcoíris de la imagen fija con movimiento reducido).
+    const art = sheet.locator('[data-testid="card-sheet-art"]');
+    const holoOn = art.locator(".cc-card.cc-con-holo, .holo-finish");
+    await expect(holoOn).toHaveCount(1);
+    await expect.poll(() => art.locator("img").first().evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
     await fan.waitForTimeout(500);
     await shot(fan, "3-ficha-holo");
     await sheet.locator("button:text-is('Normal')").click();
-    await expect(sheet.locator('[data-testid="card-sheet-art"] .card3d--holo')).toHaveCount(0);
+    await expect(holoOn).toHaveCount(0);
     await fan.keyboard.press("Escape");
     await expect(sheet).toHaveCount(0);
   });

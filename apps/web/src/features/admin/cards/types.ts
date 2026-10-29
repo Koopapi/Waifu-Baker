@@ -17,6 +17,8 @@ export interface CardDTO {
   fullUrl: string | null;
   adultReviewedAt: string | null;
   pendingArtUrl: string | null;
+  /** Spec 018, RF-18: imagen fija del cambio de capas pendiente de revisión 18+ (si lo hay). */
+  pendingLayersUrl: string | null;
   /** Probabilidad (0–1) de que la carta salga en un sobre. */
   chance: number;
   /** Spec 016: configuración por capas guardada (claves del almacén) o null. */

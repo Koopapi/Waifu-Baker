@@ -70,11 +70,11 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
               <button
                 type="button"
                 onClick={() => setOpen(s.number)}
-                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? "binder-card--holo" : ""}`}
+                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? "binder-card--holo holo-finish" : ""}`}
                 aria-label={t.collection.binder.viewCard(pad(s.number))}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
-                <img src={s.owned.thumb} alt={s.owned.name} loading="lazy" className="aspect-[63/88] w-full object-cover transition group-hover:scale-[1.03]" />
+                <img src={s.owned.thumb} alt={s.owned.name} loading="lazy" className="aspect-[700/991] w-full object-cover transition group-hover:scale-[1.03]" />
                 {/* Spec 014, RF-20: abajo a la izquierda, sin tapar el símbolo de la colección (arriba a la derecha). */}
                 <span data-testid="copies" className="absolute bottom-1.5 left-1.5 rounded-full border-2 border-k-blanco/70 bg-k-tinta/85 px-2 py-0.5 text-[11px] font-black tabular-nums">x{s.owned.qty + s.owned.holoQty}</span>
                 {s.owned.holoQty > 0 && <span className="absolute left-1.5 top-1.5 rounded-md bg-gradient-to-r from-pink-400 via-sky-300 to-yellow-200 px-1.5 py-0.5 text-[10px] font-bold text-ui-rail">HOLO</span>}
@@ -82,7 +82,7 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
             </li>
           ) : (
             <li key={s.number} data-slot={s.number} data-missing="true">
-              <div className="grid aspect-[63/88] w-full place-items-center rounded-l border-2 border-dashed border-ui-line bg-ui-raised">
+              <div className="grid aspect-[700/991] w-full place-items-center rounded-l border-2 border-dashed border-ui-line bg-ui-raised">
                 <span className="font-mono text-lg text-ui-text-3">{pad(s.number)}</span>
               </div>
             </li>

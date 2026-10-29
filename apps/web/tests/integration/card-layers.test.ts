@@ -1,5 +1,6 @@
 // Spec 016, entrega 1: subir capas, guardar la configuración, conflicto, quitar capas y auditoría.
 import { describe, expect, it } from "vitest";
+import sharp from "sharp";
 import { and, eq } from "drizzle-orm";
 import { auditLog, cards } from "@/db/schema";
 import { createSet } from "@/server/services/collections";
@@ -160,7 +161,9 @@ describe("spec 016 — quitar capas", () => {
       await removeCardLayers(tx, store, admin.id, card.id, { expectedVersion: r.card.version });
       const after = await load();
       expect(after.layers).toBeNull();
-      expect(after.keyFull).toBe(card.keyFull);
+      // Vuelve a la imagen compuesta con el marco de Pencil (1500 × 2100), no a la fija de las capas.
+      expect(after.keyFull).not.toBe(r.card.keyFull);
+      expect((await sharp((await store.get(after.keyFull!))!.body).metadata()).width).toBe(1500);
     });
   });
 

@@ -15,7 +15,8 @@
 .oa-card img {
   display: block;
   width: 100%;
-  aspect-ratio: 63 / 88;
+  /* Spec 018: la proporción de la carta por capas (700 × 991). */
+  aspect-ratio: 700 / 991;
   object-fit: cover;
 }
 .oa-card__meta {

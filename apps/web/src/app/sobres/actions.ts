@@ -13,6 +13,7 @@ import type { Dict } from "@/i18n";
 import { isAdminError } from "@/server/errors";
 import { openLimiter } from "@/server/rate-limits";
 import { ackOpenings, getOpeningResult, openAllPacks, openPack, type OpeningResult } from "@/server/services/packs";
+import { liveCardConfig } from "@/server/services/live-card";
 
 type Ok<T> = { ok: true } & T;
 type Fail = { ok: false; error: string; code?: string };
@@ -26,7 +27,9 @@ async function country() {
   return (await headers()).get("cf-ipcountry");
 }
 
-function toLabCards(t: Dict, r: OpeningResult, userId: string): LabCard[] {
+/** Spec 018, RF-6: cada carta va con su carta viva (el usuario acaba de recibirla) para montarla al revelarla. */
+async function toLabCards(t: Dict, r: OpeningResult, userId: string): Promise<LabCard[]> {
+  const lives = await Promise.all(r.cards.map((c) => liveCardConfig(db, userId, c.cardId)));
   return r.cards.map((c, i) => ({
     id: `${r.packId}-${i}`,
     name: c.name || t.packs.actions.cardFallback(String(c.number).padStart(3, "0")),
@@ -35,6 +38,7 @@ function toLabCards(t: Dict, r: OpeningResult, userId: string): LabCard[] {
     holo: c.holo,
     image: cardImageUrl(c.cardId, "mid", userId),
     framed: true,
+    live: lives[i],
     note: [c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(c.qtyAfter), c.holo ? t.packs.notes.holo : null, c.pity ? t.packs.notes.pity : null]
       .filter(Boolean)
       .join(" · "),
@@ -60,7 +64,7 @@ export async function openNextPackAction(setId: string): Promise<Ok<{ packId: st
   if (sealed.length === 0) return { ok: false, error: t.packs.actions.noPacks, code: "no_packs" };
   try {
     const r = await openPack(db, { userId, packId: sealed[0].id, country: await country() });
-    return { ok: true, packId: r.packId, cards: toLabCards(t, r, userId), remaining: sealed.length - 1 };
+    return { ok: true, packId: r.packId, cards: await toLabCards(t, r, userId), remaining: sealed.length - 1 };
   } catch (e) {
     return fail(e);
   }
@@ -73,7 +77,7 @@ export async function resumeOpeningAction(packId: string): Promise<Ok<{ packId: 
   if (!userId) return { ok: false, error: t.common.sessionExpired, code: "no_session" };
   const r = await getOpeningResult(db, userId, packId);
   if (!r) return { ok: false, error: t.packs.actions.openingNotFound, code: "not_found" };
-  return { ok: true, packId, cards: toLabCards(t, r, userId) };
+  return { ok: true, packId, cards: await toLabCards(t, r, userId) };
 }
 
 export interface OpenAllCard {

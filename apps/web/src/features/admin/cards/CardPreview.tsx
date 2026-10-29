@@ -13,7 +13,7 @@ export function CardPreview({ card }: { card: CardDTO }) {
   const tilt = useTiltSource();
   const [holo, setHolo] = useState(card.variant === "holo");
   const t = useT().admin.cards;
-  if (!card.midUrl) return <div className="grid aspect-[63/88] place-items-center rounded-l bg-ui-raised text-xs text-ui-text-3">{t.processing}</div>;
+  if (!card.midUrl) return <div className="grid aspect-[700/991] place-items-center rounded-l bg-ui-raised text-xs text-ui-text-3">{t.processing}</div>;
   return (
     <div className="space-y-2">
       <div

@@ -88,7 +88,7 @@ export default async function MiColeccionPage() {
                           {c.preview.map((id) => (
                             <li key={id} className="overflow-hidden rounded-m border-2 border-k-lavanda/40">
                               {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
-                              <img src={cardImageUrl(id, "thumb", user.id)} alt="" className="aspect-[63/88] w-full object-cover" />
+                              <img src={cardImageUrl(id, "thumb", user.id)} alt="" className="aspect-[700/991] w-full object-cover" />
                             </li>
                           ))}
                         </ul>

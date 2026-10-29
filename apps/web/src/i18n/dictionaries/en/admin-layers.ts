@@ -88,6 +88,16 @@ export const adminLayers = {
     autoNote: "Frame, particles and seal follow the rarity until you change them by hand.",
     manualNote: "You changed the style by hand: changing the rarity only updates the frame and seal. \"Apply rarity style\" makes it automatic again.",
   },
+  pending: {
+    warning: (n: number) => `${n === 1 ? "1 card has" : `${n} cards have`} layer changes awaiting 18+ review (collectors see the reviewed version):`,
+    saved: "Saved as a change awaiting 18+ review: collectors still see the reviewed version.",
+    badge: "Layer change pending",
+    current: "Current (what collectors see)",
+    proposed: "Pending",
+    approve: "Approve: clearly adult character",
+    discard: "Discard the change",
+    discarded: "Change discarded: the card stays as it was.",
+  },
   notAssembledCard: (number: number, missing: string) =>
     `Card ${String(number).padStart(3, "0")}: not assembled (missing ${missing
       .split(",")
