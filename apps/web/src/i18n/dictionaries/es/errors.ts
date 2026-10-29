@@ -56,6 +56,7 @@ export const errors: Record<string, Msg> = {
   // Spec 024: cuentas de administrador (comandos del servidor).
   invalid_username: "Usuario no válido: de 3 a 32 letras minúsculas, números, punto o guion.",
   username_taken: "Ya existe un administrador con ese usuario.",
+  last_admin: "No se puede eliminar la única cuenta de administrador.",
   not_found: (p) =>
     ({
       user: "El usuario no existe.",

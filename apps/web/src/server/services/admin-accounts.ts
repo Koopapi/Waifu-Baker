@@ -78,10 +78,22 @@ export async function resetAdminTelegram(db: DbLike, username: string) {
   await recordAudit(db, { actorUserId: null, action: "admin_telegram_reset", entityType: "admin_account", entityId: acc.id });
 }
 
+/** Quita la cuenta de administrador y su rol; el usuario y el historial de auditoría se conservan. No deja el panel sin cuentas. */
+export async function deleteAdminAccount(db: DbLike, username: string) {
+  const acc = await byUsername(db, username);
+  const all = await db.select({ id: adminAccounts.id }).from(adminAccounts);
+  if (all.length <= 1) throw new AdminError("last_admin", "No se puede eliminar la única cuenta de administrador.");
+  await db.transaction(async (tx) => {
+    await tx.delete(adminAccounts).where(eq(adminAccounts.id, acc.id));
+    await tx.update(users).set({ role: "user" }).where(eq(users.id, acc.userId));
+    await recordAudit(tx, { actorUserId: null, action: "admin_account_delete", entityType: "admin_account", entityId: acc.id, before: { username: acc.username } });
+  });
+}
+
 // ---------- inicio de sesión ----------
 
 /** RF-19: un fallo más; al quinto seguido, bloqueo de 15 minutos anotado en el historial. */
-async function fail(db: DbLike, acc: Account, now: Date): Promise<"invalid" | "locked"> {
+async function fail(db: DbLike, acc: Account, now: Date, tg?: TelegramClient | null): Promise<"invalid" | "locked"> {
   const r = afterFailure(acc.failedAttempts, now);
   await db
     .update(adminAccounts)
@@ -89,13 +101,18 @@ async function fail(db: DbLike, acc: Account, now: Date): Promise<"invalid" | "l
     .where(eq(adminAccounts.id, acc.id));
   if (r.locked) {
     await recordAudit(db, { actorUserId: acc.userId, action: "admin_locked", entityType: "admin_account", entityId: acc.id, meta: { until: r.lockedUntil!.toISOString() } });
+    await notifyAdmins(db, tg ?? null, `🔒 La cuenta «${acc.username}» se bloqueó 15 minutos por 5 intentos fallidos. Si no fueron ustedes, cambien su contraseña.`);
     return "locked";
   }
   return "invalid";
 }
 
 /** Siguiente paso tras la contraseña: cambiarla, vincular Telegram o poner el código. */
-const nextOf = (acc: Pick<Account, "mustChangePassword" | "telegramChatId">): Next => (acc.mustChangePassword ? "change" : acc.telegramChatId ? "code" : "link");
+const nextOf = (acc: Pick<Account, "mustChangePassword" | "telegramChatId">, tg: TelegramClient): Next =>
+  acc.mustChangePassword ? "change" : codeChat(acc, tg) ? "code" : "link";
+
+/** Dónde llega el código: el grupo del equipo si está configurado; si no, el chat que vinculó la cuenta. */
+const codeChat = (acc: Pick<Account, "telegramChatId">, tg: TelegramClient) => tg.teamChatId ?? acc.telegramChatId;
 
 /** El paso en curso de la cookie (`id.nonce`), si sigue vigente. */
 async function pendingAccount(db: DbLike, pending: string, now: Date): Promise<Account | null> {
@@ -130,13 +147,13 @@ export async function startAdminLogin(db: DbLike, tg: TelegramClient | null, inp
     return { status: "invalid" };
   }
   if (isLocked(acc.lockedUntil, input.now)) return { status: "locked" };
-  if (!(await verifyPassword(input.password, acc.passwordHash))) return { status: await fail(db, acc, input.now) };
+  if (!(await verifyPassword(input.password, acc.passwordHash))) return { status: await fail(db, acc, input.now, tg) };
   const nonce = randomBytes(24).toString("hex");
   await db
     .update(adminAccounts)
     .set({ pendingHash: sha(nonce), pendingUntil: new Date(input.now.getTime() + PENDING_MS), updatedAt: input.now })
     .where(eq(adminAccounts.id, acc.id));
-  const next = nextOf(acc);
+  const next = nextOf(acc, tg);
   const pending = `${acc.id}.${nonce}`;
   if (next === "link") return { status: "ok", pending, next, linkUrl: await linkUrl(db, tg, acc, input.now) };
   if (next === "code") {
@@ -163,7 +180,7 @@ export async function changeAdminPassword(
     .where(eq(adminAccounts.id, acc.id));
   await recordAudit(db, { actorUserId: acc.userId, action: "admin_password_change", entityType: "admin_account", entityId: acc.id });
   const updated = { ...acc, mustChangePassword: false };
-  const next = nextOf(updated);
+  const next = nextOf(updated, tg);
   if (next === "link") return { status: "ok", pending: input.pending, next, linkUrl: await linkUrl(db, tg, updated, input.now) };
   if ((await sendCodeTo(db, tg, updated, input.now)) !== "ok") return { status: "unavailable" };
   return { status: "ok", pending: input.pending, next };
@@ -180,7 +197,7 @@ export async function checkTelegramLink(
   // Paso caducado (10 min): se avisa como caducado para volver al inicio, no como contraseña incorrecta.
   if (!acc) return { status: "expired" };
   if (acc.mustChangePassword) return { status: "invalid" };
-  if (acc.telegramChatId) return { status: "ok", next: "code" };
+  if (codeChat(acc, tg)) return { status: "ok", next: "code" };
   if (!acc.telegramLinkHash || !acc.telegramLinkExpiresAt || acc.telegramLinkExpiresAt <= input.now) return { status: "expired" };
   let updates;
   try {
@@ -206,7 +223,8 @@ export async function checkTelegramLink(
 
 /** RF-17 y RF-18: genera y envía un código de 6 cifras (como mucho 4 cada 10 minutos). */
 async function sendCodeTo(db: DbLike, tg: TelegramClient, acc: Account, now: Date): Promise<"ok" | "limit" | "unavailable"> {
-  if (!acc.telegramChatId) return "unavailable";
+  const chat = codeChat(acc, tg);
+  if (!chat) return "unavailable";
   const recent = await db
     .select({ createdAt: adminLoginCodes.createdAt })
     .from(adminLoginCodes)
@@ -219,7 +237,7 @@ async function sendCodeTo(db: DbLike, tg: TelegramClient, acc: Account, now: Dat
     .returning({ id: adminLoginCodes.id });
   await db.update(adminLoginCodes).set({ codeHash: sha(`${row.id}:${code}`) }).where(eq(adminLoginCodes.id, row.id));
   try {
-    await tg.sendMessage(acc.telegramChatId, `Waifu Baker · tu código de acceso es ${code}. Caduca en 5 minutos. Si no fuiste tú, avisa al dueño.`);
+    await tg.sendMessage(chat, code);
   } catch {
     return "unavailable";
   }
@@ -230,17 +248,17 @@ async function sendCodeTo(db: DbLike, tg: TelegramClient, acc: Account, now: Dat
 export async function resendAdminCode(db: DbLike, tg: TelegramClient | null, input: { pending: string; now: Date }) {
   if (!tg) return { status: "unavailable" as const };
   const acc = await pendingAccount(db, input.pending, input.now);
-  if (!acc || acc.mustChangePassword || !acc.telegramChatId) return { status: "invalid" as const };
+  if (!acc || acc.mustChangePassword || !codeChat(acc, tg)) return { status: "invalid" as const };
   return { status: await sendCodeTo(db, tg, acc, input.now) };
 }
 
 /** RF-14, RF-17 y RF-19: comprueba el código; si vale, termina el paso y devuelve la cuenta para abrir la sesión. */
 export async function verifyAdminCode(
   db: DbLike,
-  input: { pending: string; code: string; now: Date },
+  input: { pending: string; code: string; now: Date; tg?: TelegramClient | null },
 ): Promise<{ status: "ok"; userId: string; username: string } | { status: "invalid" | "locked" | "expired" }> {
   const acc = await pendingAccount(db, input.pending, input.now);
-  if (!acc || acc.mustChangePassword || !acc.telegramChatId) return { status: "expired" };
+  if (!acc || acc.mustChangePassword || !(input.tg?.teamChatId ?? acc.telegramChatId)) return { status: "expired" };
   const code = normalizeCode(input.code);
   const [last] = await db
     .select()
@@ -249,19 +267,22 @@ export async function verifyAdminCode(
     .orderBy(desc(adminLoginCodes.createdAt))
     .limit(1);
   if (!last) return { status: "expired" };
-  if (!looksLikeCode(code) || sha(`${last.id}:${code}`) !== last.codeHash) return { status: await fail(db, acc, input.now) };
+  if (!looksLikeCode(code) || sha(`${last.id}:${code}`) !== last.codeHash) return { status: await fail(db, acc, input.now, input.tg) };
   await db.update(adminLoginCodes).set({ usedAt: input.now }).where(eq(adminLoginCodes.id, last.id));
   await db
     .update(adminAccounts)
     .set({ failedAttempts: 0, lockedUntil: null, pendingHash: null, pendingUntil: null, updatedAt: input.now })
     .where(eq(adminAccounts.id, acc.id));
   await recordAudit(db, { actorUserId: acc.userId, action: "admin_login", entityType: "admin_account", entityId: acc.id });
+  await notifyAdmins(db, input.tg ?? null, `✅ ${acc.username} entró al panel`);
   return { status: "ok", userId: acc.userId, username: acc.username };
 }
 
 /** RF-24: aviso a todos los administradores con Telegram vinculado (copias que fallan, etc.). Nunca lanza. */
 export async function notifyAdmins(db: DbLike, tg: TelegramClient | null, text: string) {
   if (!tg) return;
+  // Con grupo del equipo, un solo mensaje para todos.
+  if (tg.teamChatId) return void (await tg.sendMessage(tg.teamChatId, text).catch(() => {}));
   const rows = await db.select({ chat: adminAccounts.telegramChatId }).from(adminAccounts).where(isNotNull(adminAccounts.telegramChatId));
   await Promise.all(rows.map((r) => tg.sendMessage(r.chat!, text).catch(() => {})));
 }

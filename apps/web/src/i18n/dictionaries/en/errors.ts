@@ -56,6 +56,7 @@ export const errors: Record<string, Msg> = {
   // Spec 024: administrator accounts (server commands).
   invalid_username: "Invalid username: 3 to 32 lowercase letters, numbers, dots or dashes.",
   username_taken: "There is already an administrator with that username.",
+  last_admin: "The only administrator account cannot be deleted.",
   not_found: (p) =>
     ({
       user: "This user doesn't exist.",

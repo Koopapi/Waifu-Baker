@@ -48,7 +48,9 @@ export function startSchedulerIfEnabled() {
   const backup = () =>
     safely("copia de seguridad", async () => {
       const r = await runBackup(db, backupConfigFromEnv());
-      if (!r.ok) await notifyAdmins(db, getTelegram(), `Waifu Baker · la copia de seguridad de esta noche falló: ${r.error}`);
+      const tg = getTelegram();
+      if (!r.ok) await notifyAdmins(db, tg, `⚠️ La copia de seguridad de esta noche falló: ${r.error}`);
+      else await notifyAdmins(db, tg, `💾 Copia de seguridad lista (${(r.bytes / 1_048_576).toFixed(1)} MB${backupConfigFromEnv().r2 ? ", también en R2" : ""}).`);
       return r;
     });
   setTimeout(() => {

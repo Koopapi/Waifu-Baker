@@ -58,6 +58,7 @@ Variables de entorno (las marcadas con † también como variables de compilaci�
 | `AUTH_PATREON_ID`, `AUTH_PATREON_SECRET` | los del cliente de Patreon | los mismos o un cliente aparte |
 | `PATREON_*` (token de creador, campaña, webhook) | los de la campaña | — |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME` | los del bot | los mismos |
+| `TELEGRAM_ALERTS_CHAT_ID` | ID del grupo del equipo (empieza con `-`) | el mismo |
 | `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | los de R2 | vacías (pruebas no copia fuera) |
 | `SITE_NOINDEX` † | — | `1` |
 | `SITE_BASIC_AUTH` | — | `usuario:contraseña` compartidos (en el gestor) |
@@ -78,11 +79,21 @@ Se gestionan desde la **Terminal** de la aplicación en Coolify (o `docker exec`
 pnpm admin create <usuario>          # muestra una contraseña temporal una sola vez
 pnpm admin reset-password <usuario>  # nueva temporal y desbloqueo
 pnpm admin reset-telegram <usuario>  # desvincula Telegram (se vuelve a vincular al entrar)
+pnpm admin delete <usuario>          # elimina la cuenta y su rol (el historial se conserva; nunca la última)
 ```
 
 Al entrar en `https://waifubaker.com/login/team` la primera vez: contraseña temporal → contraseña propia → vincular
 Telegram con el bot (abrir el enlace y pulsar «Iniciar») → código de 6 cifras. Las siguientes veces: contraseña y
 código. Cinco fallos seguidos bloquean la cuenta 15 minutos (queda en el historial).
+
+### Grupo de Telegram del equipo
+
+Con `TELEGRAM_ALERTS_CHAT_ID` puesto, los códigos de acceso (el mensaje es solo el código de 6 cifras) y los avisos
+llegan al grupo, y ya no hace falta vincular un chat personal por cuenta. Todo el grupo ve los códigos: solo debe
+tener a administradores de confianza. Avisos: acceso al panel, cuenta bloqueada, cuenta creada, restablecida o
+eliminada, y resultado de la copia nocturna. Los avisos de despliegues y del servidor los manda Coolify
+(Notifications → Telegram, con el mismo grupo). Para sacar el ID de un grupo: escribir en él mencionando al bot y
+leer `getUpdates`.
 
 ## Copias y restauración
 

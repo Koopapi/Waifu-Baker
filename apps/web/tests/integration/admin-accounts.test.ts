@@ -7,6 +7,8 @@ import {
   changeAdminPassword,
   checkTelegramLink,
   createAdminAccount,
+  deleteAdminAccount,
+  notifyAdmins,
   resendAdminCode,
   resetAdminPassword,
   startAdminLogin,
@@ -16,6 +18,7 @@ import { inRollback } from "./db";
 
 class FakeBot implements TelegramClient {
   readonly botUsername = "waifubaker_admin_bot";
+  teamChatId: string | null = null;
   sent: { chatId: string; text: string }[] = [];
   updates: TelegramUpdate[] = [];
   async sendMessage(chatId: string, text: string) {
@@ -124,6 +127,53 @@ describe("spec 024 — acceso del equipo", () => {
   it("test_s024_rf14_usuario_inexistente_responde_igual_que_contrasena_mala", async () => {
     await inRollback(async (tx) => {
       expect(await startAdminLogin(tx, new FakeBot(), { username: "nadie", password: "x", now: T0 })).toEqual({ status: "invalid" });
+    });
+  });
+
+  it("test_s024_con_grupo_del_equipo_el_codigo_llega_solo_al_grupo_sin_vincular_chats", async () => {
+    await inRollback(async (tx) => {
+      const bot = new FakeBot();
+      bot.teamChatId = "-5561816431";
+      const { password } = await createAdminAccount(tx, "koopa");
+      const s1 = await startAdminLogin(tx, bot, { username: "koopa", password, now: T0 });
+      const pending = (s1 as { pending: string }).pending;
+      // Sin chat personal: tras la contraseña nueva se pasa directo al código.
+      const s2 = await changeAdminPassword(tx, bot, { pending, newPassword: "mi-contraseña-nueva-larga", now: T0 });
+      expect(s2).toMatchObject({ status: "ok", next: "code" });
+      expect(bot.sent).toHaveLength(1);
+      expect(bot.sent[0].chatId).toBe("-5561816431");
+      // El mensaje es solo el código.
+      expect(bot.sent[0].text).toMatch(/^\d{6}$/);
+      const r = await verifyAdminCode(tx, { pending, code: bot.sent[0].text, now: at(1), tg: bot });
+      expect(r).toMatchObject({ status: "ok", username: "koopa" });
+      expect(bot.sent.at(-1)).toEqual({ chatId: "-5561816431", text: "✅ koopa entró al panel" });
+    });
+  });
+
+  it("test_s024_los_avisos_van_una_sola_vez_al_grupo_del_equipo", async () => {
+    await inRollback(async (tx) => {
+      const bot = new FakeBot();
+      bot.teamChatId = "-100";
+      await createAdminAccount(tx, "koopa");
+      await createAdminAccount(tx, "bruno");
+      await notifyAdmins(tx, bot, "hola");
+      expect(bot.sent).toEqual([{ chatId: "-100", text: "hola" }]);
+    });
+  });
+
+  it("test_s024_eliminar_una_cuenta_quita_el_rol_y_conserva_el_historial_pero_no_la_ultima", async () => {
+    await inRollback(async (tx) => {
+      await createAdminAccount(tx, "koopa");
+      await expect(deleteAdminAccount(tx, "koopa")).rejects.toMatchObject({ code: "last_admin" });
+      await createAdminAccount(tx, "bruno");
+      const [acc] = await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "bruno"));
+      await deleteAdminAccount(tx, "bruno");
+      expect(await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "bruno"))).toHaveLength(0);
+      const [u] = await tx.select().from(users).where(eq(users.id, acc.userId));
+      expect(u.role).toBe("user");
+      const log = await tx.select().from(auditLog).where(eq(auditLog.entityId, acc.id));
+      expect(log.map((l) => l.action)).toEqual(expect.arrayContaining(["admin_account_create", "admin_account_delete"]));
+      await expect(deleteAdminAccount(tx, "bruno")).rejects.toMatchObject({ code: "not_found" });
     });
   });
 });

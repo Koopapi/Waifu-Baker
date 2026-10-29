@@ -11,6 +11,7 @@ import { syncOnLogin } from "@/server/services/membership";
 import { upsertUserFromLogin } from "@/server/services/users";
 import { grantWelcomePack } from "@/server/services/welcome";
 import { authLogger } from "@/server/auth/logger";
+import { getTelegram } from "@/server/adapters/telegram";
 import { adminPatreonId, verifyAdminCode } from "@/server/services/admin-accounts";
 import { ADMIN_STEP_COOKIE } from "@/server/auth/admin-step";
 import { now } from "@/server/clock";
@@ -65,7 +66,7 @@ providers.push(
     async authorize(c, request) {
       const cookie = request.headers.get("cookie") ?? "";
       const pending = decodeURIComponent(cookie.match(new RegExp(`(?:^|; )${ADMIN_STEP_COOKIE}=([^;]+)`))?.[1] ?? "");
-      const r = await verifyAdminCode(db, { pending, code: String(c?.code ?? ""), now: now() });
+      const r = await verifyAdminCode(db, { pending, code: String(c?.code ?? ""), now: now(), tg: getTelegram() });
       if (r.status !== "ok") throw new AdminCodeError(r.status);
       return { id: adminPatreonId(r.username), name: r.username, adminUserId: r.userId } as { id: string; name: string };
     },

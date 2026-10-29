@@ -7,6 +7,7 @@ export class HttpTelegram implements TelegramClient {
   constructor(
     private readonly token: string,
     readonly botUsername: string,
+    readonly teamChatId: string | null = null,
   ) {}
 
   private async call<T>(method: string, body: Record<string, unknown>): Promise<T> {
@@ -40,6 +41,7 @@ export function getTelegram(): TelegramClient | null {
   if (instance !== undefined) return instance;
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const username = process.env.TELEGRAM_BOT_USERNAME?.replace(/^@/, "");
-  instance = token && username ? new HttpTelegram(token, username) : null;
+  const team = process.env.TELEGRAM_ALERTS_CHAT_ID?.trim() || null;
+  instance = token && username ? new HttpTelegram(token, username, team) : null;
   return instance;
 }
