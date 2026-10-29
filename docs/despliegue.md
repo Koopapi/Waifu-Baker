@@ -9,7 +9,7 @@ repositorio: viven en las variables de entorno de Coolify y en el gestor de cont
 |---|---|---|
 | Dominio `waifubaker.com` | Comprado en HostGator Brasil | El nombre |
 | DNS | Cloudflare (nameservers `jasper` y `olga`) | `@`, `www`, `deploy` y `pruebas` → `13.140.231.48`, sin proxy (nube gris) |
-| Correo | Cloudflare Email Routing (+ envío por Brevo desde Gmail) | `hola@`, `redes@`, `soporte@` |
+| Correo | Cloudflare Email Routing (+ envío por Brevo desde Gmail) | `waifubaker@waifubaker.com` (oficial); opcionales `redes@` y `soporte@` |
 | VPS | Contabo Cloud VPS 4 (Ubuntu 24.04, 4 núcleos, 8 GB, 96 GB), US-east | Todo lo demás |
 | Coolify | En el VPS; panel en `https://deploy.waifubaker.com` | Publica, guarda registros, vuelve atrás |
 | Producción | `https://waifubaker.com`, rama `main` | La web real |
@@ -61,7 +61,7 @@ Variables de entorno (las marcadas con † también como variables de compilaci�
 | `R2_ENDPOINT`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | los de R2 | vacías (pruebas no copia fuera) |
 | `SITE_NOINDEX` † | — | `1` |
 | `SITE_BASIC_AUTH` | — | `usuario:contraseña` compartidos (en el gestor) |
-| `CONTACT_EMAIL` | `hola@waifubaker.com` | igual |
+| `CONTACT_EMAIL` | `waifubaker@waifubaker.com` | igual |
 | `DEV_LOGIN`, `DEMO_MODE` | **nunca** | **nunca** |
 
 Pruebas pide además una contraseña compartida (autenticación básica de la propia web con `SITE_BASIC_AUTH`); la
