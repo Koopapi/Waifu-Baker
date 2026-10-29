@@ -133,3 +133,9 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   (se quedan la insignia y los 3 equipos); cualquier tier de pago desbloquea el 18+. La spec 022 «tienda» queda
   sustituida. Nuevo orden: 022 rarezas y sobres plata/gold, 023 monedas y recompensas, 024 tiendas, 025 repetidas,
   026 tiers de Patreon; después Street pop (027), publicar (028) y piloto (029).
+- 28 oct 2026: maquetas de la spec 022 aprobadas (5 marcos nuevos y tabla doble). El dueño quiere la apertura de
+  sobres de Bruno: su «Laboratorio de sobres» (sobre por capas de 1000 × 1750, sticker que se despega con el dedo,
+  dientes, foil y volumen, sonidos sintetizados, mazo de cartas que se pasan deslizando) estaba en su paquete original y
+  ahora se copia a `docs/waifu-baker/waifu-baker/abridor-sobres/` como referencia. Entra como **spec 023**, justo después
+  de la 022; el aspecto de los sobres plata y gold se define ahí. Renumeración: 024 monedas y recompensas, 025 tiendas,
+  026 repetidas, 027 tiers de Patreon, 028 Street pop, 029 publicar, 030 piloto.

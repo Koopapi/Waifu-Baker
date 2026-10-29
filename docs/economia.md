@@ -34,7 +34,8 @@ La holo existe en todas las rarezas, también en la común.
 | **Plata** | El básico. |
 | **Gold** | Mayor probabilidad de legendaria y EX. |
 
-Cada colección publica dos tablas de probabilidad, una por tipo de sobre.
+Cada colección publica dos tablas de probabilidad, una por tipo de sobre. El aspecto de los sobres plata y gold se
+define en la spec 023 (apertura nueva, basada en el laboratorio de sobres de Bruno).
 
 | Fuente | Qué da |
 |---|---|
