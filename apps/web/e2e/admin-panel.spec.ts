@@ -71,6 +71,11 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await choose(page, "Rareza para la selección", /^Rara$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
+    // Spec 022: una legendaria para que el sobre gold pueda dar más legendaria que el plata.
+    await tick(page, "Seleccionar carta 009");
+    await choose(page, "Rareza para la selección", /^Legendaria$/);
+    await page.click("text=Aplicar a la selección");
+    await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
   });
 
   await test.step("Nombres de las cartas desde el editor", async () => {
@@ -109,7 +114,7 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   });
 
   await test.step("RF-20: editar probabilidades (rechaza sumas distintas de 100)", async () => {
-    const R = ["Común", "Poco común", "Rara", "Épica", "Legendaria", "Secreta"];
+    const R = ["Común", "Rara", "Épica", "Legendaria", "EX"];
     const fill = async (slot: number, weights: Record<string, number>) => {
       for (const r of R) await page.locator(`[aria-label="Ranura ${slot}, ${r}"]`).fill(String(weights[r] ?? 0));
     };
@@ -121,6 +126,14 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click("text=Guardar probabilidades");
     await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
     await expect(page.locator('[data-card-tile="10"]')).toContainText("100 % / sobre");
+    // Spec 022, RF-21: la tabla del sobre gold, en su pestaña.
+    await page.getByRole("tab", { name: "Gold" }).click();
+    await expect(page.locator('[data-testid="odds-gold"]')).toBeVisible();
+    await fill(1, { Rara: 100 });
+    await fill(2, { Legendaria: 100 });
+    await page.click("text=Guardar probabilidades");
+    await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
+    await page.getByRole("tab", { name: "Plata" }).click();
   });
 
   await test.step("RF-23: simular un sobre con las cartas reales", async () => {

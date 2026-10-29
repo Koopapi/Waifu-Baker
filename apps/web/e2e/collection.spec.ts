@@ -12,7 +12,8 @@ const shot = (p: Page, name: string, fullPage = false) =>
 test("colección y álbum público", async ({ browser }) => {
   const fan = await login(browser, "album-e2e", false, "/sobres");
   const admin = await login(browser, "admin-e2e-3", true);
-  // 3 cartas: 001 y 002 comunes, 003 rara y siempre holo. Un sobre de 2 → una común queda sin conseguir.
+  // 3 cartas: 001 y 002 comunes, 003 rara y siempre holo (y la 004, legendaria, solo en los sobres gold: spec 022).
+  // Un sobre plata de 2 → una común y la legendaria quedan sin conseguir.
   await createPublishedSet(admin, "ALB1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, 100);
   await giftPacks(admin, "album-e2e", "ALB1", 1);
   await fan.goto("/sobres");
@@ -24,7 +25,7 @@ test("colección y álbum público", async ({ browser }) => {
   await test.step("RF-1: «Mi colección» lista la colección con su progreso", async () => {
     await fan.click("header >> text=Mi colección");
     await expect(fan).toHaveURL(/\/coleccion$/);
-    await expect(fan.locator('[data-testid="collection-ALB1"] [data-testid="progress"]')).toHaveText("2/3");
+    await expect(fan.locator('[data-testid="collection-ALB1"] [data-testid="progress"]')).toHaveText("2/4");
     await shot(fan, "1-mi-coleccion");
   });
 
@@ -36,11 +37,11 @@ test("colección y álbum público", async ({ browser }) => {
       await fan.click('[data-testid="collection-ALB1"] a');
       await expect(fan).toHaveURL(/\/coleccion\/[0-9a-f-]{36}$/, { timeout: 10_000 });
     }).toPass({ timeout: 60_000 });
-    await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText("2 de 3 cartas");
+    await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText("2 de 4 cartas");
     const grid = fan.locator('[data-testid="binder-grid"]');
-    await expect(grid.locator("li")).toHaveCount(3);
+    await expect(grid.locator("li")).toHaveCount(4);
     const missing = grid.locator('li[data-missing="true"]');
-    await expect(missing).toHaveCount(1);
+    await expect(missing).toHaveCount(2);
     await expect(missing.locator("img")).toHaveCount(0);
     await expect(missing).not.toContainText("ALB1 carta");
     const img = grid.locator('[data-slot="3"] img');
@@ -52,7 +53,7 @@ test("colección y álbum público", async ({ browser }) => {
   await test.step("RF-7: filtros por estado y por rareza", async () => {
     const items = fan.locator('[data-testid="binder-grid"] li');
     await fan.click("text=Me faltan");
-    await expect(items).toHaveCount(1);
+    await expect(items).toHaveCount(2);
     await fan.click("text=Las que tengo");
     await expect(items).toHaveCount(2);
     await fan.click('[data-testid="binder-filters"] >> text=Holo');
@@ -62,7 +63,7 @@ test("colección y álbum público", async ({ browser }) => {
     await choose(fan, "Filtrar por rareza", /^Común$/);
     await expect(items).toHaveCount(1);
     await choose(fan, "Filtrar por rareza", "Todas las rarezas");
-    await expect(items).toHaveCount(3);
+    await expect(items).toHaveCount(4);
   });
 
   await test.step("RF-5 y RF-6: ficha de la carta con holo y cambio de versión", async () => {
@@ -117,11 +118,11 @@ test("colección y álbum público", async ({ browser }) => {
   await test.step("RF-13: un visitante sin sesión ve alias, destacadas y la colección", async () => {
     await anon.goto(url);
     await expect(anon.locator('[data-testid="album-alias"]')).toHaveText("Coleccionista E2E");
-    await expect(anon.locator('[data-testid="album-totals"]')).toContainText("2 de 3 cartas");
+    await expect(anon.locator('[data-testid="album-totals"]')).toContainText("2 de 4 cartas");
     await expect(anon.locator('[data-testid="album-featured"] li')).toHaveCount(2);
     await expect(anon.locator('[data-testid="album-featured"] li').first()).toContainText("ALB1 carta 003");
     const col = anon.locator('[data-testid="album-collection-ALB1"]');
-    await expect(col.locator('li[data-missing="true"]')).toHaveCount(1);
+    await expect(col.locator('li[data-missing="true"]')).toHaveCount(2);
     await expect(col.locator("li img")).toHaveCount(2);
   });
 
@@ -164,7 +165,7 @@ test("colección y álbum público", async ({ browser }) => {
     await fan.goto(`${new URL(fan.url()).origin}/coleccion`);
     await fan.click('[data-testid="collection-ALB1"] a');
     await fan.waitForURL(/\/coleccion\/[0-9a-f-]{36}$/);
-    await expect(fan.locator('[data-testid="binder-grid"] li')).toHaveCount(3);
+    await expect(fan.locator('[data-testid="binder-grid"] li')).toHaveCount(4);
     await expect
       .poll(() => fan.locator('[data-testid="binder-grid"] img').evaluateAll((els) => els.map((e) => [(e as HTMLImageElement).naturalWidth, e.getBoundingClientRect().height])))
       .toEqual([

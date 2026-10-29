@@ -10,7 +10,8 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
   const fan = await login(browser, `viva-${tag}`, false, "/sobres");
   const admin = await login(browser, `admin-viva-${tag}`, true);
   const code = `LV${tag.slice(0, 4).toUpperCase()}`;
-  // La 002 es rara y siempre holo (100 %): sirve para el acabado y el brillo holo.
+  // La 001 es común (spec 022: plana, sin carta viva) y la 002 es rara y siempre holo (100 %): sirve para la carta viva,
+  // el acabado y el brillo holo.
   await createPublishedSet(admin, code, ["07.webp", "08.webp"].map((f) => path.join(LAB, f)), 2, 100);
   await giftPacks(admin, `viva-${tag}`, code, 1);
 
@@ -21,13 +22,14 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
     await fan.click(`[data-testid="group-${code}"] >> text=Abrir un sobre`);
     await tear(fan);
     await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
+    // Spec 022, RF-4: la primera, común, se revela plana.
+    await fan.locator('.card3d[role="button"]').first().click();
+    await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
+    await expect(fan.locator(".card3d__live")).toHaveCount(0);
+    if (reduced) return;
+    // La segunda, rara, se ve viva.
     await fan.locator('.card3d[role="button"]').first().click();
     const live = fan.locator(".card3d__live .cc-card");
-    if (reduced) {
-      await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
-      await expect(fan.locator(".card3d__live")).toHaveCount(0);
-      return;
-    }
     await expect(live).toBeVisible();
     // Sus capas cargan (enlaces firmados de la carta) y hace su entrada.
     const img = fan.locator(".card3d__live .cc-capa img").first();
@@ -39,10 +41,9 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
   });
 
   await test.step("RF-8: en la bandeja y en el resumen, la imagen fija", async () => {
-    await expect(fan.locator('.stage[data-revealed="1"]')).toBeVisible();
-    await expect(fan.locator(".card3d__live")).toHaveCount(0);
-    await fan.locator('.card3d[role="button"]').first().click();
+    if (reduced) await fan.locator('.card3d[role="button"]').first().click();
     await expect(fan.locator(".summary")).toBeVisible();
+    await expect(fan.locator(".card3d__live")).toHaveCount(0);
     await expect(fan.locator(".summary__thumb img").first()).toHaveAttribute("src", /\/api\/cards\/img\?/);
   });
 
@@ -56,8 +57,14 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
   await test.step("RF-7, RF-11 y RF-14: la ficha muestra la carta viva; el interruptor del giroscopio solo en el teléfono", async () => {
     await fan.goto("/coleccion");
     await fan.click(`[data-testid="collection-${code}"] a`);
-    await fan.click('[aria-label="Ver carta 001"]');
     const art = fan.locator('[data-testid="card-sheet-art"]');
+    // Spec 022, RF-4: la ficha de la común también es plana (y sin giroscopio).
+    await fan.click('[aria-label="Ver carta 001"]');
+    await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
+    await expect(art.locator(".cc-card")).toHaveCount(0);
+    await expect(fan.locator('[data-testid="gyro"]')).toHaveCount(0);
+    await fan.keyboard.press("Escape");
+    await fan.click('[aria-label="Ver carta 002"]');
     if (reduced) {
       await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
       await expect(art.locator(".cc-card")).toHaveCount(0);
@@ -127,7 +134,8 @@ test("cartas por capas: permiso del giroscopio negado", async ({ browser }) => {
   await test.step("RF-13: si se niega el permiso, el interruptor queda apagado y avisa", async () => {
     await fan.goto("/coleccion");
     await fan.click(`[data-testid="collection-${code}"] a`);
-    await fan.click('[aria-label="Ver carta 001"]');
+    // La 002 es la rara (la común no se ve viva y no tiene interruptor: spec 022).
+    await fan.click('[aria-label="Ver carta 002"]');
     const sw = fan.locator('[data-testid="gyro"]').getByRole("switch");
     await sw.click();
     await expect(fan.locator('[data-testid="gyro-denied"]')).toContainText("No diste permiso");

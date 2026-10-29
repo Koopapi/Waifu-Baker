@@ -53,7 +53,7 @@ test("editor de cartas por capas", async ({ browser }) => {
     await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(5);
     await editor.locator('[data-testid="layer-row"]').nth(5).getByRole("button", { name: /^Quitar capa/ }).click();
     await editor.locator('[data-testid="layers-apply-rarity"]').click();
-    // La carta 001 es común (n): marco plateado, sin partículas ni sello; las cinco capas de imagen siguen.
+    // La carta 001 es común (n): marco plateado, sin partículas y con el sello C (spec 022); las cinco capas de imagen siguen.
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
   });
 
@@ -76,8 +76,8 @@ test("editor de cartas por capas", async ({ browser }) => {
 
   await test.step("RF-11: la carta por capas no lleva texto encima (ni número ni nombre)", async () => {
     const card = admin.locator('[data-testid="layers-preview"] .cc-card');
-    // La común (escalón N) no lleva sello: dentro de la carta no hay ningún texto.
-    await expect(card).toHaveText("");
+    // Dentro de la carta solo está el sello de la rareza (la C de la común, spec 022): ni número ni nombre.
+    await expect(card).toHaveText("C");
     expect(await card.evaluate((el) => el.textContent ?? "")).not.toMatch(/001|carta/i);
   });
 

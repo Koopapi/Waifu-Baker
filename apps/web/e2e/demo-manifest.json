@@ -31,13 +31,13 @@
       "file": "05.webp",
       "character": "Test Alpha",
       "title": "Pose 5",
-      "rarity": "uncommon"
+      "rarity": "common"
     },
     {
       "file": "06.webp",
       "character": "Test Beta",
       "title": "Pose 6",
-      "rarity": "uncommon"
+      "rarity": "common"
     },
     {
       "file": "07.webp",

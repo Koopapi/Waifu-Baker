@@ -67,7 +67,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
     await expect(anon.locator(`text=${en.site.home.tagline}`)).toBeVisible();
   });
 
-  // Datos: una colección publicada hoy (panel en español, como el resto de E2E) y un fan con 2 de 3 cartas.
+  // Datos: una colección publicada hoy (panel en español, como el resto de E2E) y un fan con 2 de 4 cartas.
   const adminEs = await login(browser, "admin-i18n", true);
   await createPublishedSet(adminEs, "I18N", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
 
@@ -93,7 +93,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
     await expect(admin.locator("html")).toHaveAttribute("lang", "es");
   });
 
-  // El fan (español por defecto) consigue 2 de 3 cartas y publica su álbum.
+  // El fan (español por defecto) consigue 2 de 4 cartas (la 4.ª, legendaria, solo sale en los gold) y publica su álbum.
   const fan = await login(browser, "fan-i18n", false, "/sobres");
   await giftPacks(adminEs, "fan-i18n", "I18N", 1);
   await fan.goto("/sobres");
@@ -119,10 +119,10 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
     const url = await fan.locator('[data-testid="album-url"]').inputValue();
     await anon.goto(url);
     await expect(anon.locator("html")).toHaveAttribute("lang", "en");
-    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(en.collection.publicAlbum.totals(2, 3, 67));
+    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(en.collection.publicAlbum.totals(2, 4, 50));
     await expect(anon.locator('img[alt="I18N carta 003"]')).toHaveCount(1);
     await toggle(anon, "es").click();
-    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(es.collection.publicAlbum.totals(2, 3, 67));
+    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(es.collection.publicAlbum.totals(2, 4, 50));
     await expect(anon.locator('img[alt="I18N carta 003"]')).toHaveCount(1);
     const og = await anon.locator('meta[property="og:image"]').getAttribute("content");
     expect((await anon.request.get(og!)).status()).toBe(200);
