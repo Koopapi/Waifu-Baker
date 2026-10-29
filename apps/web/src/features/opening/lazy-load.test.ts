@@ -5,7 +5,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 const src = (f: string) => readFileSync(path.resolve(__dirname, "../..", f), "utf8");
-const HEAVY = /^import[^;]*from ["'](gsap|@use-gesture\/react|howler|@\/features\/opening\/(OpeningStage|Particles|PackMesh))["']/m;
+const HEAVY = /^import[^;]*from ["'](gsap|@use-gesture\/react|howler|@\/features\/opening\/(OpeningStage|Particles|TearPack))["']/m;
 
 describe("spec 013 — carga diferida de la apertura", () => {
   it("test_s013_rf13_la_apertura_carga_la_escena_con_next_dynamic", () => {

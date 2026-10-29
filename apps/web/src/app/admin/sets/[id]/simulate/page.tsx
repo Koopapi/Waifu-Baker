@@ -5,6 +5,7 @@ import { getSet } from "@/server/services/collections";
 import { SimulateStage } from "@/features/admin/sets/SimulateStage";
 import { getDict } from "@/i18n/server";
 import { parsePackKind } from "@/domain/catalog/default-odds";
+import { packArtForSets } from "@/server/services/pack-art";
 
 export async function generateMetadata() {
   const t = await getDict();
@@ -19,5 +20,6 @@ export default async function SimulatePage({ params, searchParams }: { params: P
   const set = await getSet(db, id);
   if (!set) notFound();
   const t = await getDict();
-  return <SimulateStage setId={set.id} kind={kind} label={t.admin.simulate.packLabel(set.code, t.common.packKind[kind])} />;
+  const art = (await packArtForSets(db, [set.id])).get(set.id) ?? { coverVersion: null, packImage: null };
+  return <SimulateStage setId={set.id} kind={kind} code={set.code} name={set.name} art={art} label={t.admin.simulate.packLabel(set.code, t.common.packKind[kind])} />;
 }

@@ -58,12 +58,11 @@ export const packs: typeof en = {
     openAnother: (n) => `Abrir otro (${n})`,
     backToMine: "Volver a mis sobres",
     backToMineHud: "← Mis sobres",
-    nothingLeft: "sin sobres pendientes",
   },
   stage: {
     openFailed: "No se pudo abrir el sobre.",
     hintButton: "Pulsa el botón para abrir el sobre",
-    hintSwipe: "Desliza la tira del sobre hacia la derecha",
+    hintSwipe: "Desliza por los dientes para abrir",
     hintTap: (i, n) => `Toca la carta de arriba · ${i} de ${n}`,
     summaryTitle: "Sobre abierto",
     celebrate: (rarity) => `¡${rarity}!`,
@@ -77,5 +76,11 @@ export const packs: typeof en = {
     stripHintReduced: "tira de apertura",
     stripHint: "▸▸ desliza para abrir",
     openPack: "Abrir sobre",
+    // Spec 023: el mazo.
+    openWithoutSwipe: "Abrir sin deslizar",
+    hintDeck: (i, n) => `Toca o desliza la carta · ${i} de ${n}`,
+    hintNext: (i, n) => `Carta ${i} de ${n} · desliza para seguir`,
+    newTitle: "¡Nueva!",
+    dismissCard: "Apartar la carta",
   },
 };

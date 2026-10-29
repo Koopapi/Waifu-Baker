@@ -13,7 +13,8 @@ import { useReducedMotion } from "@/ui/hooks/useReducedMotion";
 import { OpenAllBurst } from "./open-all/OpenAllBurst";
 import { OpenAllFocus } from "./open-all/OpenAllFocus";
 import { OpenAllSummary } from "./open-all/OpenAllSummary";
-import { PackArt, type PackArtData } from "./PackArt";
+import type { PackArtData } from "./PackArt";
+import { PackShell } from "./PackShell";
 import { PackKindTag } from "./PackKindTag";
 import type { PackKind } from "@/domain/catalog/default-odds";
 import "./open-all.css";
@@ -54,14 +55,17 @@ export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { se
     });
   };
 
-  const pack = <PackArt setId={setId} code={setCode} name={setName} art={art} className="w-full" />;
+  // Spec 023, RF-5 y RF-20: el sobre nuevo de su tipo; en la ráfaga, el rasgado arranca su tira.
+  const shell = { setId, code: setCode, name: setName, art, kind, kindLabel: t.common.packKind[kind] };
+  const pack = <PackShell {...shell} className="w-full" />;
+  const tornPack = <PackShell {...shell} state="torn" className="w-full" />;
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6" data-phase={phase}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex items-end gap-4">
           {/* Spec 014, RF-8: el mismo sobre de la colección. */}
-          {phase === "idle" && <PackArt setId={setId} code={setCode} name={setName} art={art} className="w-[96px] sm:w-[120px]" />}
+          {phase === "idle" && <PackShell {...shell} className="w-[96px] sm:w-[120px]" />}
           <div>
             <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-ui-text">
               {t.packs.openAll.backToMine}
@@ -83,7 +87,7 @@ export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { se
         </div>
       </div>
       {error && <Alert tone="danger">{error}</Alert>}
-      {cards && phase === "burst" && <OpenAllBurst packs={opened} cards={cards} pack={pack} onDone={afterBurst} onSkip={() => setPhase("summary")} />}
+      {cards && phase === "burst" && <OpenAllBurst packs={opened} cards={cards} pack={pack} tornPack={tornPack} onDone={afterBurst} onSkip={() => setPhase("summary")} />}
       {cards && phase === "focus" && <OpenAllFocus items={featured} reduced={reduced} onDone={() => setPhase("summary")} />}
       {cards && phase === "summary" && (
         <>

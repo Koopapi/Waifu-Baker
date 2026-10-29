@@ -18,4 +18,7 @@ export const RARITY_TIER: Record<Rarity, RarityTier> = {
 export const rarityTier = (r: Rarity | null | undefined): RarityTier => (r ? RARITY_TIER[r] : "n");
 
 /** Spec 022, RF-4: la carta común se ve plana, sin parallax (la imagen fija, con el brillo holo si lo es). */
+/** Spec 022 y 023: el sello de cada rareza (el de los marcos y la insignia al revelar). */
+export const RARITY_SEAL: Record<Rarity, string> = { common: "C", rare: "R", epic: "E", legendary: "LEG", ex: "EX" };
+
 export const isFlat = (r: Rarity | null | undefined) => (r ?? "common") === "common";

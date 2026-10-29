@@ -114,12 +114,13 @@
 }
 .oa-burst__pack--torn {
   z-index: 5;
-  animation: oaTear 0.45s ease-in forwards;
+  /* Spec 023, RF-20: primero sale volando la tira (pack-shell.css) y después el sobre baja y se desvanece. */
+  animation: oaTear 0.4s 0.3s ease-in forwards;
 }
 @keyframes oaTear {
   to {
     opacity: 0;
-    transform: translateY(-120px) rotate(18deg) scale(0.9);
+    transform: translateY(60px) scale(0.9);
   }
 }
 .oa-burst__falling {

@@ -20,6 +20,10 @@ interface Props {
   tease?: number;
   /** Spec 018, RF-6: muestra la carta viva sobre la cara (al revelarla); si no, la imagen fija. */
   showLive?: boolean;
+  /** Spec 023: gestos del mazo (toque y deslizamiento); con ellos, `onClick` queda solo para el teclado. */
+  gesture?: React.HTMLAttributes<HTMLDivElement>;
+  /** Nombre accesible de la acción (voltear o apartar). */
+  actionLabel?: string;
 }
 
 const MAX_RX = 10; // grados
@@ -32,7 +36,7 @@ const MAX_RY = 14;
  *   .card3d__inner volteo rotationY (GSAP)
  */
 export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
-  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false },
+  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false, gesture, actionLabel },
   ref,
 ) {
   const t = useT();
@@ -93,12 +97,13 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
     <div
       ref={setRefs}
       className={classes}
-      style={tease > 0 ? ({ ...style, "--tease": tease } as CSSProperties) : style}
-      onClick={onClick}
+      {...gesture}
+      style={{ ...style, ...(tease > 0 ? { "--tease": tease } : {}), ...(gesture ? { touchAction: "none" } : {}) } as CSSProperties}
+      onClick={gesture ? undefined : onClick}
       data-card={card.id}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
-      aria-label={onClick ? t.packs.stage.flipCard : undefined}
+      aria-label={onClick ? (actionLabel ?? t.packs.stage.flipCard) : undefined}
       onKeyDown={
         onClick
           ? (e) => {

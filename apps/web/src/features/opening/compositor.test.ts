@@ -6,10 +6,11 @@ import { describe, expect, it } from "vitest";
 
 const read = (f: string) => readFileSync(path.resolve(__dirname, "../..", f), "utf8");
 const CSS = ["features/opening/opening.css", "features/packs/open-all.css"];
-const TWEENS = ["features/opening/OpeningStage.tsx", "features/opening/PackMesh.tsx", "features/opening/Card3D.tsx"];
+const TWEENS = ["features/opening/OpeningStage.tsx", "features/opening/TearPack.tsx", "features/opening/Card3D.tsx"];
 const CSS_OK = new Set(["transform", "opacity"]);
 // Propiedades de GSAP que se traducen a transform u opacity, y opciones del propio tween.
-const GSAP_OK = new Set(["x", "y", "scale", "rotation", "rotationX", "rotationY", "skewX", "opacity", "duration", "ease", "delay", "onComplete", "overwrite"]);
+// Spec 023: el rasgado anima un número (`v`, el progreso) que recorta solo la tira del sobre; nada más se repinta.
+const GSAP_OK = new Set(["x", "y", "scale", "rotation", "rotationX", "rotationY", "skewX", "opacity", "duration", "ease", "delay", "onComplete", "onUpdate", "overwrite", "v"]);
 
 /** Propiedades declaradas dentro de cada bloque @keyframes. */
 function keyframeProps(css: string) {

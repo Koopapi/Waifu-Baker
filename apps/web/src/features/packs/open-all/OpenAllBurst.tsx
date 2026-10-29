@@ -14,7 +14,22 @@ const VISIBLE_PACKS = 4;
  * Spec 019, RF-1 a RF-3 y RF-9: los sobres se rasgan uno tras otro (sin pasar de 6 s) y las cartas de cada uno caen a
  * su sitio; suena como mucho un rasgado cada 120 ms. «Saltar» lleva al resumen.
  */
-export function OpenAllBurst({ packs, cards, pack, onDone, onSkip }: { packs: number; cards: OpenAllCard[]; pack: React.ReactNode; onDone: () => void; onSkip: () => void }) {
+export function OpenAllBurst({
+  packs,
+  cards,
+  pack,
+  tornPack = pack,
+  onDone,
+  onSkip,
+}: {
+  packs: number;
+  cards: OpenAllCard[];
+  pack: React.ReactNode;
+  /** Spec 023, RF-20: el sobre rasgándose (su tira sale volando). */
+  tornPack?: React.ReactNode;
+  onDone: () => void;
+  onSkip: () => void;
+}) {
   const t = useT().packs.openAll;
   const [torn, setTorn] = useState(0);
   const done = useRef(onDone);
@@ -65,7 +80,7 @@ export function OpenAllBurst({ packs, cards, pack, onDone, onSkip }: { packs: nu
         {/* El sobre recién rasgado sale volando (una clave nueva por sobre reinicia la animación). */}
         {torn > 0 && (
           <div key={`t${torn}`} className="oa-burst__pack oa-burst__pack--torn">
-            {pack}
+            {tornPack}
           </div>
         )}
       </div>

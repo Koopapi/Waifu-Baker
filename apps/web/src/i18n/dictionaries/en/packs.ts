@@ -59,12 +59,11 @@ export const packs = {
     openAnother: (n: number) => `Open another (${n})`,
     backToMine: "Back to my packs",
     backToMineHud: "← My packs",
-    nothingLeft: "no packs left",
   },
   stage: {
     openFailed: "The pack could not be opened.",
     hintButton: "Press the button to open the pack",
-    hintSwipe: "Swipe the pack's strip to the right",
+    hintSwipe: "Swipe along the teeth to open",
     hintTap: (i: number, n: number) => `Tap the top card · ${i} of ${n}`,
     summaryTitle: "Pack opened",
     celebrate: (rarity: string) => `${rarity}!`,
@@ -78,5 +77,11 @@ export const packs = {
     stripHintReduced: "tear strip",
     stripHint: "▸▸ swipe to open",
     openPack: "Open pack",
+    // Spec 023: the deck.
+    openWithoutSwipe: "Open without swiping",
+    hintDeck: (i: number, n: number) => `Tap or swipe the card · ${i} of ${n}`,
+    hintNext: (i: number, n: number) => `Card ${i} of ${n} · swipe to continue`,
+    newTitle: "New!",
+    dismissCard: "Move the card aside",
   },
 };

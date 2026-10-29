@@ -6,7 +6,7 @@ import { now } from "@/server/clock";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
 import { packArtForSets } from "@/server/services/pack-art";
 import { newArrivalsBySet } from "@/server/services/arrivals";
-import { PackArt } from "@/features/packs/PackArt";
+import { PackShell } from "@/features/packs/PackShell";
 import { MarkPacksSeen } from "@/features/packs/MarkPacksSeen";
 import { claimableSets, rewardsSummary } from "@/server/services/rewards";
 import { RewardsPanel } from "@/features/rewards/RewardsPanel";
@@ -88,9 +88,9 @@ export default async function MisSobresPage() {
                 >
                   <div className="flex flex-col items-center gap-5 @sm:flex-row">
                     <div className="relative shrink-0">
-                      {/* Spec 014, RF-5 y RF-8: el sobre de la colección; detrás, la pila si hay más de uno. */}
+                      {/* Spec 023, RF-5: el sobre nuevo de su tipo; detrás, la pila si hay más de uno. */}
                       {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
-                      <PackArt setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} className="relative w-[200px] @sm:w-[170px]" />
+                      <PackShell setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} kind={g.kind} kindLabel={t.common.packKind[g.kind]} className="relative w-[200px] @sm:w-[170px]" />
                     </div>
                     <div className="flex w-full max-w-xs min-w-0 flex-1 flex-col gap-4 @sm:max-w-none">
                       <div className="flex items-start justify-center gap-3 @sm:justify-between">

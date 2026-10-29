@@ -6,7 +6,7 @@ import path from "node:path";
 import { revealSound, vibrationPattern } from "../src/domain/opening/feedback";
 import type { Rarity } from "../src/domain/catalog/card-rules";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, giftPacks, login, openAllAndSkip, tear } from "./helpers";
+import { createPublishedSet, giftPacks, LAB, login, openAllAndSkip, openDeck, tear } from "./helpers";
 
 type Log = { sounds: string[]; vibes: string[] };
 
@@ -22,12 +22,8 @@ async function record(page: Page) {
 const log = (page: Page) => page.evaluate(() => (window as unknown as { __wb: Log }).__wb);
 
 async function revealAll(page: Page) {
-  await expect(page.locator('.stage[data-phase="fanned"]')).toBeVisible();
-  const n = await page.locator(".card3d").count();
-  for (let k = 0; k < n; k++) {
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator(k + 1 === n ? ".summary" : `.stage[data-revealed="${k + 1}"]`)).toBeVisible();
-  }
+  // Spec 023: el mazo se revela y se aparte carta a carta hasta el resumen.
+  await openDeck(page);
   return (await page.locator(".summary__row").evaluateAll((rows) => rows.map((r) => r.className.match(/rarity-(\w+)/)![1]))) as Rarity[];
 }
 
@@ -50,7 +46,8 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
     const expected = ["tear", ...rarities.flatMap((r) => ["flip", ...(revealSound(r) ? [revealSound(r)!] : [])])];
     await expect.poll(async () => (await log(fan)).sounds).toEqual(expected);
     expect(rarities.some((r) => revealSound(r))).toBe(true);
-    expect((await log(fan)).vibes).toEqual(rarities.flatMap((r) => (vibrationPattern(r) ? [vibrationPattern(r)!.join(",")] : [])));
+    // Spec 023: el rasgado también vibra con pulsos sueltos («6») y un golpe al arrancar («18,30,12»); aquí solo cuentan los de las raras.
+    expect((await log(fan)).vibes.filter((v) => v !== "6" && v !== "18,30,12")).toEqual(rarities.flatMap((r) => (vibrationPattern(r) ? [vibrationPattern(r)!.join(",")] : [])));
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}/s013-1-resumen-con-sonido.png` });
   });
 

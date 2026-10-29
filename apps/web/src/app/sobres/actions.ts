@@ -42,6 +42,7 @@ async function toLabCards(t: Dict, r: OpeningResult, userId: string): Promise<La
     image: cardImageUrl(c.cardId, "mid", userId),
     framed: true,
     live: lives[i],
+    isNew: c.isNew,
     note: [c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(c.qtyAfter), c.holo ? t.packs.notes.holo : null, c.pity ? t.packs.notes.pity : null]
       .filter(Boolean)
       .join(" · "),
