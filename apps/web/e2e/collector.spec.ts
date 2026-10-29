@@ -8,7 +8,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
   await test.step("RF-2: sin sesión, «Mis sobres» lleva al login y vuelve", async () => {
     const anon = await (await browser.newContext()).newPage();
     await anon.goto("/packs");
-    await expect(anon).toHaveURL(/\/login\?next=%2Fsobres/);
+    await expect(anon).toHaveURL(/\/login\?next=%2Fpacks/);
     await anon.context().close();
   });
 

@@ -12,11 +12,11 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
   const page = await (await browser.newContext()).newPage();
 
   await test.step("RF-1: tras entrar, un usuario nuevo debe confirmar edad y términos", async () => {
-    await page.goto("/login?next=%2Fsobres");
+    await page.goto("/login?next=%2Fpacks");
     await page.fill('input[name="name"]', "nuevo-legal");
     await untickAdmin(page);
     await page.click("text=Entrar (desarrollo)");
-    await page.waitForURL(/\/welcome\?next=%2Fsobres/);
+    await page.waitForURL(/\/welcome\?next=%2Fpacks/);
     await expect(page.locator("h1")).toHaveText(es.gate.title);
     await expect(page.locator(`text=${es.gate.age(16)}`)).toBeVisible();
   });
@@ -33,7 +33,7 @@ test("edad, términos, páginas legales y panel de operación", async ({ browser
   });
 
   await test.step("RF-1: al aceptar vuelve a donde iba", async () => {
-    await page.goto("/welcome?next=%2Fcoleccion");
+    await page.goto("/welcome?next=%2Fcollection");
     await tickAll(page.locator('[data-testid="gate-form"]'));
     await page.click(`[data-testid="gate-form"] >> text=${es.gate.submit}`);
     await page.waitForURL(/\/collection$/);
