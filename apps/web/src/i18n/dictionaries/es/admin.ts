@@ -12,6 +12,7 @@ export const admin: typeof en = {
     sets: "Colecciones",
     characters: "Personajes",
     library: "Biblioteca",
+    expeditions: "Expediciones",
     tiers: "Tiers de Patreon",
     users: "Usuarios",
     albums: "Álbumes",

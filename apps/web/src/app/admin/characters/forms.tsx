@@ -4,18 +4,32 @@ import { useActionState, useEffect, useRef } from "react";
 import { createCharacterAction, deleteCharacterAction, updateCharacterAction } from "./actions";
 import { ConfirmSubmitButton, FormMessage, SubmitButton } from "@/features/admin/ui";
 import { Card } from "@/ui/content/Card";
+import { Select } from "@/ui/form/Select";
 import { TextArea, TextField } from "@/ui/form/TextField";
+import { ROLES, TERRAINS } from "@/domain/expeditions/rules";
 import { useT } from "@/i18n/client";
+import { useGamesT } from "@/i18n/games";
 
-type Character = { id: string; name: string; slug: string; bio: string; identityTags: string; cardCount: number };
+type Character = { id: string; name: string; slug: string; bio: string; identityTags: string; terrain: string | null; role: string | null; cardCount: number };
 
 function CharacterFields({ c }: { c?: Character }) {
   const t = useT().admin.characters;
+  const tg = useGamesT();
   return (
     <>
       <TextField label={t.name} name="name" required maxLength={60} defaultValue={c?.name} />
       <TextArea label={t.bio} name="bio" rows={2} defaultValue={c?.bio} />
       <TextArea label={t.identityTags} hint={t.identityTagsHint} name="identityTags" rows={2} defaultValue={c?.identityTags} className="font-mono text-xs" />
+      {/* Spec 020, RF-27: terreno y rol en Expediciones. */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Select label={tg.admin.characterTerrain} name="terrain" defaultValue={c?.terrain ?? ""} options={[{ value: "", label: tg.admin.none }, ...TERRAINS.map((x) => ({ value: x, label: tg.terrain[x] }))]} />
+        <Select
+          label={tg.admin.characterRole}
+          name="role"
+          defaultValue={c?.role ?? ""}
+          options={[{ value: "", label: tg.admin.none }, ...ROLES.map((x) => ({ value: x, label: tg.role[x], description: tg.roleEffect[x] }))]}
+        />
+      </div>
     </>
   );
 }

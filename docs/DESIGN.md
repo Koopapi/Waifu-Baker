@@ -71,6 +71,14 @@ con fondo transparente salen en blanco; para verificar, exportar a PNG.
 Pendiente: portada, apertura, colección y álbum. Dirección provisional: fondo oscuro para que el
 holo y las partículas destaquen, un acento por rareza, tipografía grande y mucho aire.
 
+**Juegos · Expediciones (spec 020, tablero en `waifubaker.pen`):** pegatina nueva de mapa para «Juegos» en la
+navegación. El mapa es un lienzo oscuro con caminos punteados y una chincheta por zona: redonda, con borde blanco y el
+color pastel de su terreno (Ciudad chicle, Bosque menta, Costa celeste, Ruinas lavanda, Montaña limón); con niebla, gris
+translúcida con «Niebla · x/y»; con un equipo fuera, flota suave y enseña la cuenta atrás. Los equipos son filas con
+las cartas apiladas, en menta al volver. Preparar es una ventana con 3 huecos, la barra de poder frente a la marca de
+dificultad, la calificación como pastilla de color (Difícil rojo, Normal limón, Bien celeste, Excelente menta), las tres
+duraciones con su botín y el selector de cartas con filtros. El reporte saca las frases una a una.
+
 ## Sistema de diseño (spec 011)
 
 El código vive en `apps/web/src/ui` y el diseño en `Waifu Baker/waifubaker.pen`, lámina «Sistema de diseño

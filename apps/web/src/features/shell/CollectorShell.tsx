@@ -8,6 +8,7 @@ import { getDict } from "@/i18n/server";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { cardImageUrl } from "@/server/cards/image-urls";
 import { now } from "@/server/clock";
+import { expeditionsReady } from "@/server/services/expeditions";
 import { shellSummary } from "@/server/services/shell";
 import { AppShell, type NavItem } from "@/ui/shell/AppShell";
 import { IconButton } from "@/ui/action/Button";
@@ -35,7 +36,8 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
   const [user] = await db.select({ id: users.id, displayName: users.displayName, role: users.role, patreonUserId: users.patreonUserId }).from(users).where(eq(users.id, userId));
   const demoRole = demoRoleOf(user.patreonUserId);
   const [t, jar] = await Promise.all([getDict(), cookies()]);
-  const s = await shellSummary(db, user.id, { now: now(), timeZone: jar.get("wb_tz")?.value ?? null });
+  const at = now();
+  const [s, ready] = await Promise.all([shellSummary(db, user.id, { now: at, timeZone: jar.get("wb_tz")?.value ?? null }), expeditionsReady(db, user.id, at)]);
   const sh = t.common.shell;
   // Spec 015, RF-6: llegadas sin celebrar, con el sobre de cada colección; la cola las muestra cuando toca.
   const arrivals = groupArrivals(await pendingArrivals(db, user.id));
@@ -44,6 +46,8 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
   const packs: NavItem = { href: "/sobres", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed, flyTarget: "packs" };
   const collection: NavItem = { href: "/coleccion", label: t.common.nav.myCollection, icon: "collection" };
   const rewards: NavItem = { href: "/recompensas", label: sh.rewards, icon: "rewards", badge: s.rewardsReady };
+  // Spec 020, RF-1 y RF-2: el espacio de juegos, con los equipos que ya volvieron.
+  const games: NavItem = { href: "/juegos", label: sh.games, icon: "games", badge: ready };
   const account: NavItem = { href: "/cuenta", label: t.common.nav.myAccount, icon: "account" };
 
   return (
@@ -61,7 +65,7 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
       }))}
       railExtra={{ href: "/drop-rates", label: t.common.nav.odds, icon: "odds" }}
       groups={[
-        { label: sh.groups.collection, items: [packs, collection, { href: "/coleccion/album", label: sh.album, icon: "album" }, rewards] },
+        { label: sh.groups.collection, items: [packs, collection, { href: "/coleccion/album", label: sh.album, icon: "album" }, games, rewards] },
         {
           label: sh.groups.you,
           items: [
@@ -74,6 +78,7 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
       tabs={[
         { ...packs, label: sh.tabs.packs },
         { ...collection, label: sh.tabs.collection },
+        { ...games, label: sh.tabs.games },
         { ...rewards, label: sh.tabs.rewards },
         { ...account, label: sh.tabs.account },
       ]}

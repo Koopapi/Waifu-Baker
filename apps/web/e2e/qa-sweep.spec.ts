@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
+import { LAB, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
 
 const VIEWPORTS = [
   { name: "escritorio", width: 1360, height: 950 },
@@ -131,6 +131,11 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await run(fan, cFan, "/sobres", "fan-sobres-vacio");
   await run(fan, cFan, "/coleccion", "fan-coleccion");
   await run(fan, cFan, `/coleccion/${setId}`, "fan-binder");
+  // Spec 020: el espacio de juegos y Expediciones, con una zona abierta y otra con niebla.
+  await createZone(admin, { name: "Puerto Miel", terrain: "city", difficulty: 30, fragmentsRequired: 0, sortOrder: 1 });
+  await createZone(admin, { name: "Ruinas", terrain: "ruins", difficulty: 80, fragmentsRequired: 10, sortOrder: 2 });
+  await run(fan, cFan, "/juegos", "fan-juegos");
+  await run(fan, cFan, "/juegos/expediciones", "fan-expediciones");
   await run(fan, cFan, "/coleccion/album", "fan-album-privado");
   await fan.setViewportSize({ width: 1360, height: 950 });
   await fan.goto("/coleccion/album");
@@ -151,6 +156,7 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await run(admin, cAdmin, `/admin/sets/${setId}`, "admin-coleccion");
   await run(admin, cAdmin, `/admin/sets/${setId}/simulate`, "admin-simular");
   await run(admin, cAdmin, "/admin/characters", "admin-personajes");
+  await run(admin, cAdmin, "/admin/expediciones", "admin-expediciones");
   await run(admin, cAdmin, "/admin/tiers", "admin-tiers");
   await run(admin, cAdmin, "/admin/users", "admin-usuarios");
   await run(admin, cAdmin, fanAdminUrl, "admin-usuario");

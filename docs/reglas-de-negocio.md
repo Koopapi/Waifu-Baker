@@ -239,6 +239,25 @@ Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto e
 | RN-203 | Una colección solo se publica con todas sus cartas armadas (chica y fondo visibles); el panel dice cuáles faltan, con enlace a cada una. | Vigente | 017 RF-15, RF-16 |
 | RN-204 | Las cartas se exportan y se importan en el formato del creador de cartas de Bruno (configuración con nombres de archivo y encuadre); una importación no válida no cambia la carta. | Vigente | 017 RF-17 a RF-19 |
 
+## 19. Juegos: Expediciones
+
+Origen: propuesta de Bruno (versión 1), con el botín rediseñado por el dueño (spec 020). El servidor decide con su reloj
+y su RNG; no hay forma de pagar para avanzar.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-206 | «Juegos» es un apartado del coleccionista; su primer juego es Expediciones. Su contador muestra los equipos que ya volvieron sin reclamar. | Vigente | 020 RF-1, RF-2 |
+| RN-207 | El mapa tiene zonas con terreno y dificultad. Las que piden 0 fragmentos están abiertas desde el inicio; las demás tienen niebla y cada coleccionista las abre gastando fragmentos de mapa (abrir una ya abierta no gasta). Una zona oculta no sale en el mapa; sus expediciones en curso terminan igual. | Vigente | 020 RF-3 a RF-6 |
+| RN-208 | Un equipo lleva de 1 a 3 cartas distintas de la colección del coleccionista. Una carta (por versión: normal u holo) solo puede estar en una expedición en curso. Las cartas 18+ solo con el contenido 18+ desbloqueado. Cada coleccionista tiene 2 espacios. | Vigente | 020 RF-7 a RF-9, RF-16 |
+| RN-209 | Poder de una carta = poder de su rareza (común 10, poco común 12, rara 14, épica 17, legendaria 20, secreta 24) × 1,5 si su terreno es el de la zona × 1,15 si es holo × (1 + 2 % por nivel de vínculo por encima del 1). Poder del equipo = suma. Calificación por poder ÷ dificultad: Excelente ≥ 1,4; Bien ≥ 1; Normal ≥ 0,6; Difícil por debajo. | Vigente | 020 RF-11 a RF-14 |
+| RN-210 | Duraciones de 30 min, 2 h u 8 h, con la hora del servidor. Al enviar quedan congelados poder, calificación y botín; los cambios posteriores (vínculo, terreno, rol, zona) no los tocan. Cancelar antes de la vuelta devuelve las cartas sin botín ni vínculo. | Vigente | 020 RF-15, RF-17, RF-18 |
+| RN-211 | Botín fijo por zona y duración, fijado en el panel para «Bien»; Excelente da el 125 %, Normal el 80 % y Difícil el 50 % (hacia abajo; al menos 1 galleta si la zona da galletas). Roles: Recolectora +30 % galletas, Cartógrafa ×2 fragmentos, Buscatesoros ×1,5 probabilidad de sobre (una vez por rol). | Vigente | 020 RF-14, RF-20 |
+| RN-212 | Al reclamar una expedición que volvió se entregan, en una sola operación, el botín fijo y 4, 12 o 30 puntos de vínculo (según la duración) a cada personaje del equipo (una vez por personaje); el sobre al azar se sortea con la probabilidad publicada de la zona y duración. Reclamar otra vez devuelve el mismo reporte sin entregar nada. | Vigente | 020 RF-19 a RF-21, RF-23 |
+| RN-213 | El sobre ganado es de una colección SFW publicada: si solo hay una llega al momento; si hay varias, la elige el coleccionista. Se celebra como los sobres que llegan sin pedirlos. Abrirlo sigue bloqueado en Bélgica. | Vigente | 020 RF-22 |
+| RN-214 | El vínculo es por personaje y coleccionista: niveles 1 a 10 con 0, 50, 150, 300, 500, 750, 1000, 1500, 2000 y 2500 puntos. La ficha de la carta muestra su nivel y, si está fuera, cuándo vuelve. | Vigente | 020 RF-12, RF-25 |
+| RN-215 | La página de Probabilidades publica la probabilidad de sobre de cada zona activa y duración. | Vigente | 020 RF-26 |
+| RN-216 | El administrador asigna terreno y rol a cada personaje y crea y edita zonas (nombre, terreno, dificultad 1 a 1000, fragmentos 0 a 999, orden, imagen, activa) con su botín por duración (galletas 0 a 10 000, fragmentos 0 a 100, sobre 0 a 100 %); el simulador muestra calificación, botín y sobres al día con 2 espacios. | Vigente | 020 RF-27 a RF-30 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -268,6 +287,7 @@ Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto e
 | Código de colección | 2 a 8 letras o números |
 | Idioma por defecto | inglés |
 | Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |
+| Expediciones | 2 espacios; equipos de 1 a 3 cartas; 30 min, 2 h u 8 h; vínculo hasta nivel 10 |
 | Racha diaria | 10, 10, 15, 15, 20, 20 galletas y un sobre el día 7; 1 día de gracia |
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
 | Edad mínima de la web | 16 o 18 años, la elige el administrador (16 por defecto); 18+ y tier adulto para el contenido adulto |

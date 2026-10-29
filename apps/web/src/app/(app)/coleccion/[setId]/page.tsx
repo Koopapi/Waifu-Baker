@@ -6,6 +6,7 @@ import { getDict } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { cardImageUrl } from "@/server/cards/image-urls";
 import { myBinder } from "@/server/services/collection";
+import { expeditionInfoForCards } from "@/server/services/expeditions";
 import { Alert } from "@/ui/feedback/Alert";
 import { BinderView, type BinderSlotDTO } from "@/features/collection/BinderView";
 
@@ -16,6 +17,11 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
   const user = await requireUser(`/coleccion/${setId}`);
   const [b, t] = await Promise.all([myBinder(db, user.id, setId), getDict()]);
   if (!b) notFound();
+  const info = await expeditionInfoForCards(
+    db,
+    user.id,
+    b.slots.flatMap((s) => (s.owned ? [s.owned.cardId] : [])),
+  );
   const slots: BinderSlotDTO[] = b.slots.map((s) =>
     s.owned
       ? {
@@ -25,6 +31,8 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
             firstObtainedAt: s.owned.firstObtainedAt.toISOString(),
             thumb: cardImageUrl(s.owned.cardId, "thumb", user.id),
             mid: cardImageUrl(s.owned.cardId, "mid", user.id),
+            bondLevel: info.bonds.get(s.owned.cardId) ?? 1,
+            away: { normal: info.away.get(`${s.owned.cardId}:normal`) ?? null, holo: info.away.get(`${s.owned.cardId}:holo`) ?? null },
           },
         }
       : { number: s.number, owned: null },

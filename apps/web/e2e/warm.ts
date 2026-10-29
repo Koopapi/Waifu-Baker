@@ -18,6 +18,8 @@ export const ROUTES = [
   "/coleccion/album",
   "/cuenta",
   "/recompensas",
+  "/juegos",
+  "/juegos/expediciones",
   "/bienvenida",
   "/legal/terms",
   "/sistema",
@@ -27,6 +29,7 @@ export const ROUTES = [
   `/admin/sets/${ID}/simulate`,
   "/admin/characters",
   "/admin/library",
+  "/admin/expediciones",
   "/admin/albumes",
   "/admin/tiers",
   "/admin/users",
@@ -51,4 +54,7 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   { method: "POST", path: "/api/admin/library", body: "{}" },
   { method: "GET", path: `/api/cards/${ID}/live` },
   { method: "GET", path: "/api/cards/layer" },
+  // Spec 020: imagen de las zonas y su subida desde el panel.
+  { method: "GET", path: `/api/zones/${ID}/img` },
+  { method: "POST", path: "/api/admin/zone-image", body: "{}" },
 ];

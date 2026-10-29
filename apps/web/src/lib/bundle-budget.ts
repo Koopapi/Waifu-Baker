@@ -18,6 +18,9 @@ export const BUDGET_PAGES = [
   "/album/[slug]/page",
   "/(app)/cuenta/page",
   "/(app)/recompensas/page",
+  // Spec 020: el espacio de juegos y Expediciones.
+  "/(app)/juegos/page",
+  "/(app)/juegos/expediciones/page",
   "/drop-rates/page",
   "/legal/[doc]/page",
 ] as const;

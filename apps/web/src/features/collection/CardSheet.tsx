@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { LiveCard } from "@/domain/cards/live";
 import { useLocale, useT } from "@/i18n/client";
 import { formatDate } from "@/i18n/format";
+import { useGamesT } from "@/i18n/games";
 import { Button } from "@/ui/action/Button";
 import { Switch } from "@/ui/form/Choice";
 import { CartaCapas, type CartaCapasHandle } from "@/ui/game/CartaCapas";
@@ -26,6 +27,7 @@ function useGyroAvailable() {
  */
 export function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { owned: NonNullable<BinderSlotDTO["owned"]> }; setCode: string; onClose: () => void }) {
   const t = useT();
+  const tg = useGamesT();
   const locale = useLocale();
   const o = slot.owned;
   const [holo, setHolo] = useState(o.qty === 0 && o.holoQty > 0);
@@ -111,6 +113,16 @@ export function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { 
             </div>
           </dl>
           <p className="text-sm text-ui-text-3">{t.collection.binder.firstObtained(formatDate(locale, o.firstObtainedAt, "long"))}</p>
+          {/* Spec 020, RF-25: vínculo de la personaje y, si está de expedición, cuándo vuelve. */}
+          <div className="space-y-1 rounded-m border border-ui-line p-3" data-testid="card-bond">
+            <p className="text-sm font-semibold">{tg.sheet.bond(o.bondLevel)}</p>
+            <p className="text-xs text-ui-text-3">{tg.sheet.bondHint}</p>
+          </div>
+          {(holo ? o.away.holo : o.away.normal) && (
+            <p className="text-sm font-semibold text-k-limon" data-testid="card-away">
+              {tg.sheet.away(new Date((holo ? o.away.holo : o.away.normal)!).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }))}
+            </p>
+          )}
           {o.holoQty > 0 && (
             <div className="flex gap-2" role="group" aria-label={t.collection.binder.version}>
               <Button size="sm" variant={!holo ? "primary" : "secondary"} aria-pressed={!holo} onClick={() => setHolo(false)}>
