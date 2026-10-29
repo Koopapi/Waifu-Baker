@@ -11,6 +11,7 @@ import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import type { LabCard } from "@/features/opening/fakePack";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
+import { parsePackKind } from "@/domain/catalog/default-odds";
 
 const paths = (setId: string) => [`/admin/sets/${setId}`, "/admin/sets", "/admin"];
 const rarityOf = (v: unknown): Rarity | null | undefined =>
@@ -86,10 +87,10 @@ export async function reviewCardAction(setId: string, cardId: string, version: n
 }
 
 /** RF-23: sobre simulado con cartas reales; no escribe nada (ni historial). */
-export async function simulatePackAction(setId: string): Promise<{ ok: boolean; cards?: LabCard[]; error?: string }> {
+export async function simulatePackAction(setId: string, kind?: string): Promise<{ ok: boolean; cards?: LabCard[]; error?: string }> {
   await requireAdmin("action:simulatePack");
   try {
-    const pack = await simulatePack(db, setId);
+    const pack = await simulatePack(db, setId, parsePackKind(kind));
     const t = await getDict();
     return {
       ok: true,

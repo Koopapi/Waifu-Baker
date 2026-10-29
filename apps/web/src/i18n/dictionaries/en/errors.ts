@@ -6,6 +6,8 @@ import { common } from "./common";
 
 const pad = (n: string | number | undefined) => String(n ?? "").padStart(3, "0");
 const rarity = (r: string | number | undefined) => common.rarity[r as keyof typeof common.rarity] ?? String(r ?? "");
+/** Spec 022: problems in the gold table say which pack they belong to. */
+const ofPack = (p: { kind?: string | number }) => (p.kind === "gold" ? " of the gold pack" : "");
 const FIELD: Record<string, string> = { character: "character", name: "name", rarity: "rarity", image: "composed image" };
 const plural = (n: string | number | undefined, one: string, many: string) => (Number(n) === 1 ? one : many);
 
@@ -150,10 +152,14 @@ export const errors: Record<string, Msg> = {
 
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>
-    `The pack has ${p.packSize} ${plural(p.packSize, "card", "cards")} but there ${plural(p.slots, "is", "are")} ${p.slots} drop rate ${plural(p.slots, "slot", "slots")}.`,
-  negative_weight: (p) => `Slot ${p.slot} has negative or invalid weights.`,
-  slot_sum: (p) => `Slot ${p.slot} adds up to ${p.sum}% instead of 100%.`,
+    `The ${p.kind === "gold" ? "gold " : ""}pack has ${p.packSize} ${plural(p.packSize, "card", "cards")} but there ${plural(p.slots, "is", "are")} ${p.slots} drop rate ${plural(p.slots, "slot", "slots")}.`,
+  negative_weight: (p) => `Slot ${p.slot}${ofPack(p)} has negative or invalid weights.`,
+  slot_sum: (p) => `Slot ${p.slot}${ofPack(p)} adds up to ${p.sum}% instead of 100%.`,
   holo_range: "The holo chance must be between 0% and 100%.",
+  // Spec 022, RF-13 to RF-16.
+  guarantee_slot: (p) => `The last slot of the ${p.kind === "gold" ? "gold" : "silver"} pack can only give ${rarity(p.rarity)} or better.`,
+  missing_table: (p) => `The ${p.kind === "gold" ? "gold" : "silver"} pack drop rate table is missing.`,
+  gold_not_better: "The gold pack must give a higher chance of Legendary or EX than the silver one.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: has a chance in the pack but no cards.`,
   card_incomplete: (p) =>
     `Card ${pad(p.number)}: missing ${String(p.missing ?? "")

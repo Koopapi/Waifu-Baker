@@ -4,6 +4,7 @@ import { listPublicOdds } from "@/server/services/collections";
 import { publicZoneOdds } from "@/server/services/expedition-zones";
 import { gamesDictionaries } from "@/i18n/games";
 import { Badge } from "@/ui/content/Badge";
+import { PackKindTag } from "@/features/packs/PackKindTag";
 import { formatDate, formatPercent } from "@/i18n/format";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { getDict, getLocale } from "@/i18n/server";
@@ -15,7 +16,7 @@ export async function generateMetadata() {
 // Dinámica: así la compilación no necesita la BD y lo publicado se ve al momento.
 export const dynamic = "force-dynamic";
 
-/** RF-21: probabilidades públicas, congeladas al publicar cada colección. */
+/** RF-21: probabilidades públicas, congeladas al publicar cada colección (spec 022: las del sobre plata y las del gold). */
 export default async function DropRatesPage() {
   const [rows, zones] = await Promise.all([listPublicOdds(db), publicZoneOdds(db)]);
   const [t, locale] = await Promise.all([getDict(), getLocale()]);
@@ -30,7 +31,7 @@ export default async function DropRatesPage() {
           <p className="text-ui-text-2">{t.site.dropRates.intro}</p>
         </header>
         {rows.length === 0 && <p className="text-ui-text-3">{t.site.dropRates.empty}</p>}
-        {rows.map(({ set, odds }) => (
+        {rows.map(({ set, odds, gold }) => (
           <section key={set.id} className="space-y-3">
             <h2 className="flex flex-wrap items-center gap-2 text-xl font-semibold">
               {set.name} <span className="font-mono text-sm text-ui-text-3">{set.code}</span>
@@ -39,45 +40,56 @@ export default async function DropRatesPage() {
                 <Badge tone={set.isFree ? "success" : "accent"}>{set.isFree ? t.site.dropRates.how.free : t.site.dropRates.how.patreon}</Badge>
               </span>
             </h2>
-            <p className="text-sm text-ui-text-3">
-              {t.site.dropRates.published({
-                date: odds.publishedAt ? formatDate(locale, odds.publishedAt) : "",
-                version: odds.version,
-                packSize: set.packSize,
-                holo: pct(odds.holoChance * 100),
-              })}
-            </p>
-            <p className="text-sm text-ui-text-2" data-testid={`pity-${set.code}`}>
-              {odds.pityThreshold > 0
-                ? t.site.dropRates.pity(odds.pityThreshold - 1)
-                : t.site.dropRates.noPity}
-            </p>
-            <div className="overflow-x-auto rounded-l border border-ui-line">
-              <table className="w-full text-sm">
-                <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
-                  <tr>
-                    <th className="px-3 py-2 text-left">{t.site.dropRates.slot}</th>
-                    {RARITIES.map((r) => (
-                      <th key={r} className="px-3 py-2 text-right">
-                        {t.common.rarity[r]}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {odds.slots.map((s, i) => (
-                    <tr key={i} className="border-t border-ui-line">
-                      <td className="px-3 py-2">{i + 1}</td>
-                      {RARITIES.map((r) => (
-                        <td key={r} className="px-3 py-2 text-right tabular-nums">
-                          {s[r] ? pct(s[r]) : "—"}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {/* Spec 022, RF-20: las dos tablas de la colección, plata y gold. */}
+            {([["silver", odds], ["gold", gold]] as const).map(([kind, table]) =>
+              table ? (
+                <div key={kind} className="space-y-2" data-testid={`odds-${set.code}-${kind}`}>
+                  <h3 className="flex flex-wrap items-center gap-2">
+                    <PackKindTag kind={kind} label={t.common.packKind[kind]} />
+                    <span className="text-sm text-ui-text-2">{t.site.dropRates.guarantee[kind]}</span>
+                  </h3>
+                  <p className="text-sm text-ui-text-3">
+                    {t.site.dropRates.published({
+                      date: table.publishedAt ? formatDate(locale, table.publishedAt) : "",
+                      version: table.version,
+                      packSize: set.packSize,
+                      holo: pct(table.holoChance * 100),
+                    })}
+                  </p>
+                  {kind === "silver" && (
+                    <p className="text-sm text-ui-text-2" data-testid={`pity-${set.code}`}>
+                      {table.pityThreshold > 0 ? t.site.dropRates.pity(table.pityThreshold - 1) : t.site.dropRates.noPity}
+                    </p>
+                  )}
+                  <div className="overflow-x-auto rounded-l border border-ui-line">
+                    <table className="w-full text-sm">
+                      <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
+                        <tr>
+                          <th className="px-3 py-2 text-left">{t.site.dropRates.slot}</th>
+                          {RARITIES.map((r) => (
+                            <th key={r} className="px-3 py-2 text-right">
+                              {t.common.rarity[r]}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {table.slots.map((s, i) => (
+                          <tr key={i} className="border-t border-ui-line">
+                            <td className="px-3 py-2">{i + 1}</td>
+                            {RARITIES.map((r) => (
+                              <td key={r} className="px-3 py-2 text-right tabular-nums">
+                                {s[r] ? pct(s[r]) : "—"}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ) : null,
+            )}
           </section>
         ))}
         {/* Spec 020, RF-26: probabilidad de encontrar un sobre al volver de una expedición, por zona y duración. */}

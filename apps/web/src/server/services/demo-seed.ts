@@ -30,10 +30,10 @@ export const DEMO_BANNED_NAMES = ["makima", "yor", "forger", "rias", "gremory", 
 
 /** Probabilidades de la demo: rara o mejor garantizada en la última ranura (RN de la spec 004). */
 export const DEMO_SLOTS: Partial<Slot>[] = [
-  { common: 70, uncommon: 25, rare: 5 },
-  { common: 70, uncommon: 25, rare: 5 },
-  { common: 70, uncommon: 25, rare: 5 },
-  { uncommon: 60, rare: 30, epic: 8, legendary: 2 },
+  { common: 75, rare: 20, epic: 4, legendary: 1 },
+  { common: 75, rare: 20, epic: 4, legendary: 1 },
+  { common: 75, rare: 20, epic: 4, legendary: 1 },
+  { common: 40, rare: 45, epic: 12, legendary: 3 },
   { rare: 75, epic: 18, legendary: 7 },
 ];
 

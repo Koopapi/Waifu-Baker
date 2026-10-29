@@ -16,6 +16,7 @@ import { ackOpenings, getOpeningResult, openAllPacks, openPack, type OpeningResu
 import { liveCardConfig } from "@/server/services/live-card";
 import type { LiveCard } from "@/domain/cards/live";
 import { highlights } from "@/domain/opening/open-all";
+import { parsePackKind } from "@/domain/catalog/default-odds";
 
 type Ok<T> = { ok: true } & T;
 type Fail = { ok: false; error: string; code?: string };
@@ -52,8 +53,8 @@ async function fail(e: unknown): Promise<Fail> {
   throw e;
 }
 
-/** RF-5: abre el siguiente sobre sellado de la colección. */
-export async function openNextPackAction(setId: string): Promise<Ok<{ packId: string; cards: LabCard[]; remaining: number }> | Fail> {
+/** RF-5: abre el siguiente sobre sellado de la colección y del tipo pedido (spec 022, RF-19). */
+export async function openNextPackAction(setId: string, kindParam?: string): Promise<Ok<{ packId: string; cards: LabCard[]; remaining: number }> | Fail> {
   const userId = await currentUser();
   const t = await getDict();
   if (!userId) return { ok: false, error: t.common.sessionExpired, code: "no_session" };
@@ -61,7 +62,7 @@ export async function openNextPackAction(setId: string): Promise<Ok<{ packId: st
   const sealed = await db
     .select({ id: packs.id })
     .from(packs)
-    .where(and(eq(packs.userId, userId), eq(packs.setId, setId), eq(packs.status, "sealed")))
+    .where(and(eq(packs.userId, userId), eq(packs.setId, setId), eq(packs.kind, parsePackKind(kindParam)), eq(packs.status, "sealed")))
     .orderBy(asc(packs.grantedAt));
   if (sealed.length === 0) return { ok: false, error: t.packs.actions.noPacks, code: "no_packs" };
   try {
@@ -98,14 +99,14 @@ export interface OpenAllCard {
   live?: LiveCard | null;
 }
 
-/** RF-18 y RF-19: abre hasta 50 sobres de la colección, cada uno con sus reglas. */
-export async function openAllPacksAction(setId: string): Promise<Ok<{ packs: number; cards: OpenAllCard[] }> | Fail> {
+/** RF-18 y RF-19: abre hasta 50 sobres de la colección y del tipo pedido, cada uno con sus reglas. */
+export async function openAllPacksAction(setId: string, kindParam?: string): Promise<Ok<{ packs: number; cards: OpenAllCard[] }> | Fail> {
   const userId = await currentUser();
   const t = await getDict();
   if (!userId) return { ok: false, error: t.common.sessionExpired, code: "no_session" };
   if (!openLimiter.take(userId)) return { ok: false, error: t.packs.actions.rateLimited, code: "rate_limited" };
   try {
-    const results = await openAllPacks(db, { userId, setId, country: await country() });
+    const results = await openAllPacks(db, { userId, setId, kind: parsePackKind(kindParam), country: await country() });
     await ackOpenings(db, userId, results.map((r) => r.packId));
     const cardIds = new Map<string, string>();
     const cards: OpenAllCard[] = results.flatMap((r, pack) =>

@@ -46,6 +46,8 @@ export const common = {
     legendary: "Legendary",
     ex: "EX",
   },
+  /** Spec 022, RF-11: tipos de sobre. */
+  packKind: { silver: "Silver", gold: "Gold" },
   aiNotice: "Card illustrations are AI-generated. Cards are digital, have no monetary value and cannot be traded.",
   sessionExpired: "Your session has expired: please sign in again.",
   back: "Back",

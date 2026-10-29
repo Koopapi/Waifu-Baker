@@ -402,9 +402,6 @@
 .rarity-common {
   --rarity-color: #9aa0a6;
 }
-.rarity-uncommon {
-  --rarity-color: #4ade80;
-}
 .rarity-rare {
   --rarity-color: #60a5fa;
 }
@@ -414,7 +411,7 @@
 .rarity-legendary {
   --rarity-color: #f5c451;
 }
-.rarity-secret {
+.rarity-ex {
   --rarity-color: #ff6ad5;
 }
 
@@ -700,7 +697,7 @@
 
 /* RF-13: confeti de pegatinas. */
 
-/* RF-13: celebración a pantalla completa en legendaria y secreta. */
+/* RF-13: celebración a pantalla completa en legendaria y EX. */
 .celebrate {
   position: absolute;
   inset: 0;

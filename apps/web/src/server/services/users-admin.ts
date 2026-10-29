@@ -1,3 +1,4 @@
+import type { PackKind } from "@/domain/catalog/default-odds";
 import { randomUUID } from "node:crypto";
 import { and, asc, desc, eq, ilike, or } from "drizzle-orm";
 import { cards, packOpenings, packs, sets, userCards, users, patreonLinks } from "@/db/schema";
@@ -58,8 +59,9 @@ export async function getUserDetail(db: DbLike, userId: string) {
   return { user, sealedPacks, collection, openings, patreon: patreon ?? null, packHistory };
 }
 
-/** RF-25 y RF-26: regalo de sobres con motivo; 18+ solo a quien superó la verificación de edad. */
-export async function giftPacks(db: DbLike, actorUserId: string, input: { userId: string; setId: string; count: number; reason: string }) {
+/** RF-25 y RF-26: regalo de sobres con motivo; 18+ solo a quien superó la verificación de edad. Spec 022, RF-22: plata o gold. */
+export async function giftPacks(db: DbLike, actorUserId: string, input: { userId: string; setId: string; count: number; reason: string; kind?: PackKind }) {
+  const kind = input.kind ?? "silver";
   const reason = input.reason.trim();
   if (reason.length < 3 || reason.length > 200) throw new AdminError("invalid_reason", "Escribe un motivo de 3 a 200 caracteres.", { min: 3, max: 200 });
   if (!Number.isInteger(input.count) || input.count < 1 || input.count > 20) {
@@ -80,6 +82,7 @@ export async function giftPacks(db: DbLike, actorUserId: string, input: { userId
         userId: user.id,
         setId: set.id,
         source: "manual" as const,
+        kind,
         grantKey: `manual:${randomUUID()}`,
         reason,
         grantedBy: actorUserId,
@@ -90,7 +93,7 @@ export async function giftPacks(db: DbLike, actorUserId: string, input: { userId
       action: "packs_gift",
       entityType: "user",
       entityId: user.id,
-      after: { count: input.count, setId: set.id, setCode: set.code, reason },
+      after: { count: input.count, setId: set.id, setCode: set.code, kind, reason },
     });
     return input.count;
   });

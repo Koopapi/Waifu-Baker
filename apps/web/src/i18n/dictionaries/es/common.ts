@@ -47,6 +47,8 @@ export const common: typeof en = {
     legendary: "Legendaria",
     ex: "EX",
   },
+  /** Spec 022, RF-11: tipos de sobre. */
+  packKind: { silver: "Plata", gold: "Gold" },
   aiNotice: "Las ilustraciones de las cartas están generadas con IA. Las cartas no tienen valor monetario ni se pueden intercambiar.",
   sessionExpired: "Tu sesión ha caducado: vuelve a entrar.",
   back: "Volver",

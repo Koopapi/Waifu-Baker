@@ -16,12 +16,13 @@ import { Badge } from "@/ui/content/Badge";
 import { EmptyState } from "@/ui/feedback/EmptyState";
 import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
 import { PatreonNotice } from "@/features/economy/PatreonNotice";
+import { PackKindTag } from "@/features/packs/PackKindTag";
 
 export async function generateMetadata() {
   return { title: (await getDict()).packs.meta.myPacks };
 }
 
-/** RF-1, RF-3 y RF-17: sobres sin abrir por colección y aviso de apertura sin terminar. */
+/** RF-1, RF-3 y RF-17: sobres sin abrir por colección y tipo (spec 022, RF-19) y aviso de apertura sin terminar. */
 export default async function MisSobresPage() {
   const user = await requireUser("/sobres");
   const tz = (await cookies()).get("wb_tz")?.value ?? null;
@@ -74,12 +75,16 @@ export default async function MisSobresPage() {
           // Cada tarjeta se adapta a su propio ancho (no al de la pantalla): pone el sobre al lado de los botones solo
           // si caben; si no, uno encima de otro. Así ningún botón se queda estrecho y con el texto fuera.
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,30rem),1fr))] gap-4">
-            {groups.map((g, i) => (
+            {groups.map((g, i) => {
+              // Spec 022, RF-19: el sobre gold va en su propio grupo y sus enlaces lo piden con `?k=gold`.
+              const k = g.kind === "gold" ? "?k=gold" : "";
+              return (
               <li
-                key={g.setId}
+                key={`${g.setId}-${g.kind}`}
                 style={{ "--i": i } as React.CSSProperties}
                 className="card-in @container rounded-xl border border-k-lavanda/20 bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]"
-                data-testid={`group-${g.code}`}
+                data-testid={`group-${g.code}${g.kind === "gold" ? "-gold" : ""}`}
+                data-kind={g.kind}
               >
                 <div className="flex flex-col items-center gap-5 @sm:flex-row">
                   <div className="relative shrink-0">
@@ -94,6 +99,7 @@ export default async function MisSobresPage() {
                         <h2 className="line-clamp-2 font-display text-xl font-semibold">{g.name}</h2>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
+                        <PackKindTag kind={g.kind} label={t.common.packKind[g.kind]} />
                         {!!fresh.get(g.setId) && (
                           <span data-testid="new-packs">
                             <Badge tone="new">{t.rewards.fx.newPacks(fresh.get(g.setId)!)}</Badge>
@@ -107,11 +113,11 @@ export default async function MisSobresPage() {
                     ) : (
                       <div className="flex flex-col gap-3">
                         <Button size="lg" width="full" asChild>
-                          <Link href={`/sobres/${g.setId}`}>{t.packs.mine.openOne}</Link>
+                          <Link href={`/sobres/${g.setId}${k}`}>{t.packs.mine.openOne}</Link>
                         </Button>
                         {g.sealed > 1 && (
                           <Button size="lg" width="full" variant="secondary" asChild>
-                            <Link href={`/sobres/${g.setId}/todos`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
+                            <Link href={`/sobres/${g.setId}/todos${k}`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
                           </Button>
                         )}
                       </div>
@@ -121,7 +127,8 @@ export default async function MisSobresPage() {
                   </div>
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         )}
         <p className="text-xs text-ui-text-3">{t.common.aiNotice}</p>

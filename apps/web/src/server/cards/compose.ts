@@ -17,11 +17,10 @@ export type CardSize = keyof typeof CARD_SIZES;
 
 export const RARITY_COLOR: Record<Rarity | "none", string> = {
   common: "#9aa0a6",
-  uncommon: "#4ade80",
   rare: "#60a5fa",
   epic: "#c084fc",
   legendary: "#f5c451",
-  secret: "#ff6ad5",
+  ex: "#ff6ad5",
   none: "#6b7079",
 };
 

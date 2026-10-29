@@ -7,6 +7,8 @@ import { plural } from "../../plural";
 
 const pad = (n: string | number | undefined) => String(n ?? "").padStart(3, "0");
 const rarity = (r: string | number | undefined) => common.rarity[r as keyof typeof common.rarity] ?? String(r ?? "");
+/** Spec 022: los problemas de la tabla gold dicen de qué sobre son. */
+const ofPack = (p: { kind?: string | number }) => (p.kind === "gold" ? " del sobre gold" : "");
 const FIELD: Record<string, string> = { character: "personaje", name: "nombre", rarity: "rareza", image: "imagen compuesta" };
 
 /** Traduce otro código del mismo diccionario (para mensajes que agrupan varios problemas). */
@@ -150,10 +152,14 @@ export const errors: Record<string, Msg> = {
   layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
 
   // Probabilidades y comprobaciones antes de publicar.
-  slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
-  negative_weight: (p) => `La ranura ${p.slot} tiene pesos negativos o no válidos.`,
-  slot_sum: (p) => `La ranura ${p.slot} suma ${p.sum} % en vez de 100 %.`,
+  slot_count: (p) => `El sobre${p.kind === "gold" ? " gold" : ""} tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
+  negative_weight: (p) => `La ranura ${p.slot}${ofPack(p)} tiene pesos negativos o no válidos.`,
+  slot_sum: (p) => `La ranura ${p.slot}${ofPack(p)} suma ${p.sum} % en vez de 100 %.`,
   holo_range: "La probabilidad de holo debe estar entre 0 % y 100 %.",
+  // Spec 022, RF-13 a RF-16.
+  guarantee_slot: (p) => `La última ranura del sobre ${p.kind === "gold" ? "gold" : "plata"} solo puede dar ${rarity(p.rarity)} o mejor.`,
+  missing_table: (p) => `Falta la tabla de probabilidades del sobre ${p.kind === "gold" ? "gold" : "plata"}.`,
+  gold_not_better: "El sobre gold tiene que dar más probabilidad de legendaria o de EX que el plata.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: tiene probabilidad en el sobre pero ninguna carta.`,
   card_incomplete: (p) =>
     `Carta ${pad(p.number)}: falta ${String(p.missing ?? "")

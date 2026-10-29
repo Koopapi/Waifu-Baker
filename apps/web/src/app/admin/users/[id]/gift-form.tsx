@@ -10,13 +10,14 @@ import { useT } from "@/i18n/client";
 export function GiftForm({ userId, sets }: { userId: string; sets: { id: string; code: string; name: string; isAdult: boolean; blocked: boolean }[] }) {
   const [state, action] = useActionState(giftPacksAction, null);
   const form = useRef<HTMLFormElement>(null);
-  const t = useT().admin.users;
+  const tt = useT();
+  const t = tt.admin.users;
   useEffect(() => {
     if (state?.ok) form.current?.reset();
   }, [state]);
   if (sets.length === 0) return <p className="text-sm text-ui-text-3">{t.giftNoSets}</p>;
   return (
-    <form ref={form} action={action} className="grid gap-4 md:grid-cols-[1fr_120px] md:items-end">
+    <form ref={form} action={action} className="grid gap-4 md:grid-cols-[1fr_140px_120px] md:items-end">
       <input type="hidden" name="userId" value={userId} />
       <Select
         label={t.giftSet}
@@ -25,9 +26,19 @@ export function GiftForm({ userId, sets }: { userId: string; sets: { id: string;
         searchable={sets.length > 8}
         options={sets.map((s) => ({ value: s.id, label: `${s.code} · ${s.name}${s.isAdult ? " (18+)" : ""}${s.blocked ? t.requiresAge : ""}` }))}
       />
+      {/* Spec 022, RF-22: sobre plata o gold. */}
+      <Select
+        label={t.giftKind}
+        name="kind"
+        defaultValue="silver"
+        options={[
+          { value: "silver", label: tt.common.packKind.silver },
+          { value: "gold", label: tt.common.packKind.gold },
+        ]}
+      />
       <TextField label={t.giftCount} name="count" type="number" min={1} max={20} defaultValue={1} />
-      <TextField label={t.reason} hint={t.reasonHint} name="reason" required minLength={3} maxLength={200} fieldClassName="md:col-span-2" />
-      <div className="flex flex-wrap items-center gap-4 md:col-span-2">
+      <TextField label={t.reason} hint={t.reasonHint} name="reason" required minLength={3} maxLength={200} fieldClassName="md:col-span-3" />
+      <div className="flex flex-wrap items-center gap-4 md:col-span-3">
         <SubmitButton>{t.gift}</SubmitButton>
         <FormMessage state={state} />
       </div>

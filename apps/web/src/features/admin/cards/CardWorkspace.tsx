@@ -29,11 +29,10 @@ import type { Locale } from "@/i18n";
 
 const RARITY_DOT: Record<Rarity, string> = {
   common: "bg-[#9aa0a6]",
-  uncommon: "bg-[#4ade80]",
   rare: "bg-[#60a5fa]",
   epic: "bg-[#c084fc]",
   legendary: "bg-[#f5c451]",
-  secret: "bg-[#ff6ad5]",
+  ex: "bg-[#ff6ad5]",
 };
 
 const pad = (n: number) => String(n).padStart(3, "0");

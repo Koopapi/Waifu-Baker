@@ -6,6 +6,9 @@ export type SlotWeights = Record<Rarity, number>;
 export const PACK_KINDS = ["silver", "gold"] as const;
 export type PackKind = (typeof PACK_KINDS)[number];
 
+/** Spec 022: lee el tipo de sobre de un parámetro de la URL; cualquier otra cosa es plata. */
+export const parsePackKind = (value: unknown): PackKind => (value === "gold" ? "gold" : "silver");
+
 const TABLES: Record<PackKind, { base: SlotWeights; boosted: SlotWeights; guaranteed: SlotWeights }> = {
   silver: {
     base: { common: 75, rare: 20, epic: 4, legendary: 1, ex: 0 },

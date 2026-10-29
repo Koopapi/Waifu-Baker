@@ -25,7 +25,7 @@ const SPARKLES: [number, number, number, string, number][] = [
   [51, 11, 8, "#7cc8ff", 1.6], [90, 83, 12, "#b79cff", 0.9], [7, 45, 8, "#ffffff", 1.9], [91, 39, 9, "#ffe27a", 0.4],
   [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
 ];
-const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "secret"];
+const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "ex"];
 
 interface StageProps {
   /** Fuente de cartas del sobre. Por defecto, datos falsos del laboratorio. */

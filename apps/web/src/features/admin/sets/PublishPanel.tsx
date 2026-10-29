@@ -11,14 +11,19 @@ import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";
 import { useConfirm } from "@/ui/overlay/Confirm";
 
-const anchor = (p: Problem) =>
-  p.target.kind === "card"
+// Spec 022: los problemas de la tabla gold llevan a su pestaña.
+const anchor = (p: Problem) => {
+  const gold = p.params?.kind === "gold";
+  return p.target.kind === "card"
     ? `#carta-${String(p.target.number).padStart(3, "0")}`
     : p.target.kind === "slot"
-      ? `#ranura-${p.target.index + 1}`
+      ? `#ranura-${gold ? "gold-" : ""}${p.target.index + 1}`
       : p.target.kind === "rarity"
         ? "#probabilidades"
-        : null;
+        : gold
+          ? "#probabilidades-gold"
+          : null;
+};
 
 /** RF-6/RF-7: publicar con lista de problemas enlazados. RF-9: archivar una publicada. */
 export function PublishPanel({ setId, version, status }: { setId: string; version: number; status: "draft" | "published" | "archived" }) {
