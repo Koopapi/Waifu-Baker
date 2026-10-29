@@ -7,6 +7,8 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "gyroscope=(self), accelerometer=(self), camera=(), microphone=(), geolocation=()" },
+  // Spec 024, RF-9: el servidor de pruebas no se indexa (además de pedir contraseña en el proxy).
+  ...(process.env.SITE_NOINDEX === "1" ? [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] : []),
 ];
 
 const nextConfig: NextConfig = {
