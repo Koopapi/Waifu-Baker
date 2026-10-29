@@ -187,8 +187,9 @@ export async function checkTelegramLink(
     return { status: "unavailable" };
   }
   const hit = updates.find((u) => {
-    const m = u.text.trim().match(/^\/start\s+([0-9a-f]{24})$/);
-    return m && sha(m[1]) === acc.telegramLinkHash;
+    // Con el enlace llega «/start <código>»; si Telegram pierde el código (chat ya abierto), vale enviarlo a mano.
+    const m = u.text.trim().match(/^(?:\/start\s+)?([0-9a-f]{24})$/i);
+    return m && sha(m[1].toLowerCase()) === acc.telegramLinkHash;
   });
   if (!hit) return { status: "waiting" };
   await db

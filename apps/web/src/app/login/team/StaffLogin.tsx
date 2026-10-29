@@ -16,6 +16,8 @@ export function StaffLogin() {
   const [linkUrl, setLinkUrl] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ tone: "danger" | "success" | "info"; text: string } | null>(null);
   const [pending, start] = useTransition();
+  const [copied, setCopied] = useState(false);
+  const linkCode = linkUrl ? new URL(linkUrl).searchParams.get("start") : null;
 
   const message = (s: string): string =>
     ({
@@ -75,6 +77,19 @@ export function StaffLogin() {
                 {t.openBot}
               </a>
             </Button>
+          )}
+          {linkCode && (
+            <div className="space-y-2 rounded-lg border border-ui-line p-3" data-testid="link-code">
+              <p className="text-sm text-ui-text-2">{t.linkManual}</p>
+              <code className="block select-all break-all font-mono text-sm">{linkCode}</code>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => navigator.clipboard?.writeText(linkCode).then(() => setCopied(true), () => {})}
+              >
+                {copied ? t.copied : t.copyCode}
+              </Button>
+            </div>
           )}
           <Button width="full" loading={pending} onClick={() => run(linkStep)}>
             {t.linkDone}
