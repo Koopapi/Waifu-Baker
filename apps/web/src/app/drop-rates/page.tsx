@@ -40,56 +40,63 @@ export default async function DropRatesPage() {
                 <Badge tone={set.isFree ? "success" : "accent"}>{set.isFree ? t.site.dropRates.how.free : t.site.dropRates.how.patreon}</Badge>
               </span>
             </h2>
-            {/* Spec 022, RF-20: las dos tablas de la colección, plata y gold. */}
-            {([["silver", odds], ["gold", gold]] as const).map(([kind, table]) =>
-              table ? (
-                <div key={kind} className="space-y-2" data-testid={`odds-${set.code}-${kind}`}>
-                  <h3 className="flex flex-wrap items-center gap-2">
+            {/* Spec 022, RF-20: las dos tablas de la colección en una, con la columna «Sobre» (maqueta aprobada). */}
+            <ul className="space-y-1 text-sm">
+              {([["silver", odds], ["gold", gold]] as const).map(([kind, table]) =>
+                table ? (
+                  <li key={kind} className="flex flex-wrap items-center gap-2 text-ui-text-3" data-testid={`published-${set.code}-${kind}`}>
                     <PackKindTag kind={kind} label={t.common.packKind[kind]} />
-                    <span className="text-sm text-ui-text-2">{t.site.dropRates.guarantee[kind]}</span>
-                  </h3>
-                  <p className="text-sm text-ui-text-3">
-                    {t.site.dropRates.published({
-                      date: table.publishedAt ? formatDate(locale, table.publishedAt) : "",
-                      version: table.version,
-                      packSize: set.packSize,
-                      holo: pct(table.holoChance * 100),
-                    })}
-                  </p>
-                  {kind === "silver" && (
-                    <p className="text-sm text-ui-text-2" data-testid={`pity-${set.code}`}>
-                      {table.pityThreshold > 0 ? t.site.dropRates.pity(table.pityThreshold - 1) : t.site.dropRates.noPity}
-                    </p>
-                  )}
-                  <div className="overflow-x-auto rounded-l border border-ui-line">
-                    <table className="w-full text-sm">
-                      <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
-                        <tr>
-                          <th className="px-3 py-2 text-left">{t.site.dropRates.slot}</th>
+                    <span>
+                      {t.site.dropRates.guarantee[kind]}{" "}
+                      {t.site.dropRates.published({
+                        date: table.publishedAt ? formatDate(locale, table.publishedAt) : "",
+                        version: table.version,
+                        packSize: set.packSize,
+                        holo: pct(table.holoChance * 100),
+                      })}
+                    </span>
+                  </li>
+                ) : null,
+              )}
+            </ul>
+            <p className="text-sm text-ui-text-2" data-testid={`pity-${set.code}`}>
+              {odds.pityThreshold > 0 ? t.site.dropRates.pity(odds.pityThreshold - 1) : t.site.dropRates.noPity}
+            </p>
+            <div className="overflow-x-auto rounded-l border border-ui-line">
+              <table className="w-full text-sm">
+                <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
+                  <tr>
+                    <th className="px-3 py-2 text-left">{t.site.dropRates.pack}</th>
+                    <th className="px-3 py-2 text-left">{t.site.dropRates.slot}</th>
+                    {RARITIES.map((r) => (
+                      <th key={r} className="px-3 py-2 text-right">
+                        {t.common.rarity[r]}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                {([["silver", odds], ["gold", gold]] as const).map(([kind, table]) =>
+                  table ? (
+                    <tbody key={kind} data-testid={`odds-${set.code}-${kind}`} className={kind === "gold" ? "bg-k-limon/7" : "bg-ui-nav"}>
+                      {table.slots.map((s, i) => (
+                        <tr key={i} className="border-t border-ui-line">
+                          <td className={`px-3 py-2 font-semibold ${kind === "gold" ? "text-k-limon-oscuro" : "text-ui-text-2"}`}>{t.common.packKind[kind]}</td>
+                          <td className="px-3 py-2">
+                            {i + 1}
+                            {i === table.slots.length - 1 && <span className="ml-1 text-ui-text-3">{t.site.dropRates.guaranteedSlot}</span>}
+                          </td>
                           {RARITIES.map((r) => (
-                            <th key={r} className="px-3 py-2 text-right">
-                              {t.common.rarity[r]}
-                            </th>
+                            <td key={r} className="px-3 py-2 text-right tabular-nums">
+                              {s[r] ? pct(s[r]) : "—"}
+                            </td>
                           ))}
                         </tr>
-                      </thead>
-                      <tbody>
-                        {table.slots.map((s, i) => (
-                          <tr key={i} className="border-t border-ui-line">
-                            <td className="px-3 py-2">{i + 1}</td>
-                            {RARITIES.map((r) => (
-                              <td key={r} className="px-3 py-2 text-right tabular-nums">
-                                {s[r] ? pct(s[r]) : "—"}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              ) : null,
-            )}
+                      ))}
+                    </tbody>
+                  ) : null,
+                )}
+              </table>
+            </div>
           </section>
         ))}
         {/* Spec 020, RF-26: probabilidad de encontrar un sobre al volver de una expedición, por zona y duración. */}

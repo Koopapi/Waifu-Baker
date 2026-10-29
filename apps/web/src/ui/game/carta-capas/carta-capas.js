@@ -7,7 +7,7 @@
  *   const carta = CartaCapas.montar(document.querySelector('#carta'), {
  *     etiqueta: 'Yuki, SSR',
  *     marco: 'ssr',                       // 'ur' | 'ssr' | 'sr' | 'r' | 'n' | 'ninguno' | un gradiente CSS
- *     borde: 2.2,                         // grosor del marco en % del ancho
+ *     borde: 2.2,                         // grosor del marco en % del ancho (sin él, el de su escalón)
  *     capas: [                            // de atrás hacia adelante
  *       { src: 'yuki_1_fondo.webp',       profundidad: 0.2,  margen: 5 },
  *       { particulas: 'destellos-dorados', profundidad: 0.55, margen: 4 },
@@ -48,12 +48,14 @@
 (function (global) {
   'use strict';
 
+  // Spec 022, RF-9: los marcos de la maqueta aprobada (lámina «Rarezas y sobres plata y gold»): degradado, aura y
+  // grosor propio de cada escalón (n común, r rara, sr épica, ssr legendaria, ur EX).
   var MARCOS = {
-    ur:  ['linear-gradient(135deg,#ff7aa8 0%,#ffd36e 17%,#8af0c4 33%,#ffffff 48%,#6ec8ff 62%,#c79bff 80%,#ff7aa8 100%)', 'rgba(200,160,255,.28)'],
-    ssr: ['linear-gradient(135deg,#6e4a12 0%,#f7dc8a 18%,#b9862d 34%,#fff3c4 48%,#a0701f 62%,#f2cf6e 80%,#6e4a12 100%)', 'rgba(240,190,90,.24)'],
-    sr:  ['linear-gradient(135deg,#4b2a7a 0%,#d4b8ff 20%,#8a5cd6 38%,#f1e6ff 50%,#7344c2 64%,#c9a6ff 82%,#4b2a7a 100%)', 'rgba(170,120,255,.22)'],
-    r:   ['linear-gradient(135deg,#1f3f7a 0%,#a9ccff 20%,#4a7fd6 38%,#e6f0ff 50%,#3c6cc2 64%,#9cc2ff 82%,#1f3f7a 100%)', 'rgba(110,160,255,.2)'],
-    n:   ['linear-gradient(135deg,#5a6070 0%,#e4e8ef 22%,#9aa1b0 40%,#ffffff 50%,#8a91a0 64%,#d6dbe4 82%,#5a6070 100%)', 'rgba(220,225,235,.12)']
+    ur:  ['conic-gradient(from 90deg,#ff7eb6,#b79cff,#7cc8ff,#7ef0c9,#ff7eb6)', 'rgba(255,126,182,.34)', 4.8],
+    ssr: ['linear-gradient(135deg,#fff1a8 0%,#f5c451 45%,#b7791f 100%)', 'rgba(245,196,81,.32)', 4.3],
+    sr:  ['linear-gradient(135deg,#e9b8ff 0%,#8b3fd9 100%)', 'rgba(139,63,217,.3)', 3.3],
+    r:   ['linear-gradient(135deg,#9fd3ff 0%,#3b82f6 100%)', 'rgba(59,130,246,.22)', 2.9],
+    n:   ['linear-gradient(180deg,#c9ced6 0%,#8e949e 100%)', 'rgba(220,225,235,.12)', 1.9]
   };
   MARCOS.epica = MARCOS.sr; MARCOS.rara = MARCOS.r; MARCOS.comun = MARCOS.n;
 
@@ -201,7 +203,7 @@
   function montar(el, opciones) {
     inyectarCSS();
     var op = Object.assign({
-      capas: [], sello: null, marco: 'ssr', aura: null, borde: 2.2, holo: false,
+      capas: [], sello: null, marco: 'ssr', aura: null, borde: null, holo: false,
       profundidad: 14, inclinacion: 14, reposo: true, zona: null,
       proporcion: 700 / 991, etiqueta: 'Carta', aparecer: true
     }, opciones || {});
@@ -259,7 +261,7 @@
       card.classList.toggle('cc-sin-marco', sin);
       card.style.setProperty('--cc-marco', sin ? 'none' : m[0]);
       card.style.setProperty('--cc-aura', op.aura || m[1] || 'rgba(255,255,255,.12)');
-      card.style.setProperty('--cc-borde', num(op.borde, 2.2) + 'cqw');
+      card.style.setProperty('--cc-borde', num(op.borde, m[2] || 2.2) + 'cqw');
       card.classList.toggle('cc-con-holo', !!op.holo);
 
       if (primera && op.aparecer) {
@@ -401,11 +403,11 @@
 
   /* ---------- presets por rareza ---------- */
   var PRESETS = {
-    n:   { marco: 'n',   particulas: null, sello: null, holo: false },
-    r:   { marco: 'r',   particulas: { particulas: 'destellos-arcoiris', cantidad: 16, tamano: 0.8, opacidad: 0.75 }, sello: null, holo: false },
-    sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'SR', estilo: 'morado', tamano: 12 }, holo: false },
-    ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'SSR', estilo: 'oro', tamano: 14 }, holo: false },
-    ur:  { marco: 'ur',  particulas: { particulas: 'destellos-arcoiris', cantidad: 65 }, sello: { texto: 'UR', estilo: 'arcoiris', tamano: 14 }, holo: true }
+    n:   { marco: 'n',   particulas: null, sello: { texto: 'C', estilo: 'plata', tamano: 10 }, holo: false },
+    r:   { marco: 'r',   particulas: { particulas: 'destellos-arcoiris', cantidad: 16, tamano: 0.8, opacidad: 0.75 }, sello: { texto: 'R', estilo: 'azul', tamano: 10 }, holo: false },
+    sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'E', estilo: 'morado', tamano: 12 }, holo: false },
+    ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'LEG', estilo: 'oro', tamano: 13 }, holo: false },
+    ur:  { marco: 'ur',  particulas: { particulas: 'destellos-arcoiris', cantidad: 65 }, sello: { texto: 'EX', estilo: 'arcoiris', tamano: 14 }, holo: true }
   };
   PRESETS.comun = PRESETS.n; PRESETS.rara = PRESETS.r; PRESETS.epica = PRESETS.sr;
 

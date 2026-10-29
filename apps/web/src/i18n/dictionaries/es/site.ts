@@ -29,6 +29,8 @@ export const site: typeof en = {
     // Spec 022, RF-14, RF-15 y RF-20.
     guarantee: { silver: "Cada sobre plata trae al menos una carta Rara o mejor.", gold: "Cada sobre gold trae al menos una carta Épica o mejor." },
     slot: "Ranura",
+    pack: "Sobre",
+    guaranteedSlot: "(garantía)",
     how: { free: "Gratis", patreon: "Con la suscripción" },
   },
   notFound: {

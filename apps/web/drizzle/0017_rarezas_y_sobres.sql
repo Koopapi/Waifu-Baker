@@ -33,3 +33,9 @@ SELECT dt."set_id", dt."version", 'gold', (
 ), dt."holo_chance", 0, false
 FROM "drop_tables" dt JOIN "sets" s ON s."id" = dt."set_id"
 WHERE dt."kind" = 'silver' AND dt."version" = (SELECT max(d2."version") FROM "drop_tables" d2 WHERE d2."set_id" = dt."set_id" AND d2."kind" = 'silver');
+--> statement-breakpoint
+-- Sellos de texto de los escalones: SR, SSR y UR pasan a E, LEG y EX (maqueta de la spec 022).
+UPDATE "cards" SET "layers" = jsonb_set("layers", '{sello,texto}', to_jsonb(CASE "layers"->'sello'->>'texto' WHEN 'SR' THEN 'E' WHEN 'SSR' THEN 'LEG' ELSE 'EX' END))
+WHERE "layers"->'sello'->>'texto' IN ('SR', 'SSR', 'UR');--> statement-breakpoint
+UPDATE "cards" SET "layers_pending" = jsonb_set("layers_pending", '{sello,texto}', to_jsonb(CASE "layers_pending"->'sello'->>'texto' WHEN 'SR' THEN 'E' WHEN 'SSR' THEN 'LEG' ELSE 'EX' END))
+WHERE "layers_pending"->'sello'->>'texto' IN ('SR', 'SSR', 'UR');

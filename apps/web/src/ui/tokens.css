@@ -56,10 +56,10 @@
   --ui-k-chocolate: #7a4a2e;
   --ui-k-llama: #ff9a62;
   /* Spec 022: sobres plata y gold. */
-  --ui-k-plata: #eef1f7;
-  --ui-k-plata-oscuro: #aab3c5;
-  --ui-k-oro: #ffe28a;
-  --ui-k-oro-oscuro: #d39b2a;
+  --ui-k-plata: #e3e6e9;
+  --ui-k-plata-oscuro: #4b5157;
+  --ui-k-oro: #fff1a8;
+  --ui-k-oro-oscuro: #5a3a00;
 
   /* Capas (de abajo arriba). */
   --z-nav: 20;
@@ -110,6 +110,7 @@
   --color-k-plata-oscuro: var(--ui-k-plata-oscuro);
   --color-k-oro: var(--ui-k-oro);
   --color-k-oro-oscuro: var(--ui-k-oro-oscuro);
+  --color-k-limon-oscuro: var(--ui-k-limon-oscuro);
 
   --font-sans: var(--font-body), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;

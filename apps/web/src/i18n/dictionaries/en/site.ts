@@ -29,6 +29,8 @@ export const site = {
     // Spec 022, RF-14, RF-15 and RF-20.
     guarantee: { silver: "Every silver pack brings at least one Rare or better.", gold: "Every gold pack brings at least one Epic or better." },
     slot: "Slot",
+    pack: "Pack",
+    guaranteedSlot: "(guaranteed)",
     // Spec 021, RF-10: how each set is obtained.
     how: { free: "Free", patreon: "With the subscription" },
   },
