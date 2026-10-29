@@ -96,6 +96,11 @@ export async function createPublishedSet(page: Page, code: string, images: strin
   return setId;
 }
 
+/** Spec 017: arma las cartas de una colección con un fondo de su biblioteca (lo que el administrador haría carta a carta). */
+export async function assembleSet(page: Page, code: string) {
+  await seed(page, { action: "assembleSet", setCode: code });
+}
+
 export async function giftPacks(page: Page, userName: string, code: string, count: number) {
   await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E" });
 }

@@ -46,7 +46,7 @@ export interface GlyphProps extends IconProps {
 }
 export type Glyph = React.ForwardRefExoticComponent<GlyphProps & React.RefAttributes<SVGSVGElement>>;
 
-function duotone(Icon: React.ComponentType<IconProps & React.RefAttributes<SVGSVGElement>>, name: string): Glyph {
+export function duotone(Icon: React.ComponentType<IconProps & React.RefAttributes<SVGSVGElement>>, name: string): Glyph {
   const G = forwardRef<SVGSVGElement, GlyphProps>(function Glyph({ strokeWidth, weight = "duotone", ...rest }, ref) {
     void strokeWidth;
     return <Icon ref={ref} weight={weight} {...rest} />;

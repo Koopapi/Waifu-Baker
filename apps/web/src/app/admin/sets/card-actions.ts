@@ -25,8 +25,9 @@ export async function bulkUpdateCardsAction(
     if (patch.characterId !== undefined) clean.characterId = patch.characterId === "__none" ? null : patch.characterId;
     if (patch.rarity !== undefined) clean.rarity = rarityOf(patch.rarity);
     if (patch.variant === "normal" || patch.variant === "holo" || patch.variant === "alt") clean.variant = patch.variant;
-    const n = await bulkUpdateCards(db, getCardStore(), actorId, setId, versions, clean);
-    return (await getDict()).admin.cards.updated(n);
+    const r = await bulkUpdateCards(db, getCardStore(), actorId, setId, versions, clean);
+    const t = (await getDict()).admin.cards;
+    return r.layersSealsToReview ? `${t.updated(r.updated)} ${t.layersSealReview(r.layersSealsToReview)}` : t.updated(r.updated);
   });
 }
 
@@ -42,8 +43,10 @@ export async function updateCardAction(setId: string, cardId: string, version: n
     };
     if (fd.has("rarity")) patch.rarity = rarityOf(String(fd.get("rarity")));
     if (variant === "normal" || variant === "holo" || variant === "alt") patch.variant = variant;
-    saved = (await updateCard(db, getCardStore(), actorId, cardId, version, patch)).version;
-    return (await getDict()).admin.cards.saved;
+    const row = await updateCard(db, getCardStore(), actorId, cardId, version, patch);
+    saved = row.version;
+    const t = (await getDict()).admin.cards;
+    return row.layersSealToReview ? `${t.saved} ${t.layersSealReview(1)}` : t.saved;
   });
   // La versión nueva viaja con la respuesta: el panel no depende de que llegue el refresco.
   return { ...r, version: saved };

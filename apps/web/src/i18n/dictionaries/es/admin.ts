@@ -11,6 +11,7 @@ export const admin: typeof en = {
     overview: "Resumen",
     sets: "Colecciones",
     characters: "Personajes",
+    library: "Biblioteca",
     tiers: "Tiers de Patreon",
     users: "Usuarios",
     albums: "Álbumes",
@@ -194,6 +195,7 @@ export const admin: typeof en = {
     regenerate: "Regenerar imágenes",
     updated: (n) => `${n} ${plural(n, "carta actualizada", "cartas actualizadas")}.`,
     saved: "Carta guardada.",
+    layersSealReview: (n) => (n === 1 ? "Tiene un sello de imagen en sus capas: revisa que siga encajando con la rareza nueva." : `${n} cartas tienen un sello de imagen en sus capas: revisa que siga encajando con la rareza nueva.`),
     orderSaved: "Orden guardado.",
     deleted: "Carta eliminada.",
     regenerated: (n) => `${n} ${plural(n, "carta regenerada", "cartas regeneradas")} con el marco actual.`,
@@ -205,8 +207,6 @@ export const admin: typeof en = {
     sessionExpired: "Sesión caducada: vuelve a entrar.",
     connectionLost: "Se perdió la conexión. Puedes volver a soltar este archivo.",
     locked: "Colección publicada: ya no se pueden añadir cartas (RF-8).",
-    dropHere: "Suelta aquí las imágenes de la colección",
-    hint: "PNG, JPEG o WebP · hasta 20 MB · mínimo 600 px de ancho · o pulsa para elegir",
     uploading: "Subiendo…",
     finished: "Subida terminada",
     summary: (done, failed) => `${done} correctas${failed ? ` · ${failed} con error` : ""}`,
@@ -371,6 +371,7 @@ export const admin: typeof en = {
     reasonHint: "Queda en el historial: soporte, sorteo, compensación…",
     gifted: (n) => `${n} ${plural(n, "sobre regalado", "sobres regalados")}.`,
   },
+  // Spec 016: editor de cartas por capas.
   api: {
     missingSetOrFile: "Falta la colección o el archivo.",
     missingFileOrVersion: "Falta el archivo o la versión de la carta.",

@@ -4,8 +4,18 @@
 export type CartaTier = "n" | "r" | "sr" | "ssr" | "ur";
 export type Esquina = "sup-izq" | "sup-der" | "inf-izq" | "inf-der";
 
+/** Waifu Baker, spec 017: posición (x, y en %), escala, giro y ajuste de una capa de imagen. */
+export interface Encuadre {
+  x?: number;
+  y?: number;
+  escala?: number;
+  giro?: number;
+  ajuste?: "cubrir" | "contener";
+}
+
 export interface CapaImagen {
   src: string;
+  encuadre?: Encuadre;
   profundidad?: number;
   margen?: number;
   mezcla?: string;
@@ -58,6 +68,8 @@ export interface CartaInstancia {
 }
 
 export interface CartaCapasApi {
+  /** Listas cerradas para lo que acaba dentro de `style` o de atributos (la config puede venir de la BD). */
+  seguro: { mezcla(m: unknown): string; esquina(e: unknown): string; color(c: unknown): string | null; encuadre(e: unknown): string };
   montar(el: HTMLElement, config: CartaConfig): CartaInstancia;
   montarRareza(el: HTMLElement, rareza: CartaTier, imagen: string | (CapaImagen | CapaParticulas)[], extra?: Partial<CartaConfig>): CartaInstancia;
   desdeRareza(rareza: CartaTier, imagen: string | (CapaImagen | CapaParticulas)[], extra?: Partial<CartaConfig>): CartaConfig;

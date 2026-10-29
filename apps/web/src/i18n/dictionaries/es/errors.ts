@@ -138,6 +138,15 @@ export const errors: Record<string, Msg> = {
   too_narrow: (p) => `La imagen mide ${p.width} px de ancho; el mínimo es ${p.min} px.`,
   unreadable: "No se pudo leer la imagen: el archivo parece dañado.",
 
+  // Spec 016: cartas por capas.
+  layer_too_narrow: (p) => `La capa mide ${p.width} px de ancho; el mínimo es ${p.min} px.`,
+  layer_ratio: (p) => `La capa mide ${p.width} × ${p.height}; debe tener la proporción del lienzo (${p.expected}).`,
+  too_many_layers: (p) => `Una carta admite como mucho ${p.max ?? 8} capas de imagen (las partículas no cuentan).`,
+  no_visible_layer: "Hace falta al menos una capa de imagen visible.",
+  invalid_layers: (p) => `La configuración de capas no es válida${p.path ? ` (${p.path})` : ""}.`,
+  layer_missing: "Una de las capas ya no está disponible: vuelve a subirla.",
+  layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
+
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
   negative_weight: (p) => `La ranura ${p.slot} tiene pesos negativos o no válidos.`,

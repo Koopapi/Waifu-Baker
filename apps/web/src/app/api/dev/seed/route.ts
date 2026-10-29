@@ -7,7 +7,9 @@ import { RARITIES } from "@/domain/catalog/card-rules";
 import { adminFromRequest, notFoundResponse } from "@/server/auth/admin-request";
 import { getCardStore } from "@/server/cards/store-instance";
 import { isAdminError } from "@/server/errors";
-import { seedGift, seedPublishedSet } from "@/server/services/dev-seed";
+import { eq } from "drizzle-orm";
+import { sets } from "@/db/schema";
+import { assembleSetCards, seedGift, seedPublishedSet } from "@/server/services/dev-seed";
 
 export const runtime = "nodejs";
 
@@ -36,6 +38,7 @@ const Body = z.discriminatedUnion("action", [
     count: z.number().int(),
     reason: z.string(),
   }),
+  z.object({ action: z.literal("assembleSet"), setCode: z.string().min(1) }),
 ]);
 
 /**
@@ -43,6 +46,7 @@ const Body = z.discriminatedUnion("action", [
  * interfaz. Lo llama un administrador con sesión (queda como autor en la auditoría).
  * - `publishedSet`: crea personaje y colección, sube las cartas, las completa y publica → `{ setId }`.
  * - `gift`: regala sobres de una colección a un usuario de desarrollo por su nombre → `{ userId }`.
+ * - `assembleSet` (spec 017): pone un fondo de la biblioteca a las cartas sin fondo de una colección → `{ setId }`.
  */
 export async function POST(req: Request) {
   if (!allowed()) return notFoundResponse();
@@ -52,6 +56,12 @@ export async function POST(req: Request) {
   if (!parsed.success) return Response.json({ error: parsed.error.message }, { status: 400 });
   const b = parsed.data;
   try {
+    if (b.action === "assembleSet") {
+      const [set] = await db.select({ id: sets.id }).from(sets).where(eq(sets.code, b.setCode));
+      if (!set) return Response.json({ error: "not_found" }, { status: 404 });
+      await assembleSetCards(db, getCardStore(), session.user.id, set.id);
+      return Response.json({ setId: set.id });
+    }
     if (b.action === "gift") {
       const userId = await seedGift(db, session.user.id, b);
       return Response.json({ userId });

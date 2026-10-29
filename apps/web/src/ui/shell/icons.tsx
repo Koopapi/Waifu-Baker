@@ -33,6 +33,7 @@ export const ICONS = {
   sets: Library,
   characters: UsersRound,
   cards: ImageIcon,
+  library: ImageIcon,
   users: UserRound,
   tiers: Link2,
   settings: Settings,

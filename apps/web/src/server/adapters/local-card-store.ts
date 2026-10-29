@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { contentTypeFor, type CardStore } from "@/server/ports/card-store";
 
@@ -35,5 +35,26 @@ export class LocalCardStore implements CardStore {
   async delete(key: string) {
     const full = this.resolve(key);
     if (full) await rm(full, { force: true });
+  }
+
+  async list(prefix: string) {
+    const dir = this.resolve(prefix);
+    if (!dir) return [];
+    const out: { key: string; modifiedAt: Date }[] = [];
+    const walk = async (d: string) => {
+      let entries;
+      try {
+        entries = await readdir(d, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const e of entries) {
+        const full = path.join(d, e.name);
+        if (e.isDirectory()) await walk(full);
+        else out.push({ key: path.relative(this.root, full).split(path.sep).join("/"), modifiedAt: (await stat(full)).mtime });
+      }
+    };
+    await walk(dir);
+    return out;
   }
 }

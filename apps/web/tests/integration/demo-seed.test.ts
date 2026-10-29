@@ -1,8 +1,11 @@
 // Spec 010, RF-12: la base de datos de la demo.
 import { describe, expect, it } from "vitest";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { and, eq } from "drizzle-orm";
 import { albums, cards, characters, packs, sets, userRewards, users } from "@/db/schema";
 import { parseDemoManifest } from "@/domain/demo/manifest";
+import { isAssembled, type ImageLayer } from "@/domain/cards/layers";
 import { DEMO_BANNED_NAMES, demoCollectorCards, seedDemo } from "@/server/services/demo-seed";
 import { inRollback } from "./db";
 import { testImage } from "./images";
@@ -57,5 +60,22 @@ describe("demo", () => {
         return demoCollectorCards(tx, r.collectorId);
       });
     expect(await run()).toEqual(await run());
+  }, SLOW);
+
+  it("test_s017_rf20_las_cartas_de_la_demo_estan_armadas_y_la_muestra_recortada_lleva_sus_capas", async () => {
+    const dir = path.resolve(__dirname, "../../../../docs/waifu-baker/waifu-baker/codigo/carta-capas/cartas");
+    const sample = { name: "Yuki", character: "Yuki", rarity: "legendary" as const, config: JSON.parse(await readFile(path.join(dir, "yuki.json"), "utf8")), readFile: (f: string) => readFile(path.join(dir, "yuki", f)) };
+    await inRollback(async (tx) => {
+      const r = await seedDemo(tx, tempStore(), { manifest, readImage, now: NOW, sample });
+      const list = await tx.select().from(cards).where(eq(cards.setId, r.setId));
+      expect(list).toHaveLength(7);
+      // Todas armadas: el fan art completo como chica sobre el fondo de la biblioteca.
+      expect(list.every((c) => isAssembled(c.layers))).toBe(true);
+      const yuki = list.find((c) => c.name === "Yuki")!;
+      const capas = yuki.layers!.capas;
+      expect(capas.map((l) => ("key" in l ? l.rol : "particulas"))).toEqual(["fondo", "particulas", "personaje", "extra", "extra"]);
+      expect((capas[2] as ImageLayer).key).toMatch(new RegExp(`^sets/${r.setId}/layers/`));
+      expect(yuki.layers).toMatchObject({ marco: "ssr", sello: { esquina: "sup-izq" } });
+    });
   }, SLOW);
 });

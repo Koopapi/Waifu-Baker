@@ -1,0 +1,1 @@
+DROP TABLE "set_backgrounds" CASCADE;

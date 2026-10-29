@@ -19,8 +19,11 @@ import { TextArea, TextField } from "@/ui/form/TextField";
 import { useConfirm } from "@/ui/overlay/Confirm";
 import { Modal } from "@/ui/overlay/Modal";
 import { CardPreview } from "./CardPreview";
+import { LayersEditor } from "./LayersEditor";
+import type { LibraryEntry } from "@/features/admin/library/LibraryPicker";
 import type { CardDTO, CharacterOption, Permissions } from "./types";
 import { useLocale, useT } from "@/i18n/client";
+import { useAdminLayersT } from "@/i18n/admin-layers";
 import { formatPercent } from "@/i18n/format";
 import type { Locale } from "@/i18n";
 
@@ -120,6 +123,7 @@ function CardEditor({
   setId,
   card,
   characters,
+  library,
   perms,
   onClose,
   onSaved,
@@ -127,12 +131,14 @@ function CardEditor({
   setId: string;
   card: CardDTO;
   characters: CharacterOption[];
+  library: LibraryEntry[];
   perms: Permissions;
   onClose: () => void;
   /** Versión nueva tras guardar: la cuadrícula la recuerda aunque el refresco llegue tarde. */
   onSaved: (version: number) => void;
 }) {
   const tt = useT();
+  const tl = useAdminLayersT();
   const confirm = useConfirm();
   const t = tt.admin.cards;
   const locale = useLocale();
@@ -175,6 +181,12 @@ function CardEditor({
       const res = await fetch(`/api/admin/cards/${card.id}/art`, { method: "POST", body: fd });
       const body = await res.json().catch(() => ({ ok: false, message: tt.admin.serverError(res.status) }));
       setState(body.ok ? { ok: true, message: body.pending ? t.newArtPending : t.artReplaced } : { ok: false, error: body.message });
+      // Spec 017, RF-3: si la chica nueva no está recortada, el editor sigue abierto para que se vea el aviso.
+      if (body.ok && body.uncut) {
+        setState({ ok: true, message: `${t.artReplaced} ${tl.uncut}` });
+        router.refresh();
+        return;
+      }
       if (body.ok) {
         router.refresh();
         onClose();
@@ -209,7 +221,7 @@ function CardEditor({
           )}
           <div className="mt-3 space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-ui-text-2">{t.replaceArt}</span>
-            <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-ui-text-2" data-testid="replace-art" />
+            <input type="file" accept="image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-ui-text-2" data-testid="replace-art" />
             {file && (
               <Button size="sm" variant="secondary" onClick={replaceArt} disabled={pending}>
                 {t.uploadNewArt}
@@ -279,6 +291,8 @@ function CardEditor({
           </div>
         </div>
       </form>
+      {/* Spec 016: la carta por capas se guarda aparte del formulario de la carta. */}
+      <LayersEditor card={card} library={library} onSaved={onSaved} />
     </Modal>
   );
 }
@@ -288,11 +302,14 @@ export function CardWorkspace({
   setId,
   cards,
   characters,
+  library = [],
   perms,
 }: {
   setId: string;
   cards: CardDTO[];
   characters: CharacterOption[];
+  /** Spec 017, RF-8: la biblioteca general de elementos, para armar las cartas en el editor de capas. */
+  library?: LibraryEntry[];
   perms: Permissions;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -459,6 +476,7 @@ export function CardWorkspace({
           setId={setId}
           card={latest(byId.get(editing.id) ?? editing)}
           characters={characters}
+          library={library}
           perms={perms}
           onClose={() => setEditing(null)}
           onSaved={(v) => setKnown((k) => ({ ...k, [editing.id]: Math.max(k[editing.id] ?? 0, v) }))}
