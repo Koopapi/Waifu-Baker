@@ -12,7 +12,7 @@ import { testImage } from "./images";
 import { tempStore } from "./store";
 
 const NOW = new Date("2026-10-16T12:00:00Z");
-const rarities = ["common", "common", "uncommon", "rare", "epic", "legendary"] as const;
+const rarities = ["common", "common", "common", "rare", "epic", "legendary"] as const;
 const manifest = parseDemoManifest(
   {
     code: "FA01",

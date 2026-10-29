@@ -66,3 +66,20 @@ describe("spec 018 — giroscopio", () => {
     expect(src).toMatch(/deshabilitarGiroscopio: function \(\) \{\s*global\.removeEventListener\('deviceorientation', onOri\);/);
   });
 });
+
+describe("spec 022 — marcos de las cinco rarezas", () => {
+  const tiers = ["n", "r", "sr", "ssr", "ur"] as const;
+  const marcos = (api as unknown as { marcos: Record<string, [string, string, number]> }).marcos;
+  const presets = (api as unknown as { presets: Record<string, { sello: { texto: string } | null }> }).presets;
+
+  it("test_s022_rf9_cada_escalon_tiene_su_marco_distinto_y_mas_grueso_cuanto_mas_raro", () => {
+    expect(new Set(tiers.map((t) => marcos[t][0])).size).toBe(5);
+    const grosor = tiers.map((t) => marcos[t][2]);
+    expect([...grosor].sort((a, b) => a - b)).toEqual(grosor);
+    expect(new Set(grosor).size).toBe(5);
+  });
+
+  it("test_s022_rf9_los_sellos_son_los_de_la_maqueta", () => {
+    expect(tiers.map((t) => presets[t].sello?.texto)).toEqual(["C", "R", "E", "LEG", "EX"]);
+  });
+});

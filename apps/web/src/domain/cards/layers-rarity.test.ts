@@ -13,7 +13,7 @@ describe("spec 016 — estilo de la rareza", () => {
   it("test_s016_rf9_aplicar_el_estilo_pone_marco_particulas_y_sello_del_escalon", () => {
     const out = applyTierStyle(config, "ssr", 42);
     expect(out.marco).toBe("ssr");
-    expect(out.sello).toEqual({ texto: "SSR", estilo: "oro", tamano: 14, esquina: "sup-izq" });
+    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 13, esquina: "sup-izq" });
     // Las partículas del preset sustituyen a las que había y van entre el fondo y la personaje.
     expect(out.capas).toEqual([
       { key: key(1), profundidad: 0.2 },
@@ -22,11 +22,16 @@ describe("spec 016 — estilo de la rareza", () => {
     ]);
   });
 
-  it("test_s016_rf9_el_escalon_n_no_lleva_particulas_ni_sello", () => {
+  it("test_s022_rf9_el_escalon_n_no_lleva_particulas_y_su_sello_es_la_c", () => {
     const out = applyTierStyle(config, "n", 1);
     expect(out.capas.every((l) => "key" in l)).toBe(true);
-    expect(out.sello).toBeNull();
+    expect(out.sello).toEqual({ texto: "C", estilo: "plata", tamano: 10, esquina: "sup-izq" });
     expect(out.holo).toBe(false);
+  });
+
+  it("test_s022_rf9_cada_escalon_lleva_su_propio_sello", () => {
+    const texts = (["n", "r", "sr", "ssr", "ur"] as const).map((t) => (applyTierStyle(config, t, 1).sello as { texto: string }).texto);
+    expect(texts).toEqual(["C", "R", "E", "LEG", "EX"]);
   });
 
   it("test_s016_rf9_la_ur_activa_el_holo", () => {
@@ -45,13 +50,13 @@ describe("spec 016 — cambio de rareza de una carta con capas", () => {
     const { config: out, imageSealToReview } = retierLayers(withText, "ssr");
     expect(out.marco).toBe("ssr");
     // El sello de texto pasa al del escalón, pero conserva la esquina que eligió el administrador.
-    expect(out.sello).toEqual({ texto: "SSR", estilo: "oro", tamano: 14, esquina: "inf-der" });
+    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 13, esquina: "inf-der" });
     expect(out.capas).toEqual(withText.capas);
     expect(imageSealToReview).toBe(false);
   });
 
-  it("test_s016_rf25_un_escalon_sin_sello_quita_el_sello_de_texto", () => {
-    expect(retierLayers(withText, "n").config.sello).toBeNull();
+  it("test_s016_rf25_al_bajar_a_comun_el_sello_de_texto_pasa_a_la_c", () => {
+    expect(retierLayers(withText, "n").config.sello).toEqual({ texto: "C", estilo: "plata", tamano: 10, esquina: "inf-der" });
   });
 
   it("test_s016_rf25_el_sello_de_imagen_se_mantiene_y_avisa_de_que_hay_que_revisarlo", () => {
@@ -84,17 +89,17 @@ describe("spec 017 — estilo automático", () => {
   it("test_s017_rf13_con_estilo_automatico_el_cambio_de_rareza_pone_el_estilo_completo_del_escalon", () => {
     const { config: out, imageSealToReview } = retierLayers(armada, "ur");
     expect(imageSealToReview).toBe(false);
-    expect(out).toMatchObject({ marco: "ur", holo: true, estiloAuto: true, sello: { texto: "UR", estilo: "arcoiris", esquina: "sup-izq" } });
+    expect(out).toMatchObject({ marco: "ur", holo: true, estiloAuto: true, sello: { texto: "EX", estilo: "arcoiris", esquina: "sup-izq" } });
     // Las partículas cambian a las del escalón (misma semilla) y siguen detrás de la chica; sus capas no se tocan.
     expect(out.capas).toEqual([
       { key: key(1), rol: "fondo" },
       { particulas: "destellos-arcoiris", cantidad: 65, semilla: 7, profundidad: 0.55, margen: 4 },
       { key: key(2), rol: "personaje", encuadre: { x: 5, escala: 1.2 } },
     ]);
-    // Un escalón sin partículas ni sello los quita.
+    // Un escalón sin partículas las quita; el de la común pone su sello.
     const n = retierLayers(armada, "n").config;
     expect(n.capas.every((l) => "key" in l)).toBe(true);
-    expect(n.sello).toBeNull();
+    expect(n.sello).toMatchObject({ texto: "C" });
   });
 
   it("test_s017_rf13_las_particulas_del_estilo_van_detras_de_la_chica", () => {
@@ -106,7 +111,7 @@ describe("spec 017 — estilo automático", () => {
     const manual = { ...armada, estiloAuto: false };
     const out = retierLayers(manual, "ssr").config;
     expect(out.marco).toBe("ssr");
-    expect(out.sello).toEqual({ texto: "SSR", estilo: "oro", tamano: 14, esquina: "inf-der" });
+    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 13, esquina: "inf-der" });
     expect(out.capas).toEqual(manual.capas);
   });
 

@@ -1,3 +1,4 @@
+import { onlyPresent } from "@/domain/catalog/default-odds";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { and, desc, eq } from "drizzle-orm";
@@ -78,18 +79,7 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
   }
   const present = new Set<Rarity>(files.map((c) => c.rarity));
   // Solo rarezas que tienen cartas (para publicar, toda rareza con probabilidad debe tener cartas).
-  const slots = DEMO_SLOTS.map((s) => {
-    const kept = Object.entries(s).filter(([r]) => present.has(r as Rarity));
-    const total = kept.reduce((a, [, v]) => a + (v ?? 0), 0);
-    const out: Partial<Slot> = {};
-    let acc = 0;
-    kept.forEach(([r, v], i) => {
-      const share = i === kept.length - 1 ? 100 - acc : Math.round(((v ?? 0) / total) * 100);
-      out[r as Rarity] = share;
-      acc += share;
-    });
-    return out;
-  });
+  const slots = onlyPresent(DEMO_SLOTS, present);
   const setId = await seedPublishedSet(db, store, admin.id, {
     code: manifest.code,
     name: manifest.name,

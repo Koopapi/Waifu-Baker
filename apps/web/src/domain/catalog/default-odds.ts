@@ -31,3 +31,22 @@ export function defaultSlots(packSize: number, kind: PackKind = "silver"): SlotW
 
 /** Rareza mínima de la última ranura de cada tipo (RF-14 y RF-15). */
 export const GUARANTEE: Record<PackKind, Rarity> = { silver: "rare", gold: "epic" };
+
+/**
+ * Deja en cada ranura solo las rarezas que tienen cartas y reparte su peso en proporción (enteros que suman 100). Una
+ * ranura sin ninguna rareza presente queda vacía (la validación lo señala). Para las semillas de desarrollo y la demo.
+ */
+export function onlyPresent(slots: Partial<SlotWeights>[], present: ReadonlySet<Rarity>): Partial<SlotWeights>[] {
+  return slots.map((s) => {
+    const kept = Object.entries(s).filter(([r, v]) => present.has(r as Rarity) && (v ?? 0) > 0);
+    const total = kept.reduce((a, [, v]) => a + (v ?? 0), 0);
+    const out: Partial<SlotWeights> = {};
+    let acc = 0;
+    kept.forEach(([r, v], i) => {
+      const share = i === kept.length - 1 ? 100 - acc : Math.round(((v ?? 0) / total) * 100);
+      out[r as Rarity] = share;
+      acc += share;
+    });
+    return out;
+  });
+}

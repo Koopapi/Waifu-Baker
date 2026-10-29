@@ -15,7 +15,7 @@ const VIBRATION: Partial<Record<Rarity, number[]>> = {
   ex: [80, 40, 80, 40, 120],
 };
 
-/** RF-4: sonido extra al revelar una rara o mejor; las comunes y poco comunes solo suenan al voltearse. */
+/** RF-4: sonido extra al revelar una rara o mejor; las comunes solo suenan al voltearse (la EX usa el sonido «secret»). */
 export function revealSound(rarity: Rarity): SoundName | null {
   return REVEAL[rarity] ?? null;
 }
