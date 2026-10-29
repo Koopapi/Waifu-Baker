@@ -1,6 +1,6 @@
 # Spec 024 — Despliegue en el VPS
 
-Estado: borrador para aprobar (28 oct 2026), con las respuestas del dueño.
+Estado: aprobada por el dueño el 28 oct 2026, con las decisiones derivadas.
 
 ## Contexto y objetivo
 La web solo corre en el Mac del dueño. Ya hay un VPS en Contabo y un dominio. El objetivo es tenerla publicada en el
@@ -113,7 +113,7 @@ en producción.
 - Producción empieza vacía; las cartas e imágenes se suben desde cero allí.
 - Servidor de pruebas fijo con la rama `pruebas`, antes de producción.
 - Nada 18+ hasta la confirmación de Contabo.
-- Derivadas, a confirmar al aprobar: el servidor de pruebas pide una contraseña compartida y no se indexa; el panel de
+- Derivadas, confirmadas por el dueño al aprobar: el servidor de pruebas pide una contraseña compartida y no se indexa; el panel de
   Coolify usa su propio segundo factor con app autenticadora (Coolify no admite Telegram); avisos de despliegues y
   copias por Telegram.
 
