@@ -43,7 +43,7 @@ describe("spec 020 — poder del equipo", () => {
 
   it("test_s020_rf14_el_poder_del_equipo_es_la_suma_y_la_calificacion_sale_de_la_dificultad", () => {
     const team = [member({ rarity: "rare" }), member({ rarity: "common", terrain: "forest" })];
-    expect(teamPower(team, "city")).toBeCloseTo(14 * 1.5 + 10, 10);
+    expect(teamPower(team, "city")).toBeCloseTo(RARITY_POWER.rare * 1.5 + RARITY_POWER.common, 10);
     expect(rateTeam(42, 30)).toBe("excellent");
     expect(rateTeam(30, 30)).toBe("good");
     expect(rateTeam(18, 30)).toBe("normal");

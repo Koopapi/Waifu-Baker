@@ -14,6 +14,8 @@ import { OpenAllBurst } from "./open-all/OpenAllBurst";
 import { OpenAllFocus } from "./open-all/OpenAllFocus";
 import { OpenAllSummary } from "./open-all/OpenAllSummary";
 import { PackArt, type PackArtData } from "./PackArt";
+import { PackKindTag } from "./PackKindTag";
+import type { PackKind } from "@/domain/catalog/default-odds";
 import "./open-all.css";
 
 type Phase = "idle" | "burst" | "focus" | "summary";
@@ -22,7 +24,7 @@ type Phase = "idle" | "burst" | "focus" | "summary";
  * Spec 004, RF-18: abre todos los sobres de la colección. Spec 019: los sobres se abren en el servidor y después se
  * anima el lote: ráfaga de sobres, foco en las destacadas y resumen agrupado por rareza («Saltar» lleva al resumen).
  */
-export function OpenAllView({ setId, setCode, setName, art, sealed }: { setId: string; setCode: string; setName: string; art: PackArtData; sealed: number }) {
+export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { setId: string; setCode: string; setName: string; art: PackArtData; kind: PackKind; sealed: number }) {
   const [cards, setCards] = useState<OpenAllCard[] | null>(null);
   const [opened, setOpened] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -43,7 +45,7 @@ export function OpenAllView({ setId, setCode, setName, art, sealed }: { setId: s
     sound.unlock();
     start(async () => {
       setError(null);
-      const r = await openAllPacksAction(setId);
+      const r = await openAllPacksAction(setId, kind);
       if (!r.ok) return setError(r.error);
       setOpened(r.packs);
       setCards(r.cards);
@@ -64,7 +66,11 @@ export function OpenAllView({ setId, setCode, setName, art, sealed }: { setId: s
             <Link href="/sobres" className="text-sm text-ui-text-3 hover:text-ui-text">
               {t.packs.openAll.backToMine}
             </Link>
-            <h1 className="font-display text-3xl font-semibold">{t.packs.openAll.title(setName)}</h1>
+            <h1 className="flex flex-wrap items-center gap-3 font-display text-3xl font-semibold">
+              {t.packs.openAll.title(setName)}
+              {/* Spec 022, RF-19. */}
+              <PackKindTag kind={kind} label={t.common.packKind[kind]} />
+            </h1>
           </div>
         </div>
         <div className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import type { Browser, Locator, Page } from "@playwright/test";
 import { DESKTOP, expect } from "./fixtures";
 import path from "node:path";
@@ -87,15 +88,26 @@ export async function createPublishedSet(page: Page, code: string, images: strin
     // Spec 021: gratuita = sale en el sobre cada 12 h, el día 7 y las expediciones.
     isFree: free,
     // Como en el panel, las cartas se numeran por nombre de archivo.
-    cards: images.map((img) => path.basename(img)).sort().map((image, i) => ({
-      image,
-      name: `${code} carta ${String(i + 1).padStart(3, "0")}`,
-      rarity: i + 1 === rareIndex ? "rare" : "common",
-    })),
+    cards: [
+      ...images.map((img) => path.basename(img)).sort().map((image, i) => ({
+        image,
+        name: `${code} carta ${String(i + 1).padStart(3, "0")}`,
+        rarity: i + 1 === rareIndex ? "rare" : "common",
+      })),
+      // Spec 022: sin legendaria ni EX no hay tabla gold que publicar. La última carta, legendaria, solo sale en los gold.
+      { image: goldImage(images), name: `${code} carta gold`, rarity: "legendary" },
+    ],
     slots: [{ common: 100 }, { rare: 100 }],
+    gold: [{ legendary: 100 }, { legendary: 100 }],
     holoPercent: holoPct,
   });
   return setId;
+}
+
+/** Una imagen del laboratorio que no está entre las de la colección, para su carta legendaria del sobre gold. */
+function goldImage(images: string[]) {
+  const used = new Set(images.map((i) => path.basename(i)));
+  return readdirSync(LAB).filter((f) => f.endsWith(".webp") && !used.has(f)).sort()[0];
 }
 
 /** Spec 017: arma las cartas de una colección con un fondo de su biblioteca (lo que el administrador haría carta a carta). */
@@ -108,8 +120,8 @@ export async function createZone(page: Page, zone: { name: string; terrain: stri
   await seed(page, { action: "zone", ...zone });
 }
 
-export async function giftPacks(page: Page, userName: string, code: string, count: number) {
-  await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E" });
+export async function giftPacks(page: Page, userName: string, code: string, count: number, kind: "silver" | "gold" = "silver") {
+  await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E", kind });
 }
 
 /** Rasga el sobre arrastrando la tira; con movimiento reducido, pulsa el botón que la sustituye. */

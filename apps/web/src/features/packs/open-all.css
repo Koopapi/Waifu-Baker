@@ -38,7 +38,7 @@
 .oa-card.rarity-legendary {
   box-shadow: 0 0 26px rgba(245, 196, 81, 0.55);
 }
-.oa-card.rarity-secret {
+.oa-card.rarity-ex {
   box-shadow: 0 0 30px rgba(255, 106, 213, 0.6);
 }
 /* Spec 013, RF-14: el brillo holo se desplaza con transform (sin repintar), no con background-position. */
@@ -173,7 +173,7 @@
 .oa-focus__ribbon.rarity-legendary {
   background: #ffd36e;
 }
-.oa-focus__ribbon.rarity-secret {
+.oa-focus__ribbon.rarity-ex {
   background: linear-gradient(90deg, #ffb3d1, #ffe08a, #9ff2cf, #8fd2ff, #d3b0ff);
 }
 @keyframes oaPop {
@@ -195,7 +195,7 @@
 .oa-group__title.rarity-rare {
   color: #7cc8ff;
 }
-.oa-group__title.rarity-secret {
+.oa-group__title.rarity-ex {
   color: #ff9ecb;
 }
 .oa-card__copies,

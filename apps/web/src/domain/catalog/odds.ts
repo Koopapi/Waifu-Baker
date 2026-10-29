@@ -1,5 +1,6 @@
 // RF-20: validación y cálculo de probabilidades. Los pesos de cada ranura son porcentajes.
 import { RARITIES, RARITY_LABEL, type Rarity } from "./card-rules";
+import { GUARANTEE, type PackKind } from "./default-odds";
 
 export type Slot = Record<Rarity, number>;
 
@@ -19,7 +20,7 @@ export interface Problem {
 
 const EPS = 1e-6;
 
-export function validateOdds(slots: Partial<Slot>[], packSize: number, holoChance: number): Problem[] {
+export function validateOdds(slots: Partial<Slot>[], packSize: number, holoChance: number, kind: PackKind = "silver"): Problem[] {
   const out: Problem[] = [];
   if (slots.length !== packSize) {
     out.push({
@@ -44,6 +45,17 @@ export function validateOdds(slots: Partial<Slot>[], packSize: number, holoChanc
       });
     }
   });
+  // Spec 022, RF-14 y RF-15: la última ranura solo puede dar la rareza garantizada de su tipo o mejor.
+  const last = slots[slots.length - 1];
+  const min = RARITIES.indexOf(GUARANTEE[kind]);
+  if (last && RARITIES.some((r, i) => i < min && (last[r] ?? 0) > 0)) {
+    out.push({
+      code: "guarantee_slot",
+      message: `La última ranura del sobre ${kind === "gold" ? "gold" : "plata"} solo puede dar ${RARITY_LABEL[GUARANTEE[kind]]} o mejor.`,
+      target: { kind: "slot", index: slots.length - 1 },
+      params: { kind, rarity: GUARANTEE[kind] },
+    });
+  }
   if (!(holoChance >= 0 && holoChance <= 1)) {
     out.push({ code: "holo_range", message: "La probabilidad de holo debe estar entre 0 % y 100 %.", target: { kind: "set" } });
   }
@@ -73,3 +85,13 @@ export function cardChances(cards: { id: string; rarity: Rarity | null }[], slot
 }
 
 export const rarityName = (r: Rarity) => RARITY_LABEL[r];
+
+/** Cartas legendarias o EX esperadas por sobre (suma de su probabilidad en cada ranura). */
+export function legendaryPlusRate(slots: Partial<Slot>[]): number {
+  return slots.reduce((a, s) => a + ((s.legendary ?? 0) + (s.ex ?? 0)) / 100, 0);
+}
+
+/** Spec 022, RF-16: el sobre gold tiene que dar más legendaria o EX que el plata. */
+export function goldImproves(silver: Partial<Slot>[], gold: Partial<Slot>[]): boolean {
+  return legendaryPlusRate(gold) > legendaryPlusRate(silver) + 1e-9;
+}

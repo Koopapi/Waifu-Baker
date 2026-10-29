@@ -9,6 +9,8 @@ import { PackArt, type PackArtData } from "@/features/packs/PackArt";
 import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/sobres/actions";
 import { useT } from "@/i18n/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
+import type { PackKind } from "@/domain/catalog/default-odds";
+import { PackKindTag } from "./PackKindTag";
 
 // Spec 013, RF-13: la escena (GSAP, gestos y partículas) se descarga aparte, después de pintar la página.
 const OpeningStage = dynamic(() => import("@/features/opening/OpeningStage").then((m) => m.OpeningStage), {
@@ -32,7 +34,7 @@ async function preload(cards: LabCard[]) {
 }
 
 /** Conecta la escena de apertura con los sobres reales del usuario. */
-export function PackOpener({ setId, setCode, setName, art, sealed, resumePackId }: { setId: string; setCode: string; setName: string; art: PackArtData; sealed: number; resumePackId: string | null }) {
+export function PackOpener({ setId, setCode, setName, art, kind, sealed, resumePackId }: { setId: string; setCode: string; setName: string; art: PackArtData; kind: PackKind; sealed: number; resumePackId: string | null }) {
   const t = useT();
   const [remaining, setRemaining] = useState(sealed);
   const resume = useRef(resumePackId);
@@ -41,13 +43,13 @@ export function PackOpener({ setId, setCode, setName, art, sealed, resumePackId 
   const draw = useCallback(async () => {
     const pending = resume.current;
     resume.current = null;
-    const r = pending ? await resumeOpeningAction(pending) : await openNextPackAction(setId);
+    const r = pending ? await resumeOpeningAction(pending) : await openNextPackAction(setId, kind);
     if (!r.ok) throw new Error(r.error);
     current.current = r.packId;
     if ("remaining" in r) setRemaining(r.remaining as number);
     await preload(r.cards);
     return r.cards;
-  }, [setId]);
+  }, [setId, kind]);
 
   const onFinished = useCallback(() => {
     if (current.current) void ackOpeningAction([current.current]);
@@ -59,7 +61,7 @@ export function PackOpener({ setId, setCode, setName, art, sealed, resumePackId 
     <>
       <OpeningStage
         draw={draw}
-        packLabel={`BOOSTER · ${setCode}`}
+        packLabel={`${t.common.packKind[kind].toUpperCase()} · ${setCode}`}
         packArt={<PackArt setId={setId} code={setCode} name={setName} art={art} />}
         onFinished={onFinished}
         renderSummaryActions={(reset) => (
@@ -79,6 +81,8 @@ export function PackOpener({ setId, setCode, setName, art, sealed, resumePackId 
             <Link href="/sobres" className="hud__btn">
               {t.packs.opener.backToMineHud}
             </Link>
+            {/* Spec 022, RF-19: plata o gold, a la vista durante toda la apertura. */}
+            <PackKindTag kind={kind} label={t.common.packKind[kind]} />
             {nothingLeft && <span className="hud__chip">{t.packs.opener.nothingLeft}</span>}
           </>
         }

@@ -18,7 +18,7 @@ describe("RF-13 y RF-14 protección de mala suerte", () => {
     expect(nextPityCounter(7, false)).toBe(8);
   });
 
-  it("épica, legendaria y secreta cuentan como épica o superior", () => {
-    expect(["common", "uncommon", "rare", "epic", "legendary", "secret"].map((r) => isEpicPlus(r as never))).toEqual([false, false, false, true, true, true]);
+  it("épica, legendaria y EX cuentan como épica o superior", () => {
+    expect(["common", "rare", "epic", "legendary", "ex"].map((r) => isEpicPlus(r as never))).toEqual([false, false, true, true, true]);
   });
 });

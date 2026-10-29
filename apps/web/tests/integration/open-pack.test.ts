@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { characters, dropTables, libraryItems, packOpenings, packs, pityCounters, sets, userCards, users } from "@/db/schema";
+import { auditLog, characters, dropTables, libraryItems, packOpenings, packs, pityCounters, sets, userCards, users } from "@/db/schema";
 import { drawPackWithPity } from "@/domain/catalog/draw";
 import { hmacRng } from "@/domain/random";
-import { getOpeningResult, openAllPacks, openPack } from "@/server/services/packs";
+import { getOpeningResult, listMyPacks, openAllPacks, openPack } from "@/server/services/packs";
+import { grantWelcomePack, setWelcomeSet } from "@/server/services/welcome";
 import { upsertUserFromLogin } from "@/server/services/users";
 import { giftPacks } from "@/server/services/users-admin";
 import { inRollback, testDb } from "./db";
@@ -37,7 +38,7 @@ describe("RF-5, RF-9 apertura en el servidor", () => {
       expect(r.cards[0].rarity).toBe("common");
       for (const c of r.cards) expect(setCards.map((x) => x.id)).toContain(c.cardId);
       const [o] = await tx.select().from(packOpenings).where(eq(packOpenings.packId, p.id));
-      const [dt] = await tx.select().from(dropTables).where(eq(dropTables.setId, set.id));
+      const [dt] = await tx.select().from(dropTables).where(and(eq(dropTables.setId, set.id), eq(dropTables.kind, "silver")));
       expect(o.dropTableId).toBe(dt.id);
       expect(o.serverSeed).toMatch(/^[0-9a-f]{64}$/);
       expect(o.rngVersion).toBe("hmac-sha256-v2");
@@ -129,7 +130,7 @@ describe("RF-3, RF-4, RF-7, RF-8 accesos", () => {
   it("test_s004_rf3_un sobre 18+ no se abre sin la verificación de edad", async () => {
     await inRollback(async (tx) => {
       const { admin, fan } = await world(tx);
-      const adult = await createPublishedSet(tx, admin.id, { code: "WB01A", rarities: ["common"], slots: [{ common: 100 }], isAdult: true });
+      const adult = await createPublishedSet(tx, admin.id, { code: "WB01A", rarities: ["rare"], slots: [{ rare: 100 }], isAdult: true });
       await tx.update(users).set({ isAdultDeclared: true, adultVerifiedAt: new Date() }).where(eq(users.id, fan.id));
       await giftPacks(tx, admin.id, { userId: fan.id, setId: adult.set.id, count: 1, reason: "18+" });
       await tx.update(users).set({ adultVerifiedAt: null }).where(eq(users.id, fan.id));
@@ -171,7 +172,7 @@ describe("RF-10 y RF-11 colección del usuario", () => {
   it("test_s004_rf11_indica si cada carta es nueva y cuántas tiene tras abrir", async () => {
     await inRollback(async (tx) => {
       const { admin, fan } = await world(tx);
-      const one = await createPublishedSet(tx, admin.id, { code: "ONE2", rarities: ["common"], slots: [{ common: 100 }, { common: 100 }] });
+      const one = await createPublishedSet(tx, admin.id, { code: "ONE2", rarities: ["rare"], slots: [{ rare: 100 }, { rare: 100 }] });
       await giftPacks(tx, admin.id, { userId: fan.id, setId: one.set.id, count: 1, reason: "nuevas" });
       const [p] = await tx.select().from(packs).where(eq(packs.setId, one.set.id));
       const r = await openPack(tx, { userId: fan.id, packId: p.id });
@@ -184,12 +185,12 @@ describe("RF-13 y RF-14 protección en la apertura", () => {
   it("test_s004_rf13_con N=3, el tercer sobre seguido sin épica la garantiza y luego se reinicia (RF-14)", async () => {
     await inRollback(async (tx) => {
       const { admin, fan } = await world(tx);
-      const s = await createPublishedSet(tx, admin.id, { code: "PIT1", rarities: ["common", "epic"], slots: [{ common: 99.99, epic: 0.01 }], pity: 3 });
+      const s = await createPublishedSet(tx, admin.id, { code: "PIT1", rarities: ["rare", "epic"], slots: [{ rare: 99.99, epic: 0.01 }], pity: 3 });
       await giftPacks(tx, admin.id, { userId: fan.id, setId: s.set.id, count: 4, reason: "pity" });
       const ps = await tx.select().from(packs).where(eq(packs.setId, s.set.id));
       const results = [];
       for (const p of ps) results.push(await openPack(tx, { userId: fan.id, packId: p.id, seed: Buffer.alloc(32, results.length + 1) }));
-      expect(results.map((r) => r.cards[0].rarity)).toEqual(["common", "common", "epic", "common"]);
+      expect(results.map((r) => r.cards[0].rarity)).toEqual(["rare", "rare", "epic", "rare"]);
       expect(results.map((r) => r.pityApplied)).toEqual([false, false, true, false]);
       const [counter] = await tx.select().from(pityCounters).where(eq(pityCounters.userId, fan.id));
       expect(counter.packsSinceEpic).toBe(1);
@@ -212,11 +213,11 @@ describe("RF-18 y RF-19 abrir todos", () => {
   it("test_s004_rf19_cada sobre de «Abrir todos» sigue las mismas reglas, incluida la protección", async () => {
     await inRollback(async (tx) => {
       const { admin, fan } = await world(tx);
-      const s = await createPublishedSet(tx, admin.id, { code: "PIT2", rarities: ["common", "epic"], slots: [{ common: 99.999, epic: 0.001 }], pity: 2 });
+      const s = await createPublishedSet(tx, admin.id, { code: "PIT2", rarities: ["rare", "epic"], slots: [{ rare: 99.999, epic: 0.001 }], pity: 2 });
       await giftPacks(tx, admin.id, { userId: fan.id, setId: s.set.id, count: 4, reason: "pity en lote" });
       const rs = await openAllPacks(tx, { userId: fan.id, setId: s.set.id });
       expect(rs.map((r) => r.pityApplied)).toEqual([false, true, false, true]);
-      expect(rs.map((r) => r.cards[0].rarity)).toEqual(["common", "epic", "common", "epic"]);
+      expect(rs.map((r) => r.cards[0].rarity)).toEqual(["rare", "epic", "rare", "epic"]);
       expect(await tx.select().from(packOpenings).where(eq(packOpenings.userId, fan.id))).toHaveLength(4);
     });
   });
@@ -257,5 +258,104 @@ describe("apertura reproducible", () => {
 
   it("test_s004_rf6_la_misma_semilla_da_las_mismas_cartas_aunque_cambie_el_orden_de_las_filas", async () => {
     expect(await openWithSeed(true)).toEqual(await openWithSeed(false));
+  });
+});
+
+describe("spec 022 — sobres plata y gold", () => {
+  const sealed = (tx: Tx, userId: string, kind: "silver" | "gold") =>
+    tx.select().from(packs).where(and(eq(packs.userId, userId), eq(packs.kind, kind), eq(packs.status, "sealed")));
+
+  it("test_s022_rf11_rf22_el_regalo_crea_sobres_del_tipo_elegido_y_queda_en_el_historial", async () => {
+    await inRollback(async (tx) => {
+      const { admin, fan, set } = await world(tx);
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 2, reason: "Sobres gold", kind: "gold" });
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 1, reason: "Sobre plata" });
+      expect(await sealed(tx, fan.id, "gold")).toHaveLength(2);
+      expect(await sealed(tx, fan.id, "silver")).toHaveLength(1);
+      const gifts = await tx.select().from(auditLog).where(eq(auditLog.action, "packs_gift")).orderBy(auditLog.id);
+      expect(gifts.map((g) => (g.after as { kind: string }).kind)).toEqual(["gold", "silver"]);
+    });
+  });
+
+  it("test_s022_rf12_cada_sobre_se_abre_con_la_tabla_de_su_tipo", async () => {
+    await inRollback(async (tx) => {
+      // La gold de la colección de prueba es toda legendaria (la carta que el ayudante añade); la plata no la tiene.
+      const { admin, fan, set, goldCard } = await world(tx);
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 1, reason: "gold", kind: "gold" });
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 1, reason: "plata" });
+      const [g] = await sealed(tx, fan.id, "gold");
+      const [p] = await sealed(tx, fan.id, "silver");
+      const gold = await openPack(tx, { userId: fan.id, packId: g.id });
+      const silver = await openPack(tx, { userId: fan.id, packId: p.id });
+      expect(gold.kind).toBe("gold");
+      expect(gold.cards.map((c) => c.cardId)).toEqual([goldCard!.id, goldCard!.id]);
+      expect(silver.kind).toBe("silver");
+      expect(silver.cards.map((c) => c.cardId)).not.toContain(goldCard!.id);
+      const tables = await tx.select().from(dropTables).where(eq(dropTables.setId, set.id));
+      const [og] = await tx.select().from(packOpenings).where(eq(packOpenings.packId, g.id));
+      expect(og.dropTableId).toBe(tables.find((t) => t.kind === "gold")!.id);
+      // Volver a ver la apertura también dice el tipo.
+      expect((await getOpeningResult(tx, fan.id, g.id))?.kind).toBe("gold");
+    });
+  });
+
+  it("test_s022_rf18_la_mala_suerte_solo_cuenta_y_actua_en_los_sobres_plata", async () => {
+    await inRollback(async (tx) => {
+      const { admin, fan } = await world(tx);
+      const s = await createPublishedSet(tx, admin.id, { code: "PITG", rarities: ["rare", "epic"], slots: [{ rare: 99.999, epic: 0.001 }], pity: 2 });
+      const open = async (kind: "silver" | "gold", i: number) => {
+        await giftPacks(tx, admin.id, { userId: fan.id, setId: s.set.id, count: 1, reason: "pity", kind });
+        const [p] = await sealed(tx, fan.id, kind);
+        return openPack(tx, { userId: fan.id, packId: p.id, seed: Buffer.alloc(32, i) });
+      };
+      const counter = async () => (await tx.select().from(pityCounters).where(and(eq(pityCounters.userId, fan.id), eq(pityCounters.setId, s.set.id))))[0]?.packsSinceEpic ?? 0;
+      const first = await open("silver", 1);
+      expect([first.cards[0].rarity, first.pityApplied, await counter()]).toEqual(["rare", false, 1]);
+      // El gold (con su legendaria) no reinicia el contador de la plata ni aplica la protección.
+      const gold = await open("gold", 2);
+      expect([gold.pityApplied, await counter()]).toEqual([false, 1]);
+      const second = await open("silver", 3);
+      expect([second.pityApplied, second.cards[0].rarity]).toEqual([true, "epic"]);
+    });
+  });
+
+  it("test_s022_rf19_mis_sobres_agrupa_por_coleccion_y_tipo", async () => {
+    await inRollback(async (tx) => {
+      const { admin, fan, set, gift } = await world(tx);
+      await gift(2);
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 1, reason: "gold", kind: "gold" });
+      const groups = await listMyPacks(tx, fan.id);
+      expect(groups.map((g) => [g.code, g.kind, g.sealed])).toEqual([
+        ["WB01", "silver", 2],
+        ["WB01", "gold", 1],
+      ]);
+    });
+  });
+
+  it("test_s022_rf19_abrir_todos_abre_solo_los_del_tipo_pedido_cada_uno_con_su_tabla", async () => {
+    await inRollback(async (tx) => {
+      const { admin, fan, set, gift } = await world(tx);
+      await gift(2);
+      await giftPacks(tx, admin.id, { userId: fan.id, setId: set.id, count: 3, reason: "gold", kind: "gold" });
+      const golds = await openAllPacks(tx, { userId: fan.id, setId: set.id, kind: "gold" });
+      expect(golds.map((r) => r.kind)).toEqual(["gold", "gold", "gold"]);
+      expect(await sealed(tx, fan.id, "silver")).toHaveLength(2);
+      // Sin tipo, «Abrir todos» es de los plata.
+      const silvers = await openAllPacks(tx, { userId: fan.id, setId: set.id });
+      expect(silvers.map((r) => r.kind)).toEqual(["silver", "silver"]);
+    });
+  });
+
+  it("test_s022_rf23_la_bienvenida_y_las_demas_fuentes_dan_sobres_plata", async () => {
+    await inRollback(async (tx) => {
+      const { admin, set } = await world(tx);
+      await setWelcomeSet(tx, admin.id, set.id);
+      const newcomer = await upsertUserFromLogin(tx, { patreonUserId: "fan-new", displayName: "Nueva", role: "user" });
+      await grantWelcomePack(tx, newcomer);
+      expect((await tx.select().from(packs).where(eq(packs.userId, newcomer.id))).map((p) => p.kind)).toEqual(["silver"]);
+      // Suscripción, sobre gratis, día 7 y expediciones crean sus sobres sin tipo: el de por defecto es plata.
+      const [raw] = await tx.insert(packs).values({ userId: newcomer.id, setId: set.id, source: "tier_grant", grantKey: "s022-default" }).returning();
+      expect(raw.kind).toBe("silver");
+    });
   });
 });

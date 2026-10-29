@@ -19,14 +19,18 @@ export const site = {
     metaDescription: "Published drop rates for every set.",
     heading: "Pack drop rates",
     intro:
-      "Each pack has several slots. Each slot gives one card, and its rarity is rolled with the percentages in that row. Within a rarity, every card has the same chance. A pack never repeats a card: if a slot lands on a card already in that pack, another card of the same rarity is chosen (it only repeats when that rarity has no other cards left); the rarity percentages do not change. These tables are fixed when the set is published and never change afterwards. Cards have no monetary value and cannot be traded. Card illustrations are AI-generated.",
+      "Each pack has several slots. Each slot gives one card, and its rarity is rolled with the percentages in that row. Within a rarity, every card has the same chance. A pack never repeats a card: if a slot lands on a card already in that pack, another card of the same rarity is chosen (it only repeats when that rarity has no other cards left); the rarity percentages do not change. Every set has two tables: one for the silver pack and one for the gold pack, which gives a higher chance of Legendary and EX. These tables are fixed when the set is published and never change afterwards. Cards have no monetary value and cannot be traded. Card illustrations are AI-generated.",
     empty: "No sets have been published yet.",
     published: (p: { date: string; version: number; packSize: number; holo: string }) =>
-      `Published on ${p.date} · version ${p.version} · ${p.packSize} cards per pack · holo on Rare or better: ${p.holo}`,
+      `Published on ${p.date} · version ${p.version} · ${p.packSize} cards per pack · holo (any rarity): ${p.holo}`,
     pity: (n: number) =>
-      `Bad-luck protection: if you open ${n} packs in a row from this set without any Epic or better card, the next one brings at least one (it replaces the card in the last slot). The counter is yours and for this set only.`,
+      `Bad-luck protection (silver packs only): if you open ${n} silver packs in a row from this set without any Epic or better card, the next one brings at least one (it replaces the card in the last slot). The counter is yours and for this set only.`,
     noPity: "This set has no bad-luck protection.",
+    // Spec 022, RF-14, RF-15 and RF-20.
+    guarantee: { silver: "Every silver pack brings at least one Rare or better.", gold: "Every gold pack brings at least one Epic or better." },
     slot: "Slot",
+    pack: "Pack",
+    guaranteedSlot: "(guaranteed)",
     // Spec 021, RF-10: how each set is obtained.
     how: { free: "Free", patreon: "With the subscription" },
   },

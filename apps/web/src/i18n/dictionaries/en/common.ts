@@ -41,12 +41,13 @@ export const common = {
   toast: { rewardClaimed: "Claimed!", saved: "All set", failed: "That didn’t work", opened: "Cards revealed" },
   rarity: {
     common: "Common",
-    uncommon: "Uncommon",
     rare: "Rare",
     epic: "Epic",
     legendary: "Legendary",
-    secret: "Secret",
+    ex: "EX",
   },
+  /** Spec 022, RF-11: tipos de sobre. */
+  packKind: { silver: "Silver", gold: "Gold" },
   aiNotice: "Card illustrations are AI-generated. Cards are digital, have no monetary value and cannot be traded.",
   sessionExpired: "Your session has expired: please sign in again.",
   back: "Back",

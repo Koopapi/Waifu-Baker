@@ -17,7 +17,7 @@ async function world(tx: Tx) {
   const fan = await upsertUserFromLogin(tx, { patreonUserId: "fan-album", displayName: "Nombre Real De Patreon", role: "user" });
   await tx.update(users).set({ isAdultDeclared: true, adultVerifiedAt: new Date() }).where(eq(users.id, fan.id));
   const sfw = await createPublishedSet(tx, admin.id, { code: "ALB1", rarities: ["common", "common", "rare"], slots: [{ common: 100 }, { rare: 100 }] });
-  const adult = await createPublishedSet(tx, admin.id, { code: "ALB1A", rarities: ["common"], slots: [{ common: 100 }], isAdult: true });
+  const adult = await createPublishedSet(tx, admin.id, { code: "ALB1A", rarities: ["rare"], slots: [{ rare: 100 }], isAdult: true });
   await giftPacks(tx, admin.id, { userId: fan.id, setId: sfw.set.id, count: 2, reason: "álbum" });
   await giftPacks(tx, admin.id, { userId: fan.id, setId: adult.set.id, count: 1, reason: "álbum 18+" });
   await openAllPacks(tx, { userId: fan.id, setId: sfw.set.id });
@@ -31,7 +31,8 @@ describe("RF-1 a RF-6 Mi colección", () => {
       const { fan, sfw } = await world(tx);
       const cols = await myCollections(tx, fan.id);
       const c = cols.find((x) => x.setId === sfw.set.id)!;
-      expect(c.progress.total).toBe(3);
+      // Tres cartas y la legendaria que el ayudante añade para el sobre gold (spec 022).
+      expect(c.progress.total).toBe(4);
       expect(c.progress.owned).toBeGreaterThanOrEqual(2);
       expect(cols.map((x) => x.code).sort()).toEqual(["ALB1", "ALB1A"]);
     });
@@ -54,7 +55,7 @@ describe("RF-1 a RF-6 Mi colección", () => {
     await inRollback(async (tx) => {
       const { fan, sfw } = await world(tx);
       const b = (await myBinder(tx, fan.id, sfw.set.id))!;
-      expect(b.slots.map((s) => s.number)).toEqual([1, 2, 3]);
+      expect(b.slots.map((s) => s.number)).toEqual([1, 2, 3, 4]);
       expect(b.slots[2].owned?.rarity).toBe("rare");
     });
   });
@@ -146,7 +147,7 @@ describe("RF-13 y RF-14 vista pública", () => {
       expect(p.alias).toBe("Koopa");
       expect(p.featured.map((f) => f.cardId)).toEqual([rare.id]);
       expect(p.collections.map((c) => c.code)).toEqual(["ALB1"]);
-      expect(p.collections[0].slots).toHaveLength(3);
+      expect(p.collections[0].slots).toHaveLength(4);
     });
   });
 

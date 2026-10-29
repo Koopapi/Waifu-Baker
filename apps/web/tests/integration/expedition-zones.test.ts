@@ -75,7 +75,7 @@ describe("spec 020 — panel", () => {
     await inRollback(async (tx) => {
       const admin = await makeAdmin(tx);
       const z = await saveZone(tx, admin.id, base);
-      const r = await simulateZone(tx, z.id, [{ rarity: "legendary", holo: false, terrain: "city", role: null, bondLevel: 1 }], 120, { runs: 2000, seed: 3 });
+      const r = await simulateZone(tx, z.id, [{ rarity: "ex", holo: false, terrain: "city", role: null, bondLevel: 1 }], 120, { runs: 2000, seed: 3 });
       expect(r.rating).toBe("good");
       expect(r.expeditionsPerDay).toBe(24);
       await expect(simulateZone(tx, z.id, [], 120)).rejects.toMatchObject({ code: "invalid_team" });

@@ -17,8 +17,9 @@ async function world(tx: Tx, adult = false) {
   const { cards: list } = await createPublishedSet(tx, admin.id, { code: adult ? "LIVA" : "LIVE", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], isAdult: adult, store });
   const fan = await upsertUserFromLogin(tx, { patreonUserId: `dev:live-${adult}`, displayName: "Fan", role: "user" });
   const other = await upsertUserFromLogin(tx, { patreonUserId: `dev:other-${adult}`, displayName: "Otro", role: "user" });
-  await tx.insert(userCards).values({ userId: fan.id, cardId: list[0].id });
-  return { store, card: list[0], fan, other };
+  // Spec 022, RF-4: la común no se monta viva; la carta viva de estas pruebas es la rara.
+  await tx.insert(userCards).values([list[0], list[1]].map((c) => ({ userId: fan.id, cardId: c.id })));
+  return { store, card: list[1], common: list[0], fan, other };
 }
 
 const param = (url: string, name: string) => new URL(url, "http://x").searchParams.get(name)!;
@@ -71,6 +72,14 @@ describe("spec 018 — capas para la carta viva", () => {
       const pending = { ...card.layers!, marco: "ur" as const };
       await tx.update(cards).set({ layersPending: pending }).where(eq(cards.id, card.id));
       expect((await liveCardConfig(tx, fan.id, card.id, NOW))!.config.marco).toBe(card.layers!.marco);
+    });
+  });
+
+  it("test_s022_rf4_la_comun_no_se_monta_viva_aunque_tenga_capas", async () => {
+    await inRollback(async (tx) => {
+      const { common, fan } = await world(tx);
+      expect(common.layers).not.toBeNull();
+      expect(await liveCardConfig(tx, fan.id, common.id, NOW)).toBeNull();
     });
   });
 });

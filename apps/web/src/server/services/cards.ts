@@ -7,6 +7,7 @@ import { consecutiveNumbers, isCardComplete, rarityCounts, rarityGaps, type Rari
 import { validateUpload } from "@/domain/catalog/upload-rules";
 import { mapLimit } from "@/lib/map-limit";
 import { drawPack } from "@/domain/catalog/draw";
+import type { PackKind } from "@/domain/catalog/default-odds";
 import { cryptoRng } from "@/server/rng";
 import { composeCard, type CardSize } from "@/server/cards/compose";
 import type { CardStore } from "@/server/ports/card-store";
@@ -358,11 +359,22 @@ export async function deleteCard(db: DbLike, store: CardStore, actorUserId: stri
   await deleteKeys(store, toDelete, db);
 }
 
-/** RF-17 y cuadrícula: colección, cartas con su personaje, recuento por rareza y huecos. */
+/** La última versión de la tabla de un tipo de sobre (spec 022, RF-12). */
+async function latestDropTable(db: DbLike, setId: string, kind: PackKind) {
+  const [row] = await db
+    .select()
+    .from(dropTables)
+    .where(and(eq(dropTables.setId, setId), eq(dropTables.kind, kind)))
+    .orderBy(desc(dropTables.version))
+    .limit(1);
+  return row ?? null;
+}
+
+/** RF-17 y cuadrícula: colección, cartas con su personaje, recuento por rareza y huecos (en las dos tablas, spec 022). */
 export async function getSetOverview(db: DbLike, setId: string) {
   const [set] = await db.select().from(sets).where(eq(sets.id, setId));
   if (!set) return null;
-  const [odds] = await db.select().from(dropTables).where(eq(dropTables.setId, setId)).orderBy(desc(dropTables.version)).limit(1);
+  const [odds, gold] = await Promise.all([latestDropTable(db, setId, "silver"), latestDropTable(db, setId, "gold")]);
   const list = await db
     .select({ card: cards, characterName: characters.name })
     .from(cards)
@@ -370,7 +382,8 @@ export async function getSetOverview(db: DbLike, setId: string) {
     .where(eq(cards.setId, setId))
     .orderBy(asc(cards.number));
   const plain = list.map((r) => ({ ...r.card, characterName: r.characterName }));
-  return { set, odds: odds ?? null, cards: plain, counts: rarityCounts(plain), gaps: rarityGaps(plain, odds?.slots ?? []) };
+  const slots = [...(odds?.slots ?? []), ...(gold?.slots ?? [])];
+  return { set, odds, gold, cards: plain, counts: rarityCounts(plain), gaps: rarityGaps(plain, slots) };
 }
 
 /** Regenera todas las cartas de una colección (por ejemplo, tras cambiar el marco en Pencil). */
@@ -515,12 +528,12 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
 
 /**
  * RF-23: sortea un sobre con las cartas y probabilidades reales de la colección (también en
- * borrador) sin escribir nada: ni sobres, ni colección de usuarios, ni historial.
+ * borrador) sin escribir nada: ni sobres, ni colección de usuarios, ni historial. Spec 022, RF-21: con la tabla del tipo.
  */
-export async function simulatePack(db: DbLike, setId: string) {
+export async function simulatePack(db: DbLike, setId: string, kind: PackKind = "silver") {
   const [set] = await db.select().from(sets).where(eq(sets.id, setId));
   if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
-  const [odds] = await db.select().from(dropTables).where(eq(dropTables.setId, setId)).orderBy(desc(dropTables.version)).limit(1);
+  const odds = await latestDropTable(db, setId, kind);
   const rows = await db.select().from(cards).where(eq(cards.setId, setId));
   const withRarity = rows.filter((r) => r.rarity && r.keyMid);
   if (withRarity.length === 0) {

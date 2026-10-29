@@ -39,8 +39,8 @@ describe("spec 017 — la chica crea la carta", () => {
         expect(capas[0].key).toMatch(new RegExp(`^sets/${set.id}/layers/[0-9a-f]{64}\\.webp$`));
         const file = await store.get(capas[0].key);
         expect((await sharp(file!.body).metadata()).hasAlpha).toBe(true);
-        // Sin rareza todavía: estilo automático del escalón n (marco plateado, sin partículas ni sello).
-        expect(r.layers).toMatchObject({ marco: "n", sello: null, estiloAuto: true });
+        // Sin rareza todavía: estilo automático del escalón n (marco plateado, sin partículas y con el sello C de la spec 022).
+        expect(r.layers).toMatchObject({ marco: "n", sello: { texto: "C" }, estiloAuto: true });
       }
     });
   });

@@ -3,9 +3,10 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { canEdit } from "@/domain/catalog/collection-rules";
-import { RARITIES } from "@/domain/catalog/card-rules";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { cardChances } from "@/domain/catalog/odds";
 import { OddsEditor } from "@/features/admin/sets/OddsEditor";
+import { OddsTabs } from "@/features/admin/sets/OddsTabs";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
 import { FreeToggle } from "@/features/admin/sets/FreeToggle";
@@ -28,6 +29,8 @@ import { Card } from "@/ui/content/Card";
 import { Alert } from "@/ui/feedback/Alert";
 import { EditSetForm } from "../forms";
 
+const EMPTY_SLOT: Record<Rarity, number> = { common: 0, rare: 0, epic: 0, legendary: 0, ex: 0 };
+
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
@@ -45,6 +48,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
     isAdultSet: set.isAdult,
   };
   const slots = overview.odds?.slots ?? [];
+  const cardCounts = Object.fromEntries(RARITIES.map((r) => [r, counts[r]])) as Record<Rarity, number>;
   const chances = cardChances(overview.cards, slots);
   const cards: CardDTO[] = overview.cards.map((c) => ({
     id: c.id,
@@ -103,11 +107,19 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         title={t.publishing}
         aside={
           cards.some((c) => c.rarity) && (
-            <Button size="sm" variant="secondary" asChild>
-              <Link href={`/admin/sets/${set.id}/simulate`} data-testid="simulate-link">
-                {t.simulate}
-              </Link>
-            </Button>
+            // Spec 022, RF-21: simular un sobre de cada tipo.
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="secondary" asChild>
+                <Link href={`/admin/sets/${set.id}/simulate`} data-testid="simulate-link">
+                  {t.simulateKind(tt.common.packKind.silver)}
+                </Link>
+              </Button>
+              <Button size="sm" variant="secondary" asChild>
+                <Link href={`/admin/sets/${set.id}/simulate?k=gold`} data-testid="simulate-gold-link">
+                  {t.simulateKind(tt.common.packKind.gold)}
+                </Link>
+              </Button>
+            </div>
           )
         }
       >
@@ -142,17 +154,35 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         <WelcomeToggle setId={set.id} isWelcome={set.isWelcome} eligible={set.status === "published" && !set.isAdult} />
       </Card>
 
-      {overview.odds && (
+      {overview.odds && overview.gold && (
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">{t.odds}</h2>
-          <OddsEditor
-            setId={set.id}
-            version={set.version}
-            slots={slots.map((s) => ({ common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0, ...s }))}
-            holoChance={overview.odds.holoChance}
-            pityThreshold={overview.odds.pityThreshold}
-            locked={!canEdit(set.status, "odds")}
-            cardCounts={{ common: counts.common, uncommon: counts.uncommon, rare: counts.rare, epic: counts.epic, legendary: counts.legendary, secret: counts.secret }}
+          {/* Spec 022, RF-21: una tabla por tipo de sobre. */}
+          <OddsTabs
+            silver={
+              <OddsEditor
+                setId={set.id}
+                kind="silver"
+                version={set.version}
+                slots={slots.map((s) => ({ ...EMPTY_SLOT, ...s }))}
+                holoChance={overview.odds.holoChance}
+                pityThreshold={overview.odds.pityThreshold}
+                locked={!canEdit(set.status, "odds")}
+                cardCounts={cardCounts}
+              />
+            }
+            gold={
+              <OddsEditor
+                setId={set.id}
+                kind="gold"
+                version={set.version}
+                slots={overview.gold.slots.map((s) => ({ ...EMPTY_SLOT, ...s }))}
+                holoChance={overview.gold.holoChance}
+                pityThreshold={0}
+                locked={!canEdit(set.status, "odds")}
+                cardCounts={cardCounts}
+              />
+            }
           />
         </section>
       )}

@@ -18,7 +18,7 @@ const TZ = "America/Mexico_City";
 async function world(tx: Tx) {
   const admin = await makeAdmin(tx);
   const sfw = await createPublishedSet(tx, admin.id, { code: "FREE1", isFree: true, rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], pity: 2 });
-  const adult = await createPublishedSet(tx, admin.id, { code: "FREE1A", rarities: ["common"], slots: [{ common: 100 }], isAdult: true });
+  const adult = await createPublishedSet(tx, admin.id, { code: "FREE1A", rarities: ["rare"], slots: [{ rare: 100 }], isAdult: true });
   const fan = await upsertUserFromLogin(tx, { patreonUserId: "p-free", displayName: "Fan", role: "user" });
   return { admin, sfw, adult, fan };
 }

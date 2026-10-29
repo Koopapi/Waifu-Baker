@@ -3,13 +3,13 @@ import { drawPack } from "./draw";
 import { seededRng } from "../random";
 import { RARITIES, type Rarity } from "./card-rules";
 
-const W = (o: Partial<Record<Rarity, number>>) => ({ common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0, ...o });
+const W = (o: Partial<Record<Rarity, number>>) => ({ common: 0, rare: 0, epic: 0, legendary: 0, ex: 0, ...o });
 const SLOTS = [
-  W({ common: 70, uncommon: 25, rare: 5 }),
-  W({ common: 70, uncommon: 25, rare: 5 }),
-  W({ common: 70, uncommon: 25, rare: 5 }),
-  W({ uncommon: 60, rare: 30, epic: 8, legendary: 2 }),
-  W({ rare: 75, epic: 18, legendary: 6, secret: 1 }),
+  W({ common: 70, rare: 25, epic: 5 }),
+  W({ common: 70, rare: 25, epic: 5 }),
+  W({ common: 70, rare: 25, epic: 5 }),
+  W({ common: 60, rare: 30, epic: 8, legendary: 2 }),
+  W({ rare: 75, epic: 18, legendary: 6, ex: 1 }),
 ];
 const CARDS = RARITIES.flatMap((r) => [1, 2, 3].map((i) => ({ id: `${r}-${i}`, rarity: r as Rarity })));
 
@@ -26,7 +26,7 @@ describe("Sorteo de un sobre (base de RF-23 y de la spec 004)", () => {
     const rng = seededRng(7);
     for (let i = 0; i < 2000; i++) {
       const last = drawPack({ cards: CARDS, slots: SLOTS, holoChance: 0 }, rng)[4];
-      expect(["rare", "epic", "legendary", "secret"]).toContain(last.rarity);
+      expect(["rare", "epic", "legendary", "ex"]).toContain(last.rarity);
     }
   });
 
@@ -52,20 +52,17 @@ describe("Sorteo de un sobre (base de RF-23 y de la spec 004)", () => {
     for (const id of ["common-1", "common-2", "common-3"]) expect(Math.abs(hits.get(id)! / 30_000 - 1 / 3)).toBeLessThan(0.015);
   });
 
-  it("holo solo en Rara o superior y con la probabilidad indicada", () => {
+  it("test_s022_rf3_holo_en_cualquier_rareza_tambien_la_comun_y_con_la_probabilidad_indicada", () => {
     const rng = seededRng(5);
-    let rareSeen = 0;
-    let holo = 0;
+    const seen = Object.fromEntries(RARITIES.map((r) => [r, { n: 0, holo: 0 }])) as Record<Rarity, { n: number; holo: number }>;
     for (let i = 0; i < 20_000; i++) {
       for (const d of drawPack({ cards: CARDS, slots: SLOTS, holoChance: 0.2 }, rng)) {
-        if (["common", "uncommon"].includes(d.rarity)) expect(d.holo).toBe(false);
-        else {
-          rareSeen += 1;
-          if (d.holo) holo += 1;
-        }
+        seen[d.rarity].n += 1;
+        if (d.holo) seen[d.rarity].holo += 1;
       }
     }
-    expect(Math.abs(holo / rareSeen - 0.2)).toBeLessThan(0.01);
+    for (const r of ["common", "rare", "epic"] as const) expect(Math.abs(seen[r].holo / seen[r].n - 0.2)).toBeLessThan(0.01);
+    expect(seen.legendary.holo).toBeGreaterThan(0);
   });
 
   it("en una simulación de borrador, una rareza sin cartas baja a la inmediatamente inferior y lo indica", () => {

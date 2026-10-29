@@ -1,3 +1,4 @@
+import { onlyPresent } from "@/domain/catalog/default-odds";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { and, desc, eq } from "drizzle-orm";
@@ -30,10 +31,10 @@ export const DEMO_BANNED_NAMES = ["makima", "yor", "forger", "rias", "gremory", 
 
 /** Probabilidades de la demo: rara o mejor garantizada en la última ranura (RN de la spec 004). */
 export const DEMO_SLOTS: Partial<Slot>[] = [
-  { common: 70, uncommon: 25, rare: 5 },
-  { common: 70, uncommon: 25, rare: 5 },
-  { common: 70, uncommon: 25, rare: 5 },
-  { uncommon: 60, rare: 30, epic: 8, legendary: 2 },
+  { common: 75, rare: 20, epic: 4, legendary: 1 },
+  { common: 75, rare: 20, epic: 4, legendary: 1 },
+  { common: 75, rare: 20, epic: 4, legendary: 1 },
+  { common: 40, rare: 45, epic: 12, legendary: 3 },
   { rare: 75, epic: 18, legendary: 7 },
 ];
 
@@ -78,18 +79,7 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
   }
   const present = new Set<Rarity>(files.map((c) => c.rarity));
   // Solo rarezas que tienen cartas (para publicar, toda rareza con probabilidad debe tener cartas).
-  const slots = DEMO_SLOTS.map((s) => {
-    const kept = Object.entries(s).filter(([r]) => present.has(r as Rarity));
-    const total = kept.reduce((a, [, v]) => a + (v ?? 0), 0);
-    const out: Partial<Slot> = {};
-    let acc = 0;
-    kept.forEach(([r, v], i) => {
-      const share = i === kept.length - 1 ? 100 - acc : Math.round(((v ?? 0) / total) * 100);
-      out[r as Rarity] = share;
-      acc += share;
-    });
-    return out;
-  });
+  const slots = onlyPresent(DEMO_SLOTS, present);
   const setId = await seedPublishedSet(db, store, admin.id, {
     code: manifest.code,
     name: manifest.name,

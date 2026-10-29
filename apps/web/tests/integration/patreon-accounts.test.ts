@@ -32,7 +32,7 @@ const member = (patreonUserId: string, over: Partial<MemberState> = {}): MemberS
 async function world(tx: Tx) {
   const admin = await makeAdmin(tx);
   const sfw = await createPublishedSet(tx, admin.id, { code: "PAT1", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }] });
-  const adult = await createPublishedSet(tx, admin.id, { code: "PAT1A", rarities: ["common"], slots: [{ common: 100 }], isAdult: true });
+  const adult = await createPublishedSet(tx, admin.id, { code: "PAT1A", rarities: ["rare"], slots: [{ rare: 100 }], isAdult: true });
   await tx.insert(tierRules).values([
     { patreonTierId: "t-sfw", name: "SFW", setId: sfw.set.id, packsPerMonth: 3 },
     { patreonTierId: "t-adult", name: "18+", setId: sfw.set.id, packsPerMonth: 3 },
@@ -193,7 +193,7 @@ describe("spec 001 — bienvenida", () => {
       const { admin, sfw, adult } = await world(tx);
       await expect(setWelcomeSet(tx, admin.id, adult.set.id)).rejects.toMatchObject({ code: "welcome_not_allowed" });
       await setWelcomeSet(tx, admin.id, sfw.set.id);
-      const other = await createPublishedSet(tx, admin.id, { code: "PAT2", rarities: ["common"], slots: [{ common: 100 }] });
+      const other = await createPublishedSet(tx, admin.id, { code: "PAT2", rarities: ["rare"], slots: [{ rare: 100 }] });
       await setWelcomeSet(tx, admin.id, other.set.id);
       expect((await getWelcomeSet(tx))?.id).toBe(other.set.id);
       expect(await tx.select().from(sets).where(eq(sets.isWelcome, true))).toHaveLength(1);

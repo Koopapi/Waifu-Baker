@@ -42,12 +42,13 @@ export const common: typeof en = {
   toast: { rewardClaimed: "¡Reclamada!", saved: "Listo", failed: "No ha funcionado", opened: "Cartas reveladas" },
   rarity: {
     common: "Común",
-    uncommon: "Poco común",
     rare: "Rara",
     epic: "Épica",
     legendary: "Legendaria",
-    secret: "Secreta",
+    ex: "EX",
   },
+  /** Spec 022, RF-11: tipos de sobre. */
+  packKind: { silver: "Plata", gold: "Gold" },
   aiNotice: "Las ilustraciones de las cartas están generadas con IA. Las cartas no tienen valor monetario ni se pueden intercambiar.",
   sessionExpired: "Tu sesión ha caducado: vuelve a entrar.",
   back: "Volver",

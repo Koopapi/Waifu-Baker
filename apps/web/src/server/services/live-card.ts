@@ -3,7 +3,7 @@
 import { and, eq } from "drizzle-orm";
 import { cards, sets, userCards, users } from "@/db/schema";
 import { imageKeys, isImageLayer, isImageSeal, type LayersConfig, type ParticleLayer } from "@/domain/cards/layers";
-import { rarityTier } from "@/domain/catalog/rarity-tier";
+import { isFlat, rarityTier } from "@/domain/catalog/rarity-tier";
 import type { LiveCard, LiveImageLayer, LiveSeal } from "@/domain/cards/live";
 import { verifyLayer } from "@/domain/signed-url";
 import { cardLayerUrl, imageSecret } from "@/server/cards/image-urls";
@@ -31,7 +31,8 @@ async function visibleCard(db: DbLike, userId: string, cardId: string) {
 /** RF-16 y RF-17: la configuración vigente de la carta con enlaces firmados; `null` si no la tiene o no puede verla. */
 export async function liveCardConfig(db: DbLike, userId: string, cardId: string, now = Date.now()): Promise<LiveCard | null> {
   const card = await visibleCard(db, userId, cardId);
-  if (!card?.layers) return null;
+  // Spec 022, RF-4: la común se ve plana (su imagen fija, con el brillo holo si toca), también al revelarla y en su ficha.
+  if (!card?.layers || isFlat(card.rarity)) return null;
   const url = (key: string) => cardLayerUrl(cardId, key, userId, now);
   const capas = card.layers.capas.map((l): LiveImageLayer | ParticleLayer => {
     if (!isImageLayer(l)) return { ...l };

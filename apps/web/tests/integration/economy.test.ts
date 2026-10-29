@@ -22,9 +22,9 @@ const min = (n: number) => new Date(T0.getTime() + n * 60_000);
 
 async function world(db: DbLike) {
   const admin = await makeAdmin(db);
-  const free = await createPublishedSet(db, admin.id, { code: "ECOF", isFree: true, rarities: ["common"], slots: [{ common: 100 }] });
-  const patreon = await createPublishedSet(db, admin.id, { code: "ECOP", rarities: ["common", "rare", "epic"], slots: [{ common: 100 }] });
-  const adult = await createPublishedSet(db, admin.id, { code: "ECOA", rarities: ["common"], slots: [{ common: 100 }], isAdult: true });
+  const free = await createPublishedSet(db, admin.id, { code: "ECOF", isFree: true, rarities: ["rare"], slots: [{ rare: 100 }] });
+  const patreon = await createPublishedSet(db, admin.id, { code: "ECOP", rarities: ["common", "rare", "epic"], slots: [{ rare: 100 }] });
+  const adult = await createPublishedSet(db, admin.id, { code: "ECOA", rarities: ["rare"], slots: [{ rare: 100 }], isAdult: true });
   const fan = await upsertUserFromLogin(db, { patreonUserId: "fan-eco", displayName: "Fan", role: "user" });
   return { admin, free, patreon, adult, fan };
 }

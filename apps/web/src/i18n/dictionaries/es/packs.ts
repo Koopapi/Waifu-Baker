@@ -51,7 +51,7 @@ export const packs: typeof en = {
     focusHint: "Toca la carta o «Siguiente» para pasar a la próxima",
     openedTitle: (n) => `Abriste ${n} ${plural(n, "sobre", "sobres")}`,
     totals: { cards: "Cartas", fresh: "Nuevas", holo: "Holo" },
-    group: { common: "Comunes", uncommon: "Poco comunes", rare: "Raras", epic: "Épicas", legendary: "Legendarias", secret: "Secretas" },
+    group: { common: "Comunes", rare: "Raras", epic: "Épicas", legendary: "Legendarias", ex: "EX" },
     copies: (n) => `×${n}`,
   },
   opener: {

@@ -24,7 +24,7 @@ export async function DemoLanding() {
   const d = t.site.demo;
   const list = await db.select({ number: cards.number, rarity: cards.rarity }).from(cards).innerJoin(sets, eq(sets.id, cards.setId)).where(eq(sets.isWelcome, true));
   // Las cartas más raras al frente del abanico.
-  const order = ["secret", "legendary", "epic", "rare", "uncommon", "common"];
+  const order = ["ex", "legendary", "epic", "rare", "common"];
   const picks = [...list].sort((a, b) => order.indexOf(a.rarity ?? "common") - order.indexOf(b.rarity ?? "common") || a.number - b.number).slice(0, 5);
   const fan = [picks[3], picks[1], picks[0], picks[2], picks[4]].filter(Boolean);
 

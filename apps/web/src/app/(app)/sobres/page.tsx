@@ -16,12 +16,13 @@ import { Badge } from "@/ui/content/Badge";
 import { EmptyState } from "@/ui/feedback/EmptyState";
 import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
 import { PatreonNotice } from "@/features/economy/PatreonNotice";
+import { PackKindTag } from "@/features/packs/PackKindTag";
 
 export async function generateMetadata() {
   return { title: (await getDict()).packs.meta.myPacks };
 }
 
-/** RF-1, RF-3 y RF-17: sobres sin abrir por colección y aviso de apertura sin terminar. */
+/** RF-1, RF-3 y RF-17: sobres sin abrir por colección y tipo (spec 022, RF-19) y aviso de apertura sin terminar. */
 export default async function MisSobresPage() {
   const user = await requireUser("/sobres");
   const tz = (await cookies()).get("wb_tz")?.value ?? null;
@@ -74,54 +75,60 @@ export default async function MisSobresPage() {
           // Cada tarjeta se adapta a su propio ancho (no al de la pantalla): pone el sobre al lado de los botones solo
           // si caben; si no, uno encima de otro. Así ningún botón se queda estrecho y con el texto fuera.
           <ul className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,30rem),1fr))] gap-4">
-            {groups.map((g, i) => (
-              <li
-                key={g.setId}
-                style={{ "--i": i } as React.CSSProperties}
-                className="card-in @container rounded-xl border border-k-lavanda/20 bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]"
-                data-testid={`group-${g.code}`}
-              >
-                <div className="flex flex-col items-center gap-5 @sm:flex-row">
-                  <div className="relative shrink-0">
-                    {/* Spec 014, RF-5 y RF-8: el sobre de la colección; detrás, la pila si hay más de uno. */}
-                    {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
-                    <PackArt setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} className="relative w-[200px] @sm:w-[170px]" />
-                  </div>
-                  <div className="flex w-full max-w-xs min-w-0 flex-1 flex-col gap-4 @sm:max-w-none">
-                    <div className="flex items-start justify-center gap-3 @sm:justify-between">
-                      <div className="hidden min-w-0 @sm:block">
-                        <p className="font-mono text-xs text-ui-text-3">{g.code}</p>
-                        <h2 className="line-clamp-2 font-display text-xl font-semibold">{g.name}</h2>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        {!!fresh.get(g.setId) && (
-                          <span data-testid="new-packs">
-                            <Badge tone="new">{t.rewards.fx.newPacks(fresh.get(g.setId)!)}</Badge>
-                          </span>
-                        )}
-                        <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
-                      </div>
+            {groups.map((g, i) => {
+              // Spec 022, RF-19: el sobre gold va en su propio grupo y sus enlaces lo piden con `?k=gold`.
+              const k = g.kind === "gold" ? "?k=gold" : "";
+              return (
+                <li
+                  key={`${g.setId}-${g.kind}`}
+                  style={{ "--i": i } as React.CSSProperties}
+                  className="card-in @container rounded-xl border border-k-lavanda/20 bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]"
+                  data-testid={`group-${g.code}${g.kind === "gold" ? "-gold" : ""}`}
+                  data-kind={g.kind}
+                >
+                  <div className="flex flex-col items-center gap-5 @sm:flex-row">
+                    <div className="relative shrink-0">
+                      {/* Spec 014, RF-5 y RF-8: el sobre de la colección; detrás, la pila si hay más de uno. */}
+                      {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
+                      <PackArt setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} className="relative w-[200px] @sm:w-[170px]" />
                     </div>
-                    {g.locked ? (
-                      <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
-                    ) : (
-                      <div className="flex flex-col gap-3">
-                        <Button size="lg" width="full" asChild>
-                          <Link href={`/sobres/${g.setId}`}>{t.packs.mine.openOne}</Link>
-                        </Button>
-                        {g.sealed > 1 && (
-                          <Button size="lg" width="full" variant="secondary" asChild>
-                            <Link href={`/sobres/${g.setId}/todos`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
-                          </Button>
-                        )}
+                    <div className="flex w-full max-w-xs min-w-0 flex-1 flex-col gap-4 @sm:max-w-none">
+                      <div className="flex items-start justify-center gap-3 @sm:justify-between">
+                        <div className="hidden min-w-0 @sm:block">
+                          <p className="font-mono text-xs text-ui-text-3">{g.code}</p>
+                          <h2 className="line-clamp-2 font-display text-xl font-semibold">{g.name}</h2>
+                        </div>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <PackKindTag kind={g.kind} label={t.common.packKind[g.kind]} />
+                          {!!fresh.get(g.setId) && (
+                            <span data-testid="new-packs">
+                              <Badge tone="new">{t.rewards.fx.newPacks(fresh.get(g.setId)!)}</Badge>
+                            </span>
+                          )}
+                          <Badge tone="accent" className="tabular-nums">x{g.sealed}</Badge>
+                        </div>
                       </div>
-                    )}
-                    {/* Spec 021, RF-9: cómo conseguir más sobres de una colección de Patreon (al final: las pruebas cuentan los enlaces de abrir). */}
-                    {!g.isFree && !g.locked && !patron && <PatreonNotice compact text={t.packs.mine.patreonMore} linkLabel={t.collection.patreon.link} url={patreonUrl} />}
+                      {g.locked ? (
+                        <p className="text-sm text-ui-danger-text">{t.packs.mine.locked}</p>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          <Button size="lg" width="full" asChild>
+                            <Link href={`/sobres/${g.setId}${k}`}>{t.packs.mine.openOne}</Link>
+                          </Button>
+                          {g.sealed > 1 && (
+                            <Button size="lg" width="full" variant="secondary" asChild>
+                              <Link href={`/sobres/${g.setId}/todos${k}`}>{t.packs.mine.openAll(Math.min(g.sealed, 50))}</Link>
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                      {/* Spec 021, RF-9: cómo conseguir más sobres de una colección de Patreon (al final: las pruebas cuentan los enlaces de abrir). */}
+                      {!g.isFree && !g.locked && !patron && <PatreonNotice compact text={t.packs.mine.patreonMore} linkLabel={t.collection.patreon.link} url={patreonUrl} />}
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
         <p className="text-xs text-ui-text-3">{t.common.aiNotice}</p>

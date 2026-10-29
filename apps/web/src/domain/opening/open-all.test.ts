@@ -25,7 +25,7 @@ describe("spec 019 — foco", () => {
       card(2, "rare"),
       card(3, "rare", { isNew: true }),
       card(4, "epic"),
-      card(5, "secret"),
+      card(5, "ex"),
       card(6, "legendary", { isNew: true }),
     ];
     expect(highlights(lot).map((c) => c.number)).toEqual([5, 6, 4, 3]);
@@ -48,7 +48,7 @@ describe("spec 019 — foco", () => {
   });
 
   it("test_s019_rf8_un_lote_sin_destacadas_no_tiene_foco", () => {
-    expect(highlights([card(1, "common"), card(2, "uncommon", { isNew: true }), card(3, "rare")])).toEqual([]);
+    expect(highlights([card(1, "common"), card(2, "common", { isNew: true }), card(3, "rare")])).toEqual([]);
   });
 });
 

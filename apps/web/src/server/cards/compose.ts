@@ -17,11 +17,10 @@ export type CardSize = keyof typeof CARD_SIZES;
 
 export const RARITY_COLOR: Record<Rarity | "none", string> = {
   common: "#9aa0a6",
-  uncommon: "#4ade80",
   rare: "#60a5fa",
   epic: "#c084fc",
   legendary: "#f5c451",
-  secret: "#ff6ad5",
+  ex: "#ff6ad5",
   none: "#6b7079",
 };
 
@@ -57,8 +56,8 @@ function frameFor(rarity: Rarity | null) {
 
 const pango = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/** Pastilla de numeración del diseño en Pencil (x 636, y 978, 76 × 34 a 750 px), multiplicada por 2. */
-const NUMBER_PILL = { left: 1272, top: 1956, width: 152, height: 68, size: 30, weight: "SemiBold" };
+/** Pastilla de numeración (x 621, y 978, 76 × 34 a 750 px, multiplicada por 2); spec 022: algo más a la izquierda para dejar sitio a la gema de la esquina. */
+const NUMBER_PILL = { left: 1242, top: 1956, width: 152, height: 68, size: 30, weight: "SemiBold" };
 
 async function renderText(text: string, size: number, weight: string, color: string, letterSpacing = 0) {
   return sharp({

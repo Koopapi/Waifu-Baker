@@ -34,7 +34,9 @@ export interface PendingFlatKeys {
 
 export const userRole = pgEnum("user_role", ["user", "admin"]);
 export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]);
-export const rarity = pgEnum("rarity", ["common", "uncommon", "rare", "epic", "legendary", "secret"]);
+// Spec 022, RF-1: cinco rarezas. RF-11: dos tipos de sobre.
+export const rarity = pgEnum("rarity", ["common", "rare", "epic", "legendary", "ex"]);
+export const packKind = pgEnum("pack_kind", ["silver", "gold"]);
 export const cardVariant = pgEnum("card_variant", ["normal", "holo", "alt"]);
 export const cardStatus = pgEnum("card_status", ["draft", "ready"]);
 export const albumModeration = pgEnum("album_moderation", ["none", "hidden", "review_requested", "review_rejected"]);
@@ -184,6 +186,8 @@ export const dropTables = pgTable(
       .notNull()
       .references(() => sets.id, { onDelete: "cascade" }),
     version: integer("version").notNull().default(1),
+    /** Spec 022, RF-12: una tabla por tipo de sobre. */
+    kind: packKind("kind").notNull().default("silver"),
     /** Una entrada por ranura del sobre: pesos por rareza. */
     slots: jsonb("slots").$type<Record<string, number>[]>().notNull().default(sql`'[]'::jsonb`),
     holoChance: doublePrecision("holo_chance").notNull().default(0.2),
@@ -193,7 +197,7 @@ export const dropTables = pgTable(
     isPublic: boolean("is_public").notNull().default(false),
     ...timestamps,
   },
-  (t) => [uniqueIndex("drop_tables_set_version_uq").on(t.setId, t.version)],
+  (t) => [uniqueIndex("drop_tables_set_kind_version_uq").on(t.setId, t.kind, t.version)],
 );
 
 export const tierRules = pgTable(
@@ -223,6 +227,8 @@ export const packs = pgTable(
       .notNull()
       .references(() => sets.id),
     source: packSource("source").notNull(),
+    /** Spec 022, RF-11: plata o gold. */
+    kind: packKind("kind").notNull().default("silver"),
     grantKey: text("grant_key").notNull().unique(),
     /** Spec 001: ciclo de cobro de Patreon que concedió el sobre (para anularlo si se reembolsa). */
     cycleKey: text("cycle_key"),

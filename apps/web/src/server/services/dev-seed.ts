@@ -1,3 +1,4 @@
+import { defaultSlots, onlyPresent, type PackKind } from "@/domain/catalog/default-odds";
 import { eq } from "drizzle-orm";
 import sharp from "sharp";
 import { cards, sets, users } from "@/db/schema";
@@ -30,6 +31,8 @@ export interface SeedSetInput {
   /** `character`: personaje de la carta; si falta, el de la colección (`characterName`). */
   cards: { file: UploadFile; name: string; rarity: Rarity; character?: string }[];
   slots: Partial<Slot>[];
+  /** Spec 022: la tabla del sobre gold; si falta, la de por defecto con solo las rarezas que tienen cartas. */
+  gold?: Partial<Slot>[];
   /** Porcentaje 0-100, como en el formulario del panel. */
   holoPercent?: number;
 }
@@ -80,13 +83,15 @@ export async function seedPublishedSet(db: DbLike, store: CardStore, actorUserId
   }
   await assembleSetCards(db, store, actorUserId, set.id);
   await saveOdds(db, actorUserId, set.id, await setVersion(db, set.id), { slots: input.slots, holoChance: (input.holoPercent ?? 0) / 100 });
+  const gold = input.gold ?? onlyPresent(defaultSlots(input.packSize, "gold"), new Set(input.cards.map((c) => c.rarity)));
+  await saveOdds(db, actorUserId, set.id, await setVersion(db, set.id), { kind: "gold", slots: gold, holoChance: (input.holoPercent ?? 0) / 100 });
   const { problems } = await publishSet(db, actorUserId, set.id, await setVersion(db, set.id));
   if (problems.length) throw new Error(`No se pudo publicar ${input.code}: ${problems.map((p) => p.message).join(" ")}`);
   return set.id;
 }
 
 /** Regala sobres a un usuario de desarrollo por su nombre; si aún no existe, se crea como lo haría el login. */
-export async function seedGift(db: DbLike, actorUserId: string, input: { userName: string; setCode: string; count: number; reason: string }) {
+export async function seedGift(db: DbLike, actorUserId: string, input: { userName: string; setCode: string; count: number; reason: string; kind?: PackKind }) {
   // Mismo nombre normalizado e id que el login de desarrollo (`src/auth.ts`).
   const name = input.userName.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
   const patreonUserId = `dev:${name}`;
@@ -94,6 +99,6 @@ export async function seedGift(db: DbLike, actorUserId: string, input: { userNam
   user ??= await upsertUserFromLogin(db, { patreonUserId, displayName: name, role: "user" });
   const [set] = await db.select({ id: sets.id }).from(sets).where(eq(sets.code, input.setCode));
   if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
-  await giftPacks(db, actorUserId, { userId: user.id, setId: set.id, count: input.count, reason: input.reason });
+  await giftPacks(db, actorUserId, { userId: user.id, setId: set.id, count: input.count, reason: input.reason, kind: input.kind });
   return user.id;
 }

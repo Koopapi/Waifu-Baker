@@ -13,14 +13,15 @@ type Tx = Parameters<Parameters<typeof inRollback>[0]>[0];
 
 async function seedSet(tx: Tx, adminId: string, isAdult = false) {
   const store = tempStore();
-  const files = await Promise.all([0, 1, 2].map(async (i) => ({ body: await testImage({ hue: i * 90 }), mime: MIME.png, filename: `${i}.png` })));
+  const files = await Promise.all([0, 1, 2, 3].map(async (i) => ({ body: await testImage({ hue: i * 90 }), mime: MIME.png, filename: `${i}.png` })));
   const setId = await seedPublishedSet(tx, store, adminId, {
     code: "SEED1",
     name: "Seed",
     characterName: "Seed character",
     packSize: 2,
     isAdult,
-    cards: files.map((file, i) => ({ file, name: `SEED1 ${i + 1}`, rarity: i === 2 ? "rare" : "common" })),
+    // Spec 022: la legendaria hace posible la tabla gold (la de por defecto, con las rarezas que tienen cartas).
+    cards: files.map((file, i) => ({ file, name: `SEED1 ${i + 1}`, rarity: (["common", "common", "rare", "legendary"] as const)[i] })),
     slots: [{ common: 100 }, { rare: 100 }],
     holoPercent: 50,
   });
@@ -39,6 +40,7 @@ describe("siembra de desarrollo", () => {
         [1, "common", "ready"],
         [2, "common", "ready"],
         [3, "rare", "ready"],
+        [4, "legendary", "ready"],
       ]);
       expect(list.every((c) => c.adultReviewedBy === admin.id)).toBe(true);
       expect(await store.get(list[2].keyFull!)).not.toBeNull();
