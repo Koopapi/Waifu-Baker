@@ -1,0 +1,21 @@
+{
+  "id": "yuki",
+  "etiqueta": "yuki",
+  "marco": "linear-gradient(135deg,#1b155a 0%,#c6f432 18%,#3b2fc9 34%,#ffffff 48%,#3b2fc9 62%,#c6f432 80%,#1b155a 100%)",
+  "aura": "rgba(59,47,201,0.25)",
+  "holo": true,
+  "holoIntensidad": 0.6,
+  "proporcion": 0.706,
+  "capas": [
+    { "src": "cartas/yuki/yuki_1_fondo.webp", "profundidad": 0.2, "margen": 5 },
+    { "particulas": "destellos-arcoiris", "cantidad": 65, "semilla": 7, "profundidad": 0.55, "margen": 4 },
+    {
+      "src": "cartas/yuki/yuki_3_personaje.webp",
+      "brillo": { "tipo": "holo", "intensidad": 0.7 },
+      "profundidad": 1
+    },
+    { "src": "cartas/yuki/yuki_4_particulas1.webp", "profundidad": 1.3, "margen": 6, "mezcla": "overlay" },
+    { "src": "cartas/yuki/yuki_5_insignia.webp", "profundidad": 1.6 }
+  ],
+  "sello": { "texto": "NEW", "estilo": "rosa", "esquina": "inf-der", "tamano": 14 }
+}
