@@ -1,12 +1,14 @@
 /*
  * Sistema de diseño (spec 011, RF-1 y RF-2): los únicos valores de la interfaz. Estilo kawaii sobre fondo oscuro
  * (spec 014), que sustituye a la paleta «Cereza» (spec 010).
- * Un tema futuro (por colección o por juego) solo redefine estas variables bajo un selector, p. ej.
- * `[data-theme="…"]`; los componentes no cambian. Las cartas y el holo tienen sus colores por rareza aparte.
+ * Spec 026: el tema Street pop (`themes/street.css`) redefine estas variables bajo `[data-theme="street"]` y una zona
+ * marcada con `data-theme="kawaii"` (la mesa de apertura, el escenario de la carta) vuelve a estos valores. Las cartas y el holo tienen sus colores por rareza aparte.
  * Contraste (RF-14): texto, texto-2, texto-3 y los textos de estado superan 4,5:1 sobre los fondos; el blanco
  * sobre acento, éxito, aviso, peligro e información va en tinta oscura (lo comprueba features/ui/finish.test.ts).
  */
-:root {
+:root,
+[data-theme="kawaii"] {
+  color-scheme: dark;
   /* Fondos (violeta oscuro), de más oscuro a más claro. */
   --ui-rail: #150f22;
   --ui-nav: #1a1229;
@@ -60,6 +62,11 @@
   --ui-k-plata-oscuro: #4b5157;
   --ui-k-oro: #fff1a8;
   --ui-k-oro-oscuro: #5a3a00;
+  /* Spec 026: contorno de las pegatinas (blanco en kawaii, tinta en Street pop). */
+  --ui-k-contorno: #ffffff;
+  /* Spec 026: tipografías del tema (las variables de next/font van en <html>). */
+  --ui-font-body: var(--font-nunito);
+  --ui-font-display: var(--font-fredoka);
 
   /* Capas (de abajo arriba). */
   --z-nav: 20;
@@ -112,9 +119,9 @@
   --color-k-oro-oscuro: var(--ui-k-oro-oscuro);
   --color-k-limon-oscuro: var(--ui-k-limon-oscuro);
 
-  --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-sans: var(--ui-font-body), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-display: var(--font-display), var(--font-body), sans-serif;
+  --font-display: var(--ui-font-display), var(--ui-font-body), sans-serif;
 
   --radius-s: 8px;
   --radius-m: 12px;

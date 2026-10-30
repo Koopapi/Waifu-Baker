@@ -14,6 +14,7 @@ import {
   CartaCapas,
   Celebration,
   Checkbox,
+  ChipGroup,
   Countdown,
   EmptyState,
   FlightLayer,
@@ -22,10 +23,13 @@ import {
   IconButton,
   Menu,
   Modal,
+  OptionCards,
   Progress,
   RadioGroup,
+  Segmented,
   Select,
   Skeleton,
+  Slider,
   SoundToggle,
   Sticker,
   Switch,
@@ -64,15 +68,61 @@ export function Catalog() {
   const [set, setSet] = useState("s1");
   const [until] = useState(() => new Date(Date.now() + 4 * 3600_000 + 12 * 60_000).toISOString());
   const [favs, setFavs] = useState(0);
+  // Spec 026, RF-26: ver el catálogo en los dos temas (solo en esta página; no se guarda).
+  const [theme, setTheme] = useState<"kawaii" | "street">("kawaii");
+  const [tier, setTier] = useState("r");
+  const [tilt, setTilt] = useState(16);
+  const [pick, setPick] = useState("a");
   const [liked, like] = useOptimisticAction<number, number>({ value: favs, apply: (v, d) => v + d, run: async (d) => (await wait(400), setFavs((f) => f + d), { ok: true }), undo: async (d) => (setFavs((f) => f - d), { ok: true }), successTitle: "Added to favourites" });
   const [, fail] = useOptimisticAction<number, number>({ value: 0, apply: (v, d) => v + d, run: async () => (await wait(400), { ok: false, error: "The server said no" }), successTitle: "Saved" });
 
   return (
-    <main className="mx-auto max-w-5xl space-y-12 px-4 py-10 text-ui-text md:px-8" data-testid="catalog">
+    <main data-theme={theme} className="mx-auto max-w-5xl space-y-12 bg-ui-bg px-4 py-10 text-ui-text md:px-8" data-testid="catalog">
       <header className="space-y-2">
         <h1 className="font-display text-4xl font-bold">Design system</h1>
         <p className="text-ui-text-2">Spec 011 · every component, variant and state. Development only.</p>
+        <Segmented
+          label="Theme (spec 026)"
+          value={theme}
+          onValueChange={(v) => setTheme(v as "kawaii" | "street")}
+          options={[
+            { value: "kawaii", label: "Kawaii" },
+            { value: "street", label: "Street pop" },
+          ]}
+          data-testid="catalog-theme"
+        />
       </header>
+
+      <Section id="configurator" title="Configurator and theme pickers (specs 025 and 026)">
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="space-y-4">
+            <Slider label="Tilt" value={tilt} min={0} max={26} unit="°" onValueChange={setTilt} />
+            <ChipGroup
+              label="Rarity"
+              value={tier}
+              onValueChange={setTier}
+              options={[
+                { value: "n", label: "C", swatch: "var(--ui-k-plata)" },
+                { value: "r", label: "R", swatch: "var(--ui-k-menta)" },
+                { value: "sr", label: "E", swatch: "var(--ui-k-lavanda)" },
+                { value: "ssr", label: "LEG", swatch: "var(--ui-k-limon)" },
+              ]}
+            />
+          </Card>
+          <Card>
+            <OptionCards
+              label="Option cards"
+              value={pick}
+              onValueChange={setPick}
+              checkedLabel="Active"
+              options={[
+                { value: "a", label: "Option A", description: "With a short description." },
+                { value: "b", label: "Option B", description: "Another choice." },
+              ]}
+            />
+          </Card>
+        </div>
+      </Section>
 
       <Section id="cards" title="Cards (carta-capas)">
         <p className="max-w-2xl text-sm text-ui-text-2">

@@ -57,7 +57,7 @@ export function SelectImpl(p: SelectProps) {
             id={`${id}-list`}
             align="start"
             sideOffset={6}
-            className="ui-pop z-[var(--z-overlay)] w-[var(--radix-popover-trigger-width)] min-w-56 overflow-hidden rounded-l border border-ui-line bg-ui-nav shadow-2"
+            className="ui-pop ui-popover z-[var(--z-overlay)] w-[var(--radix-popover-trigger-width)] min-w-56 overflow-hidden rounded-l border border-ui-line bg-ui-nav shadow-2"
           >
             <Command loop className="flex max-h-80 flex-col">
               {p.searchable && (

@@ -24,7 +24,7 @@ export function Menu({ trigger, items, align = "end" }: MenuProps) {
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content align={align} sideOffset={6} className="ui-pop z-[var(--z-overlay)] min-w-48 rounded-l border border-ui-line bg-ui-nav p-1 shadow-2" data-testid="menu">
+        <DropdownMenu.Content align={align} sideOffset={6} className="ui-pop ui-popover z-[var(--z-overlay)] min-w-48 rounded-l border border-ui-line bg-ui-nav p-1 shadow-2" data-testid="menu">
           {items.map((it, i) =>
             it === "separator" ? (
               <DropdownMenu.Separator key={i} className="my-1 h-px bg-ui-line" />
@@ -56,7 +56,7 @@ export function Tooltip({ content, children, side = "top" }: { content: React.Re
       <RTooltip.Root>
         <RTooltip.Trigger asChild>{children}</RTooltip.Trigger>
         <RTooltip.Portal>
-          <RTooltip.Content side={side} sideOffset={6} className="ui-pop z-[var(--z-toast)] rounded-m bg-ui-rail px-2.5 py-1.5 text-xs font-medium text-ui-text shadow-2">
+          <RTooltip.Content side={side} sideOffset={6} className="ui-pop ui-tooltip z-[var(--z-toast)] rounded-m bg-ui-rail px-2.5 py-1.5 text-xs font-medium text-ui-text shadow-2">
             {content}
           </RTooltip.Content>
         </RTooltip.Portal>

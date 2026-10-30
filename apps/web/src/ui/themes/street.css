@@ -1,0 +1,482 @@
+/*
+ * Spec 026: tema Street pop (diseño de Bruno, `docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`). Solo actúa
+ * bajo `[data-theme="street"]`: el kawaii no cambia. Los colores redefinen las variables de `tokens.css`; la forma
+ * (bordes de tinta, sombras duras, inclinación, mayúsculas) se pone sobre las clases `ui-*` de los componentes de
+ * `src/ui`. Va fuera de las capas de Tailwind a propósito: así manda sobre sus utilidades sin tocar las clases.
+ * Contraste (RF-24 y RF-25): lo comprueba `themes/street.test.ts`.
+ */
+[data-theme="street"] {
+  color-scheme: light;
+  --ui-ink: #17132b;
+  /* Fondos: lila de página, superficies blancas. `--ui-rail` es el pozo de los campos (blanco). */
+  --ui-rail: #ffffff;
+  --ui-nav: #ffffff;
+  --ui-bg: #ece4fa;
+  --ui-raised: #ffffff;
+  --ui-hover: #e2d8f6;
+  --ui-line: #736b8f;
+  /* Texto en tinta. */
+  --ui-text: #17132b;
+  --ui-text-2: #4a4368;
+  --ui-text-3: #554e72;
+  /* Acento: rosa neón como fondo (texto en tinta); el texto de acento es índigo (el rosa nunca es texto). */
+  --ui-accent: #ff3ea5;
+  --ui-accent-hover: #ff5cb3;
+  --ui-accent-deep: #17132b;
+  --ui-accent-text: #3b2fc9;
+  --ui-on-accent: #17132b;
+  /* Estados: sólidos planos con texto de tinta, y su versión oscura para texto sobre lila o blanco. */
+  --ui-success: #3fe0d0;
+  --ui-success-text: #04665c;
+  --ui-warning: #ffd93d;
+  --ui-warning-text: #744b00;
+  --ui-danger: #ff5a5f;
+  --ui-danger-text: #b0102b;
+  --ui-info: #8fa6ff;
+  --ui-info-text: #3b2fc9;
+  /* Pegatinas y adornos (RF-23): colores planos de Bruno y contorno de tinta. */
+  --ui-k-chicle: #ff3ea5;
+  --ui-k-lavanda: #3b2fc9;
+  --ui-k-menta: #3fe0d0;
+  --ui-k-celeste: #3fe0d0;
+  --ui-k-limon: #ffd93d;
+  --ui-k-melocoton: #ff9a62;
+  --ui-k-tinta: #17132b;
+  --ui-k-rubor: #ff3ea5;
+  --ui-k-chicle-claro: #ffffff;
+  --ui-k-lavanda-claro: #ffffff;
+  --ui-k-menta-claro: #ffffff;
+  --ui-k-celeste-claro: #ffffff;
+  --ui-k-limon-oscuro: #c6f432;
+  --ui-k-rosa-claro: #ffffff;
+  --ui-k-galleta: #ffc94d;
+  --ui-k-chocolate: #17132b;
+  --ui-k-llama: #ff6a3d;
+  --ui-k-contorno: #17132b;
+  /* Tipografías (RF-18). */
+  --ui-font-body: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
+  --ui-font-display: var(--font-dela), system-ui, sans-serif;
+  /* Sombras duras sin difuminar (RF-20). */
+  --shadow-relief: 4px 4px 0 var(--ui-ink);
+  --shadow-relief-soft: 4px 4px 0 var(--ui-ink);
+  --shadow-sticker: 3px 3px 0 var(--ui-ink);
+  --shadow-glow: 6px 6px 0 var(--ui-ink);
+}
+
+/* Zonas de tinta (riel, barra lateral, barra de abajo, avisos): texto claro sobre tinta. */
+[data-theme="street"] .ui-ink,
+[data-theme="street"] .ui-toast,
+[data-theme="street"] .ui-tooltip {
+  --ui-rail: #17132b;
+  --ui-nav: #17132b;
+  --ui-raised: #2a2347;
+  --ui-hover: #332b55;
+  --ui-line: #4a4368;
+  --ui-text: #ffffff;
+  --ui-text-2: #e3ddf3;
+  --ui-text-3: #c9c1e0;
+  --ui-accent-text: #c6f432;
+  background-color: #17132b;
+  color: #ffffff;
+}
+
+/* Página: lila con franjas diagonales muy suaves. */
+[data-theme="street"] body {
+  background-image: repeating-linear-gradient(-28deg, transparent 0 46px, rgb(59 47 201 / 0.05) 46px 92px);
+  background-attachment: fixed;
+}
+
+/*
+ * Piel de los componentes. `@scope … to ([data-theme="kawaii"])`: se detiene en las zonas que se quedan oscuras (la mesa
+ * de apertura, «Abrir todos», el escenario de la carta), donde los componentes conservan su aspecto kawaii.
+ */
+@scope ([data-theme="street"]) to ([data-theme="kawaii"]) {
+  /* Títulos de página (RF-22): Dela Gothic en mayúsculas con la sombra doble rosa y turquesa. */
+  main h1 {
+    /* Dela Gothic en mayúsculas es ancha: una palabra larga se corta antes que desbordar en el teléfono. */
+    overflow-wrap: anywhere;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    text-shadow: 3px 3px 0 var(--ui-accent), 6px 6px 0 var(--ui-k-menta);
+  }
+  h2 {
+    font-weight: 400;
+  }
+
+  /* Botones (RF-19 a RF-21): caja de tinta inclinada, sombra dura, Archivo itálica gruesa en mayúsculas. */
+  .ui-btn {
+    border: 3px solid var(--ui-ink);
+    border-radius: 0;
+    background-image: none;
+    color: var(--ui-ink);
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: skewX(-10deg);
+    box-shadow: 4px 4px 0 var(--ui-ink);
+    /* Las mayúsculas ocupan más: si el texto no cabe en su columna, parte línea en vez de desbordar. */
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.05;
+    text-align: center;
+  }
+  .ui-btn:active {
+    box-shadow: 1px 1px 0 var(--ui-ink);
+  }
+  .ui-btn-primary {
+    background-color: var(--ui-accent);
+  }
+  .ui-btn-secondary {
+    background-color: #ffffff;
+  }
+  .ui-btn-ghost {
+    border-color: transparent;
+    box-shadow: none;
+    background-color: transparent;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .ui-btn-ghost:hover {
+    background-color: var(--ui-hover);
+  }
+  .ui-btn-on-accent {
+    box-shadow: none;
+  }
+  /* Los botones grandes con varias líneas de texto van rectos (RF-21). */
+  .ui-btn-block {
+    transform: none;
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0;
+    border-radius: 10px;
+  }
+  .ui-ink .ui-btn {
+    border-color: #ffffff;
+  }
+  .ui-icon-btn {
+    border-radius: 6px;
+  }
+
+  /* Campos (RF-20). */
+  .ui-field {
+    border: 3px solid var(--ui-ink);
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: var(--ui-ink);
+    font-weight: 700;
+    box-shadow: 3px 3px 0 var(--ui-ink);
+  }
+  .ui-field[aria-invalid="true"] {
+    border-color: var(--ui-danger-text);
+  }
+  .ui-check {
+    border: 3px solid var(--ui-ink);
+    background-color: #ffffff;
+  }
+  input.ui-check {
+    border-radius: 3px;
+  }
+  .ui-check:checked,
+  .ui-check[data-state="checked"] {
+    background-color: var(--ui-accent);
+    border-color: var(--ui-ink);
+  }
+  .ui-switch {
+    border: 3px solid var(--ui-ink);
+    box-sizing: content-box;
+  }
+  .ui-option,
+  .ui-chip {
+    border: 3px solid var(--ui-ink);
+    border-radius: 0;
+    background-color: #ffffff;
+    color: var(--ui-ink);
+    font-style: italic;
+    font-weight: 900;
+    text-transform: uppercase;
+    transform: skewX(-10deg);
+  }
+  .ui-option[data-state="checked"],
+  .ui-chip[data-state="checked"] {
+    background-color: var(--ui-accent);
+    box-shadow: 3px 3px 0 var(--ui-ink);
+  }
+  .ui-seg {
+    border: 3px solid var(--ui-ink);
+    border-radius: 0;
+    background-color: #ffffff;
+    box-shadow: 3px 3px 0 var(--ui-ink);
+  }
+  .ui-seg > * {
+    border-color: var(--ui-ink);
+  }
+  .ui-color {
+    border: 3px solid var(--ui-ink);
+  }
+  .ui-slider {
+    height: 14px;
+    border: 3px solid var(--ui-ink);
+    border-radius: 0;
+    background: linear-gradient(to right, var(--ui-accent) var(--fill), #ffffff var(--fill));
+  }
+  .ui-slider::-webkit-slider-thumb {
+    width: 18px;
+    height: 26px;
+    border: 3px solid #ffffff;
+    border-radius: 2px;
+    background: var(--ui-ink);
+    box-shadow: 0 0 0 2px var(--ui-ink);
+  }
+  .ui-slider::-moz-range-thumb {
+    width: 14px;
+    height: 22px;
+    border: 3px solid #ffffff;
+    border-radius: 2px;
+    background: var(--ui-ink);
+  }
+
+  /* Superficies (RF-20). */
+  .ui-card {
+    border: 3px solid var(--ui-ink);
+    border-radius: 10px;
+    background-color: #ffffff;
+    background-image: none;
+    box-shadow: 6px 6px 0 var(--ui-ink);
+  }
+  .ui-card:hover {
+    border-color: var(--ui-ink);
+  }
+  .ui-popover,
+  .ui-modal {
+    border: 3px solid var(--ui-ink);
+    background-color: #ffffff;
+    box-shadow: 6px 6px 0 var(--ui-ink);
+  }
+  .ui-popover {
+    border-radius: 8px;
+  }
+  .ui-modal {
+    border-radius: 12px;
+  }
+  .ui-overlay {
+    background-color: rgb(23 19 43 / 0.6);
+  }
+  .ui-tooltip {
+    border-radius: 4px;
+  }
+  .ui-toast {
+    border: 3px solid var(--ui-ink);
+    border-radius: 0;
+    box-shadow: 5px 5px 0 var(--ui-accent);
+  }
+  .ui-table {
+    border: 3px solid var(--ui-ink);
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 5px 5px 0 var(--ui-ink);
+  }
+  .ui-table thead tr {
+    background-color: var(--ui-ink);
+  }
+  .ui-table th {
+    color: #ffffff;
+    font-style: italic;
+    font-weight: 900;
+  }
+  .ui-alert {
+    border: 3px solid var(--ui-ink);
+    border-left-width: 12px;
+    border-radius: 4px;
+    background-color: #ffffff;
+  }
+  .ui-alert[data-tone="info"] {
+    border-left-color: var(--ui-k-lavanda);
+  }
+  .ui-alert[data-tone="success"] {
+    border-left-color: var(--ui-success);
+  }
+  .ui-alert[data-tone="warning"] {
+    border-left-color: var(--ui-warning);
+  }
+  .ui-alert[data-tone="danger"] {
+    border-left-color: var(--ui-danger);
+  }
+  .ui-empty {
+    border: 3px dashed var(--ui-line);
+    border-radius: 10px;
+    background-color: rgb(255 255 255 / 0.45);
+  }
+  .ui-layer-row {
+    border: 3px solid var(--ui-ink);
+    border-radius: 8px;
+    background-color: #ffffff;
+  }
+
+  /* Etiquetas (RF-19 y RF-21). */
+  .ui-badge {
+    border: 2px solid var(--ui-ink);
+    border-radius: 0;
+    font-style: italic;
+    font-weight: 900;
+    text-transform: uppercase;
+    transform: skewX(-10deg);
+  }
+  .ui-badge-sticker {
+    font-family: var(--ui-font-body);
+  }
+  .ui-count {
+    border: 2px solid var(--ui-ink);
+    border-radius: 0;
+    background-color: var(--ui-k-limon-oscuro);
+    color: var(--ui-ink);
+    font-weight: 900;
+  }
+  .ui-tab {
+    font-style: italic;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+  .ui-progress {
+    height: 16px;
+    border: 3px solid var(--ui-ink);
+    border-radius: 0;
+    background-color: #ffffff;
+    transform: skewX(-12deg);
+  }
+  .ui-progress-bar {
+    border: 0;
+    border-radius: 0;
+    background-image: none;
+    background-color: var(--ui-accent);
+  }
+
+  /* Estructura (riel, barra lateral, barra superior y barra de abajo). */
+  .ui-banner {
+    border-bottom: 3px solid var(--ui-ink);
+    font-weight: 800;
+  }
+  .ui-topbar {
+    border-bottom: 3px solid var(--ui-ink);
+    background-color: #ffffff;
+    backdrop-filter: none;
+  }
+  .ui-topbar-title {
+    font-family: var(--ui-font-display);
+    font-weight: 400;
+  }
+  .ui-nav-link,
+  .ui-tab-link {
+    border-radius: 0;
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .ui-nav-link[aria-current="page"],
+  .ui-tab-link[aria-current="page"] {
+    background-color: var(--ui-accent);
+    color: var(--ui-ink);
+    transform: skewX(-10deg);
+  }
+  .ui-nav-link[aria-current="page"] {
+    box-shadow: 3px 3px 0 #ffffff;
+  }
+  .ui-nav-link[aria-current="page"] svg,
+  .ui-tab-link[aria-current="page"] svg {
+    color: var(--ui-ink);
+  }
+  .ui-rail-link {
+    border: 3px solid #ffffff;
+  }
+
+  /* Tarjetas de opción (selector de tema). */
+  .ui-option-card {
+    border: 3px solid var(--ui-ink);
+    border-radius: 10px;
+    background-color: #ffffff;
+  }
+  .ui-option-card[data-state="checked"] {
+    border-color: var(--ui-ink);
+    box-shadow: 5px 5px 0 var(--ui-accent);
+    outline: 3px solid var(--ui-ink);
+    outline-offset: 2px;
+  }
+  .ui-option-card-dot {
+    border: 3px solid var(--ui-ink);
+  }
+  .ui-option-card-dot > span {
+    background-color: var(--ui-ink);
+  }
+  .ui-option-card-tag {
+    border: 2px solid var(--ui-ink);
+    border-radius: 0;
+    background-color: var(--ui-k-limon-oscuro);
+    font-style: italic;
+    font-weight: 900;
+    text-transform: uppercase;
+    transform: skewX(-10deg);
+  }
+
+  /* Reloj circular: aro de tinta y avance en rosa; las cifras en Dela Gothic caben dentro. */
+  .ui-ring-track {
+    stroke: var(--ui-ink);
+  }
+  .ui-ring-value {
+    stroke: var(--ui-accent);
+    stroke-width: 5;
+    stroke-linecap: butt;
+  }
+  .ui-ring .font-display {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  .ui-nav-group {
+    color: var(--ui-accent-text);
+    font-style: italic;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+  }
+  /* La franja de demo cabe en una línea a 390 px. */
+  .ui-banner {
+    white-space: nowrap;
+  }
+  .ui-banner .ui-btn {
+    border-width: 2px;
+    font-size: 11px;
+    letter-spacing: 0;
+    box-shadow: none;
+  }
+
+  /* Adornos (RF-22): franja índigo arriba del pie y trama de puntos en su extremo derecho, donde no hay texto. */
+  .ui-footer {
+    position: relative;
+    border-top: 8px solid var(--ui-k-lavanda);
+  }
+  @media (min-width: 640px) {
+    .ui-footer::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      right: 16px;
+      bottom: 10px;
+      width: 140px;
+      pointer-events: none;
+      background: radial-gradient(var(--ui-k-limon) 30%, transparent 32%) 0 0 / 14px 14px;
+    }
+  }
+
+  /* Textos que en kawaii usan tintas pastel: sobre lila o blanco no se leen; aquí van en su versión oscura (RF-25). */
+  .text-k-limon,
+  .text-k-limon-oscuro {
+    color: var(--ui-warning-text);
+  }
+  .text-k-menta {
+    color: var(--ui-success-text);
+  }
+  .text-k-celeste,
+  .text-k-chicle {
+    color: var(--ui-accent-text);
+  }
+}

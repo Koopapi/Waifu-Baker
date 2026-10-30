@@ -6,3 +6,4 @@ export { Slider, type SliderProps } from "./Slider";
 export { ChipGroup, type ChipOption } from "./ChipGroup";
 export { Segmented } from "./Segmented";
 export { ColorField } from "./ColorField";
+export { OptionCards, type OptionCard } from "./OptionCards";

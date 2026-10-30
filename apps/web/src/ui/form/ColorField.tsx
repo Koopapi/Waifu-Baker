@@ -26,7 +26,7 @@ export function ColorField({ label, value, onValueChange, disabled, className, .
         disabled={disabled}
         onChange={(e) => onValueChange(e.target.value.toLowerCase())}
         className={cx(
-          "h-8 w-11 cursor-pointer rounded-s border-2 border-ui-line bg-ui-rail p-0.5 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-[3px] [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0",
+          "ui-color h-8 w-11 cursor-pointer rounded-s border-2 border-ui-line bg-ui-rail p-0.5 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-[3px] [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0",
           focusRing,
         )}
         data-testid={rest["data-testid"]}

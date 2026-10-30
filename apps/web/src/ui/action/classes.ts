@@ -6,17 +6,17 @@ const interactive = `inline-flex items-center justify-center select-none font-ex
 
 /** RF-3: principal, secundario, peligro, éxito y discreto; tres tamaños. */
 export const buttonClasses = variants({
-  base: `${interactive} gap-2 rounded-full`,
+  base: `ui-btn ${interactive} gap-2 rounded-full`,
   variants: {
     variant: {
-      primary: "bg-ui-accent bg-linear-to-r from-k-chicle to-ui-accent-hover text-ui-on-accent shadow-[var(--shadow-relief)] hover:brightness-105",
-      secondary: "border border-k-lavanda/30 bg-ui-hover text-ui-text shadow-[var(--shadow-relief-soft)] hover:bg-ui-line",
-      danger: "bg-ui-danger text-ui-on-accent shadow-[var(--shadow-relief-soft)] hover:brightness-110",
-      success: "bg-ui-success text-ui-on-accent shadow-[var(--shadow-relief-soft)] hover:brightness-110",
-      ghost: "text-ui-text-2 hover:bg-ui-hover hover:text-ui-text",
-      patreon: "bg-ui-patreon text-ui-rail hover:brightness-110",
+      primary: "ui-btn-primary bg-ui-accent bg-linear-to-r from-k-chicle to-ui-accent-hover text-ui-on-accent shadow-[var(--shadow-relief)] hover:brightness-105",
+      secondary: "ui-btn-secondary border border-k-lavanda/30 bg-ui-hover text-ui-text shadow-[var(--shadow-relief-soft)] hover:bg-ui-line",
+      danger: "ui-btn-danger bg-ui-danger text-ui-on-accent shadow-[var(--shadow-relief-soft)] hover:brightness-110",
+      success: "ui-btn-success bg-ui-success text-ui-on-accent shadow-[var(--shadow-relief-soft)] hover:brightness-110",
+      ghost: "ui-btn-ghost text-ui-text-2 hover:bg-ui-hover hover:text-ui-text",
+      patreon: "ui-btn-patreon bg-ui-patreon text-ui-rail hover:brightness-110",
       /** Sobre el color de acento (franjas): borde y texto claros. */
-      onAccent: "border border-ui-on-accent text-ui-on-accent hover:bg-ui-text/15",
+      onAccent: "ui-btn-on-accent border border-ui-on-accent text-ui-on-accent hover:bg-ui-text/15",
     },
     size: {
       xs: "h-6 whitespace-nowrap px-2.5 text-xs",
@@ -24,7 +24,7 @@ export const buttonClasses = variants({
       md: "h-10 whitespace-nowrap px-4 text-sm",
       lg: "h-12 whitespace-nowrap px-5 text-base",
       /** Botón grande con contenido (icono, título y detalle), p. ej. los papeles de la demo. */
-      block: "min-h-16 gap-4 p-5 text-left text-base",
+      block: "ui-btn-block min-h-16 gap-4 p-5 text-left text-base",
     },
     width: { auto: "", full: "w-full" },
   },
@@ -32,7 +32,7 @@ export const buttonClasses = variants({
 });
 
 export const iconButtonClasses = variants({
-  base: `${interactive} shrink-0 rounded-full`,
+  base: `ui-icon-btn ${interactive} shrink-0 rounded-full`,
   variants: {
     variant: {
       ghost: "text-ui-text-2 hover:bg-ui-hover hover:text-ui-text",

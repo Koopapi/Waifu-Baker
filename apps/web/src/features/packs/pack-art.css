@@ -41,7 +41,7 @@
 }
 .pack-art__brand {
   margin-top: 4.5cqw;
-  font-family: var(--font-display);
+  font-family: var(--ui-font-display);
   font-weight: 600;
   font-size: 5.8cqw;
   letter-spacing: 1.2cqw;
@@ -100,7 +100,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--font-display);
+  font-family: var(--ui-font-display);
   font-weight: 600;
   font-size: 7cqw;
   color: var(--ui-k-tinta);

@@ -30,4 +30,18 @@ export const account: typeof en = {
     button: "Borrar mi cuenta",
     confirm: "¿Borrar tu cuenta? Tienes 30 días para arrepentirte entrando de nuevo.",
   },
+  theme: {
+    title: "Tema",
+    body: "Elige cómo se ve Waifu Baker. Se guarda en tu cuenta y te sigue en todos tus dispositivos.",
+    names: { kawaii: "Kawaii", street: "Street pop" },
+    descriptions: {
+      kawaii: "Oscuro y suave, con pegatinas pastel. El de siempre.",
+      street: "Claro, con bordes de tinta y sombras duras. Diseño de Bruno.",
+    },
+    active: "Activo",
+    cardsNote: "Tus cartas se ven igual en los dos temas. La mesa donde abres sobres se queda oscura para que luzcan el holo y los brillos.",
+    saveFailed: "No se pudo guardar el tema. Volvimos al anterior.",
+    previewTitle: "Mi colección",
+    previewButton: "Abrir sobre",
+  },
 };

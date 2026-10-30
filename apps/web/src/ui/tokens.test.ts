@@ -28,7 +28,7 @@ describe("tokens del sistema de diseño", () => {
 
   it("test_s011_rf2_un_tema_solo_redefine_variables", () => {
     // Los componentes leen los colores de variables: un tema futuro solo necesita redefinirlas.
-    expect(css).toMatch(/:root\s*\{[^}]*--ui-accent:/);
+    expect(css).toMatch(/:root,\s*\[data-theme="kawaii"\]\s*\{[^}]*--ui-accent:/);
     expect(css).toMatch(/@theme inline\s*\{[^}]*--color-ui-accent:\s*var\(--ui-accent\)/);
   });
 

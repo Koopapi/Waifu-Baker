@@ -20,7 +20,7 @@ export interface TableProps<R extends { id: string }> {
 /** Spec 011, RF-7: tabla con cabeceras reales y desplazamiento horizontal en pantallas estrechas. */
 export function Table<R extends { id: string }>({ caption, columns, rows, empty, className }: TableProps<R>) {
   return (
-    <div className={cx("overflow-x-auto rounded-l bg-ui-nav", className)}>
+    <div className={cx("ui-table overflow-x-auto rounded-l bg-ui-nav", className)}>
       <table className="w-full border-collapse text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead>

@@ -7,7 +7,7 @@
   /* Spec 014, RF-9: fondo violeta kawaii. */
   background: radial-gradient(130% 90% at 50% 40%, #4a2c78 0%, #1e1630 55%, #150f22 100%);
   color: #fff6fb;
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--ui-font-body), system-ui, sans-serif;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -250,7 +250,7 @@
   align-content: center;
 }
 .card3d__backart b {
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--ui-font-display), sans-serif;
   font-size: clamp(30px, 11vw, 46px);
   font-weight: 700;
   line-height: 1;
@@ -511,7 +511,7 @@
   align-items: center;
   gap: 8px;
   margin: 0 0 14px;
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--ui-font-display), sans-serif;
   font-size: 24px;
   font-weight: 600;
 }
@@ -723,7 +723,7 @@
   background: linear-gradient(90deg, #ffe27a, var(--rarity-color, #ffb84d));
   box-shadow: 0 5px 0 rgb(59 31 53 / 0.45);
   color: #3b1f35;
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--ui-font-display), sans-serif;
   font-size: 26px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -1005,7 +1005,7 @@
   top: calc(50% - var(--card-h) / 2 - 76px);
   margin: 0;
   text-align: center;
-  font-family: var(--font-display);
+  font-family: var(--ui-font-display);
   font-weight: 800;
   font-size: clamp(38px, 11vw, 56px);
   line-height: 1;
@@ -1023,7 +1023,7 @@
   place-items: center;
   background: var(--badge);
   color: var(--badge-ink);
-  font-family: var(--font-display);
+  font-family: var(--ui-font-display);
   font-weight: 800;
   font-style: italic;
   clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
@@ -1074,7 +1074,7 @@
 }
 .reveal-info__name {
   margin: 0;
-  font-family: var(--font-display);
+  font-family: var(--ui-font-display);
   font-weight: 800;
   font-size: clamp(24px, 7vw, 34px);
   line-height: 1.05;

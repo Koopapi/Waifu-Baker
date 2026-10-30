@@ -8,7 +8,7 @@ import { cx } from "../variants";
 
 /** Casilla nativa con el aspecto del sistema: la marca se pinta encima y la casilla se ve a través de ella. */
 const box = cx(
-  "peer size-[18px] shrink-0 cursor-pointer appearance-none rounded-s border border-ui-line bg-ui-rail transition-colors duration-[var(--duration-fast)]",
+  "ui-check peer size-[18px] shrink-0 cursor-pointer appearance-none rounded-s border border-ui-line bg-ui-rail transition-colors duration-[var(--duration-fast)]",
   "hover:border-ui-hover checked:border-ui-accent checked:bg-ui-accent disabled:cursor-not-allowed disabled:opacity-50",
   focusRing,
 );
@@ -66,7 +66,7 @@ export function Switch({ label, description, className, ...rest }: SwitchProps) 
       <RSwitch.Root
         id={id}
         className={cx(
-          "relative h-6 w-10 shrink-0 rounded-full bg-ui-hover transition-colors duration-[var(--duration-fast)] data-[state=checked]:bg-ui-success disabled:opacity-50",
+          "ui-switch relative h-6 w-10 shrink-0 rounded-full bg-ui-hover transition-colors duration-[var(--duration-fast)] data-[state=checked]:bg-ui-success disabled:opacity-50",
           focusRing,
         )}
         {...rest}
@@ -99,7 +99,7 @@ export function RadioGroup({ label, options, appearance = "list", className, ...
               key={o.value}
               value={o.value}
               className={cx(
-                "rounded-m border border-ui-line px-5 py-2.5 text-sm font-semibold text-ui-text-2 transition-colors duration-[var(--duration-fast)] hover:bg-ui-hover",
+                "ui-option rounded-m border border-ui-line px-5 py-2.5 text-sm font-semibold text-ui-text-2 transition-colors duration-[var(--duration-fast)] hover:bg-ui-hover",
                 "data-[state=checked]:border-ui-accent-text data-[state=checked]:bg-ui-accent/15 data-[state=checked]:text-ui-text",
                 focusRing,
               )}

@@ -1,4 +1,5 @@
 import { and, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
+import { DEFAULT_THEME } from "@/domain/ui/theme";
 import { albums, cookieLedger, packs, patreonLinks, pityCounters, tierRules, userCards, userRewards, users } from "@/db/schema";
 import { RECOVERY_DAYS, accountState, purgeDate } from "@/domain/accounts/lifecycle";
 import { hasAdultTier, entitledPacks, isPatron } from "@/domain/patreon/membership";
@@ -95,6 +96,8 @@ export async function purgeAccount(db: DbLike, userId: string) {
         patreonUserId: null,
         role: "user",
         lastCountry: null,
+        // Spec 026: la elección de tema se borra con la cuenta.
+        theme: DEFAULT_THEME,
         purgedAt: sql`now()`,
         updatedAt: sql`now()`,
       })

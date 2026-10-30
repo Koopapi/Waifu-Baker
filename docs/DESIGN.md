@@ -92,6 +92,12 @@ El código vive en `apps/web/src/ui` y el diseño en `Waifu Baker/waifubaker.pen
 componente reutilizable en Pencil con las mismas variantes; el test `src/ui/pencil-map.test.ts` exige que
 cualquier componente nuevo se añada a esta tabla.
 
+**Temas (spec 026).** Kawaii (oscuro) es el de siempre. Street pop (claro, diseño de Bruno) vive en
+`src/ui/themes/street.css`: redefine las variables `ui-*` bajo `[data-theme="street"]` y da la piel de cada componente
+sobre sus clases `ui-*` (`ui-btn`, `ui-card`, `ui-field`…) dentro de un `@scope` que se detiene en las zonas marcadas con
+`data-theme="kawaii"` (mesa de apertura, «Abrir todos», escenario de la carta). Un componente nuevo lleva su clase
+`ui-*` y su regla en esa hoja; el catálogo `/sistema` tiene un interruptor para verlo en los dos temas.
+
 | Componente (código) | Componente en Pencil |
 |---|---|
 | Button | Button/Primary, Button/Secondary, Button/Danger, Button/Success, Button/Ghost (y fila «Estados») |
@@ -135,6 +141,7 @@ cualquier componente nuevo se añada a esta tabla.
 | Slider | Deslizador con nombre y valor (maqueta HTML de la spec 025, `specs/025-configurador-v4/maqueta.html`; pendiente de pasar a Pencil) |
 | ChipGroup | Fichas de rareza con muestra del marco (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | Segmented | Selector de opciones juntas (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| OptionCards | Tarjetas de opción con miniatura: el selector de tema (maqueta HTML de la spec 026; pendiente de pasar a Pencil) |
 | ColorField | Muestra de color con su valor (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | LayerList | Lista de capas con «Adelante» y «Atrás» (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | LayerRow | Fila de capa cerrada y abierta (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |

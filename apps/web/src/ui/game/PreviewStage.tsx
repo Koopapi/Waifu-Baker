@@ -14,6 +14,8 @@ export const PreviewStage = forwardRef<HTMLDivElement, PreviewStageProps>(functi
   return (
     <div
       ref={ref}
+      // Spec 026, RF-13: el escenario de la carta se queda oscuro en los dos temas.
+      data-theme="kawaii"
       className={cx(
         "relative isolate grid touch-none place-items-center overflow-hidden rounded-l border-2 border-ui-line bg-ui-rail px-10 pb-12 pt-14",
         "before:absolute before:inset-0 before:-z-10 before:bg-[repeating-conic-gradient(from_0deg_at_50%_42%,color-mix(in_srgb,var(--ui-k-lavanda)_14%,transparent)_0deg_7deg,transparent_7deg_18deg)]",

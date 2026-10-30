@@ -33,7 +33,7 @@ export function OpenAllFocus({ items, reduced, onDone }: { items: OpenAllCard[];
   const live = !reduced && c.live;
 
   return (
-    <section className="oa-focus" data-testid="open-all-focus">
+    <section className="oa-focus" data-theme="kawaii" data-testid="open-all-focus">
       <p className="oa-burst__counter" data-testid="focus-counter">
         {t.focusCounter(i + 1, items.length)}
       </p>

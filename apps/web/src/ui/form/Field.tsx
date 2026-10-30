@@ -6,7 +6,7 @@ import { focusRing } from "../focus";
 
 /** Aspecto común de los campos de texto (RF-4): borde, fondo, foco y estado de error. */
 export const inputClasses = cx(
-  "w-full rounded-m border border-ui-line bg-ui-rail px-3 text-sm text-ui-text placeholder:text-ui-text-3",
+  "ui-field w-full rounded-m border border-ui-line bg-ui-rail px-3 text-sm text-ui-text placeholder:text-ui-text-3",
   "transition-colors duration-[var(--duration-fast)] hover:border-ui-hover focus-visible:border-ui-accent-text",
   "aria-[invalid=true]:border-ui-danger disabled:cursor-not-allowed disabled:opacity-50",
   focusRing,

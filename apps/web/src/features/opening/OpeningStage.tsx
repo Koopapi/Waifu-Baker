@@ -292,6 +292,8 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
   return (
     <div
       ref={stage}
+      // Spec 026, RF-12: la mesa de apertura se queda oscura en los dos temas.
+      data-theme="kawaii"
       className="stage"
       data-phase={phase}
       data-revealed={phase === "deck" ? top + (shown ? 1 : 0) : 0}

@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
-import { LAB, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
+import { LAB, acceptGate, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
 
 const VIEWPORTS = [
   { name: "escritorio", width: 1360, height: 950 },
@@ -82,7 +82,9 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
   await page.screenshot({ path: `test-results/sweep/${shotName}-${vp.name}.png`, fullPage: true, caret: "initial" });
 }
 
-test("barrido de calidad de todas las páginas", async ({ browser }) => {
+// Spec 026: el barrido se repite con el tema Street pop elegido por el administrador y el coleccionista.
+for (const theme of ["kawaii", "street"] as const)
+test(`barrido de calidad de todas las páginas (${theme})`, async ({ browser }) => {
   desktopOnly();
   test.setTimeout(600_000);
   const problems: Problem[] = [];
@@ -96,6 +98,17 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await admin.goto("/admin/users?q=fan-sweep");
   await admin.click("a:text-is('fan-sweep')");
   const fanAdminUrl = new URL(admin.url()).pathname;
+  if (theme === "street") {
+    for (const p of [admin, fan]) {
+      await p.goto("/account");
+      // El administrador solo ha usado el panel: la bienvenida (edad y términos) sale al entrar en «Mi cuenta».
+      await acceptGate(p);
+      await dismissCelebration(p);
+      const saved = p.waitForResponse((r) => r.request().method() === "POST" && new URL(r.url()).pathname === "/account");
+      await p.getByRole("radio", { name: /Street pop/ }).click();
+      await saved;
+    }
+  }
 
   // Abre dos sobres para que haya colección, y deja dos sellados para ver las páginas de apertura.
   await fan.goto(`/packs/${setId}/all`);
@@ -118,7 +131,7 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
     for (const vp of VIEWPORTS) {
       c.url = url;
       c.vp = vp.name;
-      await audit(p, url, vp, problems, name);
+      await audit(p, url, vp, problems, theme === "street" ? `street-${name}` : name);
     }
   };
 

@@ -15,7 +15,7 @@ import { PackKindTag } from "./PackKindTag";
 // Spec 013, RF-13: la escena (GSAP, gestos y partículas) se descarga aparte, después de pintar la página.
 const OpeningStage = dynamic(() => import("@/features/opening/OpeningStage").then((m) => m.OpeningStage), {
   ssr: false,
-  loading: () => <div aria-busy="true" data-testid="stage-loading" className="fixed inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_55%,#050408_100%)]" />,
+  loading: () => <div aria-busy="true" data-theme="kawaii" data-testid="stage-loading" className="fixed inset-0 bg-[radial-gradient(120%_80%_at_50%_15%,#1d1236_0%,#0b0912_55%,#050408_100%)]" />,
 });
 
 /** Descarga las imágenes fijas y, para la carta viva (spec 018, RF-6), las capas de cada carta. */

@@ -35,7 +35,7 @@ export function RingTimer({ until, serverNow, totalMs, label, children, classNam
   }, [until, serverNow, totalMs]);
   const pct = Math.round(p * 100);
   return (
-    <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} className={cx("relative grid size-32 shrink-0 place-items-center", className)}>
+    <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} className={cx("ui-ring relative grid size-32 shrink-0 place-items-center", className)}>
       <svg viewBox="0 0 100 100" aria-hidden className="absolute inset-0 size-full -rotate-90">
         <defs>
           <linearGradient id={gradient} x1="0" y1="0" x2="1" y2="1">
@@ -43,8 +43,8 @@ export function RingTimer({ until, serverNow, totalMs, label, children, classNam
             <stop offset="1" stopColor="var(--ui-k-celeste)" />
           </linearGradient>
         </defs>
-        <circle cx="50" cy="50" r={R} fill="none" stroke="var(--ui-line)" strokeWidth="9" />
-        <circle cx="50" cy="50" r={R} fill="none" stroke={`url(#${gradient})`} strokeWidth="9" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - p)} />
+        <circle className="ui-ring-track" cx="50" cy="50" r={R} fill="none" stroke="var(--ui-line)" strokeWidth="9" />
+        <circle className="ui-ring-value" cx="50" cy="50" r={R} fill="none" stroke={`url(#${gradient})`} strokeWidth="9" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - p)} />
       </svg>
       <div className="relative text-center">{children}</div>
     </div>

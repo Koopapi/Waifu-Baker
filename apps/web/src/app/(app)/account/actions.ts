@@ -7,6 +7,7 @@ import { translateError } from "@/i18n/errors";
 import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import { deactivateAccount, declareAdult } from "@/server/services/account";
+import { setTheme } from "@/server/services/theme";
 
 export type AccountActionState = { ok: boolean; message?: string; error?: string } | null;
 
@@ -31,4 +32,20 @@ export async function deactivateAccountAction() {
   const userId = (await auth())?.user?.id;
   if (userId) await deactivateAccount(db, userId);
   await signOut({ redirectTo: "/" });
+}
+
+/** Spec 026, RF-6 y RF-9: guarda el tema en la cuenta; si no se puede, el selector vuelve al anterior. */
+export async function setThemeAction(theme: string): Promise<{ ok: boolean; error?: string }> {
+  const t = await getDict();
+  const userId = (await auth())?.user?.id;
+  if (!userId) return { ok: false, error: t.common.sessionExpired };
+  try {
+    await setTheme(db, userId, theme);
+  } catch (e) {
+    if (isAdminError(e)) return { ok: false, error: translateError(t, e) };
+    return { ok: false, error: t.account.theme.saveFailed };
+  }
+  // La plantilla raíz pinta `<html data-theme>`: que las páginas en caché del navegador lo tomen al navegar.
+  revalidatePath("/", "layout");
+  return { ok: true };
 }

@@ -18,6 +18,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import type { Theme } from "@/domain/ui/theme";
 import type { LayersConfig } from "@/domain/cards/layers";
 import type { ParticlePreset } from "@/domain/cards/library";
 import type { PickedPhrase } from "@/domain/expeditions/report";
@@ -75,7 +76,9 @@ export const users = pgTable("users", {
   ageConfirmedMin: integer("age_confirmed_min"),
   /** Spec 015, RF-8: última visita a «Mis sobres»; las llegadas posteriores llevan «¡Nuevo!». */
   packsSeenAt: timestamp("packs_seen_at", { withTimezone: true }),
-});
+  /** Spec 026, RF-6: el tema que eligió en «Mi cuenta» (`domain/ui/theme.ts`). */
+  theme: text("theme").$type<Theme>().notNull().default("kawaii"),
+}, (t) => [check("users_theme_check", sql`${t.theme} in ('kawaii', 'street')`)]);
 
 export const characters = pgTable("characters", {
   id: uuid("id").primaryKey().defaultRandom(),

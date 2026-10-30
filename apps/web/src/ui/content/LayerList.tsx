@@ -44,7 +44,7 @@ export function LayerRow({ thumb, title, subtitle, actions, open, onOpenChange, 
   return (
     <li
       className={cx(
-        "overflow-hidden rounded-m border-2 bg-ui-nav transition-[border-color,box-shadow] duration-[var(--duration-fast)]",
+        "ui-layer-row overflow-hidden rounded-m border-2 bg-ui-nav transition-[border-color,box-shadow] duration-[var(--duration-fast)]",
         open ? "border-ui-accent shadow-[4px_4px_0_var(--ui-k-menta)]" : "border-ui-line",
         className,
       )}

@@ -66,7 +66,7 @@ export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { se
         <div className="flex items-end gap-4">
           {/* Spec 014, RF-8: el mismo sobre de la colección. */}
           {phase === "idle" && <PackShell {...shell} className="w-[96px] sm:w-[120px]" />}
-          <div>
+          <div className="min-w-0">
             <Link href="/packs" className="text-sm text-ui-text-3 hover:text-ui-text">
               {t.packs.openAll.backToMine}
             </Link>
