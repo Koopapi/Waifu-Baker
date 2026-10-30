@@ -513,7 +513,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
         {!isImageLayer(l) && (
           <>
             <Select label={t.particleType} value={l.particulas} onValueChange={(v) => setLayer(i, { particulas: v as (typeof PARTICLE_TYPES)[number] })} options={PARTICLE_TYPES.map((p) => ({ value: p, label: v4.particleNames[p] }))} />
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 @lg:grid-cols-2">
               <Slider label={t.amount} value={l.cantidad ?? 60} min={0} max={200} onValueChange={(v) => setLayer(i, { cantidad: v })} />
               <Slider label={t.size} value={l.tamano ?? 1} min={0.3} max={2.5} step={0.05} format={fixed} onValueChange={(v) => setLayer(i, { tamano: v })} />
               <Slider label={t.speed} value={l.velocidad ?? 1} min={0.3} max={3} step={0.05} format={fixed} onValueChange={(v) => setLayer(i, { velocidad: v })} />
@@ -529,7 +529,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
           </>
         )}
         <Select label={t.blend} value={l.mezcla ?? "normal"} onValueChange={(v) => setLayer(i, { mezcla: v as (typeof BLEND_MODES)[number] })} options={blendOptions} />
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 @lg:grid-cols-2">
           <Slider label={t.opacity} value={l.opacidad ?? 1} min={0} max={1} step={0.01} format={percent} onValueChange={(v) => setLayer(i, { opacidad: v })} />
           <Slider label={t.depth} value={l.profundidad ?? 1} min={0} max={2.5} step={0.05} format={fixed} onValueChange={(v) => setLayer(i, { profundidad: v })} />
         </div>
@@ -582,7 +582,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
   }
 
   return (
-    <section className="space-y-4 border-t border-ui-line pt-5" data-testid="layers-editor" aria-labelledby={`layers-${card.id}`}>
+    <section className="@container space-y-4 border-t border-ui-line pt-5" data-testid="layers-editor" aria-labelledby={`layers-${card.id}`}>
       <div className="space-y-1">
         <h3 id={`layers-${card.id}`} className="text-base font-bold text-ui-text">
           {t.title} {dirty && <span className="ml-2 text-xs font-semibold text-ui-warning-text">· {t.unsaved}</span>}
@@ -590,9 +590,10 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
         <p className="text-sm text-ui-text-2">{t.intro}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)]">
+      {/* Columnas según el ancho del propio editor (va dentro de la ventana de la carta), no el de la pantalla. */}
+      <div className="grid gap-6 @4xl:grid-cols-[minmax(0,1fr)_minmax(320px,400px)]">
         {/* Spec 025, RF-21: vista previa grande en escena oscura y, debajo, sus ajustes. Acompaña al bajar. */}
-        <div className="min-w-0 space-y-3 self-start lg:sticky lg:top-0">
+        <div className="min-w-0 space-y-3 self-start @4xl:sticky @4xl:top-0">
           <PreviewStage
             ref={zone}
             className={cx("min-h-[420px]", focusRing)}
@@ -616,7 +617,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
 
           {/* Spec 025, RF-8 a RF-10: ajustes de la vista previa (no se guardan) y la intensidad del holo (se guarda). */}
           <Card className="space-y-4" data-testid="layers-preview-controls">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 @lg:grid-cols-2">
               <Slider label={v4.preview.depth} value={depth} min={0} max={30} unit=" px" onValueChange={setDepth} data-testid="preview-depth" />
               <Slider label={v4.preview.tilt} value={tilt} min={0} max={26} unit="°" onValueChange={setTilt} data-testid="preview-tilt" />
             </div>
@@ -729,7 +730,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
                 onValueChange={(v) => setSelected(Number(v))}
                 options={draft.capas.flatMap((l, i) => (isImageLayer(l) ? [{ value: String(i), label: labelOf(l, i) }] : []))}
               />
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 @lg:grid-cols-2">
                 <Slider label={t.framing.x} value={framingOf(selLayer).x} min={-100} max={100} unit="%" onValueChange={(v) => setFraming(sel, { x: v })} data-testid="framing-x" />
                 <Slider label={t.framing.y} value={framingOf(selLayer).y} min={-100} max={100} unit="%" onValueChange={(v) => setFraming(sel, { y: v })} data-testid="framing-y" />
                 <Slider label={t.framing.scale} value={Math.round(framingOf(selLayer).escala * 100)} min={10} max={400} step={5} unit="%" onValueChange={(v) => setFraming(sel, { escala: v / 100 })} data-testid="framing-scale" />
@@ -915,7 +916,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
               ]}
             />
             {draft.sello && !isImageSeal(draft.sello) && (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 @lg:grid-cols-2">
                 <TextField label={t.sealTextLabel} value={draft.sello.texto} maxLength={6} onChange={(e) => update((c) => (c.sello && !isImageSeal(c.sello) ? { ...c, sello: { ...c.sello, texto: e.target.value } } : c))} />
                 <Select label={t.sealStyle} value={draft.sello.estilo} onValueChange={(v) => update((c) => (c.sello && !isImageSeal(c.sello) ? { ...c, sello: { ...c.sello, estilo: v as (typeof SEAL_STYLES)[number] } } : c))} options={SEAL_STYLES.map((s) => ({ value: s, label: v4.seal.styles[s] }))} />
               </div>
@@ -968,7 +969,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
               </div>
             )}
             {draft.sello && (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 @lg:grid-cols-2">
                 <Select label={t.sealCorner} value={draft.sello.esquina} onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, esquina: v as (typeof CORNERS)[number] } } : c))} options={CORNERS.map((x) => ({ value: x, label: t.corners[x] }))} />
                 {isImageSeal(draft.sello) ? (
                   <Slider label={t.sealSize} value={draft.sello.tamano ?? 36} min={10} max={60} unit="%" onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: v } } : c))} data-testid="seal-size" />
