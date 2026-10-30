@@ -41,9 +41,9 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
   const reduced = test.info().project.name === "reduced-motion";
   const admin = await login(browser, "admin-premios", true);
   // 3 cartas: 001 y 002 comunes y 003 rara; cada sobre trae 2 cartas.
-  const setId = await createPublishedSet(admin, "PRM1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
+  const setId = await createPublishedSet(admin, "PRM1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
   await giftPacks(admin, "fan-premios", "PRM1", 2);
-  const fan = await login(browser, "fan-premios", false, "/sobres", { keepCelebration: true });
+  const fan = await login(browser, "fan-premios", false, "/packs", { keepCelebration: true });
   const dialog = fan.locator('[data-testid="celebration-dialog"]');
 
   await test.step("RF-6 y RF-7: al entrar con dos regalos sale una sola celebración, con su origen", async () => {
@@ -72,7 +72,7 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
     }
     await dialog.locator('[data-testid="celebration-primary"]').click();
     await expect(dialog).toHaveCount(0);
-    await expect(fan).toHaveURL(/\/sobres$/);
+    await expect(fan).toHaveURL(/\/packs$/);
   });
 
   await test.step("RF-8: «Mis sobres» marca los dos como nuevos; en la siguiente visita ya no", async () => {
@@ -83,13 +83,13 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
   });
 
   await test.step("RF-7: desde otro dispositivo no se vuelve a celebrar", async () => {
-    const other = await login(browser, "fan-premios", false, "/sobres", { keepCelebration: true });
+    const other = await login(browser, "fan-premios", false, "/packs", { keepCelebration: true });
     await noCelebration(other);
     await other.context().close();
   });
 
   await record(fan);
-  await fan.goto("/recompensas");
+  await fan.goto("/rewards");
   await fan.waitForLoadState("networkidle");
 
   await test.step("RF-1, RF-10, RF-12 y RF-15: la diaria se estampa, las galletas vuelan al contador y suenan; sin avisos", async () => {
@@ -188,10 +188,10 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
 
   await test.step("RF-9: en la apertura no sale ninguna celebración; en la siguiente página sí", async () => {
     await giftPacks(admin, "fan-premios", "PRM1", 1);
-    await fan.goto(`/sobres/${setId}`);
+    await fan.goto(`/packs/${setId}`);
     await fan.waitForLoadState("networkidle");
     await noCelebration(fan);
-    await fan.goto("/recompensas");
+    await fan.goto("/rewards");
     await expect(dialog).toBeVisible();
     await expect(dialog).toContainText(fx.arrivals.title(1));
     await dialog.locator('[data-testid="celebration-close"]').click();

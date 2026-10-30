@@ -3,12 +3,15 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/db/client";
 import { canEdit } from "@/domain/catalog/collection-rules";
-import { RARITIES } from "@/domain/catalog/card-rules";
+import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { cardChances } from "@/domain/catalog/odds";
 import { OddsEditor } from "@/features/admin/sets/OddsEditor";
+import { OddsTabs } from "@/features/admin/sets/OddsTabs";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
+import { FreeToggle } from "@/features/admin/sets/FreeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
+import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
@@ -17,17 +20,21 @@ import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
 import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
-import { getDict } from "@/i18n/server";
+import { getDict, getLocale } from "@/i18n/server";
+import { adminLayersDictionaries } from "@/i18n/admin-layers";
+import { missingParts } from "@/domain/cards/layers";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
 import { Card } from "@/ui/content/Card";
 import { Alert } from "@/ui/feedback/Alert";
 import { EditSetForm } from "../forms";
 
+const EMPTY_SLOT: Record<Rarity, number> = { common: 0, rare: 0, epic: 0, legendary: 0, ex: 0 };
+
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters, packArts] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id])]);
+  const [overview, characters, packArts, library] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listLibrary(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -41,6 +48,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
     isAdultSet: set.isAdult,
   };
   const slots = overview.odds?.slots ?? [];
+  const cardCounts = Object.fromEntries(RARITIES.map((r) => [r, counts[r]])) as Record<Rarity, number>;
   const chances = cardChances(overview.cards, slots);
   const cards: CardDTO[] = overview.cards.map((c) => ({
     id: c.id,
@@ -58,10 +66,19 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
     fullUrl: assetUrl(c.keyFull),
     adultReviewedAt: c.adultReviewedAt ? c.adultReviewedAt.toISOString() : null,
     pendingArtUrl: assetUrl(c.pendingOriginalKey),
+    pendingLayersUrl: assetUrl(c.pendingKeys?.mid ?? null),
     chance: chances.get(c.id) ?? 0,
+    // Spec 018, RF-18: el editor trabaja sobre el cambio pendiente de revisión, si lo hay.
+    layers: c.layersPending ?? c.layers,
+    hasOriginal: Boolean(c.originalKey),
   }));
-  const unreviewed = set.isAdult ? cards.filter((c) => !c.adultReviewedAt || c.pendingArtUrl).length : 0;
+  const unreviewed = set.isAdult ? cards.filter((c) => !c.adultReviewedAt || c.pendingArtUrl || c.pendingLayersUrl).length : 0;
+  // Spec 018, RF-21: cartas con cambios de capas pendientes de revisión, enlazadas.
+  const pendingLayers = cards.filter((c) => c.pendingLayersUrl);
   const incomplete = cards.filter((c) => c.status !== "ready").length;
+  // Spec 017, RF-15: cartas sin chica o sin fondo, enlazadas, antes de intentar publicar.
+  const notAssembled = cards.filter((c) => missingParts(c.layers).length > 0);
+  const tl = adminLayersDictionaries[await getLocale()];
 
   return (
     <div className="space-y-8">
@@ -75,6 +92,9 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           </h1>
           <StatusBadge status={set.status} />
           <AdultBadge adult={set.isAdult} />
+          <span data-testid="free-badge">
+            <Badge tone={set.isFree ? "success" : "accent"}>{set.isFree ? t.free.badgeFree : t.free.badgePatreon}</Badge>
+          </span>
         </div>
       </div>
 
@@ -87,15 +107,31 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         title={t.publishing}
         aside={
           cards.some((c) => c.rarity) && (
-            <Button size="sm" variant="secondary" asChild>
-              <Link href={`/admin/sets/${set.id}/simulate`} data-testid="simulate-link">
-                {t.simulate}
-              </Link>
-            </Button>
+            // Spec 022, RF-21: simular un sobre de cada tipo.
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant="secondary" asChild>
+                <Link href={`/admin/sets/${set.id}/simulate`} data-testid="simulate-link">
+                  {t.simulateKind(tt.common.packKind.silver)}
+                </Link>
+              </Button>
+              <Button size="sm" variant="secondary" asChild>
+                <Link href={`/admin/sets/${set.id}/simulate?k=gold`} data-testid="simulate-gold-link">
+                  {t.simulateKind(tt.common.packKind.gold)}
+                </Link>
+              </Button>
+            </div>
           )
         }
       >
         <PublishPanel setId={set.id} version={set.version} status={set.status} />
+      </Card>
+
+      {/* Spec 017 (ampliación): los elementos para armar las cartas viven en la biblioteca general. */}
+      <Card className="flex flex-wrap items-center justify-between gap-3" data-testid="library-link">
+        <p className="text-sm text-ui-text-3">{tl.library.setNote}</p>
+        <Button size="sm" variant="secondary" asChild>
+          <Link href="/admin/library">{tl.library.goTo}</Link>
+        </Button>
       </Card>
 
       <Card title={t.pack.title}>
@@ -109,21 +145,44 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         />
       </Card>
 
+      {/* Spec 021, RF-1 a RF-3: gratuita o de Patreon. */}
+      <Card className="space-y-3" title={t.free.title}>
+        <FreeToggle setId={set.id} isFree={set.isFree} isAdult={set.isAdult} />
+      </Card>
+
       <Card className="space-y-3" title={t.welcome.title}>
         <WelcomeToggle setId={set.id} isWelcome={set.isWelcome} eligible={set.status === "published" && !set.isAdult} />
       </Card>
 
-      {overview.odds && (
+      {overview.odds && overview.gold && (
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">{t.odds}</h2>
-          <OddsEditor
-            setId={set.id}
-            version={set.version}
-            slots={slots.map((s) => ({ common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0, ...s }))}
-            holoChance={overview.odds.holoChance}
-            pityThreshold={overview.odds.pityThreshold}
-            locked={!canEdit(set.status, "odds")}
-            cardCounts={{ common: counts.common, uncommon: counts.uncommon, rare: counts.rare, epic: counts.epic, legendary: counts.legendary, secret: counts.secret }}
+          {/* Spec 022, RF-21: una tabla por tipo de sobre. */}
+          <OddsTabs
+            silver={
+              <OddsEditor
+                setId={set.id}
+                kind="silver"
+                version={set.version}
+                slots={slots.map((s) => ({ ...EMPTY_SLOT, ...s }))}
+                holoChance={overview.odds.holoChance}
+                pityThreshold={overview.odds.pityThreshold}
+                locked={!canEdit(set.status, "odds")}
+                cardCounts={cardCounts}
+              />
+            }
+            gold={
+              <OddsEditor
+                setId={set.id}
+                kind="gold"
+                version={set.version}
+                slots={overview.gold.slots.map((s) => ({ ...EMPTY_SLOT, ...s }))}
+                holoChance={overview.gold.holoChance}
+                pityThreshold={0}
+                locked={!canEdit(set.status, "odds")}
+                cardCounts={cardCounts}
+              />
+            }
           />
         </section>
       )}
@@ -143,19 +202,51 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
             {counts.none > 0 && <Badge>{t.noRarityCount(counts.none)}</Badge>}
           </div>
         </div>
-        {(gaps.length > 0 || incomplete > 0 || unreviewed > 0) && cards.length > 0 && (
+        {(gaps.length > 0 || incomplete > 0 || unreviewed > 0 || notAssembled.length > 0 || pendingLayers.length > 0) && cards.length > 0 && (
           <div data-testid="set-warnings">
             <Alert tone="warning">
               <ul className="space-y-1">
                 {gaps.length > 0 && <li>{t.gaps(gaps.map((g) => tt.common.rarity[g]).join(", "))}</li>}
                 {incomplete > 0 && <li>{t.incomplete(incomplete)}</li>}
                 {unreviewed > 0 && <li>{t.unreviewed(unreviewed)}</li>}
+                {pendingLayers.length > 0 && (
+                  <li data-testid="pending-layers">
+                    {tl.pending.warning(pendingLayers.length)}{" "}
+                    {pendingLayers.map((c, i) => (
+                      <span key={c.id}>
+                        {i > 0 && ", "}
+                        <a href={`#carta-${String(c.number).padStart(3, "0")}`} className="underline underline-offset-4">
+                          {String(c.number).padStart(3, "0")}
+                        </a>
+                      </span>
+                    ))}
+                  </li>
+                )}
+                {notAssembled.length > 0 && (
+                  <li data-testid="not-assembled">
+                    {tl.notAssembled(notAssembled.length)}{" "}
+                    {notAssembled.map((c, i) => (
+                      <span key={c.id}>
+                        {i > 0 && ", "}
+                        <a href={`#carta-${String(c.number).padStart(3, "0")}`} className="underline underline-offset-4">
+                          {String(c.number).padStart(3, "0")}
+                        </a>
+                      </span>
+                    ))}
+                  </li>
+                )}
               </ul>
             </Alert>
           </div>
         )}
         <Dropzone setId={set.id} disabled={!perms.canAdd} />
-        <CardWorkspace setId={set.id} cards={cards} characters={characters.map((c) => ({ id: c.id, name: c.name }))} perms={perms} />
+        <CardWorkspace
+          setId={set.id}
+          cards={cards}
+          characters={characters.map((c) => ({ id: c.id, name: c.name }))}
+          library={library.map((i) => ({ id: i.id, kind: i.kind, name: i.name, key: i.key, url: assetUrl(i.key), particles: i.particles }))}
+          perms={perms}
+        />
       </section>
     </div>
   );

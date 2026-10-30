@@ -1,6 +1,0 @@
-{
-  "name": "waifu-baker-expediciones",
-  "private": true,
-  "scripts": { "start": "node servidor-ejemplo.js" },
-  "dependencies": { "express": "4.21.2" }
-}

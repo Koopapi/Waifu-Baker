@@ -25,7 +25,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       mime: file.type,
       filename: file.name,
     });
-    return Response.json({ ok: true, pending: Boolean(card.pendingOriginalKey) });
+    return Response.json({ ok: true, pending: Boolean(card.pendingOriginalKey), uncut: card.uncut });
   } catch (e) {
     if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: 409 });
     throw e;

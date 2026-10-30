@@ -17,14 +17,13 @@ interface Particle {
   color: string;
 }
 
-const COUNT: Record<Rarity, number> = { common: 0, uncommon: 12, rare: 40, epic: 80, legendary: 150, secret: 200 };
+const COUNT: Record<Rarity, number> = { common: 0, rare: 40, epic: 80, legendary: 150, ex: 200 };
 const COLORS: Record<Rarity, string[]> = {
   common: ["#9aa0a6"],
-  uncommon: ["#4ade80", "#bbf7d0"],
   rare: ["#60a5fa", "#bfdbfe", "#ffffff"],
   epic: ["#c084fc", "#f0abfc", "#ffffff"],
   legendary: ["#f5c451", "#fde68a", "#ffffff", "#f97316"],
-  secret: ["#ff6ad5", "#7dd3fc", "#fde68a", "#86efac", "#ffffff"],
+  ex: ["#ff6ad5", "#7dd3fc", "#fde68a", "#86efac", "#ffffff"],
 };
 
 /** Un solo canvas a pantalla completa con un pool de partículas; se apaga solo al vaciarse. */

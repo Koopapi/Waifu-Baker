@@ -6,6 +6,7 @@ import { db } from "@/db/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { getDict } from "@/i18n/server";
 import { publicAlbum } from "@/server/services/album";
+import { PatronBadge } from "@/features/economy/PatronBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -44,9 +45,12 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
       </header>
       <main className="mx-auto max-w-6xl space-y-10 px-4 pb-16 pt-6 sm:px-6">
         <section className="space-y-3 text-center">
-          <h1 className="text-4xl font-extrabold" data-testid="album-alias">
-            {a.alias}
-          </h1>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <h1 className="text-4xl font-extrabold" data-testid="album-alias">
+              {a.alias}
+            </h1>
+            {a.patron && <PatronBadge label={t.account.patronBadge} />}
+          </div>
           <p className="text-ui-text-2" data-testid="album-totals">
             {t.collection.publicAlbum.totals(a.totals.owned, a.totals.total, pct)}
           </p>
@@ -59,7 +63,7 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
               {a.featured.map((c) => (
                 <li key={c.cardId} className={`w-[min(40vw,200px)] rarity-${c.rarity ?? "common"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- imagen pública con marca de agua */}
-                  <img src={img(c.cardId)} alt={c.name} className="aspect-[63/88] w-full rounded-l object-cover shadow-3" />
+                  <img src={img(c.cardId)} alt={c.name} className="aspect-[700/991] w-full rounded-l object-cover shadow-3" />
                   <p className="mt-2 text-center text-sm">{c.name}</p>
                   <p className="text-center text-xs text-ui-text-3">
                     {c.setCode} · {pad(c.number)} · {c.rarity ? t.common.rarity[c.rarity] : ""}
@@ -87,11 +91,11 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
                 s.owned ? (
                   <li key={s.number} data-slot={s.number}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- imagen pública con marca de agua */}
-                    <img src={img(s.owned.cardId)} alt={s.owned.name} loading="lazy" className="aspect-[63/88] w-full rounded-m object-cover" />
+                    <img src={img(s.owned.cardId)} alt={s.owned.name} loading="lazy" className="aspect-[700/991] w-full rounded-m object-cover" />
                   </li>
                 ) : (
                   <li key={s.number} data-slot={s.number} data-missing="true">
-                    <div className="grid aspect-[63/88] w-full place-items-center rounded-m border-2 border-dashed border-ui-line">
+                    <div className="grid aspect-[700/991] w-full place-items-center rounded-m border-2 border-dashed border-ui-line">
                       <span className="font-mono text-sm text-ui-text-3">{pad(s.number)}</span>
                     </div>
                   </li>

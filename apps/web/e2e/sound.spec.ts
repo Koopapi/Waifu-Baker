@@ -3,10 +3,10 @@
 // silencio también recordado allí) suena una sola vez, con la mejor carta.
 import type { Page } from "@playwright/test";
 import path from "node:path";
-import { openAllFinale, revealSound, vibrationPattern } from "../src/domain/opening/feedback";
+import { revealSound, vibrationPattern } from "../src/domain/opening/feedback";
 import type { Rarity } from "../src/domain/catalog/card-rules";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, giftPacks, login, tear } from "./helpers";
+import { createPublishedSet, giftPacks, LAB, login, openAllAndSkip, openDeck, tear } from "./helpers";
 
 type Log = { sounds: string[]; vibes: string[] };
 
@@ -22,12 +22,8 @@ async function record(page: Page) {
 const log = (page: Page) => page.evaluate(() => (window as unknown as { __wb: Log }).__wb);
 
 async function revealAll(page: Page) {
-  await expect(page.locator('.stage[data-phase="fanned"]')).toBeVisible();
-  const n = await page.locator(".card3d").count();
-  for (let k = 0; k < n; k++) {
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator(k + 1 === n ? ".summary" : `.stage[data-revealed="${k + 1}"]`)).toBeVisible();
-  }
+  // Spec 023: el mazo se revela y se aparte carta a carta hasta el resumen.
+  await openDeck(page);
   return (await page.locator(".summary__row").evaluateAll((rows) => rows.map((r) => r.className.match(/rarity-(\w+)/)![1]))) as Rarity[];
 }
 
@@ -36,9 +32,9 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
   // 3 cartas y la 003 rara: cada sobre trae 2, con la rara garantizada.
   await createPublishedSet(admin, "SND1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
   await giftPacks(admin, "fan-sound", "SND1", 5);
-  const fan = await login(browser, "fan-sound", false, "/sobres");
+  const fan = await login(browser, "fan-sound", false, "/packs");
   await record(fan);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   const href = (await fan.locator('[data-testid="group-SND1"] >> text=Abrir un sobre').getAttribute("href"))!;
 
   await test.step("RF-2, RF-3, RF-4 y RF-9: rasgado, un volteo por carta, el nivel de las raras y su vibración", async () => {
@@ -50,7 +46,8 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
     const expected = ["tear", ...rarities.flatMap((r) => ["flip", ...(revealSound(r) ? [revealSound(r)!] : [])])];
     await expect.poll(async () => (await log(fan)).sounds).toEqual(expected);
     expect(rarities.some((r) => revealSound(r))).toBe(true);
-    expect((await log(fan)).vibes).toEqual(rarities.flatMap((r) => (vibrationPattern(r) ? [vibrationPattern(r)!.join(",")] : [])));
+    // Spec 023: el rasgado también vibra con pulsos sueltos («6») y un golpe al arrancar («18,30,12»); aquí solo cuentan los de las raras.
+    expect((await log(fan)).vibes.filter((v) => v !== "6" && v !== "18,30,12")).toEqual(rarities.flatMap((r) => (vibrationPattern(r) ? [vibrationPattern(r)!.join(",")] : [])));
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}/s013-1-resumen-con-sonido.png` });
   });
 
@@ -67,19 +64,16 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
     expect(await log(fan)).toEqual({ sounds: [], vibes: [] });
   });
 
-  await test.step("RF-5, RF-8 y RF-9: «Abrir todos» suena y vibra una sola vez, con la mejor carta", async () => {
-    await fan.goto(`${href}/todos`);
+  // Spec 019, RF-3 (sustituye a la RF-5 de esta spec): la ráfaga suena con rasgados y el foco con la rareza de cada
+  // destacada. Aquí se comprueba que el silencio corta todo eso.
+  await test.step("RF-8 y RF-9: con el sonido apagado, «Abrir todos» no suena ni vibra", async () => {
+    await fan.goto(`${href}/all`);
     await fan.waitForLoadState("networkidle");
     const toggle = fan.locator('[data-testid="sound-toggle"]');
+    // Viene silenciado del paso anterior (el silencio se recuerda en el dispositivo).
     await expect(toggle).toHaveAttribute("aria-pressed", "true");
-    await toggle.click();
-    await expect(toggle).toHaveAttribute("aria-pressed", "false");
-    await fan.click('[data-testid="open-all"]');
-    await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(6);
-    const rarities = (await fan.locator(".oa-card").evaluateAll((cs) => cs.map((c) => c.className.match(/rarity-(\w+)/)![1]))) as Rarity[];
-    const finale = openAllFinale(rarities)!;
-    await expect.poll(async () => (await log(fan)).sounds).toEqual([finale.sound]);
+    expect(await openAllAndSkip(fan)).toBe(6);
     await fan.waitForTimeout(500);
-    expect(await log(fan)).toEqual({ sounds: [finale.sound], vibes: finale.vibration ? [finale.vibration.join(",")] : [] });
+    expect(await log(fan)).toEqual({ sounds: [], vibes: [] });
   });
 });

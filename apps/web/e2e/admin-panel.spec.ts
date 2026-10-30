@@ -2,7 +2,7 @@
 // lote → editar probabilidades → simular sobre → publicar → comprobar bloqueos → regalar un sobre.
 import type { Browser, Page } from "@playwright/test";
 import { DESKTOP, desktopOnly, expect, test } from "./fixtures";
-import { choose, tick, untickAdmin } from "./helpers";
+import { assembleSet, choose, openDeck, tick, untickAdmin } from "./helpers";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -57,6 +57,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await expect(page.locator(`text=Subida terminada · ${IMAGES.length} correctas`)).toBeVisible({ timeout: 90_000 });
     await expect(page.locator("[data-card-tile]")).toHaveCount(IMAGES.length);
     await expect(page.locator('[data-testid="upload-list"] li').first()).toContainText("Carta 001");
+    // Spec 017, RF-3: las imágenes de prueba no tienen transparencia; las cartas se crean con el aviso.
+    await expect(page.locator('[data-testid="upload-uncut"]')).toHaveCount(IMAGES.length);
   });
 
   await test.step("RF-14: asignar personaje y rareza en lote", async () => {
@@ -67,6 +69,11 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await expect(page.locator(`text=${IMAGES.length} cartas actualizadas.`)).toBeVisible({ timeout: 60_000 });
     await tick(page, "Seleccionar carta 010");
     await choose(page, "Rareza para la selección", /^Rara$/);
+    await page.click("text=Aplicar a la selección");
+    await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
+    // Spec 022: una legendaria para que el sobre gold pueda dar más legendaria que el plata.
+    await tick(page, "Seleccionar carta 009");
+    await choose(page, "Rareza para la selección", /^Legendaria$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
   });
@@ -86,7 +93,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click('[aria-label="Editar carta 010"]');
     const preview = page.locator('[data-testid="card-preview"]');
     await expect(preview.locator("img")).toHaveAttribute("src", /\/api\/admin\/assets\/.+\/mid\.[0-9a-f]+\.webp$/);
-    await expect.poll(() => preview.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(750);
+    // Spec 018: la imagen fija de la carta por capas (700 × 991).
+    await expect.poll(() => preview.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(700);
     await expect(preview.locator(".card3d--holo")).toHaveCount(0);
     await tick(page, "Ver con efecto holo");
     await expect(preview.locator(".card3d--holo .holo--foil")).toHaveCount(1);
@@ -98,11 +106,15 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click("text=Comprobar y publicar");
     await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator('[data-testid="publish-problems"]')).toContainText("tiene probabilidad en el sobre pero ninguna carta");
+    // Spec 017, RF-15: las cartas recién subidas tienen a la chica pero no fondo; cada una sale enlazada.
+    await expect(page.locator('[data-testid="publish-problems"]')).toContainText("Carta 001: no está armada (falta el fondo).");
+    await expect(page.locator('[data-testid="publish-problems"] a[href="#carta-001"]', { hasText: "no está armada" })).toBeVisible();
+    await expect(page.locator('[data-testid="not-assembled"]')).toContainText("10 cartas no están armadas");
     await expect(page.locator("h1 ~ span").first()).toHaveText("Borrador");
   });
 
   await test.step("RF-20: editar probabilidades (rechaza sumas distintas de 100)", async () => {
-    const R = ["Común", "Poco común", "Rara", "Épica", "Legendaria", "Secreta"];
+    const R = ["Común", "Rara", "Épica", "Legendaria", "EX"];
     const fill = async (slot: number, weights: Record<string, number>) => {
       for (const r of R) await page.locator(`[aria-label="Ranura ${slot}, ${r}"]`).fill(String(weights[r] ?? 0));
     };
@@ -114,6 +126,14 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click("text=Guardar probabilidades");
     await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
     await expect(page.locator('[data-card-tile="10"]')).toContainText("100 % / sobre");
+    // Spec 022, RF-21: la tabla del sobre gold, en su pestaña.
+    await page.getByRole("tab", { name: "Gold" }).click();
+    await expect(page.locator('[data-testid="odds-gold"]')).toBeVisible();
+    await fill(1, { Rara: 100 });
+    await fill(2, { Legendaria: 100 });
+    await page.click("text=Guardar probabilidades");
+    await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
+    await page.getByRole("tab", { name: "Plata" }).click();
   });
 
   await test.step("RF-23: simular un sobre con las cartas reales", async () => {
@@ -126,17 +146,18 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.mouse.down();
     for (let i = 1; i <= 12; i++) await page.mouse.move(sx + (220 * i) / 12, sy);
     await page.mouse.up();
-    await expect(page.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator('.stage[data-revealed="1"]')).toBeVisible();
-    await page.locator('.card3d[role="button"]').first().click();
-    await expect(page.locator(".summary")).toBeVisible();
+    // Spec 023: el mazo (de menor a mayor rareza) se revela y se aparte carta a carta.
+    await openDeck(page);
     await expect(page.locator(".summary__row")).toHaveCount(2);
     await expect(page.locator(".summary__row").nth(1)).toContainText("Carta de prueba 010");
     await page.click("text=← Volver a la colección");
   });
 
   await test.step("RF-21 y RF-8: publicar, congelar probabilidades y bloquear la colección", async () => {
+    // Spec 017, RF-15: con las cartas armadas ya se puede publicar.
+    await assembleSet(page, "E2E1");
+    await page.reload();
+    await expect(page.locator('[data-testid="not-assembled"]')).toHaveCount(0);
     await page.click("text=Comprobar y publicar");
     await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator("text=Colección publicada. Sus probabilidades ya son públicas.")).toBeVisible();

@@ -137,7 +137,7 @@ describe("RF-17 resumen de la colección", () => {
       await updateCard(tx, store, admin.id, a.id, a.version, { rarity: "common" });
       const o = (await getSetOverview(tx, set.id))!;
       expect(o.counts).toMatchObject({ common: 1, none: 1 });
-      expect(o.gaps).toEqual(["uncommon", "rare", "epic", "legendary", "secret"]);
+      expect(o.gaps).toEqual(["rare", "epic", "legendary", "ex"]);
       expect(o.cards).toHaveLength(2);
     });
   });

@@ -3,6 +3,7 @@
 import { adminAction, type ActionState } from "@/server/auth/admin-action";
 import { getCardStore } from "@/server/cards/store-instance";
 import { bulkUpdateCards, deleteCard, regenerateSet, reorderCards, reviewCard, simulatePack, updateCard, type CardPatch } from "@/server/services/cards";
+import { discardPendingLayers } from "@/server/services/card-layers";
 import { requireAdmin } from "@/server/auth/require-admin";
 import { db } from "@/db/client";
 import { translateError } from "@/i18n/errors";
@@ -10,6 +11,7 @@ import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
 import type { LabCard } from "@/features/opening/fakePack";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
+import { parsePackKind } from "@/domain/catalog/default-odds";
 
 const paths = (setId: string) => [`/admin/sets/${setId}`, "/admin/sets", "/admin"];
 const rarityOf = (v: unknown): Rarity | null | undefined =>
@@ -25,8 +27,9 @@ export async function bulkUpdateCardsAction(
     if (patch.characterId !== undefined) clean.characterId = patch.characterId === "__none" ? null : patch.characterId;
     if (patch.rarity !== undefined) clean.rarity = rarityOf(patch.rarity);
     if (patch.variant === "normal" || patch.variant === "holo" || patch.variant === "alt") clean.variant = patch.variant;
-    const n = await bulkUpdateCards(db, getCardStore(), actorId, setId, versions, clean);
-    return (await getDict()).admin.cards.updated(n);
+    const r = await bulkUpdateCards(db, getCardStore(), actorId, setId, versions, clean);
+    const t = (await getDict()).admin.cards;
+    return r.layersSealsToReview ? `${t.updated(r.updated)} ${t.layersSealReview(r.layersSealsToReview)}` : t.updated(r.updated);
   });
 }
 
@@ -42,8 +45,10 @@ export async function updateCardAction(setId: string, cardId: string, version: n
     };
     if (fd.has("rarity")) patch.rarity = rarityOf(String(fd.get("rarity")));
     if (variant === "normal" || variant === "holo" || variant === "alt") patch.variant = variant;
-    saved = (await updateCard(db, getCardStore(), actorId, cardId, version, patch)).version;
-    return (await getDict()).admin.cards.saved;
+    const row = await updateCard(db, getCardStore(), actorId, cardId, version, patch);
+    saved = row.version;
+    const t = (await getDict()).admin.cards;
+    return row.layersSealToReview ? `${t.saved} ${t.layersSealReview(1)}` : t.saved;
   });
   // La versión nueva viaja con la respuesta: el panel no depende de que llegue el refresco.
   return { ...r, version: saved };
@@ -82,10 +87,10 @@ export async function reviewCardAction(setId: string, cardId: string, version: n
 }
 
 /** RF-23: sobre simulado con cartas reales; no escribe nada (ni historial). */
-export async function simulatePackAction(setId: string): Promise<{ ok: boolean; cards?: LabCard[]; error?: string }> {
+export async function simulatePackAction(setId: string, kind?: string): Promise<{ ok: boolean; cards?: LabCard[]; error?: string }> {
   await requireAdmin("action:simulatePack");
   try {
-    const pack = await simulatePack(db, setId);
+    const pack = await simulatePack(db, setId, parsePackKind(kind));
     const t = await getDict();
     return {
       ok: true,
@@ -104,4 +109,14 @@ export async function simulatePackAction(setId: string): Promise<{ ok: boolean; 
     if (isAdminError(e)) return { ok: false, error: translateError(await getDict(), e) };
     throw e;
   }
+}
+
+/** Spec 018, RF-20: descarta el cambio de capas pendiente de revisión 18+. */
+export async function discardPendingLayersAction(setId: string, cardId: string, version: number): Promise<ActionState & { version?: number }> {
+  let saved: number | undefined;
+  const r = await adminAction("discardPendingLayers", paths(setId), async ({ db, actorId }) => {
+    const c = await discardPendingLayers(db, getCardStore(), actorId, cardId, { expectedVersion: version });
+    saved = c.version;
+  });
+  return { ...r, version: saved };
 }

@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useRef } from "react";
 import type { CSSProperties, MutableRefObject } from "react";
 import { useT } from "@/i18n/client";
 import type { LabCard } from "./fakePack";
+import { CartaCapas } from "@/ui/game/CartaCapas";
 import type { Tilt, TiltMode } from "./useTiltSource";
 
 interface Props {
@@ -17,6 +18,12 @@ interface Props {
   onClick?: () => void;
   /** Spec 014, RF-12: intensidad del brillo de los bordes antes de voltear (0 = sin brillo). */
   tease?: number;
+  /** Spec 018, RF-6: muestra la carta viva sobre la cara (al revelarla); si no, la imagen fija. */
+  showLive?: boolean;
+  /** Spec 023: gestos del mazo (toque y deslizamiento); con ellos, `onClick` queda solo para el teclado. */
+  gesture?: React.HTMLAttributes<HTMLDivElement>;
+  /** Nombre accesible de la acción (voltear o apartar). */
+  actionLabel?: string;
 }
 
 const MAX_RX = 10; // grados
@@ -29,7 +36,7 @@ const MAX_RY = 14;
  *   .card3d__inner volteo rotationY (GSAP)
  */
 export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
-  { card, active, mode, tiltTarget, style, onClick, tease = 0 },
+  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false, gesture, actionLabel },
   ref,
 ) {
   const t = useT();
@@ -52,7 +59,8 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
   useEffect(() => {
     const node = el.current;
     if (!node) return;
-    if (!active) {
+    // Spec 018: con la carta viva montada, la inclinación es la suya (si no, se sumarían dos).
+    if (!active || showLive) {
       node.style.setProperty("--rx", "0deg");
       node.style.setProperty("--ry", "0deg");
       node.style.setProperty("--px", "0.5");
@@ -81,7 +89,7 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [active, mode, tiltTarget]);
+  }, [active, mode, tiltTarget, showLive]);
 
   const classes = ["card3d", `rarity-${card.rarity}`, card.holo ? "card3d--holo" : "", card.framed ? "card3d--framed" : "", tease > 0 ? "card3d--tease" : ""].join(" ");
 
@@ -89,12 +97,13 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
     <div
       ref={setRefs}
       className={classes}
-      style={tease > 0 ? ({ ...style, "--tease": tease } as CSSProperties) : style}
-      onClick={onClick}
+      {...gesture}
+      style={{ ...style, ...(tease > 0 ? { "--tease": tease } : {}), ...(gesture ? { touchAction: "none" } : {}) } as CSSProperties}
+      onClick={gesture ? undefined : onClick}
       data-card={card.id}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
-      aria-label={onClick ? t.packs.stage.flipCard : undefined}
+      aria-label={onClick ? (actionLabel ?? t.packs.stage.flipCard) : undefined}
       onKeyDown={
         onClick
           ? (e) => {
@@ -120,6 +129,20 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
             <div className="holo holo--shine" />
             <div className="holo holo--glare" />
             {card.holo && <div className="holo holo--foil" />}
+            {/* Spec 018, RF-6 y RF-9: la carta viva encima de la imagen fija, con su entrada y su brillo holo. */}
+            {showLive && card.live && (
+              <CartaCapas
+                tier={card.live.tier}
+                image=""
+                config={card.live.config}
+                holo={card.holo}
+                label={card.name}
+                entrance
+                className="card3d__live"
+                // En línea: el CSS de carta-capas.js se inyecta después y pondría `.cc` en `position: relative`.
+                style={{ position: "absolute", inset: 0, aspectRatio: "auto" }}
+              />
+            )}
             {!card.framed && (
               <>
                 <div className="card3d__frame" />

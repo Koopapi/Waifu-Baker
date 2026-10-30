@@ -24,13 +24,13 @@ describe("Carta completa", () => {
 describe("RF-17 recuento por rareza y huecos", () => {
   const cards = [{ rarity: "common" as const }, { rarity: "common" as const }, { rarity: "rare" as const }, { rarity: null }];
   it("test_rf17_cuenta cartas por rareza, incluidas las que no tienen", () => {
-    expect(rarityCounts(cards)).toEqual({ common: 2, uncommon: 0, rare: 1, epic: 0, legendary: 0, secret: 0, none: 1 });
+    expect(rarityCounts(cards)).toEqual({ common: 2, rare: 1, epic: 0, legendary: 0, ex: 0, none: 1 });
   });
   it("test_rf17_avisa de cada rareza con probabilidad pero sin cartas, en orden", () => {
     const slots = [
-      { common: 70, uncommon: 25, rare: 5, epic: 0, legendary: 0, secret: 0 },
-      { common: 0, uncommon: 0, rare: 75, epic: 18, legendary: 6, secret: 1 },
+      { common: 70, rare: 25, epic: 5, legendary: 0, ex: 0 },
+      { common: 0, rare: 75, epic: 18, legendary: 6, ex: 1 },
     ];
-    expect(rarityGaps(cards, slots)).toEqual(["uncommon", "epic", "legendary", "secret"]);
+    expect(rarityGaps(cards, slots)).toEqual(["epic", "legendary", "ex"]);
   });
 });

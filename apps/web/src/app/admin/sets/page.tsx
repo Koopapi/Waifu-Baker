@@ -32,7 +32,16 @@ export default async function SetsPage() {
               ),
             },
             { key: "name", header: t.th.name },
-            { key: "isAdult", header: t.th.type, render: (r) => <AdultBadge adult={r.isAdult} /> },
+            {
+              key: "isAdult",
+              header: t.th.type,
+              render: (r) => (
+                <span className="flex flex-wrap items-center gap-2">
+                  <AdultBadge adult={r.isAdult} />
+                  <Badge tone={r.isFree ? "success" : "accent"}>{r.isFree ? tt.admin.set.free.badgeFree : tt.admin.set.free.badgePatreon}</Badge>
+                </span>
+              ),
+            },
             {
               key: "status",
               header: t.th.status,

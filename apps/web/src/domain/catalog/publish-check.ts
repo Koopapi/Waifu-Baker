@@ -1,12 +1,16 @@
-// RF-6 y RF-7: todas las comprobaciones antes de publicar, devueltas a la vez y enlazadas.
+// RF-6 y RF-7: todas las comprobaciones antes de publicar, devueltas a la vez y enlazadas. Spec 017, RF-15 y RF-16: también
+// que cada carta esté armada (chica y fondo visibles).
 import { RARITY_LABEL, rarityGaps, type Rarity } from "./card-rules";
-import { validateOdds, type Problem, type Slot } from "./odds";
+import { goldImproves, validateOdds, type Problem, type Slot } from "./odds";
+import { missingParts, type LayersConfig } from "@/domain/cards/layers";
 
 export interface PublishInput {
   isAdult: boolean;
   packSize: number;
   slots: Partial<Slot>[];
   holoChance: number;
+  /** Spec 022, RF-12: la tabla del sobre gold (null si falta). */
+  gold?: { slots: Partial<Slot>[]; holoChance: number } | null;
   cards: {
     id: string;
     number: number;
@@ -16,6 +20,8 @@ export interface PublishInput {
     keyFull: string | null;
     adultReviewedAt: Date | null;
     pendingOriginalKey: string | null;
+    /** Spec 017: configuración por capas (la carta tiene que estar armada). */
+    layers: LayersConfig | null;
   }[];
 }
 
@@ -28,8 +34,18 @@ const FIELD_LABEL: Record<CardField, string> = { character: "personaje", name: "
 export function publishProblems(input: PublishInput): Problem[] {
   const out: Problem[] = [];
   if (input.cards.length === 0) out.push({ code: "no_cards", message: "La colección no tiene cartas.", target: { kind: "set" } });
-  out.push(...validateOdds(input.slots, input.packSize, input.holoChance));
-  for (const rarity of rarityGaps(input.cards, input.slots)) {
+  out.push(...validateOdds(input.slots, input.packSize, input.holoChance, "silver"));
+  // Spec 022, RF-13 a RF-16: el sobre gold con su tabla válida, sus rarezas con cartas y mejor que el plata.
+  const gold = input.gold === undefined ? undefined : input.gold;
+  if (gold === null) out.push({ code: "missing_table", message: "Falta la tabla de probabilidades del sobre gold.", target: { kind: "set" }, params: { kind: "gold" } });
+  if (gold) {
+    out.push(...validateOdds(gold.slots, input.packSize, gold.holoChance, "gold").map((p) => ({ ...p, params: { ...p.params, kind: "gold" } })));
+    if (!goldImproves(input.slots, gold.slots)) {
+      out.push({ code: "gold_not_better", message: "El sobre gold tiene que dar más probabilidad de legendaria o EX que el plata.", target: { kind: "set" }, params: { kind: "gold" } });
+    }
+  }
+  const allSlots = gold ? [...input.slots, ...gold.slots] : input.slots;
+  for (const rarity of rarityGaps(input.cards, allSlots)) {
     out.push({
       code: "rarity_without_cards",
       message: `${RARITY_LABEL[rarity]}: tiene probabilidad en el sobre pero ninguna carta.`,
@@ -48,6 +64,16 @@ export function publishProblems(input: PublishInput): Problem[] {
         message: `Carta ${pad(c.number)}: falta ${missing.map((f) => FIELD_LABEL[f]).join(", ")}.`,
         target,
         params: { number: c.number, missing: missing.join(",") },
+      });
+    }
+    const parts = missingParts(c.layers);
+    if (parts.length) {
+      const labels = { personaje: "la chica", fondo: "el fondo" } as const;
+      out.push({
+        code: "card_not_assembled",
+        message: `Carta ${pad(c.number)}: no está armada (falta ${parts.map((p) => labels[p]).join(" y ")}).`,
+        target,
+        params: { number: c.number, missing: parts.join(",") },
       });
     }
     if (!input.isAdult) continue;

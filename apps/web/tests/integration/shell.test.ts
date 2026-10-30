@@ -13,8 +13,8 @@ describe("estructura del coleccionista", () => {
   it("test_s010_rf1_un icono por colección con cartas o sobres, con la mejor carta como portada", async () => {
     await inRollback(async (tx) => {
       const admin = await makeAdmin(tx);
-      const a = await createPublishedSet(tx, admin.id, { code: "SHA", rarities: ["common"], slots: [{ common: 100 }] });
-      const b = await createPublishedSet(tx, admin.id, { code: "SHB", rarities: ["common", "epic", "rare"], slots: [{ common: 100 }] });
+      const a = await createPublishedSet(tx, admin.id, { code: "SHA", rarities: ["rare"], slots: [{ rare: 100 }] });
+      const b = await createPublishedSet(tx, admin.id, { code: "SHB", rarities: ["common", "epic", "rare"], slots: [{ rare: 100 }] });
       const fan = await upsertUserFromLogin(tx, { patreonUserId: "dev:shell-fan", displayName: "Shell fan", role: "user" });
       await tx.insert(packs).values([0, 1].map((n) => ({ userId: fan.id, setId: a.set.id, source: "manual" as const, grantKey: `shell:${n}` })));
       await tx.insert(userCards).values([b.cards[0], b.cards[1]].map((c) => ({ userId: fan.id, cardId: c.id })));
@@ -24,7 +24,8 @@ describe("estructura del coleccionista", () => {
         ["SHA", null],
         ["SHB", b.cards[1].id],
       ]);
-      expect(s.collections[1].progress).toEqual({ owned: 2, total: 3 });
+      // Tres cartas y la legendaria que el ayudante añade para el sobre gold (spec 022).
+      expect(s.collections[1].progress).toEqual({ owned: 2, total: 4 });
       expect(s.sealed).toBe(2);
     });
   });

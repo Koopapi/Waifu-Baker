@@ -1,0 +1,12 @@
+**/node_modules
+**/.next*
+**/.env*
+!**/.env.example
+**/var
+**/test-results
+**/playwright-report
+**/tsconfig.tsbuildinfo
+.git
+docs/waifu-baker
+art
+apps/web/demo

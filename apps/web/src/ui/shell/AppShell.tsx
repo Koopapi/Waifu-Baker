@@ -59,7 +59,7 @@ export function AppShell(p: ShellProps) {
   const drawer = useRef<HTMLDivElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const all = p.groups.flatMap((g) => g.items);
-  // La sección actual es la de ruta más larga que coincide (así /coleccion/album gana a /coleccion).
+  // La sección actual es la de ruta más larga que coincide (así /collection/album gana a /collection).
   const current = all.filter((i) => !i.external && isActive(path, i)).sort((a, b) => b.href.length - a.href.length)[0];
 
   const close = useCallback(() => {
@@ -235,7 +235,7 @@ function Rail(p: ShellProps & { path: string }) {
   const t = useT().common.shell;
   return (
     <div className="flex w-[72px] shrink-0 flex-col items-center gap-2 overflow-y-auto bg-ui-rail py-3" aria-label={t.collections} role="navigation" data-testid="collection-rail">
-      <RailLink href={p.kind === "admin" ? "/admin" : "/sobres"} label={t.home} active={p.path === (p.kind === "admin" ? "/admin" : "/sobres")}>
+      <RailLink href={p.kind === "admin" ? "/admin" : "/packs"} label={t.home} active={p.path === (p.kind === "admin" ? "/admin" : "/packs")}>
         <span className="font-display text-base font-bold">WB</span>
       </RailLink>
       <span aria-hidden className="h-0.5 w-8 rounded-full bg-ui-line" />

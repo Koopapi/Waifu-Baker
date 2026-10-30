@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   try {
     await uploadPackImage(db, getCardStore(), session.user.id, setId, { body: Buffer.from(await file.arrayBuffer()), mime: file.type, filename: file.name });
     revalidatePath(`/admin/sets/${setId}`);
-    revalidatePath("/sobres");
+    revalidatePath("/packs");
     return Response.json({ ok: true });
   } catch (e) {
     if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: e.code === "not_found" ? 404 : 422 });

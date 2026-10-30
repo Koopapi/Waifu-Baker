@@ -75,7 +75,7 @@ describe("spec 007 — copias de seguridad", () => {
   it("test_s007_rf16_una_copia_fallida_queda_registrada", async () => {
     const { runBackup, backupStatus } = await import("@/server/services/backups");
     await inRollback(async (tx) => {
-      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: "/no/existe", outDir: "/tmp/wb-it-out", passphrase: null });
+      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: "/no/existe", outDir: "/tmp/wb-it-out", passphrase: null, r2: null });
       expect(r.ok).toBe(false);
       const s = await backupStatus(tx);
       expect(s.lastFailure?.error).toMatch(/BACKUP_PASSPHRASE/);
@@ -89,7 +89,7 @@ describe("spec 007 — copias de seguridad", () => {
     const { runBackup, backupStatus } = await import("@/server/services/backups");
     const dir = await mkdtemp(path.join(tmpdir(), "wb-it-ok-"));
     await inRollback(async (tx) => {
-      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: path.join(dir, "cards"), outDir: path.join(dir, "out"), passphrase: "clave-de-prueba-larga" });
+      const r = await runBackup(tx, { databaseUrl: TEST_URL, cardsDir: path.join(dir, "cards"), outDir: path.join(dir, "out"), passphrase: "clave-de-prueba-larga", r2: null });
       expect(r.ok).toBe(true);
       const s = await backupStatus(tx);
       expect(s.lastOk?.file).toMatch(/^wb-backup-.*\.wbk$/);
@@ -106,7 +106,7 @@ describe("spec 007 — métricas", () => {
     const { activateAlbum } = await import("@/server/services/album");
     await inRollback(async (tx) => {
       const admin = await makeAdmin(tx);
-      const set = await createPublishedSet(tx, admin.id, { code: "MET1", rarities: ["common"], slots: [{ common: 100 }] });
+      const set = await createPublishedSet(tx, admin.id, { code: "MET1", isFree: true, rarities: ["rare"], slots: [{ rare: 100 }] });
       const fan = await upsertUserFromLogin(tx, { patreonUserId: "p-met", displayName: "Met", role: "user" });
       const now = new Date();
       await trackActivity(tx, fan.id, now);

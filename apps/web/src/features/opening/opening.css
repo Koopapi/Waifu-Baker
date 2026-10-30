@@ -186,7 +186,8 @@
 .card3d {
   grid-area: 1 / 1;
   width: min(64vw, 300px);
-  aspect-ratio: 63 / 88;
+  /* Spec 018: la proporción de la carta por capas (700 × 991). */
+  aspect-ratio: 700 / 991;
   pointer-events: auto;
   transform-style: preserve-3d;
   --rx: 0deg;
@@ -401,9 +402,6 @@
 .rarity-common {
   --rarity-color: #9aa0a6;
 }
-.rarity-uncommon {
-  --rarity-color: #4ade80;
-}
 .rarity-rare {
   --rarity-color: #60a5fa;
 }
@@ -413,7 +411,7 @@
 .rarity-legendary {
   --rarity-color: #f5c451;
 }
-.rarity-secret {
+.rarity-ex {
   --rarity-color: #ff6ad5;
 }
 
@@ -538,7 +536,7 @@
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: 63 / 88;
+  aspect-ratio: 700 / 991;
   border-radius: 10px;
   overflow: hidden;
   border: 3px solid var(--rarity-color, #c9cdd3);
@@ -699,7 +697,7 @@
 
 /* RF-13: confeti de pegatinas. */
 
-/* RF-13: celebración a pantalla completa en legendaria y secreta. */
+/* RF-13: celebración a pantalla completa en legendaria y EX. */
 .celebrate {
   position: absolute;
   inset: 0;
@@ -757,4 +755,405 @@
   .card3d--tease::before {
     animation: none;
   }
+}
+
+/* Spec 018, RF-6: la carta viva encima de la imagen fija de la cara, al revelarla (posición en línea en Card3D). */
+.card3d__live {
+  z-index: 3;
+}
+/* En cuanto la carta viva cargó, la imagen fija de debajo se oculta: al inclinarse, la viva dejaría ver su borde. */
+.card3d__front:has(.card3d__live .cc-card:not(.cc-cargando)) > :not(.card3d__live) {
+  opacity: 0;
+}
+
+/* ---------- spec 023: apertura nueva ---------- */
+
+.stage {
+  /* Tamaño de la carta del mazo: cabe con «¡Nueva!» arriba y el nombre abajo en cualquier teléfono. */
+  --card-w: min(62vw, 290px, calc((100dvh - 400px) * 0.706));
+  /* Nada (foco, teclado o «desplazar a la vista») puede mover la escena: recorta sin dejar desplazarse. */
+  overflow: clip;
+  --card-h: calc(var(--card-w) * 1.4157);
+}
+.stage .card3d {
+  width: var(--card-w);
+}
+
+/* Rayos que giran detrás del sobre y del mazo (laboratorio de Bruno). */
+.stage__rays {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 1600px;
+  height: 1600px;
+  margin: -800px 0 0 -800px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgb(255 111 184 / 0.16) 0deg 8deg, transparent 8deg 22deg, rgb(166 240 230 / 0.12) 22deg 28deg, transparent 28deg 45deg);
+  mask-image: radial-gradient(closest-side, #000 18%, transparent 62%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 18%, transparent 62%);
+  animation: stage-rays 60s linear infinite;
+  pointer-events: none;
+}
+.stage[data-kind="gold"] .stage__rays {
+  background: repeating-conic-gradient(rgb(247 215 116 / 0.2) 0deg 8deg, transparent 8deg 22deg, rgb(255 111 184 / 0.12) 22deg 28deg, transparent 28deg 45deg);
+}
+@keyframes stage-rays {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* RF-1 a RF-9: el sobre que se rasga. */
+.tear-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  transition: transform 0.6s, opacity 0.4s;
+  transition-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+.tear {
+  position: relative;
+  width: min(60vw, 250px, calc((100dvh - 380px) * 0.638));
+  container-type: inline-size;
+  perspective: 900px;
+  --rx: 0deg;
+  --ry: 0deg;
+}
+.tear__tilt {
+  position: relative;
+  /* Al tirar, el sobre se inclina hacia ese lado, como sujetándolo con la otra mano (--tug: -1 a 1). */
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) rotate(calc(var(--tug, 0) * 3.5deg)) translateX(calc(var(--tug, 0) * 2.4cqw));
+  transform-style: preserve-3d;
+}
+.tear .tear__shell {
+  width: 100%;
+}
+.tear__strips {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 17.6cqw;
+  transform-style: preserve-3d;
+}
+/* El blanco del papel que asoma en el corte (una tira blanca un poco más ancha, debajo de la de foil). */
+.tear__fiber {
+  background: #fffaf2 !important;
+  border-color: #fffaf2 !important;
+}
+.tear__fiber > *,
+.tear__fiber::after {
+  visibility: hidden;
+}
+.tear__fiber--rest {
+  clip-path: var(--rest-fiber, none);
+}
+.tear__rest {
+  clip-path: var(--rest-clip, none);
+}
+.tear__fly {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* La tira arrancada se levanta y se curva hacia quien mira; por debajo se oscurece. */
+.tear__peel {
+  position: absolute;
+  inset: 0;
+  transform-origin: var(--cut, 50%) 100%;
+  transform: translateY(calc(var(--tear, 0) * -5cqw)) rotate(calc(var(--tug, 0) * 15deg)) rotateX(calc(var(--tear, 0) * -32deg));
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 calc(var(--tear, 0) * 4cqw) 3cqw rgb(0 0 0 / 0.45));
+}
+.tear__fiber--flap {
+  clip-path: var(--flap-fiber, none);
+}
+.tear__flap {
+  clip-path: var(--flap-clip, none);
+  filter: brightness(calc(1 - var(--tear, 0) * 0.28));
+}
+/* Trocitos de papel y foil que saltan en el punto de rotura y caen. */
+.tear__flake {
+  position: absolute;
+  width: var(--s);
+  height: calc(var(--s) * 0.7);
+  margin: calc(var(--s) * -0.35) 0 0 calc(var(--s) * -0.5);
+  border-radius: 1px;
+  background: #fffaf2;
+  pointer-events: none;
+  animation: tear-flake 0.75s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+}
+.tear__flake--foil {
+  background: linear-gradient(135deg, var(--strip-a), var(--strip-c));
+}
+@keyframes tear-flake {
+  40% {
+    transform: translate(calc(var(--dx) * 0.6), var(--dy)) rotate(calc(var(--rot) * 0.4));
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--dx), calc(var(--dy) + 90px)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+/* Al abrirse: un destello sale de la boca del sobre y el sobre rebota un poco. */
+.tear__burst {
+  position: absolute;
+  left: 50%;
+  top: 17.6cqw;
+  width: 130cqw;
+  height: 70cqw;
+  margin: -35cqw 0 0 -65cqw;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(223 230 245 / 0.55) 40%, transparent 72%);
+  pointer-events: none;
+  animation: tear-burst 0.9s ease-out forwards;
+}
+.tear__burst.pack-shell--gold {
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(255 226 122 / 0.65) 38%, transparent 72%);
+}
+@keyframes tear-burst {
+  from {
+    opacity: 0;
+    transform: scale(0.2, 0.1);
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.25, 1);
+  }
+}
+.tear--off .tear__shell {
+  transform-origin: 50% 100%;
+  animation: tear-pop 0.5s ease-out;
+}
+@keyframes tear-pop {
+  30% {
+    transform: scale(1.03, 0.95);
+  }
+  65% {
+    transform: scale(0.99, 1.02);
+  }
+}
+/* La zona de agarre: un poco más grande que la tira, para el dedo. */
+.tear .tear__hit.pack__strip {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  top: -6cqw;
+  height: 30cqw;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  cursor: grab;
+  z-index: 3;
+}
+.tear--tearing .tear__hit.pack__strip {
+  cursor: grabbing;
+}
+.tear--off .tear__hit,
+.tear--reduced .tear__hit {
+  cursor: default;
+}
+.tear--off .tear__hit {
+  display: none;
+}
+.tear-wrap .tear__cta {
+  position: static;
+  transform: none;
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  border: 1.5px solid rgb(255 255 255 / 0.35);
+  font-weight: 800;
+  padding: 11px 22px;
+}
+.tear-wrap .tear__cta:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.tear-wrap .tear__cta:focus-visible {
+  outline: 3px solid #ffe27a;
+  outline-offset: 3px;
+}
+.tear--shake {
+  animation: packShake 0.45s ease-in-out;
+}
+
+/* RF-12: con el sobre abierto, baja y las cartas salen de su boca. */
+.stage[data-phase="opening"] .tear-wrap,
+.stage[data-phase="deck"] .tear-wrap {
+  transform: translateY(calc(var(--card-h) * 0.62)) scale(0.84);
+}
+.stage[data-phase="deck"] .tear-wrap {
+  opacity: 0.9;
+}
+
+/* RF-15: la carta presentada (referencia de Bruno). */
+.reveal-info {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+.reveal-info__new {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - var(--card-h) / 2 - 76px);
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(38px, 11vw, 56px);
+  line-height: 1;
+  color: #ff6fae;
+  -webkit-text-stroke: 3px #ffffff;
+  paint-order: stroke fill;
+  text-shadow: 5px 5px 0 #7cc8ff;
+  animation: reveal-pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.reveal-info__badge,
+.reveal-info__mini {
+  --badge: linear-gradient(160deg, #ffffff, #c9ced6 45%, #8e949e);
+  --badge-ink: #2a2f3a;
+  display: inline-grid;
+  place-items: center;
+  background: var(--badge);
+  color: var(--badge-ink);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-style: italic;
+  clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
+}
+.reveal-info__badge {
+  position: absolute;
+  left: calc(50% - var(--card-w) / 2 - 18px);
+  top: calc(50% - var(--card-h) / 2 - 20px);
+  min-width: 64px;
+  padding: 5px 18px;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  transform: rotate(-5deg);
+  filter: drop-shadow(0 4px 6px rgb(0 0 0 / 0.55));
+  animation: reveal-pop 0.4s 0.08s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.rarity-rare .reveal-info__badge,
+.rarity-rare .reveal-info__mini {
+  --badge: linear-gradient(160deg, #e6f3ff, #9fd3ff 45%, #3b82f6);
+  --badge-ink: #0b2a66;
+}
+.rarity-epic .reveal-info__badge,
+.rarity-epic .reveal-info__mini {
+  --badge: linear-gradient(160deg, #f6eeff, #e9b8ff 45%, #8b3fd9);
+  --badge-ink: #2a0b4a;
+}
+.rarity-legendary .reveal-info__badge,
+.rarity-legendary .reveal-info__mini {
+  --badge: linear-gradient(160deg, #fffbe0, #f7d774 40%, #c3861c 65%, #fbe39a);
+  --badge-ink: #3a2600;
+}
+.rarity-ex .reveal-info__badge,
+.rarity-ex .reveal-info__mini {
+  --badge: linear-gradient(120deg, #ff9ad5, #ffe27a 30%, #7ef0c9 55%, #7cc8ff 75%, #b79cff);
+  --badge-ink: #26113d;
+}
+.reveal-info__foot {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: calc(50% + var(--card-h) / 2 + 14px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  animation: reveal-rise 0.4s 0.12s ease-out both;
+}
+.reveal-info__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(24px, 7vw, 34px);
+  line-height: 1.05;
+  color: #ffffff;
+  -webkit-text-stroke: 3px #ff6fae;
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 #3b1f35;
+  overflow-wrap: anywhere;
+}
+.reveal-info__set {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.85);
+}
+.reveal-info__mini {
+  min-width: 38px;
+  padding: 2px 10px;
+  font-size: 12px;
+}
+@keyframes reveal-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-12deg);
+  }
+}
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+/* La de arriba del mazo se puede arrastrar. */
+.stage .card3d[role="button"] {
+  cursor: grab;
+  opacity: 1;
+}
+.stage .card3d[role="button"]:active {
+  cursor: grabbing;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage__rays,
+  .reveal-info__new,
+  .reveal-info__badge,
+  .reveal-info__foot {
+    animation: none;
+  }
+  .tear-wrap {
+    transition: none;
+  }
+  .tear--off .tear__shell,
+  .tear__burst,
+  .tear__flake {
+    animation: none;
+  }
+}
+
+/* Spec 023: la indicación va arriba, lejos de la barra de abajo y del nombre de la carta presentada. */
+.stage .hint {
+  top: calc(max(12px, env(safe-area-inset-top)) + 56px);
+  bottom: auto;
+}
+
+/* Spec 023: el resumen deja sitio a la barra de abajo (una sola fila) y a la etiqueta del tipo. */
+.stage .summary {
+  padding: calc(max(12px, env(safe-area-inset-top)) + 52px) 16px calc(max(16px, env(safe-area-inset-bottom)) + 64px);
+}
+.stage .hud {
+  flex-wrap: nowrap;
+}
+
+/* Con una carta presentada, el sobre abierto queda en segundo plano para que se lea el nombre. */
+.stage[data-shown] .tear-wrap {
+  opacity: 0.18;
 }

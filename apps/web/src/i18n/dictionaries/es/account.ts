@@ -3,6 +3,7 @@ import type { account as en } from "../en/account";
 export const account: typeof en = {
   title: "Mi cuenta",
   subscription: "Suscripción de Patreon",
+  patronBadge: "Patron",
   tier: "Tier",
   noTier: "Sin tier de pago",
   status: "Estado",

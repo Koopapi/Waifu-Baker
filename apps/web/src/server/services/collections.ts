@@ -1,9 +1,9 @@
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { inArray, and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { cards, dropTables, sets } from "@/db/schema";
 import { canEdit, nextStatusAllowed, type EditableField, type SetStatus } from "@/domain/catalog/collection-rules";
 import { validateOdds, type Problem, type Slot } from "@/domain/catalog/odds";
 import { publishProblems } from "@/domain/catalog/publish-check";
-import { defaultSlots } from "@/domain/catalog/default-odds";
+import { PACK_KINDS, type PackKind, defaultSlots } from "@/domain/catalog/default-odds";
 import type { DbLike } from "@/server/db-types";
 import { AdminError, isUniqueViolation } from "@/server/errors";
 import { auditChange, recordAudit } from "./audit";
@@ -47,7 +47,8 @@ export async function createSet(
         .insert(sets)
         .values({ code, name, slug: code.toLowerCase(), isAdult: input.isAdult, packSize })
         .returning();
-      await tx.insert(dropTables).values({ setId: set.id, slots: defaultSlots(packSize) });
+      // Spec 022, RF-12: una tabla por tipo de sobre.
+      await tx.insert(dropTables).values(PACK_KINDS.map((kind) => ({ setId: set.id, kind, slots: defaultSlots(packSize, kind), pityThreshold: kind === "silver" ? 10 : 0 })));
       await recordAudit(tx, {
         actorUserId,
         action: "set_create",
@@ -91,7 +92,8 @@ export async function updateSet(db: DbLike, actorUserId: string, setId: string, 
     }
     const [updated] = await tx
       .update(sets)
-      .set({ ...next, version: cur.version + 1, updatedAt: sql`now()` })
+      // Spec 021, RF-2: una colección 18+ nunca es gratuita.
+      .set({ ...next, ...(next.isAdult ? { isFree: false } : {}), version: cur.version + 1, updatedAt: sql`now()` })
       .where(and(eq(sets.id, setId), eq(sets.version, expectedVersion)))
       .returning();
     if (next.isAdult !== cur.isAdult) {
@@ -99,7 +101,9 @@ export async function updateSet(db: DbLike, actorUserId: string, setId: string, 
       await tx.update(cards).set({ adultReviewedBy: null, adultReviewedAt: null }).where(eq(cards.setId, setId));
     }
     if (next.packSize !== cur.packSize) {
-      await tx.update(dropTables).set({ slots: defaultSlots(next.packSize), updatedAt: sql`now()` }).where(eq(dropTables.setId, setId));
+      for (const kind of PACK_KINDS) {
+        await tx.update(dropTables).set({ slots: defaultSlots(next.packSize, kind), updatedAt: sql`now()` }).where(and(eq(dropTables.setId, setId), eq(dropTables.kind, kind)));
+      }
     }
     await auditChange(tx, {
       actorUserId,
@@ -123,6 +127,7 @@ export async function listSets(db: DbLike) {
       status: sets.status,
       packSize: sets.packSize,
       isWelcome: sets.isWelcome,
+      isFree: sets.isFree,
       updatedAt: sets.updatedAt,
       cardCount: count(cards.id),
     })
@@ -130,6 +135,19 @@ export async function listSets(db: DbLike) {
     .leftJoin(cards, eq(cards.setId, sets.id))
     .groupBy(sets.id)
     .orderBy(asc(sets.code));
+}
+
+/** Spec 021, RF-1 y RF-2: gratuita (sale en las fuentes gratis) o de Patreon; una 18+ nunca puede ser gratuita. */
+export async function setFreeSet(db: DbLike, actorUserId: string, setId: string, free: boolean) {
+  return db.transaction(async (tx) => {
+    const [cur] = await tx.select().from(sets).where(eq(sets.id, setId)).for("update");
+    if (!cur) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
+    if (free && cur.isAdult) throw new AdminError("free_adult", "Una colección 18+ no puede ser gratuita.");
+    if (cur.isFree === free) return cur;
+    const [u] = await tx.update(sets).set({ isFree: free, updatedAt: sql`now()` }).where(eq(sets.id, setId)).returning();
+    await recordAudit(tx, { actorUserId, action: "set.free", entityType: "set", entityId: setId, before: { isFree: cur.isFree }, after: { isFree: free } });
+    return u;
+  });
 }
 
 export async function getSet(db: DbLike, setId: string) {
@@ -146,8 +164,8 @@ async function lockForTransition(db: DbLike, setId: string, expectedVersion: num
   return cur;
 }
 
-async function editableDropTable(db: DbLike, setId: string) {
-  const [dt] = await db.select().from(dropTables).where(eq(dropTables.setId, setId)).orderBy(desc(dropTables.version)).limit(1);
+async function editableDropTable(db: DbLike, setId: string, kind: PackKind = "silver") {
+  const [dt] = await db.select().from(dropTables).where(and(eq(dropTables.setId, setId), eq(dropTables.kind, kind))).orderBy(desc(dropTables.version)).limit(1);
   if (!dt) throw new AdminError("not_found", "La colección no tiene tabla de probabilidades.", { entity: "drop_table" });
   return dt;
 }
@@ -158,8 +176,9 @@ export async function saveOdds(
   actorUserId: string,
   setId: string,
   expectedVersion: number,
-  input: { slots: Partial<Slot>[]; holoChance: number; pityThreshold?: number },
+  input: { slots: Partial<Slot>[]; holoChance: number; pityThreshold?: number; kind?: PackKind },
 ) {
+  const kind = input.kind ?? "silver";
   if (input.pityThreshold !== undefined && (!Number.isInteger(input.pityThreshold) || input.pityThreshold < 0 || input.pityThreshold > 100)) {
     throw new AdminError("invalid_odds", "La protección debe ser un número entero de sobres entre 0 y 100 (0 la desactiva).", { field: "pity", min: 0, max: 100 });
   }
@@ -168,16 +187,17 @@ export async function saveOdds(
     if (!canEdit(cur.status, "odds")) {
       throw new AdminError("locked", "Las probabilidades de una colección publicada no se pueden cambiar (RF-8).", { what: "odds" });
     }
-    const problems = validateOdds(input.slots, cur.packSize, input.holoChance);
+    const problems = validateOdds(input.slots, cur.packSize, input.holoChance, kind);
     if (problems.length) {
       // Spec 008: los problemas viajan como JSON para traducir cada uno por su código.
-      const encoded = JSON.stringify(problems.map((p) => ({ code: p.code, params: p.params })));
+      const encoded = JSON.stringify(problems.map((p) => ({ code: p.code, params: kind === "gold" ? { ...p.params, kind } : p.params })));
       throw new AdminError("invalid_odds", problems.map((p) => p.message).join(" "), { problems: encoded });
     }
-    const dt = await editableDropTable(tx, setId);
+    const dt = await editableDropTable(tx, setId, kind);
     if (dt.publishedAt) throw new AdminError("locked", "Esta versión de probabilidades ya está publicada.", { what: "odds_version" });
-    const slots = input.slots.map((s) => ({ common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0, ...s }));
-    const pityThreshold = input.pityThreshold ?? dt.pityThreshold;
+    const slots = input.slots.map((s) => ({ common: 0, rare: 0, epic: 0, legendary: 0, ex: 0, ...s }));
+    // Spec 022, RF-18: la protección de mala suerte solo existe en el sobre plata.
+    const pityThreshold = kind === "gold" ? 0 : (input.pityThreshold ?? dt.pityThreshold);
     await tx.update(dropTables).set({ slots, holoChance: input.holoChance, pityThreshold, updatedAt: sql`now()` }).where(eq(dropTables.id, dt.id));
     await tx.update(sets).set({ version: cur.version + 1, updatedAt: sql`now()` }).where(eq(sets.id, setId));
     await auditChange(tx, {
@@ -185,8 +205,8 @@ export async function saveOdds(
       action: "odds_update",
       entityType: "set",
       entityId: setId,
-      before: { slots: dt.slots, holoChance: dt.holoChance, pityThreshold: dt.pityThreshold },
-      after: { slots, holoChance: input.holoChance, pityThreshold },
+      before: { kind, slots: dt.slots, holoChance: dt.holoChance, pityThreshold: dt.pityThreshold },
+      after: { kind, slots, holoChance: input.holoChance, pityThreshold },
     });
   });
 }
@@ -198,12 +218,21 @@ export async function publishSet(db: DbLike, actorUserId: string, setId: string,
     if (!nextStatusAllowed(cur.status, "published")) {
       throw new AdminError("invalid_transition", "Solo se puede publicar una colección en borrador.", { action: "publish" });
     }
-    const dt = await editableDropTable(tx, setId);
+    const dt = await editableDropTable(tx, setId, "silver");
+    // Spec 022, RF-13 y RF-16: se publican las dos tablas o ninguna.
+    const [gold] = await tx.select().from(dropTables).where(and(eq(dropTables.setId, setId), eq(dropTables.kind, "gold"))).orderBy(desc(dropTables.version)).limit(1);
     const rows = await tx.select().from(cards).where(eq(cards.setId, setId));
-    const problems = publishProblems({ isAdult: cur.isAdult, packSize: cur.packSize, slots: dt.slots, holoChance: dt.holoChance, cards: rows });
+    const problems = publishProblems({
+      isAdult: cur.isAdult,
+      packSize: cur.packSize,
+      slots: dt.slots,
+      holoChance: dt.holoChance,
+      gold: gold ? { slots: gold.slots, holoChance: gold.holoChance } : null,
+      cards: rows,
+    });
     if (problems.length) return { problems };
     await tx.update(sets).set({ status: "published", publishedAt: sql`now()`, version: cur.version + 1, updatedAt: sql`now()` }).where(eq(sets.id, setId));
-    await tx.update(dropTables).set({ publishedAt: sql`now()`, isPublic: true, updatedAt: sql`now()` }).where(eq(dropTables.id, dt.id));
+    await tx.update(dropTables).set({ publishedAt: sql`now()`, isPublic: true, updatedAt: sql`now()` }).where(inArray(dropTables.id, [dt.id, gold!.id]));
     await recordAudit(tx, { actorUserId, action: "set_publish", entityType: "set", entityId: setId, after: { cards: rows.length, dropTableVersion: dt.version } });
     return { problems: [] };
   });
@@ -222,12 +251,18 @@ export async function archiveSet(db: DbLike, actorUserId: string, setId: string,
   });
 }
 
-/** Probabilidades públicas de las colecciones publicadas o archivadas (RF-21). */
+/** Probabilidades públicas de las colecciones publicadas o archivadas (RF-21); spec 022, RF-20: plata y gold. */
 export async function listPublicOdds(db: DbLike) {
-  return db
+  const rows = await db
     .select({ set: sets, odds: dropTables })
     .from(dropTables)
     .innerJoin(sets, eq(sets.id, dropTables.setId))
     .where(and(eq(dropTables.isPublic, true), isNull(sets.archivedAt)))
-    .orderBy(asc(sets.code));
+    .orderBy(asc(sets.code), desc(dropTables.version));
+  const out: { set: typeof sets.$inferSelect; odds: typeof dropTables.$inferSelect; gold: typeof dropTables.$inferSelect | null }[] = [];
+  for (const r of rows) {
+    if (r.odds.kind !== "silver" || out.some((o) => o.set.id === r.set.id)) continue;
+    out.push({ set: r.set, odds: r.odds, gold: rows.find((g) => g.set.id === r.set.id && g.odds.kind === "gold")?.odds ?? null });
+  }
+  return out;
 }

@@ -14,6 +14,8 @@ export const collection: typeof en = {
   },
   viewCollection: "Ver la colección",
   adultLocked: "Colección 18+: verifica tu edad con un tier adulto de Patreon para ver estas cartas.",
+  // Spec 021, RF-9: cómo se consigue una colección de Patreon.
+  patreon: { notice: "Esta colección llega con la suscripción de Patreon.", link: "Ver los tiers en Patreon" },
   progress: (owned, total) => `${owned} de ${total} cartas`,
   binder: {
     modes: { all: "Todas", owned: "Las que tengo", missing: "Me faltan", holo: "Holo" },
@@ -27,7 +29,10 @@ export const collection: typeof en = {
     holo: "Holo",
     version: "Versión",
     firstObtained: (date) => `La conseguiste por primera vez el ${date}.`,
-    aiHint: "Ilustración generada con IA. Mueve el ratón o inclina el móvil para ver el brillo.",
+    aiHint: "Ilustración generada con IA. Mueve el ratón o arrastra la carta con el dedo para inclinarla.",
+    gyro: "Mover con el teléfono",
+    gyroHint: "La carta sigue la inclinación del celular. Apagado, se inclina arrastrando el dedo.",
+    gyroDenied: "No diste permiso para usar el movimiento del teléfono; la carta se inclina con el dedo.",
   },
   album: {
     moderation: {

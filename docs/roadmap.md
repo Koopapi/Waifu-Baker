@@ -35,9 +35,11 @@ el CI en verde.
 | 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012 ✓**: moderación de álbumes públicos (los términos ya la prometen); **spec 013 ✓**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos). **Etapa cerrada el 16 oct 2026.** | entrevistas cortas |
 | 1b. Demo pulida (**spec 014**) | Estilo kawaii sobre oscuro: iconos tipo pegatina, sobres compuestos con el arte de la colección (o subidos a mano), apertura con suspense, recompensas y colección con más vida, sin cartas repetidas por sobre, demo optimizada. **Spec 014 ✓, cerrada el 18 oct 2026** tras la prueba del usuario en su teléfono. | maquetas aprobadas |
 | 1c. Premios con vida (**spec 015 ✓**, cerrada el 20 oct 2026) | Galletas y sobres que vuelan hasta su contador, celebración central para los sobres que llegan sin pedirlos y el día 7, racha que se estampa y avisa en el día de gracia, sonidos y vibración por el motor de la apertura, fuera los avisos del sistema para el coleccionista | maquetas aprobadas |
+| 1d. Cartas por capas (**specs 016 ✓, 017 ✓ y 018 ✓**, del paquete de Bruno; 016 y 017 cerradas el 23 oct 2026, 018 el 25 oct 2026) | 016 editor en el panel; 017 armado de cartas por capas (la chica recortada crea la carta, biblioteca general de fondos, sellos, adornos y partículas, mover/escalar/girar capas, estilo automático, no publicar sin armar, importar/exportar); 018 las cartas por capas se ven en toda la web (imagen plana que sustituye al marco de Pencil, apertura, colección, ficha, giroscopio, zonas públicas con marca de agua, revisión 18+). Marcos y sello de Bruno (N a UR) sin cambiar las rarezas del juego | aprobar cada spec |
+| 1e. Más juego (**specs 019 ✓, 020 ✓, 021, 022 y 023**; 019 y 020 cerradas el 25 oct 2026) | 019 «Abrir todos» dinámico; 020 espacio de juegos con Expediciones (botín fijo y, de vez en cuando, un sobre gratis con probabilidad publicada); **021 economía** (colecciones gratuitas y de Patreon, probadita, insignia y tercer espacio de patron; `docs/economia.md`); 022 tienda y cosméticos con galletas; 023 tema Street pop como segundo estilo con interruptor | entrevistas cortas |
 | 2. Contenido de pago | Pista de arte: elegir las 5 OCs, prueba A0 de consistencia, set SFW de ~30 cartas y set 18+; cargarlos con el panel | aprobar OCs y créditos |
-| 3. Salir a internet (**spec 016**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
-| 4. Piloto de pago (**spec 017**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
+| 3. Salir a internet (**spec 024**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
+| 4. Piloto de pago (**spec 025**) | Tiers y precios en Patreon, reglas de tier en el panel, edad mínima a 18 si se publica fan art subido de tono, revisión legal, pledge real de prueba, checklist de lanzamiento | precios, abogado, pledge |
 | 5. Beta cerrada | Pocos patrons invitados, métricas y correcciones antes de abrir | lista de invitados |
 | Después | Tienda de galletas, juegos (una spec por juego), temas por colección, Storybook | — |
 
@@ -98,3 +100,42 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   para después: botón de cerrar en «Probabilidades» (arreglo) y «Abrir todos» mucho más dinámico (spec 016).
 - 20 oct 2026: spec 015 cerrada; el usuario la probó a mano. El repo pasa a público con dos ramas fijas, `main` y
   `pruebas` (la beta para el equipo).
+- 23 oct 2026: Bruno entrega un paquete de diseño y una propuesta de spec de cartas por capas (PR #14 y #17) que no
+  puede seguir; se integra aquí, partida en las specs 016 a 018. Decisiones del dueño: marcos y sello de Bruno,
+  kawaii por defecto con Street pop como segundo tema (spec 022), Expediciones dentro del espacio de juegos (020).
+  Renumeración: publicar pasa a la 023 y el piloto a la 024.
+- 23 oct 2026: spec 016 cerrada (editor de capas aprobado). **Decisión del dueño: todas las cartas serán cartas por
+  capas** con el sistema de Bruno; el montaje con el marco de Pencil deja de ser la forma de hacer cartas. Las specs
+  017 y 018 se replantean con esa premisa.
+- 25 oct 2026: spec 020 «Juegos: Expediciones» aprobada e implementada (30 RF): mapa con zonas y niebla, equipos de 1 a
+  3 cartas con terreno, rol, holo y vínculo, calificación y botín fijo a la vista, 2 espacios, reporte con frases, sobre
+  al azar gratis con probabilidad publicada y panel con zonas y simulador. Decisión del dueño en la entrevista: el botín
+  puede traer, de vez en cuando, un sobre al azar (gratis); sin cartas exclusivas por zona todavía. Pendientes la prueba
+  en teléfono y la demo del dueño.
+- 25 oct 2026: specs 018, 019 y 020 CERRADAS: el dueño las probó en su teléfono (demo por túnel HTTPS, giroscopio
+  incluido) y todo funcionó. CI de GitHub en verde en todos los PR. Siguiente: spec 021 (tienda y cosméticos con galletas).
+- 25 oct 2026: revisión de coherencia para monetizar, pedida por el dueño. Hallazgo: las fuentes gratis daban 60 u 80
+  sobres al mes de las mismas colecciones que el tier (3 al mes). Decisiones «fuertes» del dueño en `docs/economia.md`:
+  colecciones gratuitas (fan art) frente a de Patreon (OCs), probaditas (bienvenida y 1 sobre semanal en la tienda),
+  tiers de 8 (8 + 8 el 18+), patron con insignia, cosméticos exclusivos y tercer espacio. Entran como **spec 021
+  economía** (motor, antes de la tienda); la tienda pasa a la 022, Street pop a la 023, publicar a la 024 y el piloto a
+  la 025. Recomendación pendiente: empezar la prueba de una OC ya y publicar la beta antes de la 023.
+- 26 oct 2026: spec 021 «economía» implementada y validada (16/16 RF, 668 tests, E2E 78 en verde en los 4 proyectos;
+  PR #27). Hallazgo de la prueba de la spec 006: en desarrollo React incluye en la página los datos que esperan los
+  componentes de servidor, así que una página pública solo debe consultar lo mínimo (la consulta de patron leía el
+  identificador de Patreon y salía en el álbum público; corregido). Pendiente: demo del dueño. La spec 022 (tienda)
+  está redactada sobre la 021 y espera aprobación.
+- 27 oct 2026: **economía versión 2** definida por el dueño (`docs/economia.md`): 5 rarezas con holo (común plana; rara,
+  épica, legendaria y EX con parallax y efectos crecientes), sobres plata y gold, galletas (cosméticos y relojes) y
+  diamantes (sobres; solo se ganan), botín de expedición al azar, repetidas para subir de nivel o hacer polvo y fabricar,
+  y cuatro tiers de Patreon (booster y premium 1 a 3). Decisiones: los diamantes nunca se compran con dinero; EX es la
+  rareza máxima y sigue siendo sugerente; se quita la separación de colecciones gratuitas y de Patreon de la spec 021
+  (se quedan la insignia y los 3 equipos); cualquier tier de pago desbloquea el 18+. La spec 022 «tienda» queda
+  sustituida. Nuevo orden: 022 rarezas y sobres plata/gold, 023 monedas y recompensas, 024 tiendas, 025 repetidas,
+  026 tiers de Patreon; después Street pop (027), publicar (028) y piloto (029).
+- 28 oct 2026: maquetas de la spec 022 aprobadas (5 marcos nuevos y tabla doble). El dueño quiere la apertura de
+  sobres de Bruno: su «Laboratorio de sobres» (sobre por capas de 1000 × 1750, sticker que se despega con el dedo,
+  dientes, foil y volumen, sonidos sintetizados, mazo de cartas que se pasan deslizando) estaba en su paquete original y
+  ahora se copia a `docs/waifu-baker/waifu-baker/abridor-sobres/` como referencia. Entra como **spec 023**, justo después
+  de la 022; el aspecto de los sobres plata y gold se define ahí. Renumeración: 024 monedas y recompensas, 025 tiendas,
+  026 repetidas, 027 tiers de Patreon, 028 Street pop, 029 publicar, 030 piloto.

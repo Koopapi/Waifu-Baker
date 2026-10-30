@@ -19,8 +19,6 @@ export interface DrawnCard {
   substitutedFrom?: Rarity;
 }
 
-const RARE_INDEX = RARITIES.indexOf("rare");
-
 function pickRarity(slot: Partial<Slot>, rng: Rng): Rarity {
   const total = RARITIES.reduce((a, r) => a + (slot[r] ?? 0), 0);
   let roll = rng.next() * total;
@@ -58,7 +56,8 @@ export function drawPack(input: DrawInput, rng: Rng, opts: DrawOptions = {}): Dr
     const pool = free.length > 0 ? free : all;
     const cardId = pool[Math.floor(rng.next() * pool.length)];
     taken.add(cardId);
-    const holo = idx >= RARE_INDEX && rng.next() < input.holoChance;
+    // Spec 022, RF-3: la holo existe en cualquier rareza.
+    const holo = rng.next() < input.holoChance;
     return { slot: i, rarity, cardId, holo, ...(rarity !== wanted ? { substitutedFrom: wanted } : {}) };
   });
 }

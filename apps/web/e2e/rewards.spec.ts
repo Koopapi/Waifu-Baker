@@ -7,14 +7,14 @@ import path from "node:path";
 import { DAILY_SCHEDULE } from "../src/domain/rewards/daily";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, choose, createPublishedSet, login, tear } from "./helpers";
+import { choose, createPublishedSet, LAB, login, openDeck, tear } from "./helpers";
 
 const es = dictionaries.es.rewards;
 
 const advance = async (api: APIRequestContext, hours: number) => expect((await api.post("/api/dev/clock", { data: { advanceHours: hours } })).status()).toBe(200);
 
 async function reload(p: Page) {
-  await p.goto("/sobres");
+  await p.goto("/packs");
   await p.waitForLoadState("networkidle");
 }
 
@@ -24,8 +24,9 @@ async function claimDaily(p: Page) {
 
 test("sobres gratis con espera y recompensa diaria", async ({ browser, request }) => {
   const admin = await login(browser, "admin-rewards", true);
-  await createPublishedSet(admin, "FREE1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
-  const fan = await login(browser, "fan-rewards", false, "/sobres");
+  // Spec 021: solo las colecciones gratuitas salen en el sobre cada 12 h y el día 7.
+  await createPublishedSet(admin, "FREE1", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3, undefined, false, true);
+  const fan = await login(browser, "fan-rewards", false, "/packs");
   await reload(fan);
 
   await test.step("RF-3 y RF-5: un usuario nuevo tiene 1 sobre gratis listo", async () => {
@@ -41,12 +42,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
     await expect(fan.locator('[data-testid="group-FREE1"]')).toContainText("x1");
     await fan.click('[data-testid="group-FREE1"] >> text=Abrir un sobre');
     await tear(fan);
-    await expect(fan.locator('.stage[data-phase="fanned"]')).toBeVisible();
-    for (let k = 0; k < 2; k++) {
-      await fan.locator('.card3d[role="button"]').first().click();
-      await expect(fan.locator(`.stage[data-revealed="${k + 1}"]`)).toBeVisible();
-    }
-    await expect(fan.locator(".summary")).toBeVisible();
+    await openDeck(fan);
   });
 
   await test.step("RF-5 y RF-6: sin cargas, se ve la cuenta atrás y no se puede reclamar", async () => {
@@ -107,7 +103,7 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
   });
 
   await test.step("RF-16: «Mi cuenta» muestra el saldo y el historial de galletas", async () => {
-    await fan.goto("/cuenta");
+    await fan.goto("/account");
     await expect(fan.locator('[data-testid="account-cookies"]')).toContainText(es.cookies.balance(90));
     await expect(fan.locator('[data-testid="account-cookies"] li')).toHaveCount(6);
   });

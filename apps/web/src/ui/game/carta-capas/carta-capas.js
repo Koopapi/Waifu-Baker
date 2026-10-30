@@ -7,7 +7,7 @@
  *   const carta = CartaCapas.montar(document.querySelector('#carta'), {
  *     etiqueta: 'Yuki, SSR',
  *     marco: 'ssr',                       // 'ur' | 'ssr' | 'sr' | 'r' | 'n' | 'ninguno' | un gradiente CSS
- *     borde: 2.2,                         // grosor del marco en % del ancho
+ *     borde: 2.2,                         // grosor del marco en % del ancho (sin él, el de su escalón)
  *     capas: [                            // de atrás hacia adelante
  *       { src: 'yuki_1_fondo.webp',       profundidad: 0.2,  margen: 5 },
  *       { particulas: 'destellos-dorados', profundidad: 0.55, margen: 4 },
@@ -48,12 +48,14 @@
 (function (global) {
   'use strict';
 
+  // Spec 022, RF-9: los marcos de la maqueta aprobada (lámina «Rarezas y sobres plata y gold»): degradado, aura y
+  // grosor propio de cada escalón (n común, r rara, sr épica, ssr legendaria, ur EX).
   var MARCOS = {
-    ur:  ['linear-gradient(135deg,#ff7aa8 0%,#ffd36e 17%,#8af0c4 33%,#ffffff 48%,#6ec8ff 62%,#c79bff 80%,#ff7aa8 100%)', 'rgba(200,160,255,.28)'],
-    ssr: ['linear-gradient(135deg,#6e4a12 0%,#f7dc8a 18%,#b9862d 34%,#fff3c4 48%,#a0701f 62%,#f2cf6e 80%,#6e4a12 100%)', 'rgba(240,190,90,.24)'],
-    sr:  ['linear-gradient(135deg,#4b2a7a 0%,#d4b8ff 20%,#8a5cd6 38%,#f1e6ff 50%,#7344c2 64%,#c9a6ff 82%,#4b2a7a 100%)', 'rgba(170,120,255,.22)'],
-    r:   ['linear-gradient(135deg,#1f3f7a 0%,#a9ccff 20%,#4a7fd6 38%,#e6f0ff 50%,#3c6cc2 64%,#9cc2ff 82%,#1f3f7a 100%)', 'rgba(110,160,255,.2)'],
-    n:   ['linear-gradient(135deg,#5a6070 0%,#e4e8ef 22%,#9aa1b0 40%,#ffffff 50%,#8a91a0 64%,#d6dbe4 82%,#5a6070 100%)', 'rgba(220,225,235,.12)']
+    ur:  ['conic-gradient(from 90deg,#ff7eb6,#b79cff,#7cc8ff,#7ef0c9,#ff7eb6)', 'rgba(255,126,182,.34)', 4.8],
+    ssr: ['linear-gradient(135deg,#fff1a8 0%,#f5c451 45%,#b7791f 100%)', 'rgba(245,196,81,.32)', 4.3],
+    sr:  ['linear-gradient(135deg,#e9b8ff 0%,#8b3fd9 100%)', 'rgba(139,63,217,.3)', 3.3],
+    r:   ['linear-gradient(135deg,#9fd3ff 0%,#3b82f6 100%)', 'rgba(59,130,246,.22)', 2.9],
+    n:   ['linear-gradient(180deg,#c9ced6 0%,#8e949e 100%)', 'rgba(220,225,235,.12)', 1.9]
   };
   MARCOS.epica = MARCOS.sr; MARCOS.rara = MARCOS.r; MARCOS.comun = MARCOS.n;
 
@@ -160,6 +162,22 @@
   function clamp(v) { return Math.max(-1, Math.min(1, v)); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function num(v, d) { v = Number(v); return isFinite(v) ? v : d; }
+  // Lo que va dentro de `style` o de atributos solo puede ser de una lista cerrada (la config puede venir de la BD).
+  var MEZCLAS = ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light',
+    'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity', 'plus-lighter'];
+  var ESQUINAS = ['sup-izq', 'sup-der', 'inf-izq', 'inf-der'];
+  // Encuadre de una capa de imagen (Waifu Baker, spec 017): x e y en %, escala de 0,1 a 4 y giro en grados. Va en
+  // el <img>, no en la capa, que ya lleva el translate3d del parallax. Valores acotados: vienen de la base de datos.
+  function lim(v, a, b, d) { v = num(v, d); return +Math.max(a, Math.min(b, v)).toFixed(3); }
+  function encuadreEstilo(e) {
+    if (!e || typeof e !== 'object') return '';
+    var x = lim(e.x, -100, 100, 0), y = lim(e.y, -100, 100, 0), s = lim(e.escala, .1, 4, 1), g = lim(e.giro, -180, 180, 0);
+    var t = x || y || s !== 1 || g ? 'transform:translate(' + x + '%,' + y + '%) scale(' + s + ') rotate(' + g + 'deg);' : '';
+    return t + (e.ajuste === 'contener' ? 'object-fit:contain;' : '');
+  }
+  function mezclaSegura(m) { return MEZCLAS.indexOf(m) >= 0 ? m : 'normal'; }
+  function esquinaSegura(e) { return ESQUINAS.indexOf(e) >= 0 ? e : 'sup-izq'; }
+  function colorSeguro(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : null; }
 
   function particulasHTML(c, semilla) {
     var p = PARTICULAS[c.particulas] || PARTICULAS['destellos-dorados'];
@@ -167,7 +185,7 @@
     function r() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
     var n = Math.max(0, Math.min(200, Math.round(num(c.cantidad, p.cantidad) * (c._factor || 1))));
     var t = Math.max(.2, num(c.tamano, 1)), v = Math.max(.2, num(c.velocidad, 1));
-    var colores = c.color ? [c.color] : p.colores, h = '';
+    var colores = colorSeguro(c.color) ? [c.color] : p.colores, h = '';
     for (var i = 0; i < n; i++) {
       var forma = p.formas.length > 1 ? (r() < .42 ? p.formas[0] : p.formas[1]) : p.formas[0];
       var tm = TAM[forma], du = DUR[p.anim];
@@ -185,7 +203,7 @@
   function montar(el, opciones) {
     inyectarCSS();
     var op = Object.assign({
-      capas: [], sello: null, marco: 'ssr', aura: null, borde: 2.2, holo: false,
+      capas: [], sello: null, marco: 'ssr', aura: null, borde: null, holo: false,
       profundidad: 14, inclinacion: 14, reposo: true, zona: null,
       proporcion: 700 / 991, etiqueta: 'Carta', aparecer: true
     }, opciones || {});
@@ -199,7 +217,7 @@
 
     function capaHTML(c, i) {
       var estilo = 'inset:-' + num(c.margen, 0) + '%;' +
-        (c.mezcla && c.mezcla !== 'normal' ? 'mix-blend-mode:' + c.mezcla + ';' : '') +
+        (mezclaSegura(c.mezcla) !== 'normal' ? 'mix-blend-mode:' + mezclaSegura(c.mezcla) + ';' : '') +
         (c.opacidad != null && c.opacidad !== 1 ? 'opacity:' + num(c.opacidad, 1) + ';' : '');
       var prof = c.profundidad == null ? 1 : num(c.profundidad, 1);
       var tipo = c.particulas || (c.destellos ? 'destellos-dorados' : null);
@@ -208,13 +226,13 @@
         return '<div class="cc-capa cc-part" data-p="' + prof + '" style="' + estilo + '">' + particulasHTML(cfg, 7 + id + i) + '</div>';
       }
       if (!c.src) return '';
-      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false"></div>';
+      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false" style="' + encuadreEstilo(c.encuadre) + '"></div>';
     }
 
     function selloHTML() {
       var s = op.sello;
       if (!s || (!s.src && !s.texto)) return '';
-      var esq = s.esquina || 'sup-izq';
+      var esq = esquinaSegura(s.esquina);
       if (s.src) {
         var rc = s.recorte, img;
         if (rc && rc.length === 4 && rc[2] > 0 && rc[3] > 0) {
@@ -243,7 +261,7 @@
       card.classList.toggle('cc-sin-marco', sin);
       card.style.setProperty('--cc-marco', sin ? 'none' : m[0]);
       card.style.setProperty('--cc-aura', op.aura || m[1] || 'rgba(255,255,255,.12)');
-      card.style.setProperty('--cc-borde', num(op.borde, 2.2) + 'cqw');
+      card.style.setProperty('--cc-borde', num(op.borde, m[2] || 2.2) + 'cqw');
       card.classList.toggle('cc-con-holo', !!op.holo);
 
       if (primera && op.aparecer) {
@@ -365,6 +383,11 @@
           return true;
         }).catch(function () { return false; });
       },
+      // Waifu Baker, spec 018: el interruptor «Mover con el teléfono» se puede apagar.
+      deshabilitarGiroscopio: function () {
+        global.removeEventListener('deviceorientation', onOri);
+        giro = false; tx = 0; ty = 0;
+      },
       destruir: function () {
         cancelAnimationFrame(raf); raf = 0; visible = false;
         if (io) io.disconnect();
@@ -380,11 +403,11 @@
 
   /* ---------- presets por rareza ---------- */
   var PRESETS = {
-    n:   { marco: 'n',   particulas: null, sello: null, holo: false },
-    r:   { marco: 'r',   particulas: { particulas: 'destellos-arcoiris', cantidad: 16, tamano: 0.8, opacidad: 0.75 }, sello: null, holo: false },
-    sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'SR', estilo: 'morado', tamano: 12 }, holo: false },
-    ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'SSR', estilo: 'oro', tamano: 14 }, holo: false },
-    ur:  { marco: 'ur',  particulas: { particulas: 'destellos-arcoiris', cantidad: 65 }, sello: { texto: 'UR', estilo: 'arcoiris', tamano: 14 }, holo: true }
+    n:   { marco: 'n',   particulas: null, sello: { texto: 'C', estilo: 'plata', tamano: 10 }, holo: false },
+    r:   { marco: 'r',   particulas: { particulas: 'destellos-arcoiris', cantidad: 16, tamano: 0.8, opacidad: 0.75 }, sello: { texto: 'R', estilo: 'azul', tamano: 10 }, holo: false },
+    sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'E', estilo: 'morado', tamano: 12 }, holo: false },
+    ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'LEG', estilo: 'oro', tamano: 13 }, holo: false },
+    ur:  { marco: 'ur',  particulas: { particulas: 'destellos-arcoiris', cantidad: 65 }, sello: { texto: 'EX', estilo: 'arcoiris', tamano: 14 }, holo: true }
   };
   PRESETS.comun = PRESETS.n; PRESETS.rara = PRESETS.r; PRESETS.epica = PRESETS.sr;
 
@@ -414,7 +437,7 @@
     return montar(el, desdeRareza(rareza, imagen, extra));
   }
 
-  var api = { montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
+  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro, encuadre: encuadreEstilo }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
   global.CartaCapas = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : {});

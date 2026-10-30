@@ -1,5 +1,6 @@
-import { expect, type Browser, type Locator, type Page } from "@playwright/test";
-import { DESKTOP } from "./fixtures";
+import { readdirSync } from "node:fs";
+import type { Browser, Locator, Page } from "@playwright/test";
+import { DESKTOP, expect } from "./fixtures";
 import path from "node:path";
 
 export const LAB = path.resolve(__dirname, "../public/lab");
@@ -14,7 +15,7 @@ export async function login(browser: Browser, name: string, admin: boolean, next
   await page.click("text=Entrar (desarrollo)");
   // Se espera al destino final (o a la bienvenida): en WebKit hay pasos intermedios tras el login.
   const target = next.split("?")[0];
-  await page.waitForURL((u) => u.pathname.startsWith(target) || u.pathname.startsWith("/bienvenida"));
+  await page.waitForURL((u) => u.pathname.startsWith(target) || u.pathname.startsWith("/welcome"));
   await page.waitForLoadState("networkidle");
   await acceptGate(page);
   if (!opts.keepCelebration) await dismissCelebration(page);
@@ -44,23 +45,23 @@ export async function dismissCelebration(page: Page, timeout = 1500) {
 export async function acceptGate(page: Page) {
   const here = new URL(page.url());
   if (here.pathname.startsWith("/admin")) return;
-  const next = here.pathname.startsWith("/bienvenida")
+  const next = here.pathname.startsWith("/welcome")
     ? (here.searchParams.get("next") ?? "/")
     : here.pathname + here.search;
   try {
-    await page.goto(`/bienvenida?next=${encodeURIComponent(next)}`);
+    await page.goto(`/welcome?next=${encodeURIComponent(next)}`);
   } catch (e) {
     // La redirección de la propia web a la bienvenida puede llegar justo a la vez: va al mismo sitio.
     if (!String(e).includes("interrupted by another navigation")) throw e;
     await page.waitForLoadState("load");
   }
   // En una carga completa, la redirección del servidor ya ha ocurrido cuando `goto` termina.
-  if (new URL(page.url()).pathname.startsWith("/bienvenida")) {
+  if (new URL(page.url()).pathname.startsWith("/welcome")) {
     const gate = page.locator('[data-testid="gate-form"]');
     await gate.waitFor({ state: "visible" });
     await tickAll(gate);
     await gate.locator('button[type="submit"]').click();
-    await page.waitForURL((u) => !u.pathname.startsWith("/bienvenida"));
+    await page.waitForURL((u) => !u.pathname.startsWith("/welcome"));
   }
   await page.waitForLoadState("networkidle");
 }
@@ -76,7 +77,7 @@ async function seed<T>(page: Page, data: Record<string, unknown>): Promise<T> {
 }
 
 /** Colección publicada de 2 cartas por sobre: ranura 1 común, ranura 2 rara (la carta `rareIndex`). */
-export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number, adult = false) {
+export async function createPublishedSet(page: Page, code: string, images: string[], rareIndex: number, holoPct?: number, adult = false, free = false) {
   const { setId } = await seed<{ setId: string }>(page, {
     action: "publishedSet",
     code,
@@ -84,27 +85,51 @@ export async function createPublishedSet(page: Page, code: string, images: strin
     characterName: `Personaje ${code}`,
     packSize: 2,
     isAdult: adult,
+    // Spec 021: gratuita = sale en el sobre cada 12 h, el día 7 y las expediciones.
+    isFree: free,
     // Como en el panel, las cartas se numeran por nombre de archivo.
-    cards: images.map((img) => path.basename(img)).sort().map((image, i) => ({
-      image,
-      name: `${code} carta ${String(i + 1).padStart(3, "0")}`,
-      rarity: i + 1 === rareIndex ? "rare" : "common",
-    })),
+    cards: [
+      ...images.map((img) => path.basename(img)).sort().map((image, i) => ({
+        image,
+        name: `${code} carta ${String(i + 1).padStart(3, "0")}`,
+        rarity: i + 1 === rareIndex ? "rare" : "common",
+      })),
+      // Spec 022: sin legendaria ni EX no hay tabla gold que publicar. La última carta, legendaria, solo sale en los gold.
+      { image: goldImage(images), name: `${code} carta gold`, rarity: "legendary" },
+    ],
     slots: [{ common: 100 }, { rare: 100 }],
+    gold: [{ legendary: 100 }, { legendary: 100 }],
     holoPercent: holoPct,
   });
   return setId;
 }
 
-export async function giftPacks(page: Page, userName: string, code: string, count: number) {
-  await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E" });
+/** Una imagen del laboratorio que no está entre las de la colección, para su carta legendaria del sobre gold. */
+function goldImage(images: string[]) {
+  const used = new Set(images.map((i) => path.basename(i)));
+  return readdirSync(LAB).filter((f) => f.endsWith(".webp") && !used.has(f)).sort()[0];
+}
+
+/** Spec 017: arma las cartas de una colección con un fondo de su biblioteca (lo que el administrador haría carta a carta). */
+export async function assembleSet(page: Page, code: string) {
+  await seed(page, { action: "assembleSet", setCode: code });
+}
+
+/** Spec 020: una zona de Expediciones con el botín por defecto. */
+export async function createZone(page: Page, zone: { name: string; terrain: string; difficulty: number; fragmentsRequired: number; sortOrder: number }) {
+  await seed(page, { action: "zone", ...zone });
+}
+
+export async function giftPacks(page: Page, userName: string, code: string, count: number, kind: "silver" | "gold" = "silver") {
+  await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E", kind });
 }
 
 /** Rasga el sobre arrastrando la tira; con movimiento reducido, pulsa el botón que la sustituye. */
 export async function tear(page: Page) {
   await page.waitForSelector(".pack__strip");
   await page.waitForLoadState("networkidle");
-  if (await page.locator(".pack__cta").isVisible()) {
+  // Spec 023: «Abrir sin deslizar» está siempre; con movimiento reducido es la única forma de abrir.
+  if (await page.locator(".tear--reduced").count()) {
     await page.click(".pack__cta");
     return;
   }
@@ -171,4 +196,43 @@ export async function untickAdmin(page: Page) {
 export async function tickAll(scope: Locator) {
   const boxes = scope.locator('input[type="checkbox"]');
   for (let i = 0; i < (await boxes.count()); i++) await boxes.nth(i).setChecked(true);
+}
+
+/**
+ * Spec 019: «Abrir todos» y saltar la animación (ráfaga y foco) hasta el resumen. Devuelve el número de cartas del lote
+ * según los totales del resumen.
+ */
+export async function openAllAndSkip(page: Page): Promise<number> {
+  await page.click('[data-testid="open-all"]');
+  const result = page.locator('[data-testid="open-all-result"]');
+  const skip = page.locator('[data-testid="open-all-skip"]');
+  await expect(result.or(skip).first()).toBeVisible({ timeout: 30_000 });
+  while (!(await result.isVisible())) {
+    if (await skip.isVisible()) await skip.click().catch(() => {});
+    await page.waitForTimeout(100);
+  }
+  return Number(await page.locator('[data-testid="open-all-totals"] dd').first().textContent());
+}
+
+/** Spec 023: revela (voltea y presenta) la carta de arriba del mazo. */
+export async function revealTop(page: Page) {
+  await page.locator('.card3d[role="button"]').first().click();
+  await expect(page.locator('[data-testid="reveal-info"]')).toBeVisible();
+}
+
+/** Spec 023: aparta la carta presentada (con la última, llega el resumen). */
+export async function dismissTop(page: Page) {
+  await page.locator('.card3d[role="button"]').first().click();
+  await expect(page.locator('[data-testid="reveal-info"]')).toHaveCount(0);
+}
+
+/** Spec 023: revela y aparta todas las cartas del mazo hasta el resumen. */
+export async function openDeck(page: Page) {
+  await expect(page.locator('.stage[data-phase="deck"]')).toBeVisible();
+  const n = await page.locator(".card3d").count();
+  for (let k = 0; k < n; k++) {
+    await revealTop(page);
+    await dismissTop(page);
+  }
+  await expect(page.locator(".summary")).toBeVisible();
 }

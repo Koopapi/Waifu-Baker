@@ -8,11 +8,11 @@ import { dictionaries } from "@/i18n";
 const card = (id: string, rarity: Rarity) => ({ id, rarity });
 const CARDS = [
   ...["c1", "c2", "c3", "c4", "c5", "c6"].map((id) => card(id, "common")),
-  ...["u1", "u2", "u3"].map((id) => card(id, "uncommon")),
+  ...["u1", "u2", "u3"].map((id) => card(id, "common")),
   ...["r1", "r2"].map((id) => card(id, "rare")),
   card("e1", "epic"),
 ];
-const SLOTS = [{ common: 70, uncommon: 30 }, { common: 70, uncommon: 30 }, { common: 70, uncommon: 30 }, { uncommon: 60, rare: 40 }, { rare: 80, epic: 20 }];
+const SLOTS = [{ common: 100 }, { common: 100 }, { common: 100 }, { common: 60, rare: 40 }, { rare: 80, epic: 20 }];
 
 describe("spec 014 — sin cartas repetidas en un sobre", () => {
   it("test_s014_rf21_ninguna_carta_se_repite_en_un_sobre", () => {

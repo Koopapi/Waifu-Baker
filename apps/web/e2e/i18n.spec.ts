@@ -7,7 +7,7 @@ import { translateError } from "../src/i18n/errors";
 import { formatDate } from "../src/i18n/format";
 import { dictionaries } from "../src/i18n/index";
 import { DESKTOP, expect, test } from "./fixtures";
-import { LAB, acceptGate, createPublishedSet, dismissCelebration, giftPacks, login, untickAdmin } from "./helpers";
+import { LAB, acceptGate, createPublishedSet, dismissCelebration, giftPacks, login, untickAdmin, openAllAndSkip } from "./helpers";
 
 const en = dictionaries.en;
 const es = dictionaries.es;
@@ -67,7 +67,7 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
     await expect(anon.locator(`text=${en.site.home.tagline}`)).toBeVisible();
   });
 
-  // Datos: una colección publicada hoy (panel en español, como el resto de E2E) y un fan con 2 de 3 cartas.
+  // Datos: una colección publicada hoy (panel en español, como el resto de E2E) y un fan con 2 de 4 cartas.
   const adminEs = await login(browser, "admin-i18n", true);
   await createPublishedSet(adminEs, "I18N", ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
 
@@ -93,37 +93,36 @@ test("idiomas: inglés por defecto y cambio a español en toda la web", async ({
     await expect(admin.locator("html")).toHaveAttribute("lang", "es");
   });
 
-  // El fan (español por defecto) consigue 2 de 3 cartas y publica su álbum.
-  const fan = await login(browser, "fan-i18n", false, "/sobres");
+  // El fan (español por defecto) consigue 2 de 4 cartas (la 4.ª, legendaria, solo sale en los gold) y publica su álbum.
+  const fan = await login(browser, "fan-i18n", false, "/packs");
   await giftPacks(adminEs, "fan-i18n", "I18N", 1);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   await dismissCelebration(fan);
   const href = await fan.locator('[data-testid="group-I18N"] >> text=Abrir un sobre').getAttribute("href");
-  await fan.goto(`${href}/todos`);
-  await fan.click('[data-testid="open-all"]');
-  await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(2);
+  await fan.goto(`${href}/all`);
+  expect(await openAllAndSkip(fan)).toBe(2);
 
   await test.step("RF-3 y RF-9: el coleccionista cambia a inglés; los nombres de las cartas no se traducen", async () => {
-    await fan.goto("/coleccion");
+    await fan.goto("/collection");
     await expect(fan.locator("h1")).toHaveText(es.collection.title);
     await toggle(fan, "en").click();
     await expect(fan.locator("h1")).toHaveText(en.collection.title);
     await fan.click('[data-testid="collection-I18N"] a');
-    await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText(en.collection.progress(2, 3));
+    await expect(fan.locator('[data-testid="binder-progress"]')).toHaveText(en.collection.progress(2, 4));
     await expect(fan.locator('[data-testid="binder-grid"] img[alt="I18N carta 003"]')).toHaveCount(1);
   });
 
   await test.step("RF-8: el álbum público sale en el idioma de quien lo visita", async () => {
-    await fan.goto("/coleccion/album");
+    await fan.goto("/collection/album");
     await fan.click(`text=${en.collection.album.activate}`);
     await expect(fan.locator('[data-testid="album-url"]')).toBeVisible();
     const url = await fan.locator('[data-testid="album-url"]').inputValue();
     await anon.goto(url);
     await expect(anon.locator("html")).toHaveAttribute("lang", "en");
-    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(en.collection.publicAlbum.totals(2, 3, 67));
+    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(en.collection.publicAlbum.totals(2, 4, 50));
     await expect(anon.locator('img[alt="I18N carta 003"]')).toHaveCount(1);
     await toggle(anon, "es").click();
-    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(es.collection.publicAlbum.totals(2, 3, 67));
+    await expect(anon.locator('[data-testid="album-totals"]')).toHaveText(es.collection.publicAlbum.totals(2, 4, 50));
     await expect(anon.locator('img[alt="I18N carta 003"]')).toHaveCount(1);
     const og = await anon.locator('meta[property="og:image"]').getAttribute("content");
     expect((await anon.request.get(og!)).status()).toBe(200);

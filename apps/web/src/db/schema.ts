@@ -18,14 +18,33 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import type { LayersConfig } from "@/domain/cards/layers";
+import type { ParticlePreset } from "@/domain/cards/library";
+import type { PickedPhrase } from "@/domain/expeditions/report";
+import type { DurationLoot, Rating, ZoneLoot } from "@/domain/expeditions/rules";
+
+/** Spec 016: imagen plana de una configuración pendiente de revisión, en sus cuatro tamaños. */
+export interface PendingFlatKeys {
+  full: string;
+  mid: string;
+  thumb: string;
+  public: string;
+  blurhash: string;
+}
 
 export const userRole = pgEnum("user_role", ["user", "admin"]);
 export const setStatus = pgEnum("set_status", ["draft", "published", "archived"]);
-export const rarity = pgEnum("rarity", ["common", "uncommon", "rare", "epic", "legendary", "secret"]);
+// Spec 022, RF-1: cinco rarezas. RF-11: dos tipos de sobre.
+export const rarity = pgEnum("rarity", ["common", "rare", "epic", "legendary", "ex"]);
+export const packKind = pgEnum("pack_kind", ["silver", "gold"]);
 export const cardVariant = pgEnum("card_variant", ["normal", "holo", "alt"]);
 export const cardStatus = pgEnum("card_status", ["draft", "ready"]);
 export const albumModeration = pgEnum("album_moderation", ["none", "hidden", "review_requested", "review_rejected"]);
-export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo", "free", "daily"]);
+export const packSource = pgEnum("pack_source", ["tier_grant", "manual", "promo", "free", "daily", "expedition"]);
+/** Spec 020: terreno y rol de las personajes en Expediciones. */
+export const expeditionTerrain = pgEnum("expedition_terrain", ["city", "forest", "coast", "ruins", "mountain"]);
+export const expeditionRole = pgEnum("expedition_role", ["gatherer", "cartographer", "treasure_hunter"]);
+export const expeditionStatus = pgEnum("expedition_status", ["active", "claimed", "cancelled"]);
 export const packStatus = pgEnum("pack_status", ["sealed", "opened", "void"]);
 
 const timestamps = {
@@ -65,6 +84,9 @@ export const characters = pgTable("characters", {
   bio: text("bio").notNull().default(""),
   identityTags: text("identity_tags").notNull().default(""),
   refImageId: text("ref_image_id"),
+  /** Spec 020, RF-27: terreno y rol en Expediciones (sin asignar = sin bonus de terreno ni efecto de rol). */
+  terrain: expeditionTerrain("terrain"),
+  role: expeditionRole("role"),
   ...timestamps,
 });
 
@@ -81,12 +103,14 @@ export const sets = pgTable("sets", {
   version: integer("version").notNull().default(1),
   /** Spec 001, RF-5: colección de la que sale el sobre de bienvenida (solo una). */
   isWelcome: boolean("is_welcome").notNull().default(false),
+  /** Spec 021, RF-1: gratuita (sale en las fuentes gratis) o, por defecto, de Patreon. Nunca 18+ (RF-2). */
+  isFree: boolean("is_free").notNull().default(false),
   /** Spec 014, RF-6: carta de portada del sobre (si no hay, la de mayor rareza). */
   coverCardId: uuid("cover_card_id").references((): AnyPgColumn => cards.id, { onDelete: "set null" }),
   /** Spec 014, RF-7: sobre diseñado a mano; mientras exista, sustituye al compuesto. */
   packImageKey: text("pack_image_key"),
   ...timestamps,
-}, (t) => [uniqueIndex("sets_single_welcome_uq").on(t.isWelcome).where(sql`${t.isWelcome}`)]);
+}, (t) => [uniqueIndex("sets_single_welcome_uq").on(t.isWelcome).where(sql`${t.isWelcome}`), check("sets_free_not_adult", sql`not (${t.isFree} and ${t.isAdult})`)]);
 
 export const cards = pgTable(
   "cards",
@@ -119,6 +143,11 @@ export const cards = pgTable(
     promptSha256: text("prompt_sha256"),
     sourceJob: text("source_job"),
     version: integer("version").notNull().default(1),
+    // Spec 016: configuración por capas vigente (null = carta sin capas) y la pendiente de revisión (18+ publicada),
+    // con la imagen plana de lo pendiente. La imagen plana vigente va en key_* como la compuesta.
+    layers: jsonb("layers").$type<LayersConfig>(),
+    layersPending: jsonb("layers_pending").$type<LayersConfig>(),
+    pendingKeys: jsonb("pending_keys").$type<PendingFlatKeys>(),
     ...timestamps,
   },
   (t) => [
@@ -126,6 +155,27 @@ export const cards = pgTable(
     uniqueIndex("cards_set_sha_uq").on(t.setId, t.originalSha256),
     index("cards_set_rarity_idx").on(t.setId, t.rarity),
   ],
+);
+
+export const libraryKind = pgEnum("library_kind", ["fondo", "sello", "adorno", "particulas"]);
+
+/**
+ * Spec 017, RF-6 a RF-9 y RF-21: biblioteca general de elementos, común a todas las colecciones. Las imágenes viven en
+ * `library/<sha>.webp` (o en la clave que ya tenían los fondos de antes); las partículas guardadas, en `particles`.
+ * Una imagen está «en uso» si su clave aparece en la configuración por capas de alguna carta.
+ */
+export const libraryItems = pgTable(
+  "library_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: libraryKind("kind").notNull(),
+    name: text("name").notNull(),
+    key: text("key"),
+    sha256: text("sha256"),
+    particles: jsonb("particles").$type<ParticlePreset>(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("library_items_sha_uq").on(t.sha256).where(sql`${t.sha256} is not null`)],
 );
 
 export const dropTables = pgTable(
@@ -136,6 +186,8 @@ export const dropTables = pgTable(
       .notNull()
       .references(() => sets.id, { onDelete: "cascade" }),
     version: integer("version").notNull().default(1),
+    /** Spec 022, RF-12: una tabla por tipo de sobre. */
+    kind: packKind("kind").notNull().default("silver"),
     /** Una entrada por ranura del sobre: pesos por rareza. */
     slots: jsonb("slots").$type<Record<string, number>[]>().notNull().default(sql`'[]'::jsonb`),
     holoChance: doublePrecision("holo_chance").notNull().default(0.2),
@@ -145,7 +197,7 @@ export const dropTables = pgTable(
     isPublic: boolean("is_public").notNull().default(false),
     ...timestamps,
   },
-  (t) => [uniqueIndex("drop_tables_set_version_uq").on(t.setId, t.version)],
+  (t) => [uniqueIndex("drop_tables_set_kind_version_uq").on(t.setId, t.kind, t.version)],
 );
 
 export const tierRules = pgTable(
@@ -175,6 +227,8 @@ export const packs = pgTable(
       .notNull()
       .references(() => sets.id),
     source: packSource("source").notNull(),
+    /** Spec 022, RF-11: plata o gold. */
+    kind: packKind("kind").notNull().default("silver"),
     grantKey: text("grant_key").notNull().unique(),
     /** Spec 001: ciclo de cobro de Patreon que concedió el sobre (para anularlo si se reembolsa). */
     cycleKey: text("cycle_key"),
@@ -379,3 +433,178 @@ export const appSettings = pgTable("app_settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   updatedBy: uuid("updated_by").references(() => users.id),
 });
+
+/** Spec 020, RF-28 y RF-29: zonas del mapa de Expediciones, con su botín fijo por duración (calificación «Bien»). */
+export const expeditionZones = pgTable("expedition_zones", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  terrain: expeditionTerrain("terrain").notNull(),
+  difficulty: integer("difficulty").notNull(),
+  /** 0 = abierta desde el inicio (RF-4). */
+  fragmentsRequired: integer("fragments_required").notNull().default(0),
+  sortOrder: integer("sort_order").notNull().default(0),
+  imageKey: text("image_key"),
+  active: boolean("active").notNull().default(true),
+  loot: jsonb("loot").$type<ZoneLoot>().notNull(),
+  ...timestamps,
+});
+
+/** Spec 020: fragmentos de mapa y expediciones completadas de cada coleccionista. */
+export const expeditionProfiles = pgTable(
+  "expedition_profiles",
+  {
+    userId: uuid("user_id")
+      .primaryKey()
+      .references(() => users.id),
+    fragments: integer("fragments").notNull().default(0),
+    completed: integer("completed").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [check("expedition_profiles_fragments_non_negative", sql`${t.fragments} >= 0`)],
+);
+
+/** Spec 020, RF-5: zonas con niebla que cada coleccionista ya abrió. */
+export const expeditionZoneUnlocks = pgTable(
+  "expedition_zone_unlocks",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    zoneId: uuid("zone_id")
+      .notNull()
+      .references(() => expeditionZones.id, { onDelete: "cascade" }),
+    unlockedAt: timestamp("unlocked_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.zoneId] })],
+);
+
+/** Una carta del equipo congelada al enviar (RF-17). */
+export interface ExpeditionMember {
+  cardId: string;
+  holo: boolean;
+  characterId: string | null;
+  name: string;
+  rarity: string;
+  terrain: string | null;
+  role: string | null;
+  bondLevel: number;
+}
+
+/** Lo que pasó al reclamar (RF-20 a RF-24); se devuelve igual si se reclama otra vez. */
+export interface ExpeditionResult {
+  loot: DurationLoot;
+  packWon: boolean;
+  packId: string | null;
+  phrases: PickedPhrase[];
+  bonds: { characterId: string; xp: number; level: number; before: number }[];
+}
+
+/** Spec 020: una expedición, con su calificación y botín congelados al enviar (RF-15 a RF-24). */
+export const expeditions = pgTable(
+  "expeditions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    zoneId: uuid("zone_id")
+      .notNull()
+      .references(() => expeditionZones.id),
+    zoneName: text("zone_name").notNull(),
+    zoneTerrain: expeditionTerrain("zone_terrain").notNull(),
+    durationMin: integer("duration_min").notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    power: doublePrecision("power").notNull(),
+    difficulty: integer("difficulty").notNull(),
+    rating: text("rating").$type<Rating>().notNull(),
+    loot: jsonb("loot").$type<DurationLoot>().notNull(),
+    team: jsonb("team").$type<ExpeditionMember[]>().notNull(),
+    status: expeditionStatus("status").notNull().default("active"),
+    seed: text("seed"),
+    result: jsonb("result").$type<ExpeditionResult>(),
+    claimedAt: timestamp("claimed_at", { withTimezone: true }),
+    cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
+  },
+  (t) => [index("expeditions_user_status_idx").on(t.userId, t.status)],
+);
+
+/** Spec 020, RF-8: una carta (por versión) solo puede estar en una expedición en curso, también ante peticiones a la vez. */
+export const expeditionCards = pgTable(
+  "expedition_cards",
+  {
+    expeditionId: uuid("expedition_id")
+      .notNull()
+      .references(() => expeditions.id),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => cards.id),
+    holo: boolean("holo").notNull().default(false),
+    active: boolean("active").notNull().default(true),
+  },
+  (t) => [
+    primaryKey({ columns: [t.expeditionId, t.cardId, t.holo] }),
+    uniqueIndex("expedition_cards_busy_uq").on(t.userId, t.cardId, t.holo).where(sql`${t.active}`),
+  ],
+);
+
+/** Spec 020: vínculo de cada coleccionista con cada personaje (experiencia acumulada). */
+export const characterBonds = pgTable(
+  "character_bonds",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    characterId: uuid("character_id")
+      .notNull()
+      .references(() => characters.id, { onDelete: "cascade" }),
+    xp: integer("xp").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.characterId] })],
+);
+
+/**
+ * Spec 024, RF-14 a RF-21: cuentas de administrador con usuario, contraseña y segundo factor por Telegram. Cada una
+ * tiene su usuario del juego (rol `admin`, `patreon_user_id` = `admin:<usuario>`).
+ */
+export const adminAccounts = pgTable("admin_accounts", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  /** La contraseña la puso el servidor (al crearla o restablecerla): hay que cambiarla al entrar. */
+  mustChangePassword: boolean("must_change_password").notNull().default(true),
+  telegramChatId: text("telegram_chat_id"),
+  /** Hash del enlace de vinculación con el bot (`/start <token>`) y su caducidad. */
+  telegramLinkHash: text("telegram_link_hash"),
+  telegramLinkExpiresAt: timestamp("telegram_link_expires_at", { withTimezone: true }),
+  /** Paso de inicio de sesión en curso (contraseña ya comprobada): hash del valor de la cookie y hasta cuándo vale. */
+  pendingHash: text("pending_hash"),
+  pendingUntil: timestamp("pending_until", { withTimezone: true }),
+  failedAttempts: integer("failed_attempts").notNull().default(0),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  ...timestamps,
+});
+
+/** Spec 024, RF-17 y RF-18: los códigos enviados por Telegram (solo su hash), de un uso y con caducidad. */
+export const adminLoginCodes = pgTable(
+  "admin_login_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    accountId: uuid("account_id")
+      .notNull()
+      .references(() => adminAccounts.id, { onDelete: "cascade" }),
+    codeHash: text("code_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("admin_login_codes_account_idx").on(t.accountId, t.createdAt)],
+);

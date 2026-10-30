@@ -5,17 +5,17 @@ import { RARITIES, type Rarity } from "../catalog/card-rules";
 export { SOUNDS, type SoundName } from "../feedback/sounds";
 import type { SoundName } from "../feedback/sounds";
 
-const REVEAL: Partial<Record<Rarity, SoundName>> = { rare: "rare", epic: "epic", legendary: "legendary", secret: "secret" };
+const REVEAL: Partial<Record<Rarity, SoundName>> = { rare: "rare", epic: "epic", legendary: "legendary", ex: "secret" };
 
 /** Milisegundos de vibración y pausa alternos (`navigator.vibrate`); más largos cuanto más rara. */
 const VIBRATION: Partial<Record<Rarity, number[]>> = {
   rare: [30],
   epic: [45],
   legendary: [60, 40, 60],
-  secret: [80, 40, 80, 40, 120],
+  ex: [80, 40, 80, 40, 120],
 };
 
-/** RF-4: sonido extra al revelar una rara o mejor; las comunes y poco comunes solo suenan al voltearse. */
+/** RF-4: sonido extra al revelar una rara o mejor; las comunes solo suenan al voltearse (la EX usa el sonido «secret»). */
 export function revealSound(rarity: Rarity): SoundName | null {
   return REVEAL[rarity] ?? null;
 }
@@ -36,7 +36,7 @@ export function openAllFinale(rarities: readonly Rarity[]): { sound: SoundName; 
   return { sound: revealSound(best) ?? "flip", vibration: vibrationPattern(best) };
 }
 
-const LEVEL: Partial<Record<Rarity, number>> = { rare: 1, epic: 2, legendary: 3, secret: 4 };
+const LEVEL: Partial<Record<Rarity, number>> = { rare: 1, epic: 2, legendary: 3, ex: 4 };
 
 /** Spec 014, RF-12: intensidad del brillo de los bordes antes de voltear (0 = sin brillo). */
 export function teaseLevel(rarity: Rarity): number {

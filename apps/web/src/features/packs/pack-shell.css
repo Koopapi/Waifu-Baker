@@ -1,0 +1,266 @@
+/*
+ * Spec 023: el sobre nuevo (maqueta «Sobre de apertura»). Medidas en `cqw` (porcentaje del ancho del sobre, 250 × 392):
+ * 1 cqw = 2,5 px de la maqueta. `--px` y `--py` (0–1) mueven el brillo del foil con la inclinación.
+ */
+.pack-shell {
+  --px: 0.5;
+  --py: 0.5;
+  container-type: inline-size;
+  position: relative;
+  width: 220px;
+  aspect-ratio: 250 / 392;
+  flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+/* Foil de cada tipo (RF-2): cuerpo, tira, tinta del nombre y línea de dientes. */
+.pack-shell--silver {
+  --shell-a: #f4f6f9;
+  --shell-b: #b9c0cb;
+  --shell-c: #7d8592;
+  --strip-a: #ffffff;
+  --strip-b: #c9ced6;
+  --strip-c: #8e949e;
+  --shell-ink: #2a2f3a;
+  --shell-teeth: var(--ui-k-plata-oscuro);
+  --shell-halo: rgb(233 238 247 / 0.25);
+}
+.pack-shell--gold {
+  --shell-a: #fff4c2;
+  --shell-b: #f5c451;
+  --shell-c: #a16207;
+  --strip-a: #fffbe0;
+  --strip-b: #f7d774;
+  --strip-c: #c3861c;
+  --shell-ink: #3a2600;
+  --shell-teeth: var(--ui-k-oro-oscuro);
+  --shell-halo: rgb(245 196 81 / 0.35);
+}
+.pack-shell__shadow {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: 0;
+  height: 7%;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+  filter: blur(5.6cqw);
+}
+.pack-shell__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 17.6cqw;
+  height: 132cqw;
+  border-radius: 0 0 6.4cqw 6.4cqw;
+  border: 1.2cqw solid var(--ui-k-blanco);
+  border-top: 0;
+  background: linear-gradient(150deg, var(--shell-a), var(--shell-b) 50%, var(--shell-c));
+  box-shadow: 0 4.8cqw 10.4cqw rgb(0 0 0 / 0.5), 0 0 16cqw var(--shell-halo);
+  overflow: hidden;
+}
+.pack-shell__brand {
+  position: absolute;
+  top: 2.8cqw;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 4cqw;
+  letter-spacing: 1.2cqw;
+  color: var(--shell-ink);
+  line-height: 1;
+}
+.pack-shell__window {
+  position: absolute;
+  left: 6cqw;
+  top: 10.4cqw;
+  width: 85.6cqw;
+  height: 92.8cqw;
+  border-radius: 4.8cqw;
+  border: 1.2cqw solid var(--ui-k-blanco);
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--ui-k-lavanda), var(--ui-k-chicle));
+  box-shadow: inset 0 0 7cqw rgb(0 0 0 / 0.4);
+}
+.pack-shell__window img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+}
+.pack-shell__placeholder {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 40%;
+  height: 40%;
+}
+/* Brillo holo sobre la imagen (RF-1). */
+.pack-shell__holo {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  background: linear-gradient(120deg, #ff9ad5, #ffe27a 30%, #7ef0c9 55%, #7cc8ff 75%, #b79cff);
+  background-size: 200% 200%;
+  background-position: calc(var(--px) * 100%) calc(var(--py) * 100%);
+}
+.pack-shell__name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 108cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6cqw;
+  color: var(--shell-ink);
+  line-height: 1.1;
+  text-align: center;
+  padding: 0 6cqw;
+}
+.pack-shell__name b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 6.4cqw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.pack-shell__name small {
+  font-weight: 800;
+  font-size: 4.4cqw;
+  letter-spacing: 0.4cqw;
+}
+/* Foil que se mueve con la inclinación (RF-4). */
+.pack-shell__sheen {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: overlay;
+  background: linear-gradient(
+    120deg,
+    transparent 25%,
+    rgb(255 255 255 / 0.65) 42%,
+    transparent 50%,
+    rgb(255 255 255 / 0.4) 62%,
+    transparent 75%
+  );
+  background-size: 250% 250%;
+  background-position: calc(var(--px) * 100%) calc(var(--py) * 100%);
+}
+/* Volumen: los bordes se oscurecen como en un sobre de verdad. */
+.pack-shell__edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 7.2cqw;
+}
+.pack-shell__edge--left {
+  left: 0;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.3), transparent);
+}
+.pack-shell__edge--right {
+  right: 0;
+  background: linear-gradient(270deg, rgb(0 0 0 / 0.3), transparent);
+}
+.pack-shell__strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 17.6cqw;
+  border-radius: 4cqw 4cqw 0 0;
+  border: 1.2cqw solid var(--ui-k-blanco);
+  border-bottom: 0;
+  background: linear-gradient(150deg, var(--strip-a), var(--strip-b) 50%, var(--strip-c));
+  display: grid;
+  place-items: center;
+}
+.pack-shell__strip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  mix-blend-mode: overlay;
+  background: linear-gradient(120deg, transparent 30%, rgb(255 255 255 / 0.7) 45%, transparent 55%);
+  background-size: 250% 250%;
+  background-position: calc(var(--px) * 100%) 50%;
+}
+.pack-shell__tag {
+  position: relative;
+  z-index: 1;
+  padding: 0.8cqw 4.4cqw;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 5.2cqw;
+  letter-spacing: 0.8cqw;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+.pack-shell--silver .pack-shell__tag {
+  background: var(--ui-k-plata);
+  color: var(--ui-k-plata-oscuro);
+  border: 0.6cqw solid var(--ui-k-plata-oscuro);
+}
+.pack-shell--gold .pack-shell__tag {
+  background: var(--ui-k-oro);
+  color: var(--ui-k-oro-oscuro);
+  border: 0.6cqw solid var(--ui-k-oro-oscuro);
+}
+.pack-shell__teeth {
+  position: absolute;
+  left: -1.2cqw;
+  right: -1.2cqw;
+  bottom: -1.6cqw;
+  width: calc(100% + 2.4cqw);
+  height: 3.2cqw;
+  fill: none;
+  stroke: var(--shell-teeth);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+/* El borde roto que queda arriba al abrirlo. */
+.pack-shell__lip {
+  position: absolute;
+  left: 0;
+  top: 15.6cqw;
+  width: 100%;
+  height: 3.2cqw;
+  fill: var(--ui-k-blanco);
+}
+.pack-shell__sparkles svg {
+  position: absolute;
+  fill: var(--ui-k-blanco);
+  animation: pack-shell-twinkle 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.5s);
+}
+.pack-shell__sparkles svg:nth-child(1) { left: 85.6cqw; top: 23.2cqw; width: 7.2cqw; }
+.pack-shell__sparkles svg:nth-child(2) { left: 2.4cqw; top: 60cqw; width: 4.8cqw; }
+.pack-shell__sparkles svg:nth-child(3) { left: 90.4cqw; top: 112cqw; width: 5.6cqw; }
+.pack-shell__sparkles svg:nth-child(4) { left: 10.4cqw; top: 120cqw; width: 4cqw; }
+@keyframes pack-shell-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1) rotate(25deg); }
+}
+/* «Abrir todos»: la tira sale volando al rasgarse (RF-20). */
+.pack-shell--torn .pack-shell__strip {
+  animation: pack-shell-strip-off 0.55s cubic-bezier(0.3, 0.6, 0.4, 1) forwards;
+  transform-origin: 0 100%;
+}
+@keyframes pack-shell-strip-off {
+  to { transform: translate(40cqw, -40cqw) rotate(28deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pack-shell__sparkles svg,
+  .pack-shell--torn .pack-shell__strip {
+    animation: none;
+  }
+  .pack-shell--torn .pack-shell__strip {
+    opacity: 0;
+  }
+}

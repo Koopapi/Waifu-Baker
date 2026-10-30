@@ -6,6 +6,8 @@ import { common } from "./common";
 
 const pad = (n: string | number | undefined) => String(n ?? "").padStart(3, "0");
 const rarity = (r: string | number | undefined) => common.rarity[r as keyof typeof common.rarity] ?? String(r ?? "");
+/** Spec 022: problems in the gold table say which pack they belong to. */
+const ofPack = (p: { kind?: string | number }) => (p.kind === "gold" ? " of the gold pack" : "");
 const FIELD: Record<string, string> = { character: "character", name: "name", rarity: "rarity", image: "composed image" };
 const plural = (n: string | number | undefined, one: string, many: string) => (Number(n) === 1 ? one : many);
 
@@ -30,7 +32,7 @@ export const errors: Record<string, Msg> = {
   unknown: "Something went wrong. Please try again.",
   welcome_not_allowed: "Only a published SFW set can be the welcome set.",
   choose_set: "Choose a set.",
-  set_not_claimable: "That set is not available for free packs. Choose another one.",
+  set_not_claimable: "That set isn't free: pick another one.",
   invalid_min_age: "The minimum age can only be 16 or 18.",
   album_hidden: "Your album is hidden: change the alias and request a review.",
   invalid_moderation_reason: "Choose a reason from the list.",
@@ -51,6 +53,10 @@ export const errors: Record<string, Msg> = {
   patreon_unavailable: "Patreon is not configured or did not respond. Please try again later.",
 
   // Genéricos con varios significados: un parámetro distingue cada caso.
+  // Spec 024: administrator accounts (server commands).
+  invalid_username: "Invalid username: 3 to 32 lowercase letters, numbers, dots or dashes.",
+  username_taken: "There is already an administrator with that username.",
+  last_admin: "The only administrator account cannot be deleted.",
   not_found: (p) =>
     ({
       user: "This user doesn't exist.",
@@ -60,6 +66,8 @@ export const errors: Record<string, Msg> = {
       character: "This character doesn't exist.",
       chosen_character: "The selected character no longer exists.",
       pack: "That pack doesn't exist.",
+      zone: "This zone doesn't exist.",
+      expedition: "This expedition doesn't exist.",
       card: "This card doesn't exist.",
       selected_cards: "Some of the selected cards no longer exist.",
     })[String(p.entity)] ?? "Not found.",
@@ -137,12 +145,25 @@ export const errors: Record<string, Msg> = {
   too_narrow: (p) => `The image is ${p.width} px wide; the minimum is ${p.min} px.`,
   unreadable: "The image couldn't be read: the file seems to be damaged.",
 
+  // Spec 016: layered cards.
+  layer_too_narrow: (p) => `The layer is ${p.width} px wide; the minimum is ${p.min} px.`,
+  layer_ratio: (p) => `The layer is ${p.width} × ${p.height}; it must have the canvas ratio (${p.expected}).`,
+  too_many_layers: (p) => `A card takes at most ${p.max ?? 8} image layers (particles don't count).`,
+  no_visible_layer: "At least one visible image layer is needed.",
+  invalid_layers: (p) => `The layer setup is not valid${p.path ? ` (${p.path})` : ""}.`,
+  layer_missing: "One of the layers is no longer available: upload it again.",
+  layers_required: "This card was created from layers and has no original image: it needs at least one visible image layer.",
+
   // Probabilidades y comprobaciones antes de publicar.
   slot_count: (p) =>
-    `The pack has ${p.packSize} ${plural(p.packSize, "card", "cards")} but there ${plural(p.slots, "is", "are")} ${p.slots} drop rate ${plural(p.slots, "slot", "slots")}.`,
-  negative_weight: (p) => `Slot ${p.slot} has negative or invalid weights.`,
-  slot_sum: (p) => `Slot ${p.slot} adds up to ${p.sum}% instead of 100%.`,
+    `The ${p.kind === "gold" ? "gold " : ""}pack has ${p.packSize} ${plural(p.packSize, "card", "cards")} but there ${plural(p.slots, "is", "are")} ${p.slots} drop rate ${plural(p.slots, "slot", "slots")}.`,
+  negative_weight: (p) => `Slot ${p.slot}${ofPack(p)} has negative or invalid weights.`,
+  slot_sum: (p) => `Slot ${p.slot}${ofPack(p)} adds up to ${p.sum}% instead of 100%.`,
   holo_range: "The holo chance must be between 0% and 100%.",
+  // Spec 022, RF-13 to RF-16.
+  guarantee_slot: (p) => `The last slot of the ${p.kind === "gold" ? "gold" : "silver"} pack can only give ${rarity(p.rarity)} or better.`,
+  missing_table: (p) => `The ${p.kind === "gold" ? "gold" : "silver"} pack drop rate table is missing.`,
+  gold_not_better: "The gold pack must give a higher chance of Legendary or EX than the silver one.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: has a chance in the pack but no cards.`,
   card_incomplete: (p) =>
     `Card ${pad(p.number)}: missing ${String(p.missing ?? "")

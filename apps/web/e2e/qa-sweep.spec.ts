@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login } from "./helpers";
+import { LAB, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
 
 const VIEWPORTS = [
   { name: "escritorio", width: 1360, height: 950 },
@@ -89,16 +89,16 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
 
   const admin = await login(browser, "admin-sweep", true);
   const setId = await createPublishedSet(admin, "QA1", ["01.webp", "02.webp", "03.webp", "04.webp"].map((f) => path.join(LAB, f)), 4, 50);
-  const fan = await login(browser, "fan-sweep", false, "/sobres");
+  const fan = await login(browser, "fan-sweep", false, "/packs");
   await giftPacks(admin, "fan-sweep", "QA1", 4);
-  await fan.goto("/sobres");
+  await fan.goto("/packs");
   await dismissCelebration(fan);
   await admin.goto("/admin/users?q=fan-sweep");
   await admin.click("a:text-is('fan-sweep')");
   const fanAdminUrl = new URL(admin.url()).pathname;
 
   // Abre dos sobres para que haya colección, y deja dos sellados para ver las páginas de apertura.
-  await fan.goto(`/sobres/${setId}/todos`);
+  await fan.goto(`/packs/${setId}/all`);
   await fan.evaluate(() => 0);
   const anon = await (await browser.newContext()).newPage();
   // Los datos se preparan con los textos en español; el barrido se hace en inglés, el idioma por defecto.
@@ -122,23 +122,27 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
     }
   };
 
-  await run(fan, cFan, "/sobres", "fan-sobres");
-  await run(fan, cFan, `/sobres/${setId}`, "fan-abrir");
-  await run(fan, cFan, `/sobres/${setId}/todos`, "fan-abrir-todos");
+  await run(fan, cFan, "/packs", "fan-sobres");
+  await run(fan, cFan, `/packs/${setId}`, "fan-abrir");
+  await run(fan, cFan, `/packs/${setId}/all`, "fan-abrir-todos");
   await fan.setViewportSize({ width: 1360, height: 950 });
-  await fan.goto(`/sobres/${setId}/todos`);
-  await fan.click('[data-testid="open-all"]');
-  await expect(fan.locator('[data-testid="open-all-grid"] li')).toHaveCount(8);
-  await run(fan, cFan, "/sobres", "fan-sobres-vacio");
-  await run(fan, cFan, "/coleccion", "fan-coleccion");
-  await run(fan, cFan, `/coleccion/${setId}`, "fan-binder");
-  await run(fan, cFan, "/coleccion/album", "fan-album-privado");
+  await fan.goto(`/packs/${setId}/all`);
+  expect(await openAllAndSkip(fan)).toBe(8);
+  await run(fan, cFan, "/packs", "fan-sobres-vacio");
+  await run(fan, cFan, "/collection", "fan-coleccion");
+  await run(fan, cFan, `/collection/${setId}`, "fan-binder");
+  // Spec 020: el espacio de juegos y Expediciones, con una zona abierta y otra con niebla.
+  await createZone(admin, { name: "Puerto Miel", terrain: "city", difficulty: 30, fragmentsRequired: 0, sortOrder: 1 });
+  await createZone(admin, { name: "Ruinas", terrain: "ruins", difficulty: 80, fragmentsRequired: 10, sortOrder: 2 });
+  await run(fan, cFan, "/games", "fan-juegos");
+  await run(fan, cFan, "/games/expeditions", "fan-expediciones");
+  await run(fan, cFan, "/collection/album", "fan-album-privado");
   await fan.setViewportSize({ width: 1360, height: 950 });
-  await fan.goto("/coleccion/album");
+  await fan.goto("/collection/album");
   await fan.click(`text=${dictionaries.en.collection.album.activate}`);
   await expect(fan.locator('[data-testid="album-url"]')).toBeVisible();
   const albumUrl = new URL(await fan.locator('[data-testid="album-url"]').inputValue()).pathname;
-  await run(fan, cFan, "/coleccion/album", "fan-album-ajustes");
+  await run(fan, cFan, "/collection/album", "fan-album-ajustes");
 
   await run(anon, cAnon, "/", "anon-inicio");
   await run(anon, cAnon, "/login", "anon-login");
@@ -152,6 +156,7 @@ test("barrido de calidad de todas las páginas", async ({ browser }) => {
   await run(admin, cAdmin, `/admin/sets/${setId}`, "admin-coleccion");
   await run(admin, cAdmin, `/admin/sets/${setId}/simulate`, "admin-simular");
   await run(admin, cAdmin, "/admin/characters", "admin-personajes");
+  await run(admin, cAdmin, "/admin/expeditions", "admin-expediciones");
   await run(admin, cAdmin, "/admin/tiers", "admin-tiers");
   await run(admin, cAdmin, "/admin/users", "admin-usuarios");
   await run(admin, cAdmin, fanAdminUrl, "admin-usuario");

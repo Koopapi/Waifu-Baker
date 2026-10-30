@@ -11,7 +11,7 @@ sólidos va en tinta oscura (`--ui-on-accent`). Sustituye a la paleta «Cereza»
 
 ### Premios con vida (spec 015, 18 oct 2026)
 
-Lámina «Premios (spec 015)», debajo de la kawaii. Lo pequeño vuela y lo grande se celebra: `FlightLayer` pinta las
+Lámina «Premios (spec 015) y cartas por capas (spec 016)», debajo de la kawaii (rehecha el 23 oct 2026: la primera versión se perdió al cerrar Pencil sin guardar). Lo pequeño vuela y lo grande se celebra: `FlightLayer` pinta las
 pegatinas que vuelan en arco (Web Animations API, solo `transform` y `opacity`) hasta los elementos con
 `data-fly-target` («packs» en la navegación, «cookies» en los contadores), que rebotan al recibirlas; los contadores
 (`Badge` con `count`, `AnimatedCounter`) suben como un marcador. `Celebration` es un diálogo kawaii (píldora de
@@ -71,6 +71,20 @@ con fondo transparente salen en blanco; para verificar, exportar a PNG.
 Pendiente: portada, apertura, colección y álbum. Dirección provisional: fondo oscuro para que el
 holo y las partículas destaquen, un acento por rareza, tipografía grande y mucho aire.
 
+**Juegos · Expediciones (spec 020, tablero en `waifubaker.pen`):** pegatina nueva de mapa para «Juegos» en la
+navegación. El mapa es un lienzo oscuro con caminos punteados y una chincheta por zona: redonda, con borde blanco y el
+color pastel de su terreno (Ciudad chicle, Bosque menta, Costa celeste, Ruinas lavanda, Montaña limón); con niebla, gris
+translúcida con «Niebla · x/y»; con un equipo fuera, flota suave y enseña la cuenta atrás. Los equipos son filas con
+las cartas apiladas, en menta al volver. Preparar es una ventana con 3 huecos, la barra de poder frente a la marca de
+dificultad, la calificación como pastilla de color (Difícil rojo, Normal limón, Bien celeste, Excelente menta), las tres
+duraciones con su botín y el selector de cartas con filtros. El reporte saca las frases una a una.
+
+**Economía (spec 021, tablero «Economía (spec 021)»):** insignia de patron como pegatina chicle con corazón y borde
+blanco (`Badge` tono `patron`), junto al nombre en la cuenta y el álbum público. Aviso «llega con la suscripción» en
+acento suave con icono de destellos y enlace a Patreon, debajo de la tarjeta de colección, en el álbum de la colección
+y compacto en «Mis sobres»; en Expediciones, el tercer espacio bloqueado con candado. En el panel, etiqueta «Gratuita»
+(verde) o «Patreon» (acento) y un botón para cambiarla.
+
 ## Sistema de diseño (spec 011)
 
 El código vive en `apps/web/src/ui` y el diseño en `Waifu Baker/waifubaker.pen`, lámina «Sistema de diseño
@@ -110,12 +124,15 @@ cualquier componente nuevo se añada a esta tabla.
 | SoundToggle | SoundToggle |
 | RingTimer | RingTimer (anillo de «Recompensas» y «Mis sobres», lámina «Kawaii (spec 014)») |
 | Sticker | Sobre, Carta, Galleta, Regalo, Reloj, Colección, Racha y Perfil (lámina «Kawaii (spec 014)») |
-| FlightLayer | Premio que vuela (lámina «Premios (spec 015)») |
-| Celebration | Celebración (lámina «Premios (spec 015)») |
-| Confetti | Confeti (lámina «Premios (spec 015)») |
+| FlightLayer | Premio que vuela (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Celebration | Celebración (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Confetti | Confeti (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
 | AppShell | RailIcon (estados), NavPanel con «Item de navegación», TabBar |
 | Banner | Banner |
-| CartaCapas | Sin versión en Pencil: carta por capas del paquete de diseño (`docs/waifu-baker/waifu-baker/codigo/carta-capas`) |
+| CartaCapas | Carta por capas (componente) con los cinco escalones N, R, SR, SSR y UR (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
+| Armado por capas | Editor de la carta (chica, fondo, sello, adornos y partículas de la biblioteca o propios, encuadre, estilo automático, exportar e importar, «Guardar en la biblioteca»), página «Biblioteca» con pestañas por tipo, ventana «Añadir de la biblioteca» y aviso de cartas sin armar (lámina «Armado de cartas por capas (spec 017)») |
+| Cartas por capas en la web | Revelación con la carta viva, ficha con la carta viva y el interruptor «Mover con el teléfono», imágenes fijas con acabado holo, álbum público con marca de agua y revisión 18+ de cambios pendientes (lámina «Cartas por capas en la web (spec 018)») |
+| «Abrir todos» dinámico | Ráfaga de sobres con «Saltar», foco en las destacadas con la carta viva y resumen agrupado por rareza con totales (lámina «"Abrir todos" dinámico (spec 019)») |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
 de la demo (`pnpm showcase`). Se regeneran tras cada cambio visible.

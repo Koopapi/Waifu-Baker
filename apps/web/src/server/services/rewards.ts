@@ -22,11 +22,14 @@ async function activeUser(db: DbLike, userId: string) {
   return u;
 }
 
-/** RF-4, RF-7 y RF-9: solo colecciones SFW publicadas. */
-async function claimableSet(db: DbLike, setId: string | null | undefined) {
+/**
+ * RF-4, RF-7 y RF-9: solo colecciones gratuitas publicadas (spec 021, RF-4 a RF-6: lo gratis solo da gratis). También
+ * para el sobre de Expediciones (spec 020).
+ */
+export async function claimableSet(db: DbLike, setId: string | null | undefined) {
   if (!setId) throw new AppError("choose_set", "Elige una colección.");
   const [s] = await db.select().from(sets).where(eq(sets.id, setId));
-  if (!s || s.status !== "published" || s.isAdult) throw new AppError("set_not_claimable", "Esa colección no está disponible para sobres gratis. Elige otra.");
+  if (!s || s.status !== "published" || s.isAdult || !s.isFree) throw new AppError("set_not_claimable", "Esa colección no es gratuita: elige otra.");
   return s;
 }
 
@@ -35,7 +38,7 @@ export async function claimableSets(db: DbLike) {
   return db
     .select({ id: sets.id, code: sets.code, name: sets.name })
     .from(sets)
-    .where(and(eq(sets.status, "published"), eq(sets.isAdult, false)))
+    .where(and(eq(sets.status, "published"), eq(sets.isAdult, false), eq(sets.isFree, true)))
     .orderBy(sets.code);
 }
 

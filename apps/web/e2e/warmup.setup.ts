@@ -4,7 +4,9 @@ import { login } from "./helpers";
 import { API_CALLS, ROUTES } from "./warm";
 
 test("calentar rutas", async ({ browser }) => {
-  test.setTimeout(300_000);
+  // Compilar todas las rutas en modo desarrollo tarda más en máquinas lentas o cargadas (WSL, otra app en marcha):
+  // 10 minutos por defecto y ajustable con E2E_WARMUP_TIMEOUT_MS.
+  test.setTimeout(Number(process.env.E2E_WARMUP_TIMEOUT_MS) || 600_000);
   const page = await login(browser, "warmup", true);
   for (const r of ROUTES) {
     await page.goto(r);

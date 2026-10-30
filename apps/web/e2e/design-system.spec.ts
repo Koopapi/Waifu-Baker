@@ -1,4 +1,4 @@
-// Criterios de la spec 011: sistema de diseño (catálogo /sistema, teclado, foco, avisos, confirmación, movimiento).
+// Criterios de la spec 011: sistema de diseño (catálogo /design-system, teclado, foco, avisos, confirmación, movimiento).
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
 
@@ -7,7 +7,7 @@ const es = dictionaries.es;
 test("sistema de diseño: catálogo, teclado, superposiciones, avisos y acciones optimistas", async ({ browser }, info) => {
   test.setTimeout(240_000);
   const page = await (await browser.newContext()).newPage();
-  await page.goto("/sistema");
+  await page.goto("/design-system");
   await expect(page.locator('[data-testid="catalog"]')).toBeVisible();
 
   await test.step("RF-15: el catálogo muestra todas las familias de componentes", async () => {
@@ -26,9 +26,12 @@ test("sistema de diseño: catálogo, teclado, superposiciones, avisos y acciones
 
   await test.step("RF-4 y RF-14: desplegable con buscador usable solo con teclado", async () => {
     const combo = page.locator('[data-testid="catalog-form"] button[role="combobox"]');
-    await combo.focus();
-    await page.keyboard.press("Enter");
-    await expect(combo).toHaveAttribute("aria-expanded", "true");
+    // Hasta que la página se hidrata, el botón no responde al teclado: se repite el gesto hasta que abre.
+    await expect(async () => {
+      await combo.focus();
+      await page.keyboard.press("Enter");
+      await expect(combo).toHaveAttribute("aria-expanded", "true", { timeout: 2_000 });
+    }).toPass({ timeout: 30_000 });
     await page.keyboard.type("07");
     await page.keyboard.press("Enter");
     await expect(page.locator('[data-testid="catalog-select-value"]')).toHaveText("Selected: s7");

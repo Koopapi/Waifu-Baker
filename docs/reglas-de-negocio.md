@@ -65,7 +65,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-40 | Los sobres sin abrir no caducan nunca, aunque la persona deje de ser patron o la colección se archive. | Vigente | 004 RF-4 |
 | RN-41 | Un sobre se abre una sola vez. Repetir la petición (doble clic, dos pestañas, recarga) devuelve el mismo resultado. | Vigente | 004 RF-6, RF-17 |
 | RN-42 | Cada apertura guarda la versión de probabilidades, la semilla, las tiradas, si actuó la protección y las cartas. No se puede modificar después. | Vigente | 004 RF-9 |
-| RN-43 | «Abrir todos» abre hasta 50 sobres de una colección, cada uno por separado y con las mismas reglas. | Vigente | 004 RF-18, RF-19 |
+| RN-43 | «Abrir todos» abre hasta 50 sobres de una colección, cada uno por separado y con las mismas reglas. Los sobres se abren en el servidor antes de animar: después, una ráfaga de sobres rasgándose (como mucho 6 s), las destacadas en grande y vivas (épicas, legendarias y secretas siempre; raras solo si son nuevas; como mucho 10) y un resumen agrupado por rareza con copias, nuevas, holo y totales. «Saltar» lleva al resumen; con movimiento reducido no hay ráfaga. | Vigente | 004 RF-18, RF-19; 019 |
 | RN-44 | Como máximo 10 aperturas por minuto y usuario. | Vigente | 004 RF-21 |
 | RN-45 | Las cartas repetidas se acumulan (x2, x3…). Una carta holo cuenta aparte de su versión normal. | Vigente | 004 RF-10 |
 
@@ -188,7 +188,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Regla | Descripción | Estado | Origen |
 |---|---|---|---|
 | RN-160 | Los sonidos son de dominio público (CC0) y su origen, autor y licencia constan junto a ellos en el repositorio. | Vigente | 013 RF-1 |
-| RN-161 | Rasgar y voltear suenan igual para todas las cartas; una rara, épica, legendaria o secreta añade un sonido de su nivel. En «Abrir todos» suena una sola vez, con la mejor carta. | Vigente | 013 RF-2 a RF-5 |
+| RN-161 | Rasgar y voltear suenan igual para todas las cartas; una rara, épica, legendaria o secreta añade un sonido de su nivel. En «Abrir todos», la ráfaga suena con los rasgados (como mucho uno cada 120 ms) y cada destacada con el sonido de su rareza. | Vigente | 013 RF-2 a RF-4; 019 RF-3, RF-6 |
 | RN-162 | En los móviles que lo permiten (Android), una rara o mejor vibra; más en legendaria y secreta. | Vigente | 013 RF-9 |
 | RN-163 | El sonido está activado por defecto. El botón de silencio de la apertura y de «Abrir todos» corta sonido y vibración, y se recuerda en ese dispositivo. | Vigente | 013 RF-7, RF-8, RF-10 |
 | RN-164 | Ninguna página del coleccionista ni pública carga más de 250 kB de JavaScript comprimido al abrirse; la integración continua falla si alguna se pasa. | Vigente | 013 RF-11, RF-12 |
@@ -215,17 +215,75 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | RN-185 | Las galletas al llegar, el sobre al aterrizar y una celebración al abrirse suenan (sonidos CC0, por el mismo motor y silencio de la apertura); solo la celebración vibra, suave y una vez. El botón de silencio está también en la cabecera del coleccionista. | Vigente | 015 RF-12 a RF-14 |
 | RN-186 | Las pantallas del coleccionista no muestran avisos emergentes ni mensajes de éxito por reclamar; los lectores de pantalla reciben un anuncio de texto. Un fallo se muestra junto al botón, con «Reintentar» solo si falló la red. El panel de administración conserva sus avisos. | Vigente | 015 RF-15 a RF-17 |
 
+## 18. Cartas por capas
+
+Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto en las specs 016 a 018. Desde la spec
+017, todas las cartas son cartas por capas; desde la 018, se ven así en toda la web.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-190 | Solo el administrador crea y edita cartas por capas, desde el panel; cada cambio queda registrado. Fuera del panel, las capas solo las recibe quien tiene la carta (RN-194). | Vigente | 016 RF-1, RF-2, RF-4 |
+| RN-191 | Una carta por capas lleva el marco y el sello de su escalón (N, R, SR, SSR, UR; común y poco común → N, rara → R, épica → SR, legendaria → SSR, secreta → UR) y ningún texto encima. Las rarezas del juego, el sorteo y las probabilidades no cambian. El número, el nombre, la rareza y la colección siguen en la base de datos. | Vigente | 016 RF-9 a RF-11, RF-15 |
+| RN-192 | Las capas de imagen tienen la proporción 700 × 991 (±1 %), al menos 700 px de ancho, PNG, JPEG o WebP de hasta 20 MB; se guardan en WebP; como mucho 8 capas de imagen por carta (las partículas no cuentan). El sello de imagen no tiene que cumplir la proporción. Lo subido y no guardado se borra a las 24 h. | Vigente | 016 RF-19 a RF-23 |
+| RN-193 | Para guardar hace falta al menos una capa visible. Si otro administrador guardó antes, se avisa del conflicto: recargar o forzar a sabiendas. Una carta con chica no puede quedarse sin capas (spec 017; sustituye a la vuelta a la imagen de Pencil de la spec 016). | Vigente | 016 RF-13, RF-17, RF-18; 017 RF-5 |
+| RN-195 | Al cambiar la rareza de una carta con capas cambian el marco y el sello de texto; un sello de imagen se mantiene con aviso; las partículas no cambian. | Vigente | 016 RF-25 |
+| RN-197 | Las capas se editan también en colecciones publicadas. | Vigente | 016 RF-16 |
+| RN-194 | Toda carta por capas tiene una imagen fija generada en el servidor con el mismo dibujo que la carta viva (el sello va dentro del borde), que sustituye a la compuesta con Pencil en cuadrículas, resúmenes y miniaturas y, reducida y con marca de agua, en las zonas públicas. La carta se ve viva al revelarla y en su ficha (con movimiento reducido, la imagen fija); el giroscopio se activa con un interruptor en la ficha, solo en teléfonos. Las capas solo se entregan a quien tiene la carta, con enlaces que caducan a los 10 minutos. La holo lleva un brillo arcoíris encima. | Vigente | 018 RF-1 a RF-16 |
+| RN-196 | En una colección 18+ publicada, cualquier cambio de capas queda pendiente de revisión: los coleccionistas ven la versión revisada hasta que un administrador lo aprueba («personaje claramente adulto») o lo descarta; varios cambios seguidos dejan pendiente solo el último y el panel avisa qué cartas los tienen. Las capas y la imagen fija de una carta 18+ solo se entregan con el doble control de edad. | Vigente | 018 RF-17 a RF-21 |
+| RN-198 | Una carta no puede quedarse sin su chica ni sin capas; los modos de mezcla importados que el editor no ofrece pasan a normal con aviso. | Vigente | 017 RF-5, RF-19 |
+| RN-199 | Toda carta nace de la imagen de la chica recortada (PNG o WebP con transparencia, hasta 20 MB, al menos 991 px de alto, de cualquier proporción), centrada y entera. Sin transparencia se acepta con aviso. Sustituirla conserva su encuadre y el resto de la carta. El recorte se hace fuera del panel. | Vigente | 017 RF-1 a RF-4 |
+| RN-200 | Hay una biblioteca general de elementos, común a todas las colecciones: fondos y adornos (con las reglas de las capas del lienzo), sellos de imagen (con las del sello) y partículas guardadas. La misma imagen no se guarda dos veces. Una carta toma de ahí su fondo, su sello, adornos y partículas, o usa los suyos propios. Una imagen que usa alguna carta no se quita (se indica cuántas cartas y de qué colecciones); las partículas se copian a la carta al usarlas. | Vigente | 017 RF-6 a RF-9 |
+| RN-205 | Desde el editor, el fondo, el sello, un adorno o unas partículas de una carta se guardan en la biblioteca con un nombre; la chica no. La carta no cambia. | Vigente | 017 RF-21 |
+| RN-201 | Cada capa de imagen se puede mover, escalar (10 % a 400 %) y girar (−180° a 180°) sin perder el parallax ni el brillo. | Vigente | 017 RF-10 a RF-12 |
+| RN-202 | Mientras nadie cambie a mano el marco, las partículas o el sello, la carta lleva el estilo completo de su escalón y lo cambia con la rareza; aplicar el estilo de la rareza lo vuelve automático. | Vigente | 017 RF-13, RF-14 |
+| RN-203 | Una colección solo se publica con todas sus cartas armadas (chica y fondo visibles); el panel dice cuáles faltan, con enlace a cada una. | Vigente | 017 RF-15, RF-16 |
+| RN-204 | Las cartas se exportan y se importan en el formato del creador de cartas de Bruno (configuración con nombres de archivo y encuadre); una importación no válida no cambia la carta. | Vigente | 017 RF-17 a RF-19 |
+
+## 19. Juegos: Expediciones
+
+Origen: propuesta de Bruno (versión 1), con el botín rediseñado por el dueño (spec 020). El servidor decide con su reloj
+y su RNG; no hay forma de pagar para avanzar.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-206 | «Juegos» es un apartado del coleccionista; su primer juego es Expediciones. Su contador muestra los equipos que ya volvieron sin reclamar. | Vigente | 020 RF-1, RF-2 |
+| RN-207 | El mapa tiene zonas con terreno y dificultad. Las que piden 0 fragmentos están abiertas desde el inicio; las demás tienen niebla y cada coleccionista las abre gastando fragmentos de mapa (abrir una ya abierta no gasta). Una zona oculta no sale en el mapa; sus expediciones en curso terminan igual. | Vigente | 020 RF-3 a RF-6 |
+| RN-208 | Un equipo lleva de 1 a 3 cartas distintas de la colección del coleccionista. Una carta (por versión: normal u holo) solo puede estar en una expedición en curso. Las cartas 18+ solo con el contenido 18+ desbloqueado. Cada coleccionista tiene 2 espacios. | Vigente | 020 RF-7 a RF-9, RF-16 |
+| RN-209 | Poder de una carta = poder de su rareza (común 10, poco común 12, rara 14, épica 17, legendaria 20, secreta 24) × 1,5 si su terreno es el de la zona × 1,15 si es holo × (1 + 2 % por nivel de vínculo por encima del 1). Poder del equipo = suma. Calificación por poder ÷ dificultad: Excelente ≥ 1,4; Bien ≥ 1; Normal ≥ 0,6; Difícil por debajo. | Vigente | 020 RF-11 a RF-14 |
+| RN-210 | Duraciones de 30 min, 2 h u 8 h, con la hora del servidor. Al enviar quedan congelados poder, calificación y botín; los cambios posteriores (vínculo, terreno, rol, zona) no los tocan. Cancelar antes de la vuelta devuelve las cartas sin botín ni vínculo. | Vigente | 020 RF-15, RF-17, RF-18 |
+| RN-211 | Botín fijo por zona y duración, fijado en el panel para «Bien»; Excelente da el 125 %, Normal el 80 % y Difícil el 50 % (hacia abajo; al menos 1 galleta si la zona da galletas). Roles: Recolectora +30 % galletas, Cartógrafa ×2 fragmentos, Buscatesoros ×1,5 probabilidad de sobre (una vez por rol). | Vigente | 020 RF-14, RF-20 |
+| RN-212 | Al reclamar una expedición que volvió se entregan, en una sola operación, el botín fijo y 4, 12 o 30 puntos de vínculo (según la duración) a cada personaje del equipo (una vez por personaje); el sobre al azar se sortea con la probabilidad publicada de la zona y duración. Reclamar otra vez devuelve el mismo reporte sin entregar nada. | Vigente | 020 RF-19 a RF-21, RF-23 |
+| RN-213 | El sobre ganado es de una colección SFW publicada: si solo hay una llega al momento; si hay varias, la elige el coleccionista. Se celebra como los sobres que llegan sin pedirlos. Abrirlo sigue bloqueado en Bélgica. | Vigente | 020 RF-22 |
+| RN-214 | El vínculo es por personaje y coleccionista: niveles 1 a 10 con 0, 50, 150, 300, 500, 750, 1000, 1500, 2000 y 2500 puntos. La ficha de la carta muestra su nivel y, si está fuera, cuándo vuelve. | Vigente | 020 RF-12, RF-25 |
+| RN-215 | La página de Probabilidades publica la probabilidad de sobre de cada zona activa y duración. | Vigente | 020 RF-26 |
+| RN-216 | El administrador asigna terreno y rol a cada personaje y crea y edita zonas (nombre, terreno, dificultad 1 a 1000, fragmentos 0 a 999, orden, imagen, activa) con su botín por duración (galletas 0 a 10 000, fragmentos 0 a 100, sobre 0 a 100 %); el simulador muestra calificación, botín y sobres al día con 2 espacios. | Vigente | 020 RF-27 a RF-30 |
+
+## 20. Economía: colecciones gratuitas y de Patreon
+
+Decisiones del dueño del 25 oct 2026 para poder monetizar (`docs/economia.md`). Mandan sobre las reglas anteriores de
+las fuentes gratis (RN-20 a RN-23 siguen; RN-100 y siguientes de la spec 009 y RN-213 de la 020 se leen con RN-218).
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-217 | Cada colección es **gratuita** o **de Patreon** (de Patreon por defecto); lo decide el administrador y se ve en el panel. Una colección 18+ nunca es gratuita; pasar a 18+ una gratuita le quita la marca. | Vigente | 021 RF-1 a RF-3 |
+| RN-218 | **Lo gratis solo da gratis**: el sobre cada 12 h, el del día 7 y el sobre de expedición solo salen de colecciones gratuitas publicadas. Sin ninguna, esas fuentes no conceden, conservan lo pendiente y lo explican. | Vigente | 021 RF-4 a RF-7 |
+| RN-219 | La colección de bienvenida puede ser gratuita o de Patreon (la probadita de las OCs). | Vigente | 021 RF-8 |
+| RN-220 | A quien no es patron, cada colección de Patreon que ve (lista, álbum de la colección, «Mis sobres») le dice que llega con la suscripción, con enlace a la página de Patreon (`PATREON_PAGE_URL`). Probabilidades indica cómo se consigue cada colección. | Vigente | 021 RF-9, RF-10 |
+| RN-221 | **Patron** = membresía de Patreon activa y pagada en un tier con reglas de sobres (un tier «Free» no cuenta). Tiene insignia en su cuenta y en su álbum público mientras dure; se quita en la siguiente lectura de la membresía. | Vigente | 021 RF-11, RF-12 |
+| RN-222 | El patron tiene 3 espacios de expedición en lugar de 2 (excepción deliberada a «sin ventajas por pagar»). Al dejar de serlo, las que están fuera terminan y no envía otra hasta tener menos de 2 en curso. A quien no es patron se le dice cómo conseguir el tercero. | Vigente | 021 RF-13 a RF-15 |
+| RN-223 | Al añadir una regla de tier, el panel propone 8 sobres al mes. Valores de arranque: SFW 8; 18+: 8 SFW + 8 adultos. | Vigente | 021 RF-16 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
 |---|---|
 | Sobre de bienvenida | 1, de la colección elegida en el panel |
-| Sobres al mes por regla de tier | 1 a 50 |
+| Sobres al mes por regla de tier | 1 a 50 (8 por defecto) |
 | Regalo del panel | 1 a 20 sobres, motivo de 3 a 200 caracteres |
 | Cartas por sobre | 1 a 10 (5 por defecto) |
 | Probabilidad de holo (rara o mejor) | 20 % por defecto, configurable |
 | Protección de mala suerte | N de 0 a 100, 10 por defecto |
-| «Abrir todos» | hasta 50 sobres |
+| «Abrir todos» | hasta 50 sobres; ráfaga de 6 s como mucho; hasta 10 destacadas |
 | Nota de moderación | hasta 300 caracteres |
 | Espera entre revisiones de un álbum oculto | 7 días |
 | JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
@@ -239,9 +297,12 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Alias del álbum | 2 a 30 caracteres |
 | Cartas destacadas | hasta 5 |
 | Imágenes subidas | PNG, JPEG o WebP; hasta 20 MB; mínimo 600 px de ancho |
+| Imagen de la chica (crea la carta) | PNG o WebP con transparencia; hasta 20 MB; al menos 991 px de alto |
+| Encuadre de una capa | escala 10 % a 400 %; giro −180° a 180° |
 | Código de colección | 2 a 8 letras o números |
 | Idioma por defecto | inglés |
 | Sobre gratis | 1 cada 12 h, hasta 2 acumulados; 1 listo al empezar |
+| Expediciones | 2 espacios (3 el patron); equipos de 1 a 3 cartas; 30 min, 2 h u 8 h; vínculo hasta nivel 10 |
 | Racha diaria | 10, 10, 15, 15, 20, 20 galletas y un sobre el día 7; 1 día de gracia |
 | Cambio de zona horaria | mínimo 20 h entre recompensas |
 | Edad mínima de la web | 16 o 18 años, la elige el administrador (16 por defecto); 18+ y tier adulto para el contenido adulto |
@@ -250,3 +311,4 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 | Premio que vuela | 0,7 s por pegatina, escalonadas 90 ms (3 galletas, 1 sobre); el destino rebota 0,42 s |
 | Estampado de la pegatina del día | 0,45 s antes de que vuele el premio |
 | Celebración | una a la vez, en orden; confeti de 70 piezas; vibración de 30 ms |
+| Capas de una carta | hasta 8 de imagen (700 × 991 ± 1 %, mín. 700 px, ≤ 20 MB, se guardan en WebP); partículas aparte; temporales borradas a las 24 h |

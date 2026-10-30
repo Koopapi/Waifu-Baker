@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 const SRC = path.resolve(__dirname, "..");
 const walk = (d: string): string[] => readdirSync(d).flatMap((f) => (statSync(path.join(d, f)).isDirectory() ? walk(path.join(d, f)) : [path.join(d, f)]));
 // La apertura de sobres (y su laboratorio) tiene su propia escena animada; el catálogo muestra el sistema.
-const EXEMPT = [/features\/opening\//, /app\/lab\//, /app\/sistema\//, /opengraph-image/, /\.test\.tsx?$/];
+const EXEMPT = [/features\/opening\//, /app\/lab\//, /app\/design-system\//, /opengraph-image/, /\.test\.tsx?$/];
 const screens = [...walk(path.join(SRC, "app")), ...walk(path.join(SRC, "features"))].filter((f) => f.endsWith(".tsx") && !EXEMPT.some((r) => r.test(f)));
 
 /** Coincidencias en el texto completo (las etiquetas JSX pueden ocupar varias líneas), con su línea. */

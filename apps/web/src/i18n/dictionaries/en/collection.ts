@@ -13,6 +13,8 @@ export const collection = {
   },
   viewCollection: "View collection",
   adultLocked: "18+ set: verify your age with an adult Patreon tier to see these cards.",
+  // Spec 021, RF-9: how a Patreon set is obtained.
+  patreon: { notice: "This set comes with the Patreon subscription.", link: "See the tiers on Patreon" },
   progress: (owned: number, total: number) => `${owned} of ${total} cards`,
   binder: {
     modes: { all: "All", owned: "Owned", missing: "Missing", holo: "Holo" },
@@ -26,7 +28,10 @@ export const collection = {
     holo: "Holo",
     version: "Version",
     firstObtained: (date: string) => `You first got it on ${date}.`,
-    aiHint: "AI-generated illustration. Move your mouse or tilt your phone to see the shine.",
+    aiHint: "AI-generated illustration. Move your mouse or drag the card with your finger to tilt it.",
+    gyro: "Move with the phone",
+    gyroHint: "The card follows your phone's tilt. When off, drag it with your finger.",
+    gyroDenied: "You didn't allow the phone's motion; the card tilts with your finger.",
   },
   album: {
     moderation: {

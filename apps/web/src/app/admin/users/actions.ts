@@ -4,6 +4,7 @@ import { adminAction, type ActionState } from "@/server/auth/admin-action";
 import { now } from "@/server/clock";
 import { adjustCookies } from "@/server/services/rewards";
 import { giftPacks } from "@/server/services/users-admin";
+import { parsePackKind } from "@/domain/catalog/default-odds";
 import { getDict } from "@/i18n/server";
 
 export async function giftPacksAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
@@ -14,6 +15,7 @@ export async function giftPacksAction(_: ActionState | null, fd: FormData): Prom
       setId: String(fd.get("setId") ?? ""),
       count: Number(fd.get("count")),
       reason: String(fd.get("reason") ?? ""),
+      kind: parsePackKind(fd.get("kind")),
     });
     return (await getDict()).admin.users.gifted(n);
   });

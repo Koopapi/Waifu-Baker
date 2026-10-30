@@ -36,7 +36,7 @@ export async function AdminShell({ userId, children }: { userId: string; childre
           label: sh.groups.operation,
           items: [
             { href: "/admin", label: n.overview, icon: "overview", exact: true },
-            { href: "/admin/metricas", label: n.metrics, icon: "metrics" },
+            { href: "/admin/metrics", label: n.metrics, icon: "metrics" },
           ],
         },
         {
@@ -44,21 +44,23 @@ export async function AdminShell({ userId, children }: { userId: string; childre
           items: [
             { href: "/admin/sets", label: n.sets, icon: "sets" },
             { href: "/admin/characters", label: n.characters, icon: "characters" },
+            { href: "/admin/library", label: n.library, icon: "library" },
+            { href: "/admin/expeditions", label: n.expeditions, icon: "expeditions" },
           ],
         },
         {
           label: sh.groups.players,
           items: [
             { href: "/admin/users", label: n.users, icon: "users" },
-            { href: "/admin/albumes", label: n.albums, icon: "album" },
+            { href: "/admin/albums", label: n.albums, icon: "album" },
             { href: "/admin/tiers", label: n.tiers, icon: "tiers" },
           ],
         },
         {
           label: sh.groups.system,
           items: [
-            { href: "/admin/ajustes", label: n.settings, icon: "settings" },
-            { href: "/sobres", label: sh.collectorView, icon: "packs" },
+            { href: "/admin/settings", label: n.settings, icon: "settings" },
+            { href: "/packs", label: sh.collectorView, icon: "packs" },
             { href: "/drop-rates", label: n.publicOdds, icon: "odds", external: true },
           ],
         },

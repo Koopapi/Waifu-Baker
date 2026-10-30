@@ -43,7 +43,7 @@ describe("RF-16 composición de la carta", () => {
 
 describe("Marcos de Pencil", () => {
   it("existe un marco 1500×2100 con ventana transparente para cada rareza y para «sin rareza»", async () => {
-    for (const r of ["common", "uncommon", "rare", "epic", "legendary", "secret", "none"]) {
+    for (const r of ["common", "rare", "epic", "legendary", "ex", "none"]) {
       const { data, info } = await sharp(`assets/frames/frame_${r}.png`).raw().toBuffer({ resolveWithObject: true });
       expect([info.width, info.height, info.channels]).toEqual([1500, 2100, 4]);
       expect(data[(1000 * 1500 + 750) * 4 + 3]).toBe(0);

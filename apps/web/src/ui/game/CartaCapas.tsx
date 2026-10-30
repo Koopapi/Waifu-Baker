@@ -27,6 +27,8 @@ export interface CartaCapasProps {
   noSeal?: boolean;
   /** Apertura: el sello espera escondido hasta `entrar()`. */
   sealHidden?: boolean;
+  /** Spec 018, RF-6: al cargar sus capas, hace su entrada (brillo que barre y el sello que salta). */
+  entrance?: boolean;
   /** Elemento donde se escucha el ratón (por defecto, el padre). */
   zone?: React.RefObject<HTMLElement | null>;
   className?: string;
@@ -36,6 +38,9 @@ export interface CartaCapasProps {
 export interface CartaCapasHandle {
   entrar(): void;
   ocultarSello(): void;
+  /** Spec 018, RF-12: sigue la inclinación del teléfono (pide permiso si el dispositivo lo exige). */
+  habilitarGiroscopio(): Promise<boolean>;
+  deshabilitarGiroscopio(): void;
 }
 
 /**
@@ -45,7 +50,7 @@ export interface CartaCapasHandle {
  * destruye (con sus escuchas) al desmontarse.
  */
 export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function CartaCapas(
-  { tier, image, label, rawArt = false, config, holo = false, estatica = false, noSeal = false, sealHidden = false, zone, className, style },
+  { tier, image, label, rawArt = false, config, holo = false, estatica = false, noSeal = false, sealHidden = false, entrance = false, zone, className, style },
   ref,
 ) {
   const box = useRef<HTMLDivElement>(null);
@@ -59,16 +64,22 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
       const lib = mod.default;
       if (!alive || !box.current || !lib) return;
       const extra: CartaConfig = {
-        ...(rawArt ? {} : { marco: "ninguno", proporcion: CARD_RATIO }),
+        // Una configuración por capas trae su marco y su proporción; una imagen compuesta ya lleva el marco de Pencil.
+        ...(rawArt || config ? {} : { marco: "ninguno", proporcion: CARD_RATIO }),
         etiqueta: label,
         estatica,
         zona: zone?.current ?? undefined,
-        // El holo es la versión holo del juego, no el del preset (la UR lo trae siempre).
-        holo,
+        // Con una imagen, el holo es la versión holo del juego (no el del preset: la UR lo trae siempre); con
+        // capas, también el que elija la configuración.
+        holo: holo || Boolean(config?.holo),
         ...(noSeal ? { sello: null } : {}),
       };
       card.current = config ? lib.montar(box.current, { ...config, ...extra }) : lib.montarRareza(box.current, tier, image, extra);
-      if (hidden.current) card.current.ocultarSello();
+      if (hidden.current || entrance) card.current.ocultarSello();
+      if (entrance) {
+        const inst = card.current;
+        void inst.listo.then(() => alive && inst.entrar());
+      }
     });
     return () => {
       alive = false;
@@ -77,16 +88,18 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
     };
     // `zone` es un ref estable; `label` solo cambia con la carta.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tier, image, rawArt, config, estatica, noSeal]);
+  }, [tier, image, rawArt, config, estatica, noSeal, entrance]);
 
   useEffect(() => {
-    card.current?.set({ holo });
-  }, [holo]);
+    card.current?.set({ holo: holo || Boolean(config?.holo) });
+  }, [holo, config]);
 
   useImperativeHandle(ref, () => ({
     entrar: () => card.current?.entrar(),
     ocultarSello: () => card.current?.ocultarSello(),
+    habilitarGiroscopio: () => card.current?.habilitarGiroscopio() ?? Promise.resolve(false),
+    deshabilitarGiroscopio: () => card.current?.deshabilitarGiroscopio(),
   }), []);
 
-  return <div ref={box} className={className} style={{ aspectRatio: rawArt ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} />;
+  return <div ref={box} className={className} style={{ aspectRatio: rawArt || config ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} />;
 });

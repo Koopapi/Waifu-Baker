@@ -4,9 +4,9 @@ import { seededRng } from "../random";
 import { RARITIES, type Rarity } from "./card-rules";
 import { isEpicPlus } from "./pity";
 
-const W = (o: Partial<Record<Rarity, number>>) => ({ common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0, secret: 0, ...o });
+const W = (o: Partial<Record<Rarity, number>>) => ({ common: 0, rare: 0, epic: 0, legendary: 0, ex: 0, ...o });
 const CARDS = RARITIES.flatMap((r) => [1, 2].map((i) => ({ id: `${r}-${i}`, rarity: r as Rarity })));
-const SLOTS = [W({ common: 100 }), W({ rare: 80, epic: 15, legendary: 4, secret: 1 })];
+const SLOTS = [W({ common: 100 }), W({ rare: 80, epic: 15, legendary: 4, ex: 1 })];
 
 describe("Sorteo con protección (RF-5, RF-13)", () => {
   it("test_s004_rf13_si toca la protección, siempre hay épica o superior", () => {

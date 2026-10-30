@@ -7,6 +7,8 @@ import { plural } from "../../plural";
 
 const pad = (n: string | number | undefined) => String(n ?? "").padStart(3, "0");
 const rarity = (r: string | number | undefined) => common.rarity[r as keyof typeof common.rarity] ?? String(r ?? "");
+/** Spec 022: los problemas de la tabla gold dicen de qué sobre son. */
+const ofPack = (p: { kind?: string | number }) => (p.kind === "gold" ? " del sobre gold" : "");
 const FIELD: Record<string, string> = { character: "personaje", name: "nombre", rarity: "rareza", image: "imagen compuesta" };
 
 /** Traduce otro código del mismo diccionario (para mensajes que agrupan varios problemas). */
@@ -30,7 +32,7 @@ export const errors: Record<string, Msg> = {
   unknown: "Algo ha fallado. Inténtalo de nuevo.",
   welcome_not_allowed: "Solo una colección SFW publicada puede ser la de bienvenida.",
   choose_set: "Elige una colección.",
-  set_not_claimable: "Esa colección no está disponible para sobres gratis. Elige otra.",
+  set_not_claimable: "Esa colección no es gratuita: elige otra.",
   invalid_min_age: "La edad mínima solo puede ser 16 o 18 años.",
   album_hidden: "Tu álbum está oculto: cambia el alias y pide una revisión.",
   invalid_moderation_reason: "Elige un motivo de la lista.",
@@ -51,6 +53,10 @@ export const errors: Record<string, Msg> = {
   patreon_unavailable: "Patreon no está configurado o no respondió. Inténtalo más tarde.",
 
   // Genéricos con varios significados: un parámetro distingue cada caso.
+  // Spec 024: cuentas de administrador (comandos del servidor).
+  invalid_username: "Usuario no válido: de 3 a 32 letras minúsculas, números, punto o guion.",
+  username_taken: "Ya existe un administrador con ese usuario.",
+  last_admin: "No se puede eliminar la única cuenta de administrador.",
   not_found: (p) =>
     ({
       user: "El usuario no existe.",
@@ -60,6 +66,8 @@ export const errors: Record<string, Msg> = {
       character: "El personaje no existe.",
       chosen_character: "El personaje elegido ya no existe.",
       pack: "Ese sobre no existe.",
+      zone: "La zona no existe.",
+      expedition: "La expedición no existe.",
       card: "La carta no existe.",
       selected_cards: "Alguna de las cartas seleccionadas ya no existe.",
     })[String(p.entity)] ?? "No se encontró lo que buscabas.",
@@ -138,11 +146,24 @@ export const errors: Record<string, Msg> = {
   too_narrow: (p) => `La imagen mide ${p.width} px de ancho; el mínimo es ${p.min} px.`,
   unreadable: "No se pudo leer la imagen: el archivo parece dañado.",
 
+  // Spec 016: cartas por capas.
+  layer_too_narrow: (p) => `La capa mide ${p.width} px de ancho; el mínimo es ${p.min} px.`,
+  layer_ratio: (p) => `La capa mide ${p.width} × ${p.height}; debe tener la proporción del lienzo (${p.expected}).`,
+  too_many_layers: (p) => `Una carta admite como mucho ${p.max ?? 8} capas de imagen (las partículas no cuentan).`,
+  no_visible_layer: "Hace falta al menos una capa de imagen visible.",
+  invalid_layers: (p) => `La configuración de capas no es válida${p.path ? ` (${p.path})` : ""}.`,
+  layer_missing: "Una de las capas ya no está disponible: vuelve a subirla.",
+  layers_required: "Esta carta se creó desde capas y no tiene imagen original: necesita al menos una capa de imagen visible.",
+
   // Probabilidades y comprobaciones antes de publicar.
-  slot_count: (p) => `El sobre tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
-  negative_weight: (p) => `La ranura ${p.slot} tiene pesos negativos o no válidos.`,
-  slot_sum: (p) => `La ranura ${p.slot} suma ${p.sum} % en vez de 100 %.`,
+  slot_count: (p) => `El sobre${p.kind === "gold" ? " gold" : ""} tiene ${p.packSize} ${plural(Number(p.packSize), "carta", "cartas")} pero hay ${p.slots} ${plural(Number(p.slots), "ranura", "ranuras")} de probabilidad.`,
+  negative_weight: (p) => `La ranura ${p.slot}${ofPack(p)} tiene pesos negativos o no válidos.`,
+  slot_sum: (p) => `La ranura ${p.slot}${ofPack(p)} suma ${p.sum} % en vez de 100 %.`,
   holo_range: "La probabilidad de holo debe estar entre 0 % y 100 %.",
+  // Spec 022, RF-13 a RF-16.
+  guarantee_slot: (p) => `La última ranura del sobre ${p.kind === "gold" ? "gold" : "plata"} solo puede dar ${rarity(p.rarity)} o mejor.`,
+  missing_table: (p) => `Falta la tabla de probabilidades del sobre ${p.kind === "gold" ? "gold" : "plata"}.`,
+  gold_not_better: "El sobre gold tiene que dar más probabilidad de legendaria o de EX que el plata.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: tiene probabilidad en el sobre pero ninguna carta.`,
   card_incomplete: (p) =>
     `Carta ${pad(p.number)}: falta ${String(p.missing ?? "")

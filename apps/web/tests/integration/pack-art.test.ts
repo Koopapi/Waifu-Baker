@@ -53,7 +53,8 @@ describe("spec 014 — arte del sobre", () => {
       await removePackImage(tx, store, admin.id, set.id);
       expect((await packArt(tx, set.id))!.packImageKey).toBeNull();
       expect(await store.get(second)).toBeNull();
-      const actions = (await tx.select().from(auditLog).where(eq(auditLog.entityId, set.id))).map((r) => r.action);
+      // Sin ORDER BY, Postgres puede devolver las filas en otro orden bajo carga.
+      const actions = (await tx.select().from(auditLog).where(eq(auditLog.entityId, set.id)).orderBy(auditLog.id)).map((r) => r.action);
       expect(actions.filter((a) => a.startsWith("set.pack_image"))).toEqual(["set.pack_image", "set.pack_image", "set.pack_image_remove"]);
     });
   });

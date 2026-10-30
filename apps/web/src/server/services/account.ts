@@ -1,24 +1,13 @@
 import { and, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { albums, cookieLedger, packs, patreonLinks, pityCounters, tierRules, userCards, userRewards, users } from "@/db/schema";
 import { RECOVERY_DAYS, accountState, purgeDate } from "@/domain/accounts/lifecycle";
-import { hasAdultTier, entitledPacks, type MemberState } from "@/domain/patreon/membership";
+import { hasAdultTier, entitledPacks, isPatron } from "@/domain/patreon/membership";
 import type { DbLike } from "@/server/db-types";
 import { AppError } from "@/server/errors";
 import { recordAudit } from "./audit";
 import { loadGrantRules } from "./membership";
 
-function linkAsState(link: typeof patreonLinks.$inferSelect | undefined, patreonUserId: string): MemberState | null {
-  if (!link) return null;
-  return {
-    memberId: link.memberId,
-    patreonUserId,
-    patronStatus: link.patronStatus as MemberState["patronStatus"],
-    lastChargeDate: link.lastChargeDate,
-    lastChargeStatus: link.lastChargeStatus,
-    nextChargeDate: link.nextChargeDate,
-    entitledTierIds: link.entitledTierIds,
-  };
-}
+import { linkAsState } from "./patron";
 
 /** RF-21: lo que ve el usuario en «Mi cuenta». */
 export async function accountSummary(db: DbLike, userId: string) {
@@ -31,15 +20,17 @@ export async function accountSummary(db: DbLike, userId: string) {
     (await db.select({ id: tierRules.patreonTierId, name: tierRules.name }).from(tierRules)).map((t) => [t.id, t.name]),
   );
   const perSet = state ? entitledPacks({ ...state, lastChargeStatus: "Paid" }, rules) : new Map<string, number>();
-  const isPatron = state?.patronStatus === "active_patron";
+  const active = state?.patronStatus === "active_patron";
   return {
     displayName: user.displayName,
+    // Spec 021, RF-11: la insignia (membresía pagada y activa en un tier con sobres).
+    patron: isPatron(state, rules),
     tiers: (state?.entitledTierIds ?? []).map((id) => ({ id, name: tierNames.get(id) || id })),
     patronStatus: state?.patronStatus ?? null,
     lastChargeDate: state?.lastChargeDate ?? null,
     lastChargeStatus: state?.lastChargeStatus ?? null,
     nextChargeDate: state?.nextChargeDate ?? null,
-    packsPerMonth: isPatron ? [...perSet.values()].reduce((a, n) => a + n, 0) : 0,
+    packsPerMonth: active ? [...perSet.values()].reduce((a, n) => a + n, 0) : 0,
     syncedAt: link?.syncedAt ?? null,
     adult: {
       declared: user.isAdultDeclared,

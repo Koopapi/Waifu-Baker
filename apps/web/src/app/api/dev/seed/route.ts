@@ -1,3 +1,4 @@
+import { PACK_KINDS } from "@/domain/catalog/default-odds";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
@@ -7,7 +8,11 @@ import { RARITIES } from "@/domain/catalog/card-rules";
 import { adminFromRequest, notFoundResponse } from "@/server/auth/admin-request";
 import { getCardStore } from "@/server/cards/store-instance";
 import { isAdminError } from "@/server/errors";
-import { seedGift, seedPublishedSet } from "@/server/services/dev-seed";
+import { eq } from "drizzle-orm";
+import { sets } from "@/db/schema";
+import { assembleSetCards, seedGift, seedPublishedSet } from "@/server/services/dev-seed";
+import { TERRAINS, defaultZoneLoot } from "@/domain/expeditions/rules";
+import { saveZone } from "@/server/services/expedition-zones";
 
 export const runtime = "nodejs";
 
@@ -25,8 +30,11 @@ const Body = z.discriminatedUnion("action", [
     characterName: z.string(),
     packSize: z.number().int(),
     isAdult: z.boolean().default(false),
+    isFree: z.boolean().default(false),
     cards: z.array(z.object({ image: z.string().regex(/^[\w-]+\.webp$/), name: z.string(), rarity: Rarity })).min(1),
     slots: z.array(z.partialRecord(Rarity, z.number())),
+    // Spec 022: la tabla gold (si falta, la de por defecto con las rarezas que tienen cartas).
+    gold: z.array(z.partialRecord(Rarity, z.number())).optional(),
     holoPercent: z.number().min(0).max(100).optional(),
   }),
   z.object({
@@ -35,14 +43,19 @@ const Body = z.discriminatedUnion("action", [
     setCode: z.string().min(1),
     count: z.number().int(),
     reason: z.string(),
+    kind: z.enum(PACK_KINDS).default("silver"),
   }),
+  z.object({ action: z.literal("assembleSet"), setCode: z.string().min(1) }),
+  z.object({ action: z.literal("zone"), name: z.string().min(1), terrain: z.enum(TERRAINS), difficulty: z.number().int(), fragmentsRequired: z.number().int(), sortOrder: z.number().int() }),
 ]);
 
 /**
  * Solo desarrollo y E2E: prepara datos por los mismos servicios que usa el panel, sin pasar por su
  * interfaz. Lo llama un administrador con sesión (queda como autor en la auditoría).
  * - `publishedSet`: crea personaje y colección, sube las cartas, las completa y publica → `{ setId }`.
- * - `gift`: regala sobres de una colección a un usuario de desarrollo por su nombre → `{ userId }`.
+ * - `gift`: regala sobres (plata o gold, spec 022) de una colección a un usuario de desarrollo por su nombre → `{ userId }`.
+ * - `assembleSet` (spec 017): pone un fondo de la biblioteca a las cartas sin fondo de una colección → `{ setId }`.
+ * - `zone` (spec 020): crea una zona de Expediciones con el botín por defecto → `{ zoneId }`.
  */
 export async function POST(req: Request) {
   if (!allowed()) return notFoundResponse();
@@ -52,6 +65,16 @@ export async function POST(req: Request) {
   if (!parsed.success) return Response.json({ error: parsed.error.message }, { status: 400 });
   const b = parsed.data;
   try {
+    if (b.action === "assembleSet") {
+      const [set] = await db.select({ id: sets.id }).from(sets).where(eq(sets.code, b.setCode));
+      if (!set) return Response.json({ error: "not_found" }, { status: 404 });
+      await assembleSetCards(db, getCardStore(), session.user.id, set.id);
+      return Response.json({ setId: set.id });
+    }
+    if (b.action === "zone") {
+      const z = await saveZone(db, session.user.id, { ...b, active: true, loot: defaultZoneLoot(b.difficulty) });
+      return Response.json({ zoneId: z.id });
+    }
     if (b.action === "gift") {
       const userId = await seedGift(db, session.user.id, b);
       return Response.json({ userId });

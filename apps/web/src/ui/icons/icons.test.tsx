@@ -11,7 +11,7 @@ const walk = (d: string): string[] => readdirSync(d).flatMap((f) => (statSync(pa
 
 describe("spec 014 — iconos", () => {
   it("test_s014_rf3_ocho_pegatinas_con_borde_blanco", () => {
-    expect([...STICKERS].sort()).toEqual(["card", "clock", "collection", "cookie", "gift", "pack", "profile", "streak"]);
+    expect([...STICKERS].sort()).toEqual(["card", "clock", "collection", "cookie", "gift", "map", "pack", "profile", "streak"]);
     for (const name of STICKERS) {
       const svg = renderToStaticMarkup(<Sticker name={name} className="size-10" />);
       expect(svg, name).toMatch(/^<svg[^>]*aria-hidden="true"/);

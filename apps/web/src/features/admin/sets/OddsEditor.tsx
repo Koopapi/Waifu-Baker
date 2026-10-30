@@ -10,12 +10,17 @@ import { Button } from "@/ui/action/Button";
 import { Alert } from "@/ui/feedback/Alert";
 import { TextField } from "@/ui/form/TextField";
 import { formatNumber, formatPercent } from "@/i18n/format";
+import type { PackKind } from "@/domain/catalog/default-odds";
 
 type Slot = Record<Rarity, number>;
 
-/** RF-20: pesos por ranura y rareza, con suma por ranura y probabilidad de holo. */
+/**
+ * RF-20: pesos por ranura y rareza, con suma por ranura y probabilidad de holo. Spec 022, RF-21: una tabla por tipo de
+ * sobre; la protección de mala suerte solo en la plata.
+ */
 export function OddsEditor({
   setId,
+  kind,
   version,
   slots: initial,
   holoChance,
@@ -24,6 +29,7 @@ export function OddsEditor({
   cardCounts,
 }: {
   setId: string;
+  kind: PackKind;
   version: number;
   slots: Slot[];
   holoChance: number;
@@ -56,7 +62,7 @@ export function OddsEditor({
   const set = (i: number, r: Rarity, v: string) => setSlots((prev) => prev.map((s, j) => (j === i ? { ...s, [r]: v === "" ? 0 : Number(v) } : s)));
 
   return (
-    <div className="space-y-4" id="probabilidades">
+    <div className="space-y-4" id={kind === "gold" ? "probabilidades-gold" : "probabilidades"} data-testid={`odds-${kind}`}>
       <div className="overflow-x-auto rounded-l border border-ui-line">
         <table className="w-full min-w-[720px] text-sm">
           <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
@@ -73,7 +79,7 @@ export function OddsEditor({
           </thead>
           <tbody>
             {slots.map((s, i) => (
-              <tr key={i} id={`ranura-${i + 1}`} className="border-t border-ui-line">
+              <tr key={i} id={`ranura-${kind === "gold" ? "gold-" : ""}${i + 1}`} className="border-t border-ui-line">
                 <td className="px-3 py-2 text-ui-text-2">
                   {i + 1}
                   {i === slots.length - 1 && <span className="ml-2 text-xs text-ui-text-3">{t.guaranteed}</span>}
@@ -117,6 +123,7 @@ export function OddsEditor({
       </div>
       <div className="flex flex-wrap items-end gap-4">
         <TextField label={`${t.holo} (%)`} type="number" min={0} max={100} step={0.5} value={holo} disabled={locked} onChange={(e) => setHolo(Number(e.target.value))} fieldClassName="w-40" className="text-right tabular-nums" />
+        {kind === "silver" && (
         <TextField
           label={t.pity}
           aria-label={t.pityAria}
@@ -132,13 +139,14 @@ export function OddsEditor({
           fieldClassName="w-40"
           className="text-right tabular-nums"
         />
+        )}
         {!locked && (
           <Button
             loading={pending}
             disabled={!dirty}
             onClick={() =>
               start(async () => {
-                const r = await saveOddsAction(setId, version, slots, holo, pity);
+                const r = await saveOddsAction(setId, version, slots, holo, pity, kind);
                 setState(r);
                 if (r.ok) router.refresh();
               })

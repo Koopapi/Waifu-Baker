@@ -1,15 +1,15 @@
 // Reglas puras sobre cartas: numeración (RF-15), carta completa y recuento por rareza (RF-17).
 
-export const RARITIES = ["common", "uncommon", "rare", "epic", "legendary", "secret"] as const;
+// Spec 022, RF-1: cinco rarezas (la poco común pasó a común y la secreta a EX).
+export const RARITIES = ["common", "rare", "epic", "legendary", "ex"] as const;
 export type Rarity = (typeof RARITIES)[number];
 
 export const RARITY_LABEL: Record<Rarity, string> = {
   common: "Común",
-  uncommon: "Poco común",
   rare: "Rara",
   epic: "Épica",
   legendary: "Legendaria",
-  secret: "Secreta",
+  ex: "EX",
 };
 
 export function consecutiveNumbers(orderedIds: string[]): Map<string, number> {

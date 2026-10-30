@@ -5,6 +5,7 @@ import type { Rarity } from "@/domain/catalog/card-rules";
 import { drawPackWithPity } from "@/domain/catalog/draw";
 import { isEpicPlus, nextPityCounter, pityActive } from "@/domain/catalog/pity";
 import { hmacRng } from "@/domain/random";
+import type { PackKind } from "@/domain/catalog/default-odds";
 import type { DbLike } from "@/server/db-types";
 import { AppError } from "@/server/errors";
 
@@ -30,6 +31,8 @@ export interface OpeningResult {
   packId: string;
   setId: string;
   setCode: string;
+  /** Spec 022, RF-19: plata o gold. */
+  kind: PackKind;
   pityApplied: boolean;
   cards: OpenedCard[];
 }
@@ -55,7 +58,7 @@ const notFound = () => new AppError("not_found", "Ese sobre no existe.", { entit
 /** Reconstruye el resultado guardado (RF-6, RF-17). */
 async function resultFromOpening(db: DbLike, packId: string): Promise<OpeningResult> {
   const [row] = await db
-    .select({ opening: packOpenings, setId: sets.id, setCode: sets.code })
+    .select({ opening: packOpenings, setId: sets.id, setCode: sets.code, kind: packs.kind })
     .from(packOpenings)
     .innerJoin(packs, eq(packs.id, packOpenings.packId))
     .innerJoin(sets, eq(sets.id, packs.setId))
@@ -70,6 +73,7 @@ async function resultFromOpening(db: DbLike, packId: string): Promise<OpeningRes
     packId,
     setId: row.setId,
     setCode: row.setCode,
+    kind: row.kind,
     pityApplied: row.opening.pityApplied,
     cards: rolls.draws.map((d) => ({
       cardId: d.cardId,
@@ -112,10 +116,13 @@ export async function openPack(
     const [odds] = await tx
       .select()
       .from(dropTables)
-      .where(and(eq(dropTables.setId, set.id), isNotNull(dropTables.publishedAt)))
+      // Spec 022, RF-12: la tabla publicada del tipo de este sobre.
+      .where(and(eq(dropTables.setId, set.id), eq(dropTables.kind, pack.kind), isNotNull(dropTables.publishedAt)))
       .orderBy(desc(dropTables.version))
       .limit(1);
     if (!odds) throw new AppError("not_published", "Esta colección aún no tiene probabilidades publicadas.");
+    // Spec 022, RF-18: la protección de mala suerte solo cuenta y actúa en los sobres plata.
+    const silver = pack.kind === "silver";
     // Orden fijo: con la misma semilla, la apertura debe dar siempre las mismas cartas (auditoría, spec 004).
     const pool = await tx
       .select()
@@ -130,7 +137,7 @@ export async function openPack(
       .from(pityCounters)
       .where(and(eq(pityCounters.userId, user.id), eq(pityCounters.setId, set.id)))
       .for("update");
-    const active = pityActive(counter.packsSinceEpic, odds.pityThreshold);
+    const active = silver && pityActive(counter.packsSinceEpic, odds.pityThreshold);
 
     const seed = input.seed ?? randomBytes(32);
     const result = drawPackWithPity({ cards: pool, slots: odds.slots, holoChance: odds.holoChance }, hmacRng(seed), active, { unique: true });
@@ -163,16 +170,19 @@ export async function openPack(
       })
       .returning();
     await tx.update(packs).set({ status: "opened", openedAt: sql`now()` }).where(eq(packs.id, pack.id));
-    await tx
-      .update(pityCounters)
-      .set({ packsSinceEpic: nextPityCounter(counter.packsSinceEpic, draws.some((d) => isEpicPlus(d.rarity))), updatedAt: sql`now()` })
-      .where(and(eq(pityCounters.userId, user.id), eq(pityCounters.setId, set.id)));
+    if (silver) {
+      await tx
+        .update(pityCounters)
+        .set({ packsSinceEpic: nextPityCounter(counter.packsSinceEpic, draws.some((d) => isEpicPlus(d.rarity))), updatedAt: sql`now()` })
+        .where(and(eq(pityCounters.userId, user.id), eq(pityCounters.setId, set.id)));
+    }
 
     return {
       openingId: opening.id,
       packId: pack.id,
       setId: set.id,
       setCode: set.code,
+      kind: pack.kind,
       pityApplied: result.pityApplied,
       cards: draws.map((d) => ({
         cardId: d.cardId,
@@ -191,13 +201,13 @@ export async function openPack(
 /** RF-18 y RF-19: abre por separado los sobres sellados de una colección (hasta 50). */
 export async function openAllPacks(
   db: DbLike,
-  input: { userId: string; setId: string; country?: string | null; limit?: number },
+  input: { userId: string; setId: string; kind?: PackKind; country?: string | null; limit?: number },
 ): Promise<OpeningResult[]> {
   const limit = Math.min(input.limit ?? OPEN_ALL_MAX, OPEN_ALL_MAX);
   const sealed = await db
     .select({ id: packs.id })
     .from(packs)
-    .where(and(eq(packs.userId, input.userId), eq(packs.setId, input.setId), eq(packs.status, "sealed")))
+    .where(and(eq(packs.userId, input.userId), eq(packs.setId, input.setId), eq(packs.kind, input.kind ?? "silver"), eq(packs.status, "sealed")))
     .orderBy(asc(packs.grantedAt))
     .limit(limit);
   const out: OpeningResult[] = [];
@@ -212,18 +222,18 @@ export async function getOpeningResult(db: DbLike, userId: string, packId: strin
   return resultFromOpening(db, packId);
 }
 
-/** RF-1 y RF-3: sobres sellados por colección; los 18+ sin verificación salen bloqueados. */
+/** RF-1 y RF-3: sobres sellados por colección y tipo (spec 022, RF-19); los 18+ sin verificación salen bloqueados. */
 export async function listMyPacks(db: DbLike, userId: string) {
   const [user] = await db.select().from(users).where(eq(users.id, userId));
   if (!user) return [];
   const verified = Boolean(user.isAdultDeclared && user.adultVerifiedAt);
   const rows = await db
-    .select({ setId: sets.id, code: sets.code, name: sets.name, isAdult: sets.isAdult, status: sets.status, sealed: count(packs.id) })
+    .select({ setId: sets.id, code: sets.code, name: sets.name, isAdult: sets.isAdult, isFree: sets.isFree, status: sets.status, kind: packs.kind, sealed: count(packs.id) })
     .from(packs)
     .innerJoin(sets, eq(sets.id, packs.setId))
     .where(and(eq(packs.userId, userId), eq(packs.status, "sealed")))
-    .groupBy(sets.id)
-    .orderBy(asc(sets.code));
+    .groupBy(sets.id, packs.kind)
+    .orderBy(asc(sets.code), asc(packs.kind));
   return rows.map((r) => ({ ...r, locked: r.isAdult && !verified }));
 }
 

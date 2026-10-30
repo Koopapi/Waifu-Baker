@@ -21,11 +21,11 @@ export default async function Home() {
         </div>
         <div className="flex flex-wrap justify-center gap-3">
           <Button size="lg" asChild>
-            <Link href={session?.user?.id ? "/sobres" : "/login?next=/sobres"}>{session?.user?.id ? t.common.nav.myPacks : t.common.nav.signIn}</Link>
+            <Link href={session?.user?.id ? "/packs" : "/login?next=/packs"}>{session?.user?.id ? t.common.nav.myPacks : t.common.nav.signIn}</Link>
           </Button>
           {session?.user?.id && (
             <Button size="lg" variant="secondary" asChild>
-              <Link href="/coleccion">{t.common.nav.myCollection}</Link>
+              <Link href="/collection">{t.common.nav.myCollection}</Link>
             </Button>
           )}
           <Button size="lg" variant="secondary" asChild>

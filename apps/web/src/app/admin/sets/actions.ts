@@ -1,8 +1,9 @@
 "use server";
 
 import { adminAction, type ActionState } from "@/server/auth/admin-action";
-import { archiveSet, createSet, publishSet, saveOdds, updateSet } from "@/server/services/collections";
+import { archiveSet, createSet, publishSet, saveOdds, setFreeSet, updateSet } from "@/server/services/collections";
 import type { Problem } from "@/domain/catalog/odds";
+import { parsePackKind } from "@/domain/catalog/default-odds";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { getDict } from "@/i18n/server";
 import { setWelcomeSet } from "@/server/services/welcome";
@@ -41,10 +42,11 @@ export async function saveOddsAction(
   slots: Record<string, number>[],
   holoPercent: number,
   pityThreshold: number,
+  kind?: string,
 ): Promise<ActionState> {
   return adminAction("saveOdds", paths(setId), async ({ db, actorId }) => {
     const clean = slots.map((s) => Object.fromEntries(RARITIES.map((r) => [r, Number(s[r] ?? 0)])) as Record<Rarity, number>);
-    await saveOdds(db, actorId, setId, version, { slots: clean, holoChance: holoPercent / 100, pityThreshold });
+    await saveOdds(db, actorId, setId, version, { slots: clean, holoChance: holoPercent / 100, pityThreshold, kind: parsePackKind(kind) });
     return (await getDict()).admin.sets.oddsSaved;
   });
 }
@@ -73,9 +75,17 @@ export async function setWelcomeSetAction(setId: string, makeWelcome: boolean): 
   });
 }
 
+/** Spec 021, RF-1: gratuita (fuentes gratis) o de Patreon. */
+export async function setFreeSetAction(setId: string, free: boolean): Promise<ActionState> {
+  return adminAction("setFreeSet", ["/admin/sets", `/admin/sets/${setId}`, "/drop-rates"], async ({ db, actorId }) => {
+    await setFreeSet(db, actorId, setId, free);
+    return (await getDict()).admin.set.free.made;
+  });
+}
+
 /** Spec 014, RF-6: elige (o vuelve a la automática, con `null`) la carta de portada del sobre. */
 export async function setCoverAction(setId: string, cardId: string | null): Promise<ActionState> {
-  return adminAction("setCover", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
+  return adminAction("setCover", [`/admin/sets/${setId}`, "/packs"], async ({ db, actorId }) => {
     await setCoverCard(db, actorId, setId, cardId);
     return (await getDict()).admin.set.pack.coverSaved;
   });
@@ -83,7 +93,7 @@ export async function setCoverAction(setId: string, cardId: string | null): Prom
 
 /** Spec 014, RF-7: quita el sobre hecho a mano. */
 export async function removePackImageAction(setId: string): Promise<ActionState> {
-  return adminAction("removePackImage", [`/admin/sets/${setId}`, "/sobres"], async ({ db, actorId }) => {
+  return adminAction("removePackImage", [`/admin/sets/${setId}`, "/packs"], async ({ db, actorId }) => {
     await removePackImage(db, getCardStore(), actorId, setId);
     return (await getDict()).admin.set.pack.removed;
   });

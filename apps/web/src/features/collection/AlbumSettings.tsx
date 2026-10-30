@@ -11,7 +11,7 @@ import {
   requestReviewAction,
   saveFeaturedAction,
   type AlbumActionState,
-} from "@/app/(app)/coleccion/album/actions";
+} from "@/app/(app)/collection/album/actions";
 import { ArrowDown, ArrowUp, X } from "@/ui/icons/glyphs";
 import { useT } from "@/i18n/client";
 import { Button, IconButton } from "@/ui/action/Button";
@@ -102,7 +102,7 @@ function FeaturedPicker({ cards, initial }: { cards: FeaturableCard[]; initial: 
                 className={`relative block w-full overflow-hidden rounded-m ring-2 transition-[box-shadow,opacity] duration-[var(--duration-fast)] disabled:opacity-40 ${on ? "ring-ui-accent" : "ring-transparent"} ${focusRing}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
-                <img src={c.thumb} alt={c.name} loading="lazy" className="aspect-[63/88] w-full object-cover" />
+                <img src={c.thumb} alt={c.name} loading="lazy" className="aspect-[700/991] w-full object-cover" />
                 {on && (
                   <span className="absolute right-1 top-1 grid size-6 place-items-center rounded-s bg-ui-accent text-xs font-bold text-ui-on-accent">
                     {picked.indexOf(c.cardId) + 1}
