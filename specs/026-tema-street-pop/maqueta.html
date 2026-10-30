@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec 026 · Maquetas Street pop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&amp;family=Dela+Gothic+One&amp;family=Fredoka:wght@600;700&amp;family=Nunito:wght@400;600;700;800&amp;display=swap">
+<!--
+  Maquetas de la spec 026 (tema Street pop seleccionable). Solo referencia visual: la web conserva su estructura
+  (riel, barra lateral, barra superior y pie); Street pop cambia el aspecto y los adornos. Las pantallas que Bruno ya
+  diseñó (b-portada, b-coleccion, b-ficha, b-apertura, b-paleta) están en docs/waifu-baker/waifu-baker/disenos/.
+  Servir por HTTP desde la raíz del repo para que carguen las imágenes de Yuki.
+-->
+<style>
+:root{
+  --sp-lila:#ECE4FA; --sp-blanco:#FFFFFF; --sp-tinta:#17132B; --sp-indigo:#3B2FC9; --sp-texto-2:#4A4368;
+  --sp-rosa:#FF3EA5; --sp-lima:#C6F432; --sp-turquesa:#3FE0D0; --sp-trama:#FFD93D; --sp-peligro:#FF5A5F;
+  --sp-titulo:"Dela Gothic One",system-ui,sans-serif; --sp-texto:"Archivo","Arial Narrow",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#d9d2e8;color:var(--sp-tinta);font-family:var(--sp-texto)}
+.doc{max-width:1440px;margin:0 auto;padding:32px 24px 80px}
+.doc>header h1{font-family:var(--sp-titulo);font-weight:400;font-size:34px;margin:0 0 6px}
+.doc>header p{margin:0 0 4px;max-width:900px;line-height:1.5;color:var(--sp-texto-2)}
+.lamina{margin-top:44px}
+.lamina>h2{font-family:var(--sp-titulo);font-weight:400;font-size:22px;margin:0 0 4px}
+.lamina>p.nota{margin:0 0 14px;color:var(--sp-texto-2);max-width:980px;line-height:1.45;font-size:14px}
+.marco{border:3px solid var(--sp-tinta);border-radius:14px;overflow:hidden;box-shadow:8px 8px 0 var(--sp-tinta);background:var(--sp-lila)}
+.fila{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+
+/* ---------- Street pop: piel de la web ---------- */
+.sp{background:var(--sp-lila);color:var(--sp-tinta);font-family:var(--sp-texto);position:relative}
+.sp .rayas{position:absolute;inset:0;background-image:repeating-linear-gradient(-28deg,transparent 0 46px,rgba(59,47,201,.05) 46px 92px);pointer-events:none}
+.sp .demo{position:relative;z-index:3;display:flex;justify-content:center;align-items:center;gap:12px;background:var(--sp-rosa);border-bottom:3px solid var(--sp-tinta);font-weight:800;font-size:13px;padding:6px 12px}
+.sp .demo b{font-style:italic;text-transform:uppercase;letter-spacing:.04em}
+.sp .demo button{font:inherit;font-weight:900;font-style:italic;text-transform:uppercase;font-size:12px;background:var(--sp-blanco);border:2px solid var(--sp-tinta);padding:3px 12px;transform:skewX(-10deg);box-shadow:2px 2px 0 var(--sp-tinta)}
+.sp .app{position:relative;z-index:1;display:grid;grid-template-columns:72px 240px 1fr;min-height:860px}
+.sp .riel{background:var(--sp-tinta);display:flex;flex-direction:column;align-items:center;gap:14px;padding:12px 0;border-right:3px solid #000}
+.logo{display:grid;place-items:center;width:44px;height:44px;background:var(--sp-lima);color:var(--sp-tinta);font-family:var(--sp-titulo);font-size:16px;border:3px solid var(--sp-blanco);border-radius:9px;transform:rotate(-6deg);box-shadow:3px 3px 0 var(--sp-rosa)}
+.riel .bola{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--sp-blanco);border:3px solid var(--sp-blanco);font-weight:900;font-style:italic;font-size:14px;outline:3px solid var(--sp-tinta);outline-offset:-6px}
+.riel .bola .n{position:absolute;right:-6px;top:-4px;background:var(--sp-lima);border:2px solid var(--sp-tinta);font-size:11px;padding:0 5px;font-style:normal}
+.sp .lateral{background:var(--sp-tinta);color:var(--sp-blanco);display:flex;flex-direction:column;padding:14px 12px}
+.lateral .marca{padding:2px 8px 14px}
+.lateral .marca b{display:block;font-family:var(--sp-titulo);font-weight:400;font-size:17px;letter-spacing:.02em}
+.lateral .marca span{font-size:12px;color:#CFC8E6}
+.lateral .grupo{margin:14px 8px 6px;font-weight:900;font-style:italic;font-size:12px;letter-spacing:.16em;color:var(--sp-lima)}
+.lateral a{display:flex;align-items:center;gap:10px;color:var(--sp-blanco);text-decoration:none;font-weight:900;font-style:italic;text-transform:uppercase;font-size:13.5px;letter-spacing:.05em;padding:8px 10px;margin:2px 0}
+.lateral a svg{width:32px;height:32px;flex:none;margin:-4px 0}
+.lateral a .cuenta{margin-left:auto;background:var(--sp-lima);color:var(--sp-tinta);font-style:normal;font-size:12px;padding:0 7px;border:2px solid var(--sp-tinta)}
+.lateral.panel a{font-size:12.5px;letter-spacing:.03em;white-space:nowrap}
+.lateral a[aria-current]{background:var(--sp-rosa);color:var(--sp-tinta);transform:skewX(-10deg);box-shadow:3px 3px 0 var(--sp-blanco)}
+.lateral .yo{margin-top:auto;display:flex;align-items:center;gap:10px;border-top:2px solid #3a3358;padding:14px 8px 4px}
+.avatar{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--sp-turquesa);color:var(--sp-tinta);font-weight:900;border:2px solid var(--sp-blanco);flex:none}
+.yo b{display:block;font-size:14px}.yo span{font-size:12px;color:var(--sp-lima);font-weight:800}
+.sp .columna{display:flex;flex-direction:column;min-width:0}
+.sp .barra{display:flex;align-items:center;gap:12px;height:62px;padding:0 22px;background:var(--sp-blanco);border-bottom:3px solid var(--sp-tinta)}
+.barra h3{margin:0;font-family:var(--sp-titulo);font-weight:400;font-size:18px;display:flex;align-items:center;gap:10px}
+.barra h3 svg{width:28px;height:28px}
+.barra .der{margin-left:auto;display:flex;align-items:center;gap:12px}
+.seg{display:inline-flex;border:3px solid var(--sp-tinta);background:var(--sp-blanco);box-shadow:3px 3px 0 var(--sp-tinta)}
+.seg span{font-weight:900;font-style:italic;font-size:12.5px;padding:4px 11px;text-transform:uppercase}
+.seg span[aria-pressed=true]{background:var(--sp-rosa)}
+.icono-btn{display:grid;place-items:center;width:36px;height:36px;border:3px solid var(--sp-tinta);background:var(--sp-blanco);box-shadow:3px 3px 0 var(--sp-tinta)}
+.sp main{padding:34px 40px 56px;flex:1}
+.sp main.centro{max-width:700px;margin:0 auto;width:100%}
+.sp main.ancho{max-width:900px;margin:0 auto;width:100%}
+.titulo{margin:0 0 6px;font-family:var(--sp-titulo);font-weight:400;font-size:44px;line-height:1;text-shadow:3px 3px 0 var(--sp-rosa),6px 6px 0 var(--sp-turquesa)}
+.etiqueta{display:inline-block;background:var(--sp-tinta);color:var(--sp-lima);font-weight:900;font-style:italic;font-size:12px;letter-spacing:.16em;padding:5px 12px;transform:skewX(-12deg);text-transform:uppercase}
+.sub{margin:8px 0 0;color:var(--sp-texto-2);line-height:1.5}
+.tarjeta{background:var(--sp-blanco);border:3px solid var(--sp-tinta);border-radius:10px;box-shadow:6px 6px 0 var(--sp-tinta);padding:20px 22px;margin-top:26px}
+.tarjeta>h4{margin:0 0 12px;font-family:var(--sp-titulo);font-weight:400;font-size:17px;display:flex;align-items:center;gap:10px}
+.tarjeta>h4 .der{margin-left:auto;font-family:var(--sp-texto);font-weight:900;font-style:italic;font-size:13px;text-transform:uppercase}
+.tarjeta.peligro{box-shadow:6px 6px 0 var(--sp-peligro)}
+.tarjeta p{margin:0;line-height:1.5;color:var(--sp-texto-2);font-size:14.5px}
+dl.datos{display:grid;grid-template-columns:auto 1fr;gap:8px 28px;margin:0;font-size:14.5px}
+dl.datos dt{color:var(--sp-texto-2);font-weight:700}
+dl.datos dd{margin:0;font-weight:800}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:900;font-style:italic;text-transform:uppercase;letter-spacing:.04em;font-size:14px;padding:10px 20px;border:3px solid var(--sp-tinta);background:var(--sp-blanco);color:var(--sp-tinta);transform:skewX(-10deg);box-shadow:4px 4px 0 var(--sp-tinta);cursor:pointer}
+.btn>*{transform:skewX(10deg)}
+.btn.primario{background:var(--sp-rosa)}
+.btn.lima{background:var(--sp-lima)}
+.btn.peligro{background:var(--sp-peligro)}
+.btn.fantasma{background:transparent;box-shadow:none;border-color:transparent;text-decoration:underline;text-underline-offset:4px}
+.btn.ancho{width:100%}
+.btn:disabled{background:#E3DEEE;color:#6E6788;box-shadow:none;border-style:dashed}
+.btn.foco{outline:3px solid var(--sp-indigo);outline-offset:4px}
+.trama{position:absolute;width:120px;height:120px;background:radial-gradient(var(--sp-trama) 30%,transparent 32%) 0 0/14px 14px;pointer-events:none}
+.franja{height:12px;background:var(--sp-indigo);transform:skewY(-1.2deg);margin:0 -40px}
+
+/* Selector de tema (RF-4) */
+.temas{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:6px}
+.tema{position:relative;display:flex;flex-direction:column;gap:10px;padding:12px;border:3px solid var(--sp-tinta);border-radius:10px;background:var(--sp-blanco);cursor:pointer;text-align:left;font:inherit}
+.tema[aria-checked=true]{box-shadow:5px 5px 0 var(--sp-rosa);outline:3px solid var(--sp-tinta);outline-offset:2px}
+.tema .nombre{display:flex;align-items:center;gap:8px;font-weight:900;font-style:italic;text-transform:uppercase;font-size:15px}
+.tema .radio{width:20px;height:20px;border-radius:50%;border:3px solid var(--sp-tinta);background:var(--sp-blanco);display:grid;place-items:center;flex:none}
+.tema[aria-checked=true] .radio::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--sp-tinta)}
+.tema .activo{margin-left:auto;background:var(--sp-lima);border:2px solid var(--sp-tinta);font-size:11px;padding:1px 8px;transform:skewX(-10deg)}
+.tema small{color:var(--sp-texto-2);font-size:13px;line-height:1.4}
+.mini{height:118px;border-radius:7px;overflow:hidden;display:grid;grid-template-columns:34% 1fr;border:2px solid var(--sp-tinta)}
+.mini.kawaii{background:#1e1630}
+.mini.kawaii .l{background:#1a1229;padding:10px 8px;display:flex;flex-direction:column;gap:7px}
+.mini.kawaii .l i{display:block;height:8px;border-radius:6px;background:#3a2d57}
+.mini.kawaii .l i.a{background:#3a2d57;outline:2px solid #ff6fae;outline-offset:1px}
+.mini.kawaii .r{padding:12px 10px;display:flex;flex-direction:column;gap:8px}
+.mini.kawaii .r b{font-family:Fredoka,sans-serif;color:#fff6fb;font-size:15px}
+.mini.kawaii .r .c{flex:1;border-radius:12px;background:#2b2142;border:1px solid #43345f;display:flex;align-items:flex-end;padding:8px}
+.mini.kawaii .r .c span{background:#ff6fae;color:#2a0e1f;border-radius:999px;font:700 10px Nunito,sans-serif;padding:3px 10px;box-shadow:0 3px 0 #c2337a}
+.mini.street{background:var(--sp-lila)}
+.mini.street .l{background:var(--sp-tinta);padding:10px 8px;display:flex;flex-direction:column;gap:7px}
+.mini.street .l i{display:block;height:8px;background:#4A4368}
+.mini.street .l i.a{background:var(--sp-rosa);transform:skewX(-12deg)}
+.mini.street .r{padding:10px;display:flex;flex-direction:column;gap:8px}
+.mini .r{min-width:0}
+.mini .r b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini.street .r b{font-family:var(--sp-titulo);font-weight:400;font-size:15px;text-shadow:2px 2px 0 var(--sp-rosa)}
+.mini.street .r .c{flex:1;background:var(--sp-blanco);border:2px solid var(--sp-tinta);box-shadow:3px 3px 0 var(--sp-tinta);border-radius:5px;display:flex;align-items:flex-end;padding:8px}
+.mini.street .r .c span{background:var(--sp-rosa);border:2px solid var(--sp-tinta);font:900 italic 10px Archivo,sans-serif;text-transform:uppercase;padding:2px 9px;transform:skewX(-10deg)}
+.aviso-tema{margin-top:14px;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--sp-texto-2);line-height:1.45}
+.aviso-tema i{flex:none;width:18px;height:18px;border-radius:4px;background:#1e1630;border:2px solid var(--sp-tinta);margin-top:1px}
+
+/* Recompensas */
+.dos{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+.dos .tarjeta{margin-top:26px}
+.reloj{display:flex;gap:18px;align-items:center}
+.anillo{position:relative;width:140px;height:140px;flex:none}
+.anillo svg{width:100%;height:100%;transform:rotate(-90deg)}
+.anillo div{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.anillo b{font-family:var(--sp-titulo);font-weight:400;font-size:16px;display:block}
+.anillo small{font-weight:800;font-style:italic;font-size:9.5px;text-transform:uppercase;color:var(--sp-texto-2)}
+.listos{font-weight:900;font-style:italic;text-transform:uppercase;font-size:14px;color:var(--sp-indigo)}
+.campo{display:flex;flex-direction:column;gap:6px;margin:16px 0}
+.campo>span{font-weight:900;font-style:italic;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase}
+.select{display:flex;justify-content:space-between;align-items:center;border:3px solid var(--sp-tinta);border-radius:6px;background:var(--sp-blanco);padding:9px 12px;font-weight:800;font-size:14.5px;box-shadow:3px 3px 0 var(--sp-tinta)}
+.dias{display:flex;gap:10px;justify-content:space-between;margin:6px 0 18px}
+.dia{display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:900;font-size:12.5px}
+.dia span{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:3px solid var(--sp-tinta);background:var(--sp-blanco);font-family:var(--sp-titulo);font-size:15px}
+.dia.hoy span{background:var(--sp-rosa);box-shadow:3px 3px 0 var(--sp-tinta)}
+.dia.siete span{background:var(--sp-lima)}
+.pildora{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;border:3px solid var(--sp-tinta);background:var(--sp-trama);font-weight:900;font-style:italic;font-size:13px;padding:3px 12px 3px 4px;transform:skewX(-8deg);text-transform:uppercase}
+.pildora svg{width:26px;height:26px}
+
+/* Juegos */
+.juego{display:flex;align-items:center;gap:20px}
+.juego svg{width:72px;height:72px;flex:none}
+.juego h4{margin:0 0 4px;font-family:var(--sp-titulo);font-weight:400;font-size:20px}
+
+/* Panel */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:22px}
+.stat{background:var(--sp-blanco);border:3px solid var(--sp-tinta);border-radius:10px;box-shadow:5px 5px 0 var(--sp-tinta);padding:14px 16px;position:relative;overflow:hidden}
+.stat::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:var(--c,var(--sp-turquesa));border-bottom:3px solid var(--sp-tinta)}
+.stat b{display:block;font-family:var(--sp-titulo);font-weight:400;font-size:30px;margin-top:8px}
+.stat span{font-weight:800;font-size:13.5px;color:var(--sp-texto-2)}
+.vacio{margin-top:12px;border:3px dashed #8F87A8;border-radius:10px;padding:34px;text-align:center;font-weight:800;background:rgba(255,255,255,.45)}
+.cabeza{display:flex;justify-content:space-between;align-items:center;margin-top:30px}
+.cabeza h4{margin:0;font-family:var(--sp-titulo);font-weight:400;font-size:17px}
+.cabeza a{color:var(--sp-indigo);font-weight:900;font-style:italic;text-transform:uppercase;font-size:13px}
+
+.pie{display:flex;gap:22px;padding:18px 40px;background:var(--sp-tinta);color:#CFC8E6;font-size:13px;font-weight:700;position:relative;z-index:1}
+.pie a{color:var(--sp-blanco);text-decoration:none}
+
+/* Teléfono */
+.tel{width:390px;height:844px;border:3px solid var(--sp-tinta);border-radius:28px;overflow:hidden;box-shadow:8px 8px 0 var(--sp-tinta);background:var(--sp-lila);position:relative;display:flex;flex-direction:column}
+.tel .demo{font-size:12px;gap:8px}
+.tel .barra{height:56px;padding:0 14px}
+.tel main{padding:22px 16px 90px;overflow:hidden}
+.tel .titulo{font-size:34px}
+.tel .temas{grid-template-columns:1fr 1fr;gap:12px}
+.tel .tema{padding:8px}
+.tel .mini{height:84px}
+.tel .tema small{display:none}
+.abajo{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--sp-tinta);border-top:3px solid #000;padding:6px 4px 10px}
+.abajo a{display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--sp-blanco);text-decoration:none;font-weight:900;font-style:italic;text-transform:uppercase;font-size:8.5px;letter-spacing:0;padding:5px 0;min-width:0;overflow:hidden}
+.abajo a svg{width:26px;height:26px}
+.abajo a[aria-current]{background:var(--sp-rosa);color:var(--sp-tinta);transform:skewX(-10deg)}
+
+/* Configurador (spec 025) en Street pop: escenario oscuro */
+.editor{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:22px;margin-top:20px}
+.escenario{position:relative;border:3px solid var(--sp-tinta);border-radius:12px;box-shadow:6px 6px 0 var(--sp-tinta);background:radial-gradient(circle at 50% 40%,#2b2142,#120d1d 70%);min-height:470px;display:grid;place-items:center;overflow:hidden}
+.escenario::before{content:"";position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 45%,rgba(255,255,255,.035) 0 8deg,transparent 8deg 20deg)}
+.escenario img{position:relative;width:250px;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.6);transform:perspective(900px) rotateY(-12deg) rotateX(4deg)}
+.escenario .chip{position:absolute;left:14px;top:14px;background:var(--sp-lima);border:2px solid var(--sp-tinta);font-weight:900;font-style:italic;font-size:11px;padding:2px 9px;text-transform:uppercase;transform:skewX(-10deg)}
+.capas{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.capas li{display:flex;align-items:center;gap:10px;border:3px solid var(--sp-tinta);background:var(--sp-blanco);padding:6px 8px;border-radius:8px}
+.capas li[data-open]{box-shadow:4px 4px 0 var(--sp-turquesa)}
+.capas .th{width:34px;height:46px;border:2px solid var(--sp-tinta);border-radius:4px;background:#2b2142 center/cover}
+.capas b{display:block;font-weight:900;font-style:italic;text-transform:uppercase;font-size:13px}
+.capas small{font-size:12px;color:var(--sp-texto-2);font-weight:700}
+.capas .acc{margin-left:auto;display:flex;gap:4px}
+.capas .acc span{display:grid;place-items:center;width:26px;height:26px;border:2px solid var(--sp-tinta);font-size:13px;font-weight:900}
+.lado{font-weight:900;font-style:italic;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--sp-indigo)}
+
+/* Componentes */
+.comp{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:28px}
+.comp .tarjeta{margin:0}
+.comp h5{margin:0 0 12px;font-weight:900;font-style:italic;text-transform:uppercase;font-size:13px;letter-spacing:.12em;color:var(--sp-indigo)}
+.botones{display:flex;flex-wrap:wrap;gap:14px}
+.input{border:3px solid var(--sp-tinta);border-radius:6px;padding:9px 12px;font-weight:700;background:var(--sp-blanco);box-shadow:3px 3px 0 var(--sp-tinta)}
+.input.foco{outline:3px solid var(--sp-indigo);outline-offset:3px}
+.chk{display:flex;align-items:center;gap:10px;font-weight:800;margin-top:12px}
+.chk i{width:22px;height:22px;border:3px solid var(--sp-tinta);background:var(--sp-lima);display:grid;place-items:center;font-style:normal;font-weight:900;font-size:13px}
+.slider{margin-top:14px}
+.slider .t{display:flex;justify-content:space-between;font-weight:900;font-style:italic;text-transform:uppercase;font-size:12.5px;margin-bottom:8px}
+.slider .t output{font-style:normal;color:var(--sp-indigo)}
+.slider .riel2{position:relative;height:14px;border:3px solid var(--sp-tinta);background:var(--sp-blanco);transform:skewX(-12deg)}
+.slider .riel2 i{position:absolute;left:0;top:0;bottom:0;width:62%;background:var(--sp-rosa)}
+.slider .riel2 b{position:absolute;left:calc(62% - 10px);top:-8px;width:20px;height:24px;background:var(--sp-tinta);border:3px solid var(--sp-blanco);outline:2px solid var(--sp-tinta)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{display:inline-flex;align-items:center;gap:6px;border:3px solid var(--sp-tinta);background:var(--sp-blanco);font-weight:900;font-style:italic;font-size:12.5px;text-transform:uppercase;padding:4px 10px;transform:skewX(-10deg)}
+.chips span[aria-checked=true]{background:var(--sp-tinta);color:var(--sp-blanco)}
+.chips span i{width:12px;height:12px;border:2px solid var(--sp-tinta);border-radius:3px}
+.rarezas{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.rarezas span{font:800 12px Nunito,sans-serif;padding:3px 10px;border-radius:999px;color:#2a0e1f}
+.alerta{border:3px solid var(--sp-tinta);border-left-width:12px;background:var(--sp-blanco);padding:12px 14px;font-weight:700;font-size:14px;line-height:1.4}
+.alerta.ok{border-left-color:var(--sp-turquesa)}
+.alerta.mal{border-left-color:var(--sp-peligro)}
+.toast{display:flex;align-items:center;gap:12px;background:var(--sp-tinta);color:var(--sp-blanco);border:3px solid var(--sp-tinta);box-shadow:5px 5px 0 var(--sp-peligro);padding:12px 14px;font-weight:800;font-size:14px;margin-top:12px}
+.toast i{display:grid;place-items:center;width:24px;height:24px;background:var(--sp-peligro);color:var(--sp-tinta);font-style:normal;font-weight:900;border:2px solid var(--sp-blanco);flex:none}
+
+/* Pegatinas: el mismo dibujo con los colores de cada tema */
+.pegatinas{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.pegatinas>div{padding:22px 24px}
+.pegatinas h5{margin:0 0 14px;font-weight:900;font-style:italic;text-transform:uppercase;font-size:13px;letter-spacing:.12em}
+.pegatinas .k{background:#1e1630;color:#fff6fb}
+.pegatinas .k h5{font-family:Nunito,sans-serif;font-style:normal;color:#ff9ecb}
+.pegs{display:flex;flex-wrap:wrap;gap:18px}
+.pegs figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:800}
+.pegs svg{width:64px;height:64px}
+.tk{--k-out:#ffffff;--k-ow:6;--k-tinta:#3b1f35;--k-rubor:#ff9ec6;--k-chicle:#ff7eb6;--k-chicle-claro:#ffb3d4;--k-limon:#ffe27a;--k-limon-oscuro:#ffc94a;--k-lavanda:#b79cff;--k-lavanda-claro:#e9e1ff;--k-menta:#7ef0c9;--k-menta-claro:#b5fae3;--k-celeste:#7cc8ff;--k-celeste-claro:#e3f3ff;--k-galleta:#f2c27b;--k-chocolate:#7a4a2e;--k-llama:#ff9a62;--k-rosa-claro:#ffc4dd;--k-lazo:#ff5aa2;--k-sombra:drop-shadow(0 3px 3px rgb(10 4 24 / .45))}
+.ts{--k-out:#17132B;--k-ow:5;--k-tinta:#17132B;--k-rubor:#FF3EA5;--k-chicle:#FF3EA5;--k-chicle-claro:#FFFFFF;--k-limon:#FFD93D;--k-limon-oscuro:#C6F432;--k-lavanda:#3B2FC9;--k-lavanda-claro:#FFFFFF;--k-menta:#3FE0D0;--k-menta-claro:#FFFFFF;--k-celeste:#3FE0D0;--k-celeste-claro:#FFFFFF;--k-galleta:#FFC94D;--k-chocolate:#17132B;--k-llama:#FF6A3D;--k-rosa-claro:#FFFFFF;--k-lazo:#17132B;--k-sombra:drop-shadow(3px 3px 0 #17132B)}
+svg.peg{filter:var(--k-sombra);overflow:visible}
+
+.leyenda{margin-top:10px;font-size:13px;color:var(--sp-texto-2)}
+</style>
+</head>
+<body class="ts">
+<div class="doc">
+  <header>
+    <h1>Spec 026 · Street pop</h1>
+    <p>Maquetas de las pantallas que Bruno no diseñó. La web conserva su estructura (riel, barra lateral, barra superior y pie);
+      Street pop solo cambia el aspecto y los adornos. Para portada, colección, ficha y apertura sirven las pantallas de Bruno
+      (<code>docs/waifu-baker/waifu-baker/disenos/b-*.html</code>).</p>
+    <p>Las cartas, sus marcos, sellos y colores de rareza no cambian (RF-14 y RF-15). La mesa de apertura y el escenario del
+      configurador se quedan oscuros (RF-12 y RF-13).</p>
+  </header>
+
+  <!-- ============ 1. Configuración con el selector de tema ============ -->
+  <section class="lamina">
+    <h2>1 · Mi cuenta con el selector de tema (escritorio)</h2>
+    <p class="nota">RF-4 a RF-9: la tarjeta «Tema» va primero en Mi cuenta. Cada opción muestra una miniatura del tema. Al elegir,
+      la página cambia al instante (menos de 1 s) y se guarda en la cuenta. Si no se puede guardar, vuelve el tema anterior y sale
+      el aviso de la lámina 6.</p>
+    <div class="marco sp" id="s-cuenta">
+      <div class="rayas"></div>
+      <div class="demo"><span>⚗ Modo demo · estás viendo la web como <b>administrador</b></span><button><span>Cambiar a coleccionista</span></button></div>
+      <div class="app">
+        <nav class="riel"><span class="logo">WB</span><span class="bola">FA<span class="n">1</span></span><span class="bola">%</span></nav>
+        <aside class="lateral" data-nav="perfil"></aside>
+        <div class="columna">
+          <div class="barra"><h3><svg class="peg" data-s="profile" viewBox="-4 -4 72 72"></svg>Mi cuenta</h3>
+            <div class="der"><span class="icono-btn">🔊</span><span class="seg"><span>EN</span><span aria-pressed="true">ES</span></span></div></div>
+          <main class="centro">
+            <h1 class="titulo">MI CUENTA</h1>
+
+            <section class="tarjeta" aria-label="Tema">
+              <h4>Tema</h4>
+              <p>Elige cómo se ve Waifu Baker. Se guarda en tu cuenta y te sigue en todos tus dispositivos.</p>
+              <div class="temas" role="radiogroup" aria-label="Tema" style="margin-top:14px">
+                <button class="tema" role="radio" aria-checked="false">
+                  <div class="mini kawaii"><div class="l"><i class="a"></i><i></i><i></i><i></i></div><div class="r"><b>Mi colección</b><div class="c"><span>Abrir sobre</span></div></div></div>
+                  <span class="nombre"><span class="radio"></span>Kawaii</span>
+                  <small>Oscuro y suave, con pegatinas pastel. El de siempre.</small>
+                </button>
+                <button class="tema" role="radio" aria-checked="true">
+                  <div class="mini street"><div class="l"><i class="a"></i><i></i><i></i><i></i></div><div class="r"><b>MI COLECCIÓN</b><div class="c"><span>Abrir sobre</span></div></div></div>
+                  <span class="nombre"><span class="radio"></span>Street pop<span class="activo">Activo</span></span>
+                  <small>Claro, con bordes de tinta y sombras duras. Diseño de Bruno.</small>
+                </button>
+              </div>
+              <div class="aviso-tema"><i></i><span>Tus cartas se ven igual en los dos temas. La mesa donde abres sobres se queda oscura para que luzcan el holo y los brillos.</span></div>
+            </section>
+
+            <section class="tarjeta">
+              <h4>Suscripción de Patreon</h4>
+              <dl class="datos"><dt>Tier</dt><dd>Sin tier de pago</dd><dt>Estado</dt><dd>No eres patron</dd><dt>Sobres al mes</dt><dd>0</dd><dt>Último cobro</dt><dd>Todavía ninguno</dd></dl>
+              <p style="margin-top:12px">Hazte patron para recibir sobres cada mes.</p>
+            </section>
+
+            <section class="tarjeta">
+              <h4><svg class="peg" data-s="cookie" viewBox="-4 -4 72 72" style="width:30px;height:30px"></svg>Galletas<span class="der">0 galletas</span></h4>
+              <p>Las galletas se ganan con la racha diaria. No tienen valor monetario y no se pueden comprar, vender ni transferir.</p>
+            </section>
+
+            <section class="tarjeta peligro">
+              <h4>Borrar cuenta</h4>
+              <p>Tu cuenta se desactivará y se cerrará tu sesión. Si vuelves a entrar con el mismo Patreon antes de 30 días, recuperas todo.</p>
+              <div style="margin-top:16px"><button class="btn peligro"><span>Borrar mi cuenta</span></button></div>
+            </section>
+          </main>
+          <div class="pie"><span>© Waifu Baker</span><a href="#">Términos</a><a href="#">Privacidad</a><a href="#">Contenido e IA</a><a href="#">Probabilidades</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2. Teléfono ============ -->
+  <section class="lamina">
+    <h2>2 · Teléfono (390 px)</h2>
+    <p class="nota">El selector cabe en dos columnas sin scroll horizontal; las descripciones se ocultan y quedan la miniatura y el
+      nombre. La barra de abajo usa tinta con la sección activa en rosa inclinado. A la derecha, Recompensas en el teléfono.</p>
+    <div class="fila">
+      <div class="tel sp">
+        <div class="rayas"></div>
+        <div class="demo"><span>⚗ Demo · <b>admin</b></span><button><span>Cambiar a coleccionista</span></button></div>
+        <div class="barra" style="position:relative;z-index:1"><span style="font-size:22px;font-weight:900">☰</span><h3 style="font-size:16px">Mi cuenta</h3>
+          <div class="der"><span class="seg"><span>EN</span><span aria-pressed="true">ES</span></span></div></div>
+        <main style="position:relative;z-index:1">
+          <h1 class="titulo">MI CUENTA</h1>
+          <section class="tarjeta">
+            <h4>Tema</h4>
+            <p style="font-size:13.5px">Se guarda en tu cuenta y te sigue en todos tus dispositivos.</p>
+            <div class="temas" role="radiogroup" aria-label="Tema" style="margin-top:12px">
+              <button class="tema" role="radio" aria-checked="false"><div class="mini kawaii"><div class="l"><i class="a"></i><i></i><i></i></div><div class="r"><b style="font-size:11px">Cartas</b><div class="c"><span>Abrir</span></div></div></div><span class="nombre" style="font-size:13px"><span class="radio"></span>Kawaii</span></button>
+              <button class="tema" role="radio" aria-checked="true"><div class="mini street"><div class="l"><i class="a"></i><i></i><i></i></div><div class="r"><b style="font-size:11px">CARTAS</b><div class="c"><span>Abrir</span></div></div></div><span class="nombre" style="font-size:13px"><span class="radio"></span>Street pop</span></button>
+            </div>
+          </section>
+          <section class="tarjeta">
+            <h4>Suscripción de Patreon</h4>
+            <dl class="datos" style="font-size:13.5px"><dt>Tier</dt><dd>Sin tier de pago</dd><dt>Estado</dt><dd>No eres patron</dd></dl>
+          </section>
+        </main>
+        <nav class="abajo" data-abajo="cuenta"></nav>
+      </div>
+
+      <div class="tel sp">
+        <div class="rayas"></div>
+        <div class="demo"><span>⚗ Demo · <b>admin</b></span><button><span>Cambiar a coleccionista</span></button></div>
+        <div class="barra" style="position:relative;z-index:1"><span style="font-size:22px;font-weight:900">☰</span><h3 style="font-size:16px">Recompensas</h3></div>
+        <main style="position:relative;z-index:1">
+          <h1 class="titulo">RECOMPENSAS</h1>
+          <section class="tarjeta">
+            <h4><svg class="peg" data-s="streak" viewBox="-4 -4 72 72" style="width:32px;height:32px"></svg>Recompensa diaria</h4>
+            <div class="dias" style="gap:4px"><div class="dia hoy"><span style="width:34px;height:34px">1</span>10</div><div class="dia"><span style="width:34px;height:34px">2</span>10</div><div class="dia"><span style="width:34px;height:34px">3</span>15</div><div class="dia"><span style="width:34px;height:34px">4</span>15</div><div class="dia"><span style="width:34px;height:34px">5</span>20</div><div class="dia"><span style="width:34px;height:34px">6</span>20</div><div class="dia siete"><span style="width:34px;height:34px">7</span>🎁</div></div>
+            <button class="btn primario ancho"><span>Reclamar la de hoy</span></button>
+          </section>
+        </main>
+        <nav class="abajo" data-abajo="recompensas"></nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. Recompensas ============ -->
+  <section class="lamina">
+    <h2>3 · Recompensas (escritorio)</h2>
+    <p class="nota">RF-23: el reloj, el sobre, la llama y la galleta son las mismas pegatinas, redibujadas con borde de tinta, sombra dura y
+      colores planos. El anillo del reloj cuenta en rosa sobre tinta. Las cifras van en Dela Gothic.</p>
+    <div class="marco sp">
+      <div class="rayas"></div>
+      <div class="demo"><span>⚗ Modo demo · estás viendo la web como <b>administrador</b></span><button><span>Cambiar a coleccionista</span></button></div>
+      <div class="app">
+        <nav class="riel"><span class="logo">WB</span><span class="bola">FA<span class="n">1</span></span><span class="bola">%</span></nav>
+        <aside class="lateral" data-nav="recompensas"></aside>
+        <div class="columna">
+          <div class="barra"><h3><svg class="peg" data-s="gift" viewBox="-4 -4 72 72"></svg>Recompensas</h3>
+            <div class="der"><span class="icono-btn">🔊</span><span class="seg"><span>EN</span><span aria-pressed="true">ES</span></span></div></div>
+          <main class="ancho" style="position:relative">
+            <div class="trama" style="right:-10px;top:10px"></div>
+            <span class="etiqueta">Cada día</span>
+            <h1 class="titulo" style="margin-top:12px">RECOMPENSAS</h1>
+            <div class="dos">
+              <section class="tarjeta">
+                <div class="reloj">
+                  <div class="anillo"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#17132B" stroke-width="14"/><circle cx="60" cy="60" r="50" fill="none" stroke="#FF3EA5" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="80"/></svg>
+                    <div><span><b>11:59:55</b><small>para el siguiente</small></span></div></div>
+                  <div>
+                    <h4 style="margin:0 0 10px;font-family:var(--sp-titulo);font-weight:400;font-size:17px;display:flex;gap:8px;align-items:center"><svg class="peg" data-s="clock" viewBox="-4 -4 72 72" style="width:32px;height:32px"></svg>Sobre gratis</h4>
+                    <div style="display:flex;gap:6px"><svg class="peg" data-s="pack" viewBox="-4 -4 72 72" style="width:36px;height:36px"></svg><svg class="peg" data-s="pack" viewBox="-4 -4 72 72" style="width:36px;height:36px;opacity:.3;filter:grayscale(1)"></svg></div>
+                    <div class="listos" style="margin-top:6px">1 de 2 listos</div>
+                  </div>
+                </div>
+                <label class="campo"><span>Colección</span><span class="select">FA01 · Fan Art · Vol. 1 <span>▾</span></span></label>
+                <button class="btn primario ancho"><span>Reclamar sobre gratis</span></button>
+              </section>
+              <section class="tarjeta">
+                <h4><svg class="peg" data-s="streak" viewBox="-4 -4 72 72" style="width:34px;height:34px"></svg>Recompensa diaria
+                  <span class="der"><span class="pildora"><svg class="peg" data-s="cookie" viewBox="-4 -4 72 72"></svg>0 galletas</span></span></h4>
+                <div class="dias"><div class="dia hoy"><span>1</span>10</div><div class="dia"><span>2</span>10</div><div class="dia"><span>3</span>15</div><div class="dia"><span>4</span>15</div><div class="dia"><span>5</span>20</div><div class="dia"><span>6</span>20</div><div class="dia siete"><span>7</span><svg class="peg" data-s="pack" viewBox="-4 -4 72 72" style="width:20px;height:20px"></svg></div></div>
+                <button class="btn primario ancho"><span>Reclamar la recompensa de hoy</span></button>
+                <p style="margin-top:12px;font-size:13px">Puedes fallar un día sin perder la racha.</p>
+              </section>
+            </div>
+          </main>
+          <div class="pie"><span>© Waifu Baker</span><a href="#">Términos</a><a href="#">Privacidad</a><a href="#">Contenido e IA</a><a href="#">Probabilidades</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. Juegos ============ -->
+  <section class="lamina">
+    <h2>4 · Juegos</h2>
+    <p class="nota">RF-22: la franja índigo y la trama amarilla decoran el encabezado, nunca detrás de un texto.</p>
+    <div class="marco sp">
+      <div class="rayas"></div>
+      <div class="app" style="min-height:560px">
+        <nav class="riel"><span class="logo">WB</span><span class="bola">FA<span class="n">1</span></span><span class="bola">%</span></nav>
+        <aside class="lateral" data-nav="juegos"></aside>
+        <div class="columna">
+          <div class="barra"><h3><svg class="peg" data-s="map" viewBox="-4 -4 72 72"></svg>Juegos</h3>
+            <div class="der"><span class="icono-btn">🔊</span><span class="seg"><span>EN</span><span aria-pressed="true">ES</span></span></div></div>
+          <main class="ancho" style="position:relative">
+            <div class="trama" style="right:0;top:0;width:150px;height:90px"></div>
+            <h1 class="titulo">JUEGOS</h1>
+            <p class="sub">Dales algo que hacer a tus cartas. Todo lo que ganas aquí es gratis: no hay forma de pagar para avanzar más rápido.</p>
+            <div class="franja" style="margin-top:22px"></div>
+            <section class="tarjeta juego">
+              <svg class="peg" data-s="map" viewBox="-4 -4 72 72"></svg>
+              <div style="flex:1"><h4>EXPEDICIONES</h4><p>Manda equipos de 1 a 3 cartas a explorar el mapa. Vuelven con galletas, fragmentos de mapa y, de vez en cuando, un sobre.</p></div>
+              <button class="btn primario"><span>Jugar</span></button>
+            </section>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. Panel ============ -->
+  <section class="lamina">
+    <h2>5 · Panel de administración</h2>
+    <p class="nota">RF-11: el panel también cambia. Cada cifra lleva una franja de color arriba; los grupos de la barra lateral van en lima.</p>
+    <div class="marco sp">
+      <div class="rayas"></div>
+      <div class="app" style="min-height:600px">
+        <nav class="riel"><span class="logo" style="background:var(--sp-rosa)">WB</span><span class="bola">01</span><span class="bola">＋</span></nav>
+        <aside class="lateral" data-nav="panel"></aside>
+        <div class="columna">
+          <div class="barra"><h3>Resumen</h3><div class="der"><span class="seg"><span>EN</span><span aria-pressed="true">ES</span></span></div></div>
+          <main>
+            <h1 class="titulo">RESUMEN</h1>
+            <div class="stats">
+              <div class="stat" style="--c:var(--sp-rosa)"><b>1 de 1</b><span>Colecciones publicadas</span></div>
+              <div class="stat" style="--c:var(--sp-lima)"><b>27</b><span>Cartas</span></div>
+              <div class="stat" style="--c:var(--sp-turquesa)"><b>7</b><span>Personajes</span></div>
+              <div class="stat" style="--c:var(--sp-trama)"><b>2</b><span>Usuarios</span></div>
+              <div class="stat" style="--c:var(--sp-indigo)"><b>2</b><span>Sobres sin abrir</span></div>
+            </div>
+            <div class="cabeza"><h4>Borradores en preparación</h4><a href="#">Todas las colecciones</a></div>
+            <div class="vacio">No hay borradores. Crea una colección para empezar a cargar cartas.</div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5b. Configurador ============ -->
+  <section class="lamina">
+    <h2>5b · Configurador de cartas (spec 025) en Street pop</h2>
+    <p class="nota">RF-13: el escenario de la carta se queda oscuro dentro de la ventana clara. Las filas de capas, deslizadores y fichas
+      toman la piel Street pop (lámina 6).</p>
+    <div class="marco sp" style="padding:24px 28px">
+      <span class="etiqueta">Carta 002</span>
+      <div class="editor">
+        <div>
+          <div class="escenario"><span class="chip">Vista previa</span><img src="../../docs/waifu-baker/waifu-baker/disenos/assets/yuki_carta.webp" alt="Carta de Yuki"></div>
+        </div>
+        <section class="tarjeta" style="margin:0">
+          <h4>Capas</h4>
+          <div class="lado">Adelante</div>
+          <ul class="capas">
+            <li data-open><span class="th" style="background-image:url(../../docs/waifu-baker/waifu-baker/disenos/assets/yuki_ssr.webp)"></span><span><b>Chica</b><small>Normal · 100 % · ✦ brillo</small></span><span class="acc"><span>👁</span><span>↑</span><span>↓</span></span></li>
+            <li><span class="th"></span><span><b>Destellos dorados</b><small>Partículas · 24</small></span><span class="acc"><span>👁</span><span>↑</span><span>↓</span></span></li>
+            <li><span class="th" style="background:#3B2FC9"></span><span><b>Fondo</b><small>Normal · 100 %</small></span><span class="acc"><span>👁</span><span>↑</span><span>↓</span></span></li>
+          </ul>
+          <div class="lado" style="margin-top:8px">Atrás</div>
+          <div class="slider"><div class="t"><span>Intensidad del brillo</span><output>70 %</output></div><div class="riel2"><i></i><b></b></div></div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. Componentes y pegatinas ============ -->
+  <section class="lamina">
+    <h2>6 · Componentes y pegatinas</h2>
+    <p class="nota">RF-19 a RF-21 y RF-24: botones y etiquetas inclinados en Archivo itálica gruesa; bordes de 3 px y sombras duras. El rosa
+      neón y la lima solo como fondo, con texto de tinta. Las insignias de rareza no cambian (RF-15). Foco visible en índigo.</p>
+    <div class="marco sp">
+      <div class="comp">
+        <section class="tarjeta">
+          <h5>Botones</h5>
+          <div class="botones">
+            <button class="btn primario"><span>Abrir sobre</span></button>
+            <button class="btn"><span>Cancelar</span></button>
+            <button class="btn lima"><span>Reclamar</span></button>
+            <button class="btn peligro"><span>Borrar</span></button>
+            <button class="btn primario foco"><span>Con foco</span></button>
+            <button class="btn" disabled><span>Desactivado</span></button>
+            <button class="btn fantasma"><span>Ver todo</span></button>
+          </div>
+        </section>
+        <section class="tarjeta">
+          <h5>Formulario</h5>
+          <div class="input">demo-collector</div>
+          <div class="input foco" style="margin-top:12px">Con foco</div>
+          <label class="chk"><i>✓</i>Versión holo</label>
+          <div class="slider"><div class="t"><span>Inclinación</span><output>16°</output></div><div class="riel2"><i></i><b></b></div></div>
+        </section>
+        <section class="tarjeta">
+          <h5>Fichas, selector e insignias</h5>
+          <div class="chips"><span aria-checked="true"><i style="background:#d9dee8"></i>C</span><span><i style="background:#7ef0c9"></i>R</span><span><i style="background:#b79cff"></i>E</span><span><i style="background:#ffe27a"></i>LEG</span><span><i style="background:linear-gradient(135deg,#ff9ad5,#ffe66b,#a6f0e6)"></i>EX</span></div>
+          <div class="seg" style="margin-top:14px"><span aria-pressed="true">Texto</span><span>Imagen</span></div>
+          <div class="rarezas"><span style="background:#d9dee8">Común</span><span style="background:#7ef0c9">Rara</span><span style="background:#b79cff">Épica</span><span style="background:#ffe27a">Legendaria</span><span style="background:linear-gradient(90deg,#ff9ad5,#ffc7a6,#ffe66b,#a6f0e6,#c8a8ff)">EX</span></div>
+          <p class="leyenda">Las insignias de rareza se ven igual que en Kawaii.</p>
+        </section>
+        <section class="tarjeta">
+          <h5>Avisos</h5>
+          <div class="alerta ok">Capas guardadas.</div>
+          <div class="alerta mal" style="margin-top:10px">No se pudo generar la imagen fija.</div>
+          <div class="toast"><i>!</i>No se pudo guardar el tema. Volvimos al anterior.</div>
+        </section>
+        <section class="tarjeta" style="grid-column:span 2">
+          <h5>Contraste (RF-25)</h5>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-weight:800;font-size:13px">
+            <div style="background:var(--sp-lila);border:3px solid var(--sp-tinta);padding:10px">Tinta sobre lila<br><span style="color:var(--sp-texto-2)">Texto 2 sobre lila</span></div>
+            <div style="background:var(--sp-rosa);border:3px solid var(--sp-tinta);padding:10px">Tinta sobre rosa</div>
+            <div style="background:var(--sp-indigo);color:#fff;border:3px solid var(--sp-tinta);padding:10px">Blanco sobre índigo</div>
+            <div style="background:var(--sp-tinta);color:var(--sp-lima);border:3px solid var(--sp-tinta);padding:10px">Lima sobre tinta</div>
+          </div>
+          <p class="leyenda">Prohibido: rosa o lima como texto sobre lila o blanco (RF-24).</p>
+        </section>
+      </div>
+      <div class="pegatinas">
+        <div class="k tk"><h5>Kawaii (hoy)</h5><div class="pegs" data-pegs></div></div>
+        <div class="ts" style="background:var(--sp-lila)"><h5>Street pop</h5><div class="pegs" data-pegs></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// Pegatinas: mismo dibujo que ui/icons/Sticker.tsx; los colores salen de variables que cada tema redefine.
+const O = 'stroke="var(--k-out)" stroke-width="var(--k-ow)" stroke-linejoin="round" paint-order="stroke"';
+const STAR = "M7 0 L9 5 L14 7 L9 9 L7 14 L5 9 L0 7 L5 5 Z";
+const HEART = "M7 12 C1 8 0 5 0 3.5 C0 1.5 1.6 0 3.5 0 C5 0 6.3 0.9 7 2.2 C7.7 0.9 9 0 10.5 0 C12.4 0 14 1.5 14 3.5 C14 5 13 8 7 12 Z";
+const face = (x, y) => `<ellipse cx="${x-5}" cy="${y+2.5}" rx="2" ry="2.5" fill="var(--k-tinta)"/><ellipse cx="${x+5}" cy="${y+2.5}" rx="2" ry="2.5" fill="var(--k-tinta)"/><ellipse cx="${x-10}" cy="${y+6.5}" rx="3" ry="1.5" fill="var(--k-rubor)"/><ellipse cx="${x+10}" cy="${y+6.5}" rx="3" ry="1.5" fill="var(--k-rubor)"/><path d="M${x-3} ${y+6} Q${x} ${y+9} ${x+3} ${y+6}" fill="none" stroke="var(--k-tinta)" stroke-width="1.6" stroke-linecap="round"/>`;
+const D = {
+  pack: `<rect x="14" y="10" width="36" height="46" rx="6" fill="var(--k-chicle)" ${O}/><path transform="translate(14 6)" d="M0 8 L0 4 L3 0 L6 4 L9 0 L12 4 L15 0 L18 4 L21 0 L24 4 L27 0 L30 4 L33 0 L36 4 L36 8 Z" fill="var(--k-chicle-claro)" ${O}/><rect x="14" y="44" width="36" height="5" fill="var(--k-chicle-claro)"/>${face(32,26)}<path transform="translate(42 2)" d="${STAR}" fill="var(--k-limon)" ${O}/>`,
+  card: `<rect x="16" y="8" width="32" height="46" rx="6" fill="var(--k-lavanda)" transform="rotate(-8 16 8)" ${O}/><rect x="21" y="12" width="22" height="26" rx="4" fill="var(--k-lavanda-claro)" transform="rotate(-8 21 12)"/><path transform="rotate(-8 25 18) translate(25 18)" d="${HEART}" fill="var(--k-chicle)"/><path transform="translate(40 40) scale(0.857)" d="${STAR}" fill="var(--k-limon)" ${O}/>`,
+  cookie: `<circle cx="32" cy="32" r="24" fill="var(--k-galleta)" ${O}/>${[[16,18],[42,16],[14,38],[44,40],[30,46]].map(([x,y])=>`<ellipse cx="${x+3}" cy="${y+2.5}" rx="3" ry="2.5" fill="var(--k-chocolate)"/>`).join("")}${face(32,26)}`,
+  gift: `<rect x="12" y="28" width="40" height="28" rx="5" fill="var(--k-menta)" ${O}/><rect x="9" y="20" width="46" height="11" rx="4" fill="var(--k-menta-claro)" ${O}/><rect x="29" y="20" width="6" height="36" fill="var(--k-chicle)"/><ellipse cx="24.5" cy="15" rx="7.5" ry="6" fill="var(--k-chicle)" transform="rotate(15 24.5 15)" ${O}/><ellipse cx="39.5" cy="11" rx="7.5" ry="6" fill="var(--k-chicle)" transform="rotate(-15 39.5 11)" ${O}/><circle cx="32" cy="18" r="4" fill="var(--k-lazo)"/>${face(32,38)}`,
+  clock: `<ellipse cx="15" cy="11" rx="7" ry="6" fill="var(--k-celeste)" ${O}/><ellipse cx="49" cy="11" rx="7" ry="6" fill="var(--k-celeste)" ${O}/><circle cx="32" cy="34" r="24" fill="var(--k-celeste)" ${O}/><circle cx="32" cy="34" r="18" fill="var(--k-celeste-claro)"/><path transform="translate(31 22)" d="M1 13 L1 1 M1 13 L10 8" fill="none" stroke="var(--k-tinta)" stroke-width="3" stroke-linecap="round"/><ellipse cx="20" cy="39.5" rx="3" ry="1.5" fill="var(--k-rubor)"/><ellipse cx="44" cy="39.5" rx="3" ry="1.5" fill="var(--k-rubor)"/>`,
+  collection: `<rect x="20" y="6" width="32" height="42" rx="6" fill="var(--k-lavanda)" transform="rotate(10 20 6)" ${O}/><rect x="12" y="14" width="38" height="44" rx="6" fill="var(--k-limon)" ${O}/><rect x="12" y="14" width="8" height="44" rx="6" fill="var(--k-limon-oscuro)"/><path transform="translate(25 24)" d="M9 0 L11.6 5.6 L18 6.4 L13.2 10.6 L14.6 17 L9 13.8 L3.4 17 L4.8 10.6 L0 6.4 L6.4 5.6 Z" fill="var(--k-chicle)"/>`,
+  streak: `<path transform="translate(12 4)" d="M20 0 C28 12 40 18 40 34 C40 46 31 54 20 54 C9 54 0 46 0 34 C0 24 8 20 10 10 C14 16 16 18 18 20 C18 12 18 6 20 0 Z" fill="var(--k-llama)" ${O}/><path transform="translate(22 28)" d="M10 0 C15 7 20 10 20 18 C20 24 15 28 10 28 C5 28 0 24 0 18 C0 12 5 10 10 0 Z" fill="var(--k-limon)"/>${face(32,40)}`,
+  map: `<path d="M8 16 L24 10 L40 16 L56 10 L56 50 L40 56 L24 50 L8 56 Z" fill="var(--k-celeste)" ${O}/><path d="M24 10 L24 50 M40 16 L40 56" stroke="var(--k-celeste-claro)" stroke-width="3"/><path d="M14 46 C20 38 26 42 30 34 S42 26 48 22" fill="none" stroke="var(--k-tinta)" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="1 5"/><path transform="translate(39 8) scale(1.2)" d="${HEART}" fill="var(--k-chicle)" ${O}/><ellipse cx="18" cy="30" rx="3" ry="1.5" fill="var(--k-rubor)"/>`,
+  profile: `<path transform="translate(12 8)" d="M0 18 L4 0 L16 12 Z" fill="var(--k-rosa-claro)" ${O}/><path transform="translate(36 8)" d="M16 18 L12 0 L0 12 Z" fill="var(--k-rosa-claro)" ${O}/><ellipse cx="32" cy="36" rx="22" ry="20" fill="var(--k-rosa-claro)" ${O}/>${face(32,32)}`,
+};
+const NOMBRES = { pack: "Sobres", card: "Carta", collection: "Colección", map: "Juegos", gift: "Recompensas", profile: "Cuenta", cookie: "Galleta", streak: "Racha", clock: "Reloj" };
+const svg = (s, extra = "") => `<svg class="peg" viewBox="-4 -4 72 72" ${extra}>${D[s]}</svg>`;
+document.querySelectorAll("svg[data-s]").forEach((el) => { el.innerHTML = D[el.dataset.s]; });
+document.querySelectorAll("[data-pegs]").forEach((el) => { el.innerHTML = Object.keys(D).map((s) => `<figure>${svg(s)}<figcaption>${NOMBRES[s]}</figcaption></figure>`).join(""); });
+
+// Barra lateral del coleccionista y del panel.
+const COL = [["pack","Mis sobres",1,"sobres"],["collection","Mi colección",0,"coleccion"],["card","Álbum público",0,"album"],["map","Juegos",0,"juegos"],["gift","Recompensas",2,"recompensas"]];
+const TU = [["profile","Mi cuenta",0,"perfil"]];
+const item = ([s, t, n, k], cur) => `<a href="#" ${k === cur ? 'aria-current="page"' : ""}>${s ? svg(s) : '<span style="width:26px;text-align:center">·</span>'}<span>${t}</span>${n ? `<span class="cuenta">${n}</span>` : ""}</a>`;
+document.querySelectorAll("aside[data-nav]").forEach((el) => {
+  const cur = el.dataset.nav;
+  if (cur === "panel") {
+    el.classList.add("panel");
+    const g = (t, xs) => `<div class="grupo">${t}</div>` + xs.map((x) => item([null, x, 0, x === "Resumen" ? "panel" : ""], cur)).join("");
+    el.innerHTML = `<div class="marca"><b>PANEL</b><span>Waifu Baker · local</span></div>` + g("OPERACIÓN", ["Resumen", "Métricas y copias"]) + g("CATÁLOGO", ["Colecciones", "Personajes", "Biblioteca", "Expediciones"]) + g("JUGADORES", ["Usuarios", "Álbumes", "Tiers de Patreon"]) + g("SISTEMA", ["Ajustes", "Vista de coleccionista"]) + `<div class="yo"><span class="avatar">DA</span><span><b>demo-admin</b><span>Administrador</span></span></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="marca"><b>WAIFU BAKER</b><span>Tus colecciones</span></div><div class="grupo">COLECCIÓN</div>` + COL.map((x) => item(x, cur)).join("") + `<div class="grupo">TÚ</div>` + TU.map((x) => item(x, cur)).join("") + item([null, "Probabilidades", 0, ""], cur) + item([null, "Panel", 0, ""], cur) + `<div class="yo"><span class="avatar">DA</span><span><b>demo-admin</b><span>240 galletas</span></span></div>`;
+});
+document.querySelectorAll("nav[data-abajo]").forEach((el) => {
+  const cur = el.dataset.abajo;
+  el.innerHTML = [["pack","Sobres","sobres"],["collection","Colección","coleccion"],["map","Juegos","juegos"],["gift","Recompensas","recompensas"],["profile","Cuenta","cuenta"]].map(([s, t, k]) => `<a href="#" ${k === cur ? 'aria-current="page"' : ""}>${svg(s)}<span>${t}</span></a>`).join("");
+});
+</script>
+</body>
+</html>
