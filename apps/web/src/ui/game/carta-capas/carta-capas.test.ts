@@ -83,3 +83,52 @@ describe("spec 022 — marcos de las cinco rarezas", () => {
     expect(tiers.map((t) => presets[t].sello?.texto)).toEqual(["C", "R", "E", "LEG", "EX"]);
   });
 });
+
+describe("spec 025 — carta-capas v4 en nuestra copia", () => {
+  it("test_s025_rf1_rf2_el_brillo_va_dentro_de_la_capa_con_su_imagen_como_mascara", () => {
+    expect(api.version).toBe(4);
+    expect(Object.keys(api.brillos)).toEqual(["holo", "destello", "oro", "plata"]);
+    // El brillo es un hijo de la capa (se mueve con ella) y usa la imagen de la capa como máscara.
+    expect(src).toMatch(/'<div class="cc-brillo cc-brillo-' \+ b\.tipo/);
+    expect(src).toMatch(/mask-image:' \+ m/);
+  });
+
+  it("test_s025_la_imagen_de_la_mascara_solo_admite_rutas_sin_caracteres_que_rompan_el_css", () => {
+    expect(api.seguro.url("/api/cards/layer?k=abc&e=123&s=%2F")).toBe("/api/cards/layer?k=abc&e=123&s=%2F");
+    expect(api.seguro.url("data:image/webp;base64,UklGRg+/=")).toBe("data:image/webp;base64,UklGRg+/=");
+    expect(api.seguro.url('x") ; background:url(https://evil')).toBeNull();
+    expect(api.seguro.url("a\\b")).toBeNull();
+    expect(api.seguro.url(7)).toBeNull();
+  });
+
+  it("test_s025_rf3_la_intensidad_del_holo_mueve_la_opacidad_del_holo", () => {
+    expect(src).toMatch(/\.cc-card\.cc-con-holo \.cc-holo\{opacity:calc\(var\(--cc-holo-i,\.4\)/);
+    expect(src).toMatch(/setProperty\('--cc-holo-i', intensidad\(op\.holoIntensidad, \.4\)\)/);
+  });
+
+  it("test_s025_rf6_con_movimiento_reducido_el_destello_queda_quieto_en_el_centro", () => {
+    expect(src).toMatch(/prefers-reduced-motion:reduce\)\{\.cc-brillo-destello\{animation:none;background-position:50% 0\}/);
+  });
+
+  it("test_s025_ex_es_sinonimo_de_ur_y_conserva_los_sellos_de_la_022", () => {
+    const presets = (api as unknown as { presets: Record<string, unknown> }).presets;
+    const marcos = (api as unknown as { marcos: Record<string, unknown> }).marcos;
+    expect(presets.ex).toBe(presets.ur);
+    expect(marcos.ex).toBe(marcos.ur);
+  });
+
+  it("test_s025_rf16_el_marco_personalizado_sale_de_dos_colores_validos", () => {
+    const [grad, aura] = api.marcoPersonalizado({ color: "#6d5cff", brillo: "#d7ff3a" })!;
+    expect(grad).toBe("linear-gradient(135deg,#312973 0%,#d7ff3a 18%,#6d5cff 34%,#ffffff 48%,#6d5cff 62%,#d7ff3a 80%,#312973 100%)");
+    expect(aura).toBe("rgba(109,92,255,.25)");
+    expect(api.marcoPersonalizado({ color: "red;x:url(y)", brillo: "#fff" })).toBeNull();
+    expect(api.marcoPersonalizado(null)).toBeNull();
+  });
+});
+
+describe("spec 025 — grosor del marco", () => {
+  it("test_s025_rf11_sin_grosor_guardado_el_marco_usa_el_de_su_escalon", () => {
+    // Antes `num(null, …)` devolvía 0 y el marco no se veía.
+    expect(src).toMatch(/op\.borde == null \? m\[2\] \|\| 2\.2 : num\(op\.borde, m\[2\] \|\| 2\.2\)/);
+  });
+});

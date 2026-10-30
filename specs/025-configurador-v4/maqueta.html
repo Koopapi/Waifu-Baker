@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maqueta spec 025 · Editor de capas v4</title>
+<!--
+  Maqueta de la spec 025 (sustituye a Pencil mientras su plan gratis está agotado; se pasa a waifubaker.pen cuando
+  vuelva). Distribución y componentes del configurador de Bruno con la paleta actual del panel («Cereza», variables
+  ui-*). La carta es la real: carta-capas.js v4 del sitio con las capas de Yuki.
+  Ábrela con un servidor (por ejemplo, `npx serve .` en la raíz del repo y entra a /specs/025-configurador-v4/maqueta.html):
+  desde file:// el brillo por capa no se ve (el navegador trata cada archivo como de otro origen).
+-->
+<style>
+  :root {
+    --ui-rail:#150f22; --ui-nav:#1a1229; --ui-bg:#1e1630; --ui-raised:#2b2142; --ui-hover:#3a2d57; --ui-line:#43345f;
+    --ui-text:#fff6fb; --ui-text-2:#d9c8e8; --ui-text-3:#a99ac0; --ui-accent:#ff6fae; --ui-accent-text:#ff9ecb;
+    --ui-on-accent:#2a0e1f; --ui-menta:#7ef0c9; --ui-oro:#fff1a8; --ui-lavanda:#b79cff;
+  }
+  * { box-sizing:border-box }
+  body { margin:0; background:var(--ui-bg); color:var(--ui-text); font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif }
+  h1 { font-size:20px; margin:0 0 4px } h2 { font-size:15px; margin:0 } p { margin:0 }
+  .wrap { max-width:1360px; margin:0 auto; padding:24px 16px 64px }
+  .note { color:var(--ui-text-3); font-size:12px; margin-bottom:20px }
+  .label { font-size:11px; font-weight:800; font-style:italic; letter-spacing:.14em; text-transform:uppercase; color:var(--ui-accent-text) }
+  .boards { display:grid; gap:32px; grid-template-columns:minmax(0,1fr) 390px; align-items:start }
+  @media (max-width:1100px){ .boards { grid-template-columns:1fr } }
+  .board > .label { display:block; margin-bottom:8px }
+  .editor { display:grid; gap:20px; grid-template-columns:minmax(0,1fr) minmax(300px,380px); align-items:start }
+  .mobile .editor { grid-template-columns:1fr }
+  .mobile { border:2px solid var(--ui-line); border-radius:28px; padding:16px; background:var(--ui-bg) }
+  .panel { border:1px solid rgba(183,156,255,.15); border-radius:16px; padding:16px; background:linear-gradient(var(--ui-raised),var(--ui-nav)); display:grid; gap:14px }
+  .panel-h { display:flex; justify-content:space-between; align-items:baseline }
+  /* Escena oscura (PreviewStage) */
+  .stage { position:relative; isolation:isolate; overflow:hidden; border:2px solid var(--ui-line); border-radius:16px; background:var(--ui-rail); min-height:440px; display:grid; place-items:center; padding:56px 40px 48px }
+  .stage::before { content:""; position:absolute; inset:0; z-index:-1; background:repeating-conic-gradient(from 0deg at 50% 42%,color-mix(in srgb,var(--ui-lavanda) 14%,transparent) 0deg 7deg,transparent 7deg 18deg) }
+  .stage::after { content:""; position:absolute; left:-40px; bottom:-40px; width:224px; height:224px; z-index:-1; border-radius:50%; background:radial-gradient(color-mix(in srgb,var(--ui-oro) 55%,transparent) 1.6px,transparent 2px) 0 0/14px 14px; -webkit-mask-image:radial-gradient(circle,#000 45%,transparent 72%); mask-image:radial-gradient(circle,#000 45%,transparent 72%) }
+  .stage .hint { position:absolute; inset:auto 16px 12px; text-align:center; font-size:12px; font-weight:600; font-style:italic; color:var(--ui-text-2) }
+  .card-host { width:100%; max-width:280px }
+  .mobile .card-host { max-width:220px }
+  /* Slider */
+  .slider { display:grid; gap:6px }
+  .slider .row { display:flex; justify-content:space-between; gap:12px; align-items:baseline }
+  .slider output { font:600 12px ui-monospace,monospace; color:var(--ui-accent-text) }
+  input[type=range] { -webkit-appearance:none; appearance:none; height:8px; width:100%; border-radius:99px; background:linear-gradient(to right,var(--ui-accent) var(--fill),var(--ui-hover) var(--fill)) }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--ui-accent); border:2px solid var(--ui-on-accent) }
+  .grid2 { display:grid; gap:14px; grid-template-columns:1fr 1fr }
+  .mobile .grid2 { grid-template-columns:1fr }
+  .checks { display:flex; flex-wrap:wrap; gap:12px 24px; align-items:center }
+  .check { display:inline-flex; gap:8px; align-items:center }
+  .check i { width:18px; height:18px; border-radius:6px; border:1px solid var(--ui-line); background:var(--ui-rail); display:inline-grid; place-items:center; font-style:normal; font-size:12px }
+  .check i.on { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--ui-on-accent) }
+  .btn { display:inline-flex; align-items:center; gap:6px; border-radius:99px; padding:6px 14px; font-weight:700; font-size:13px; border:0; cursor:pointer }
+  .btn.primary { background:var(--ui-accent); color:var(--ui-on-accent) } .btn.secondary { background:var(--ui-hover); color:var(--ui-text) }
+  /* Dropzone */
+  .drop { border:2px dashed var(--ui-line); border-radius:12px; padding:18px; text-align:center }
+  .drop b { display:block; font-style:italic; text-transform:uppercase; letter-spacing:.04em; font-weight:800 }
+  .drop span { font-size:12px; color:var(--ui-text-3) }
+  /* LayerList / LayerRow */
+  .list { display:grid; gap:8px; list-style:none; margin:0; padding:0 }
+  .lrow { border:2px solid var(--ui-line); border-radius:12px; background:var(--ui-nav); overflow:hidden }
+  .lrow.open { border-color:var(--ui-accent); box-shadow:4px 4px 0 var(--ui-menta) }
+  .lhead { display:flex; gap:10px; align-items:center; padding:8px }
+  .thumb { width:40px; height:40px; border-radius:8px; border:1px solid var(--ui-line); background:repeating-conic-gradient(var(--ui-hover) 0 25%,var(--ui-raised) 0 50%) 0 0/10px 10px; display:grid; place-items:center; overflow:hidden; flex:none }
+  .thumb img { width:100%; height:100%; object-fit:contain }
+  .ltxt { flex:1; min-width:0 } .ltxt b { display:block; font-size:13px } .ltxt span { font-size:12px; color:var(--ui-text-3) }
+  .acts { display:flex; gap:2px } .acts button { width:32px; height:32px; border-radius:8px; border:0; background:transparent; color:var(--ui-text-2); font-size:15px }
+  .acts button:disabled { opacity:.35 }
+  .lbody { border-top:2px solid var(--ui-line); padding:12px; display:grid; gap:14px }
+  .select { display:grid; gap:6px } .select div { border:1px solid var(--ui-line); border-radius:10px; padding:8px 12px; background:var(--ui-rail); display:flex; justify-content:space-between }
+  /* ChipGroup y Segmented */
+  .chips { display:flex; flex-wrap:wrap; gap:8px }
+  .chip { display:inline-flex; gap:8px; align-items:center; border:2px solid var(--ui-line); border-radius:10px; padding:5px 12px; font:800 italic 12px system-ui; text-transform:uppercase; letter-spacing:.04em; color:var(--ui-text-2) }
+  .chip s { width:12px; height:12px; border-radius:3px; border:1px solid var(--ui-rail); text-decoration:none }
+  .chip.on { background:var(--ui-accent); border-color:var(--ui-accent); color:var(--ui-on-accent) }
+  .seg { display:inline-flex; border:2px solid var(--ui-line); border-radius:10px; overflow:hidden }
+  .seg span { padding:5px 12px; font:800 italic 12px system-ui; text-transform:uppercase; color:var(--ui-text-2) }
+  .seg span + span { border-left:2px solid var(--ui-line) } .seg .on { background:var(--ui-text); color:var(--ui-rail) }
+  .apply { border:2px dashed var(--ui-line); border-radius:12px; padding:12px; display:grid; gap:8px; font-size:12px; color:var(--ui-text-2) }
+  .colors { display:flex; gap:16px; flex-wrap:wrap } .color { display:inline-flex; gap:8px; align-items:center } .color i { width:44px; height:32px; border-radius:8px; border:2px solid var(--ui-line) }
+  .color code { color:var(--ui-text-3); font-size:12px }
+  .save { display:flex; gap:10px; flex-wrap:wrap }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Spec 025 · Editor de cartas por capas con el configurador de Bruno</h1>
+  <p class="note">Maqueta HTML (Pencil sin cupo). Distribución, deslizadores, lista de capas, fichas y selector del configurador de Bruno, con los colores y fuentes actuales del panel (los del configurador llegan con Street pop). La carta de la izquierda es la real: carta-capas.js v4 con las capas de Yuki, brillo holográfico en la chica y marco personalizado.</p>
+
+  <div class="boards">
+    <section class="board">
+      <span class="label">Escritorio · 1360 px</span>
+      <div class="editor" id="desktop"></div>
+    </section>
+    <section class="board">
+      <span class="label">Celular · 390 px</span>
+      <div class="mobile"><div class="editor" id="mobile"></div></div>
+    </section>
+  </div>
+</div>
+
+<template id="editor">
+  <div style="display:grid;gap:12px">
+    <div class="stage"><div class="card-host"></div><p class="hint">Pasa el cursor por aquí o arrastra la carta.</p></div>
+    <div class="panel">
+      <div class="grid2">
+        <div class="slider"><div class="row"><label>Profundidad del parallax</label><output>14 px</output></div><input type="range" min="0" max="30" value="14" style="--fill:46.6%"></div>
+        <div class="slider"><div class="row"><label>Inclinación máxima</label><output>14°</output></div><input type="range" min="0" max="26" value="14" style="--fill:53.8%"></div>
+      </div>
+      <div class="checks"><span class="check"><i class="on">✓</i>Versión holo</span><span class="check"><i class="on">✓</i>Movimiento solo</span><button class="btn secondary">Probar revelado</button></div>
+      <div class="slider"><div class="row"><label>Intensidad del holo</label><output>60 %</output></div><input type="range" value="60" style="--fill:60%"></div>
+      <p class="note" style="margin:0">Solo cambian la vista previa; no se guardan en la carta (salvo la intensidad del holo).</p>
+    </div>
+  </div>
+  <div style="display:grid;gap:16px">
+    <div class="panel">
+      <div class="panel-h"><h2>Capas</h2><span class="label">5 capas</span></div>
+      <div class="drop"><b>Arrastra tus capas o toca para elegir</b><span>PNG, WebP o JPG. Ponles nombres como yuki_1_fondo, yuki_2_personaje… y se ordenan solas.</span></div>
+      <div class="panel-h"><span class="label">Adelante</span><button class="btn primary">✦ Añadir partículas</button></div>
+      <ol class="list">
+        <li class="lrow"><div class="lhead"><span class="thumb"><img data-src="yuki_5_insignia.webp" alt=""></span><span class="ltxt"><b>Imagen 2</b><span>Normal · prof 1.60</span></span><span class="acts"><button>👁</button><button disabled>↑</button><button>↓</button><button>✕</button></span></div></li>
+        <li class="lrow"><div class="lhead"><span class="thumb"><img data-src="yuki_4_particulas1.webp" alt=""></span><span class="ltxt"><b>Imagen 1</b><span>Superponer · prof 1.30</span></span><span class="acts"><button>👁</button><button>↑</button><button>↓</button><button>✕</button></span></div></li>
+        <li class="lrow open"><div class="lhead"><span class="thumb"><img data-src="yuki_3_personaje.webp" alt=""></span><span class="ltxt"><b>Chica</b><span>Normal · prof 1.00 · ✦ brillo</span></span><span class="acts"><button disabled>👁</button><button>↑</button><button>↓</button><button disabled>✕</button></span></div>
+          <div class="lbody">
+            <div class="select"><label>Mezcla</label><div>Normal <span>▾</span></div></div>
+            <div class="grid2">
+              <div class="slider"><div class="row"><label>Opacidad</label><output>100 %</output></div><input type="range" value="100" style="--fill:100%"></div>
+              <div class="slider"><div class="row"><label>Profundidad</label><output>1.00</output></div><input type="range" value="40" style="--fill:40%"></div>
+            </div>
+            <div class="slider"><div class="row"><label>Margen extra (para que no se vean bordes)</label><output>0%</output></div><input type="range" value="0" style="--fill:0%"></div>
+            <div class="select"><label>Brillo solo en el dibujo</label><div>Holográfico <span>▾</span></div></div>
+            <div class="slider"><div class="row"><label>Intensidad del brillo</label><output>70 %</output></div><input type="range" value="70" style="--fill:70%"></div>
+          </div>
+        </li>
+        <li class="lrow"><div class="lhead"><span class="thumb">✦</span><span class="ltxt"><b>Destellos dorados</b><span>Partículas · Normal · prof 0.55</span></span><span class="acts"><button>👁</button><button>↑</button><button>↓</button><button>✕</button></span></div></li>
+        <li class="lrow"><div class="lhead"><span class="thumb"><img data-src="yuki_1_fondo.webp" alt=""></span><span class="ltxt"><b>Fondo</b><span>Normal · prof 0.20</span></span><span class="acts"><button>👁</button><button>↑</button><button disabled>↓</button><button>✕</button></span></div></li>
+      </ol>
+      <span class="label">Atrás</span>
+    </div>
+    <div class="panel">
+      <h2>Rareza</h2>
+      <div class="chips">
+        <span class="chip"><s style="background:linear-gradient(180deg,#c9ced6,#8e949e)"></s>C</span>
+        <span class="chip"><s style="background:linear-gradient(135deg,#9fd3ff,#3b82f6)"></s>R</span>
+        <span class="chip"><s style="background:linear-gradient(135deg,#e9b8ff,#8b3fd9)"></s>E</span>
+        <span class="chip"><s style="background:linear-gradient(135deg,#fff1a8,#f5c451 45%,#b7791f)"></s>LEG</span>
+        <span class="chip"><s style="background:conic-gradient(from 90deg,#ff7eb6,#b79cff,#7cc8ff,#7ef0c9,#ff7eb6)"></s>EX</span>
+        <span class="chip on"><s style="background:linear-gradient(135deg,#312973,#d7ff3a,#6d5cff,#fff,#6d5cff)"></s>Personalizado</span>
+        <span class="chip"><s style="background:transparent"></s>Sin marco</span>
+      </div>
+      <div class="colors"><span class="color"><i style="background:#6d5cff"></i>Color <code>#6d5cff</code></span><span class="color"><i style="background:#d7ff3a"></i>Brillo <code>#d7ff3a</code></span></div>
+      <div class="apply">Pone el aspecto de la rareza de la carta: marco, partículas, sello y holo.<span><button class="btn primary">Aplicar estilo de la rareza</button></span></div>
+      <div class="slider"><div class="row"><label>Grosor del borde</label><output>2.2</output></div><input type="range" value="33" style="--fill:33%"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h" style="align-items:center;flex-wrap:wrap;gap:8px"><span>Sello que flota en la esquina</span><span class="seg"><span>Ninguno</span><span class="on">Texto</span><span>Imagen</span></span></div>
+      <div class="grid2"><div class="select"><label>Texto del sello</label><div>EX</div></div><div class="select"><label>Estilo del sello</label><div>Arcoíris <span>▾</span></div></div></div>
+      <div class="grid2"><div class="select"><label>Esquina</label><div>Arriba a la izquierda <span>▾</span></div></div><div class="slider"><div class="row"><label>Tamaño del sello</label><output>14</output></div><input type="range" value="33" style="--fill:33%"></div></div>
+    </div>
+    <div class="save"><button class="btn primary">Guardar capas</button><button class="btn secondary">Exportar</button><button class="btn secondary">Importar</button></div>
+  </div>
+</template>
+
+<script src="../../apps/web/src/ui/game/carta-capas/carta-capas.js"></script>
+<script>
+  var Y = "../../docs/waifu-baker/configurador-cartas/src/cartas/yuki/";
+  ["desktop", "mobile"].forEach(function (id) {
+    var root = document.getElementById(id);
+    root.appendChild(document.getElementById("editor").content.cloneNode(true));
+    root.querySelectorAll("img[data-src]").forEach(function (im) { im.src = Y + im.dataset.src; });
+    var stage = root.querySelector(".stage");
+    CartaCapas.montar(root.querySelector(".card-host"), {
+      etiqueta: "Yuki", marco: "personalizado", marcoColores: { color: "#6d5cff", brillo: "#d7ff3a" }, holo: true, holoIntensidad: .6, zona: stage,
+      capas: [
+        { src: Y + "yuki_1_fondo.webp", profundidad: .2, margen: 5 },
+        { particulas: "destellos-dorados", cantidad: 60, semilla: 7, profundidad: .55, margen: 4 },
+        { src: Y + "yuki_3_personaje.webp", profundidad: 1, brillo: { tipo: "holo", intensidad: .7 } },
+        { src: Y + "yuki_4_particulas1.webp", profundidad: 1.3, margen: 6, mezcla: "overlay" },
+        { src: Y + "yuki_5_insignia.webp", profundidad: 1.6 }
+      ],
+      sello: { texto: "EX", estilo: "arcoiris", esquina: "sup-izq", tamano: 14 }
+    });
+  });
+</script>
+</body>
+</html>

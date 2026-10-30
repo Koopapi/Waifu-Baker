@@ -82,4 +82,17 @@ describe("spec 018 — capas para la carta viva", () => {
       expect(await liveCardConfig(tx, fan.id, common.id, NOW)).toBeNull();
     });
   });
+
+  // Spec 025, RF-4: lo nuevo de la v4 y el marco personalizado llegan tal cual a la carta viva del coleccionista.
+  it("test_s025_rf4_la_carta_viva_recibe_el_brillo_la_intensidad_del_holo_y_el_marco_personalizado", async () => {
+    await inRollback(async (tx) => {
+      const { card, fan } = await world(tx);
+      const layers = card.layers!;
+      const capas = layers.capas.map((l) => ("key" in l && l.rol === "personaje" ? { ...l, brillo: { tipo: "oro" as const, intensidad: 0.5 } } : l));
+      await tx.update(cards).set({ layers: { ...layers, capas, holo: true, holoIntensidad: 0.7, marco: "personalizado", marcoColores: { color: "#6d5cff", brillo: "#d7ff3a" } } }).where(eq(cards.id, card.id));
+      const live = (await liveCardConfig(tx, fan.id, card.id, NOW))!;
+      expect(live.config).toMatchObject({ holo: true, holoIntensidad: 0.7, marco: "personalizado", marcoColores: { color: "#6d5cff", brillo: "#d7ff3a" } });
+      expect(live.config.capas.find((l) => "src" in l && l.rol === "personaje")).toMatchObject({ brillo: { tipo: "oro", intensidad: 0.5 } });
+    });
+  });
 });

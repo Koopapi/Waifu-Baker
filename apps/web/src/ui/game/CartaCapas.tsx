@@ -31,6 +31,11 @@ export interface CartaCapasProps {
   entrance?: boolean;
   /** Elemento donde se escucha el ratón (por defecto, el padre). */
   zone?: React.RefObject<HTMLElement | null>;
+  /**
+   * Spec 025, RF-8: ajustes de la vista previa del editor (parallax, inclinación, movimiento solo e intensidad del holo).
+   * Cambiarlos no vuelve a montar la carta.
+   */
+  view?: Pick<CartaConfig, "profundidad" | "inclinacion" | "reposo" | "holoIntensidad">;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -44,19 +49,21 @@ export interface CartaCapasHandle {
 }
 
 /**
- * Carta por capas (carta-capas.js v3, paquete de diseño): brillo que sigue al cursor, partículas y sello flotante
+ * Carta por capas (carta-capas.js v4, paquete de diseño): brillo que sigue al cursor, partículas y sello flotante
  * según su rareza. Con una imagen ya compuesta (marco de Pencil incluido) se monta con `marco: "ninguno"`; con arte
  * suelto (`rawArt`) usa el marco metálico del escalón. El script se descarga aparte la primera vez que hace falta y la carta se
  * destruye (con sus escuchas) al desmontarse.
  */
 export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function CartaCapas(
-  { tier, image, label, rawArt = false, config, holo = false, estatica = false, noSeal = false, sealHidden = false, entrance = false, zone, className, style },
+  { tier, image, label, rawArt = false, config, holo = false, estatica = false, noSeal = false, sealHidden = false, entrance = false, zone, view, className, style },
   ref,
 ) {
   const box = useRef<HTMLDivElement>(null);
   const card = useRef<CartaInstancia | null>(null);
   const hidden = useRef(sealHidden);
   hidden.current = sealHidden;
+  const viewRef = useRef(view);
+  viewRef.current = view;
 
   useEffect(() => {
     let alive = true;
@@ -73,6 +80,7 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
         // capas, también el que elija la configuración.
         holo: holo || Boolean(config?.holo),
         ...(noSeal ? { sello: null } : {}),
+        ...viewRef.current,
       };
       card.current = config ? lib.montar(box.current, { ...config, ...extra }) : lib.montarRareza(box.current, tier, image, extra);
       if (hidden.current || entrance) card.current.ocultarSello();
@@ -93,6 +101,10 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
   useEffect(() => {
     card.current?.set({ holo: holo || Boolean(config?.holo) });
   }, [holo, config]);
+
+  useEffect(() => {
+    if (view) card.current?.set(view);
+  }, [view?.profundidad, view?.inclinacion, view?.reposo, view?.holoIntensidad]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useImperativeHandle(ref, () => ({
     entrar: () => card.current?.entrar(),

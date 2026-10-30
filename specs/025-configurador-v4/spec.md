@@ -115,8 +115,8 @@ auditoría.
   (constitución). Las páginas del coleccionista no crecen más de 2 KB comprimidos (`pnpm budget`).
 - Accesibilidad: todos los controles nuevos con teclado y nombre para lectores de pantalla.
 - Sistema de diseño: los componentes nuevos (RF-26) van en `ui/` con su componente en Pencil; los colores y las
-  fuentes del configurador (lila, bordes gruesos, Dela Gothic One y Archivo) **no** entran aquí: son del tema Street pop
-  (spec 028), que los aplicará a todo el sitio a la vez.
+  fuentes del configurador (lila, bordes gruesos, Dela Gothic One y Archivo) **no** entran aquí: son del tema Street pop,
+  que los aplicará a todo el sitio a la vez.
 - Idioma: todos los textos nuevos en inglés y español.
 - Navegadores: revisar a mano en Safari (iPhone) el brillo de capa y el marco, que usan máscaras.
 
@@ -138,7 +138,7 @@ auditoría.
 - Guardar el trabajo a medias en el navegador (`localStorage`): el editor del panel ya guarda en la carta.
 - La carta de ejemplo de Yuki como carta del sitio (es arte de prueba; Bruno debe confirmar su origen antes de usarla).
 - La página `ejemplo.html` del paquete.
-- Los colores y las fuentes del configurador (tema Street pop, spec 028).
+- Los colores y las fuentes del configurador (tema Street pop).
 - Volver a los marcos de rareza y los sellos de Bruno: se quedan los de la spec 022 (el marco personalizado sí entra).
 
 ## Criterios de finalización
@@ -150,7 +150,7 @@ Android); demo del dueño y de Bruno.
 ## Decisiones del dueño (29 oct 2026)
 - **D1. Aspecto del editor:** se trae lo visual del configurador de Bruno (distribución, deslizadores, lista de capas
   con sus botones, fichas de rareza, selector de sello y escena oscura de la vista previa) como componentes reutilizables
-  (RF-21 a RF-26). Los colores y las fuentes se quedan como están hasta el tema Street pop (spec 028).
+  (RF-21 a RF-26). Los colores y las fuentes se quedan como están hasta el tema Street pop.
 - **D2. Marcos y sellos:** se quedan los de la spec 022 (sellos C, R, E, LEG y EX).
 - **D4. Componente de la carta:** lo nuevo de la v4 (brillo de capa, intensidad del holo y `ex`) pasa a nuestra copia,
   que conserva el encuadre de la spec 017, los marcos de la 022 y los filtros de seguridad.

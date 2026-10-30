@@ -3,7 +3,7 @@
 import type { Page } from "@playwright/test";
 import path from "node:path";
 import { desktopOnly, expect, test } from "./fixtures";
-import { LAB, createPublishedSet, login } from "./helpers";
+import { LAB, createPublishedSet, login, setSlider } from "./helpers";
 
 const YUKI = path.resolve(__dirname, "../../../docs/waifu-baker/waifu-baker/codigo/carta-capas/cartas/yuki");
 
@@ -23,15 +23,16 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
   await test.step("RF-1 y RF-20: la carta nace con la chica como personaje y la de prueba viene armada", async () => {
     const editor = await openEditor(admin, setId);
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(2);
-    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Fondo");
-    await expect(editor.locator('[data-testid="layer-row"]').nth(1)).toContainText("Chica");
+    // Spec 025, RF-23: la de adelante arriba.
+    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Chica");
+    await expect(editor.locator('[data-testid="layer-row"]').nth(1)).toContainText("Fondo");
     await expect(editor.locator('[data-testid="layers-character"]')).toBeVisible();
   });
 
   await test.step("RF-5: la chica no se puede quitar ni ocultar, ni la carta volver a su imagen original", async () => {
     const chica = admin.locator('[data-testid="layers-editor"] [data-testid="layer-row"]', { hasText: "Chica" });
     await expect(chica.getByRole("button", { name: /^Quitar capa/ })).toBeDisabled();
-    await expect(chica.getByRole("checkbox", { name: "Visible" })).toBeDisabled();
+    await expect(chica.getByRole("button", { name: /^Ocultar/ })).toBeDisabled();
     await expect(admin.locator('[data-testid="layers-remove"]')).toHaveCount(0);
   });
 
@@ -60,7 +61,7 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await yuki.click();
     await expect(yuki).toHaveAttribute("aria-pressed", "true");
     await expect(editor.getByRole("button", { name: "Usar el fondo Fondo de prueba" })).toHaveAttribute("aria-pressed", "false");
-    await expect(editor.locator('[data-testid="layer-row"]').first()).toContainText("Fondo");
+    await expect(editor.locator('[data-testid="layer-row"]').last()).toContainText("Fondo");
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
     await admin.goto("/admin/library");
@@ -72,10 +73,10 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
   await test.step("RF-10 a RF-12: encuadrar a la chica con números, teclado y arrastre, y restablecer", async () => {
     const editor = await openEditor(admin, setId);
     const chica = () => editor.locator('[data-testid="layers-preview"] .cc-capa img').last();
-    await editor.locator('input[data-testid="framing-scale"]').fill("150");
+    await setSlider(editor.locator('input[data-testid="framing-scale"]'), 150);
     await expect(chica()).toHaveAttribute("style", /scale\(1\.5\)/);
     // La escala tiene un tope del 400 %.
-    await editor.locator('input[data-testid="framing-scale"]').fill("900");
+    await setSlider(editor.locator('input[data-testid="framing-scale"]'), 900);
     await expect(chica()).toHaveAttribute("style", /scale\(4\)/);
     await editor.locator('[data-testid="layers-preview"]').focus();
     await admin.keyboard.press("ArrowRight");
@@ -99,7 +100,7 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     const editor = await openEditor(admin, setId, "002");
     await editor.getByRole("tab", { name: "Propio de esta carta" }).click();
     await admin.setInputFiles('[data-testid="layers-background-upload"]', path.join(YUKI, "yuki_1_fondo.webp"));
-    await expect(editor.locator('[data-testid="layer-row"]').first()).toContainText("Fondo");
+    await expect(editor.locator('[data-testid="layer-row"]').last()).toContainText("Fondo");
     // El fondo propio sustituye al de la biblioteca: ninguno de la biblioteca queda elegido.
     await editor.getByRole("tab", { name: "Biblioteca de la colección" }).click();
     await expect(editor.locator('[data-testid="layers-background-option"][aria-pressed="true"]')).toHaveCount(0);
@@ -116,7 +117,7 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
 
   await test.step("RF-4: sustituir la chica conserva su encuadre", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
-    await editor.locator('input[data-testid="framing-x"]').fill("12");
+    await setSlider(editor.locator('input[data-testid="framing-x"]'), 12);
     await admin.setInputFiles('[data-testid="layers-replace-character"]', path.join(YUKI, "yuki_3_personaje.webp"));
     await expect(editor.locator('[data-testid="layers-uploads"]')).toContainText("yuki_3_personaje.webp");
     await expect(editor.locator('[data-testid="layers-uploads"]')).not.toContainText("no está recortada");
@@ -146,7 +147,7 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await admin.setInputFiles('[data-testid="layers-import"]', [path.join(YUKI, "..", "yuki.json"), ...files]);
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Configuración importada");
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
-    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Fondo");
+    await expect(editor.locator('[data-testid="layer-row"]').nth(4)).toContainText("Fondo");
     await expect(editor.locator('[data-testid="layer-row"]').nth(2)).toContainText("Chica");
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
@@ -160,7 +161,7 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
     await picker.getByRole("button", { name: "Elegir Insignia de Yuki" }).click();
     await picker.locator('[data-testid="library-picker-add"]').click();
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(rows + 1);
-    await expect(editor.locator('[data-testid="layer-row"]').last()).toContainText("De la biblioteca");
+    await expect(editor.locator('[data-testid="layer-row"]').first()).toContainText("De la biblioteca");
     await editor.locator('[data-testid="library-picker-open"]').click();
     await picker.getByRole("button", { name: "Sellos" }).click();
     await picker.getByRole("button", { name: "Elegir yuki_ssr" }).click();
@@ -173,7 +174,10 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
   await test.step("RF-21: guardar en la biblioteca unas partículas de la carta", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
     await editor.getByRole("button", { name: "Añadir partículas" }).click();
-    await editor.locator('[data-testid="layer-row"]').last().locator('[data-testid="layer-save-to-library"]').click();
+    // Spec 025: las partículas nuevas van justo detrás de la chica; sus ajustes están dentro de su fila abierta.
+    const nuevas = editor.locator('[data-testid="layer-row"]').filter({ hasText: "Chica" }).locator("xpath=following-sibling::li[1]");
+    await nuevas.locator("button[aria-expanded]").click();
+    await nuevas.locator('[data-testid="layer-save-to-library"]').click();
     await admin.fill('[data-testid="save-to-library-name"]', "Destellos de prueba");
     await admin.click('[data-testid="save-to-library-submit"]');
     await expect(admin.locator('[data-testid="save-to-library"]')).toHaveCount(0);

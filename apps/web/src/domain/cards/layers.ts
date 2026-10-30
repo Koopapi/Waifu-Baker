@@ -1,4 +1,4 @@
-// Spec 016: configuración de una carta por capas (formato de carta-capas.js v3) y sus reglas. Puro, sin E/S.
+// Spec 016: configuración de una carta por capas (formato de carta-capas.js v3, ampliado con la v4 en la spec 025) y sus reglas. Puro, sin E/S.
 import { z } from "zod";
 
 /** Lienzo de referencia de todas las capas de imagen (el del creador). */
@@ -14,6 +14,17 @@ export const RATIO_TOLERANCE = 0.01;
 export const MAX_IMAGE_LAYERS = 8;
 
 export const TIERS = ["n", "r", "sr", "ssr", "ur"] as const;
+/** Spec 025, RF-16: además del marco de la rareza, uno personalizado con dos colores o ninguno. */
+export const FRAMES = [...TIERS, "personalizado", "ninguno"] as const;
+export type Frame = (typeof FRAMES)[number];
+/** Spec 025, RF-1: brillo que se pinta solo sobre el dibujo de una capa de imagen (carta-capas.js v4). */
+export const GLOSS_TYPES = ["holo", "destello", "oro", "plata"] as const;
+export type GlossType = (typeof GLOSS_TYPES)[number];
+/** Spec 025, RF-11: grosor del borde del marco, en % del ancho de la carta. */
+export const BORDER_RANGE = { min: 0.8, max: 5 } as const;
+/** Spec 025: valores por defecto del brillo de capa y de la intensidad del holo (los de carta-capas.js v4). */
+export const DEFAULT_GLOSS_INTENSITY = 0.7;
+export const DEFAULT_HOLO_INTENSITY = 0.4;
 export const CORNERS = ["sup-izq", "sup-der", "inf-izq", "inf-der"] as const;
 export const SEAL_STYLES = ["oro", "plata", "arcoiris", "rosa", "azul", "morado"] as const;
 export const PARTICLE_TYPES = ["destellos-dorados", "destellos-arcoiris", "confeti", "burbujas", "bokeh", "corazones", "nieve", "chispas", "petalos"] as const;
@@ -31,6 +42,7 @@ export const isTempKey = (key: string) => /^tmp\/layers\/[0-9a-f-]{36}\.webp$/.t
 export const isSetLayerKey = (setId: string, key: string) => key.startsWith(`sets/${setId}/layers/`) && /\/[0-9a-f]{64}\.webp$/.test(key);
 
 const num = (min: number, max: number) => z.number().finite().min(min).max(max);
+const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 
 /** Spec 017: papel de una capa de imagen en la carta armada. */
 export const LAYER_ROLES = ["personaje", "fondo", "extra"] as const;
@@ -56,6 +68,7 @@ export const imageLayerSchema = z.object({
   mezcla: z.enum(BLEND_MODES).optional(),
   opacidad: num(0, 1).optional(),
   visible: z.boolean().optional(),
+  brillo: z.object({ tipo: z.enum(GLOSS_TYPES), intensidad: num(0, 1).optional() }).optional(),
 });
 
 export const particleLayerSchema = z.object({
@@ -63,7 +76,7 @@ export const particleLayerSchema = z.object({
   cantidad: num(0, 200).optional(),
   tamano: num(0.2, 5).optional(),
   velocidad: num(0.2, 5).optional(),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  color: hexColor.optional(),
   semilla: z.number().int().min(1).max(2_147_483_646).optional(),
   profundidad: num(-3, 3).optional(),
   margen: num(0, 30).optional(),
@@ -89,10 +102,14 @@ export const textSealSchema = z.object({
 
 export const layersConfigSchema = z.object({
   capas: z.array(z.union([imageLayerSchema, particleLayerSchema])).max(40),
-  marco: z.enum(TIERS),
+  marco: z.enum(FRAMES),
+  /** Spec 025, RF-16 y RF-19: los dos colores del marco personalizado, solo en hexadecimal. */
+  marcoColores: z.object({ color: hexColor, brillo: hexColor }).optional(),
   borde: num(0, 8).optional(),
   sello: z.union([imageSealSchema, textSealSchema]).nullable(),
   holo: z.boolean().optional(),
+  /** Spec 025, RF-3: qué tan fuerte se ve el holo de la carta (0 a 1). */
+  holoIntensidad: num(0, 1).optional(),
   /** Spec 017, RF-13: el sistema pone marco, partículas y sello del escalón mientras nadie los toque. */
   estiloAuto: z.boolean().optional(),
 });
@@ -170,6 +187,7 @@ export function checkLayersConfig(input: unknown, previous?: LayersConfig | null
   const parsed = layersConfigSchema.safeParse(input);
   if (!parsed.success) return { ok: false, issue: { code: "invalid_layers", path: parsed.error.issues[0]?.path.join(".") ?? "" } };
   const config = parsed.data;
+  if (config.marco === "personalizado" && !config.marcoColores) return { ok: false, issue: { code: "invalid_layers", path: "marcoColores" } };
   if (imageLayers(config).length > MAX_IMAGE_LAYERS) return { ok: false, issue: { code: "too_many_layers", max: MAX_IMAGE_LAYERS } };
   if (!imageLayers(config).some(isVisible)) return { ok: false, issue: { code: "no_visible_layer" } };
   if (imageLayers(config).filter((l) => l.rol === "personaje").length > 1) return { ok: false, issue: { code: "two_characters" } };

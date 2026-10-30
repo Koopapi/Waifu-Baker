@@ -24,8 +24,9 @@ test("editor de cartas por capas", async ({ browser }) => {
   await test.step("La carta de prueba nace armada: fondo y chica (spec 017)", async () => {
     const editor = await openEditor(admin, setId);
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(2);
-    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Fondo");
-    await expect(editor.locator('[data-testid="layer-row"]').nth(1)).toContainText("Chica");
+    // Spec 025, RF-23: la de adelante arriba.
+    await expect(editor.locator('[data-testid="layer-row"]').nth(0)).toContainText("Chica");
+    await expect(editor.locator('[data-testid="layer-row"]').nth(1)).toContainText("Fondo");
     await expect(editor.locator('[data-testid="layers-character"]')).toBeVisible();
     await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(2);
   });
@@ -49,9 +50,10 @@ test("editor de cartas por capas", async ({ browser }) => {
 
   await test.step("RF-5, RF-6 y RF-9: los ajustes cambian la vista previa al momento", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
-    await editor.locator('[data-testid="layer-row"]').nth(5).getByRole("checkbox", { name: "Visible" }).uncheck();
+    // Spec 025, RF-23: la recién subida queda delante (arriba); el ojo la oculta.
+    await editor.locator('[data-testid="layer-row"]').nth(0).getByRole("button", { name: /^Ocultar/ }).click();
     await expect(editor.locator('[data-testid="layers-preview"] .cc-card img')).toHaveCount(5);
-    await editor.locator('[data-testid="layer-row"]').nth(5).getByRole("button", { name: /^Quitar capa/ }).click();
+    await editor.locator('[data-testid="layer-row"]').nth(0).getByRole("button", { name: /^Quitar capa/ }).click();
     await editor.locator('[data-testid="layers-apply-rarity"]').click();
     // La carta 001 es común (n): marco plateado, sin partículas y con el sello C (spec 022); las cinco capas de imagen siguen.
     await expect(editor.locator('[data-testid="layer-row"]')).toHaveCount(5);
@@ -61,7 +63,7 @@ test("editor de cartas por capas", async ({ browser }) => {
     const editor = admin.locator('[data-testid="layers-editor"]');
     const chica = editor.locator('[data-testid="layer-row"]', { hasText: "Chica" });
     await expect(chica.getByRole("button", { name: /^Quitar capa/ })).toBeDisabled();
-    await expect(chica.getByRole("checkbox", { name: "Visible" })).toBeDisabled();
+    await expect(chica.getByRole("button", { name: /^Ocultar/ })).toBeDisabled();
     await expect(editor.locator('[data-testid="layers-remove"]')).toHaveCount(0);
   });
 
@@ -88,7 +90,8 @@ test("editor de cartas por capas", async ({ browser }) => {
     await a.getByRole("button", { name: "Añadir partículas" }).click();
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="layers-notice"]')).toContainText("Capas guardadas");
-    await b.locator('[data-testid="layer-row"]').nth(2).getByRole("button", { name: /^Quitar capa/ }).click();
+    // Cualquier capa que no sea la chica (la chica no se quita).
+    await b.locator('[data-testid="layer-row"]').filter({ hasNotText: "Chica" }).first().getByRole("button", { name: /^Quitar capa/ }).click();
     await other.click('[data-testid="layers-save"]');
     await expect(other.locator('[data-testid="layers-conflict"]')).toBeVisible();
     await other.click('[data-testid="layers-reload"]');

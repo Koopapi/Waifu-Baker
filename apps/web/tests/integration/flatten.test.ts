@@ -73,4 +73,33 @@ describe("spec 018 — imagen fija", () => {
   it("test_s018_rf4_si_falta_una_imagen_no_se_genera", async () => {
     await expect(flattenCard(config, new Map())).rejects.toMatchObject({ code: "flatten_failed" });
   }, SLOW);
+
+  // Spec 025, RF-5: la imagen fija incluye el brillo de capa en reposo, la intensidad del holo y el marco personalizado.
+  it("test_s025_rf2_rf5_el_brillo_de_capa_sale_solo_sobre_la_chica", async () => {
+    const imgs = await images();
+    const glossy: LayersConfig = { ...config, capas: config.capas.map((l) => ("key" in l && l.rol === "personaje" ? { ...l, brillo: { tipo: "holo" as const, intensidad: 1 } } : l)) };
+    const [plain, shiny] = [await flattenCard(config, imgs), await flattenCard(glossy, imgs)];
+    const delta = (a: number[], b: number[]) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+    // Centro: la chica, con brillo. Arriba a la izquierda: solo fondo, igual que antes.
+    expect(delta(await pixel(plain, 700, 991), await pixel(shiny, 700, 991))).toBeGreaterThan(20);
+    expect(delta(await pixel(plain, 250, 400), await pixel(shiny, 250, 400))).toBeLessThan(4);
+  }, SLOW);
+
+  it("test_s025_rf3_rf5_la_intensidad_del_holo_cambia_la_imagen_fija", async () => {
+    const imgs = await images();
+    const [weak, strong] = [await flattenCard({ ...config, holo: true, holoIntensidad: 0 }, imgs), await flattenCard({ ...config, holo: true, holoIntensidad: 1 }, imgs)];
+    expect(await meanDiff(weak, strong)).toBeGreaterThan(3);
+  }, SLOW);
+
+  it("test_s025_rf18_el_marco_personalizado_sale_con_sus_colores_y_sin_marco_no_hay_borde", async () => {
+    const imgs = await images();
+    const green = await flattenCard({ ...config, marco: "personalizado", marcoColores: { color: "#10c040", brillo: "#10c040" } }, imgs);
+    const [r, g, b] = await pixel(green, 12, 991);
+    expect(g).toBeGreaterThan(r + 40);
+    expect(g).toBeGreaterThan(b + 40);
+    // Sin marco, en ese punto se ve el arte (el fondo rojo de prueba), no un borde.
+    const bare = await flattenCard({ ...config, marco: "ninguno" }, imgs);
+    const [r2, g2] = await pixel(bare, 40, 991);
+    expect(r2).toBeGreaterThan(g2);
+  }, SLOW);
 });

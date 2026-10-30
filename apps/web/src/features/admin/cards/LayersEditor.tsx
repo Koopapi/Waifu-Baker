@@ -1,11 +1,15 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   BLEND_MODES,
+  BORDER_RANGE,
   CORNERS,
+  DEFAULT_GLOSS_INTENSITY,
+  DEFAULT_HOLO_INTENSITY,
   framingOf,
+  GLOSS_TYPES,
   imageLayers,
   isImageLayer,
   isImageSeal,
@@ -15,27 +19,40 @@ import {
   SEAL_STYLES,
   setBackground,
   TIERS,
+  type Frame,
   type Framing,
+  type GlossType,
   type ImageLayer,
   type Layer,
   type LayersConfig,
 } from "@/domain/cards/layers";
-import { applyTierStyle, replaceCharacter, settleAutoStyle } from "@/domain/cards/layers-rarity";
+import { applyTierStyle, replaceCharacter, settleAutoStyle, TIER_PRESETS } from "@/domain/cards/layers-rarity";
+import { addParticles, byNaturalName, placeUpload, planUpload, trimBox, layerToSeal, type UploadPlan } from "@/domain/cards/layers-editing";
 import { parseCreatorConfig, withKeys } from "@/domain/cards/layers-io";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import { useT } from "@/i18n/client";
 import { useAdminLayersT } from "@/i18n/admin-layers";
 import { Button, IconButton } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
+import { Card } from "@/ui/content/Card";
+import { LayerList, LayerRow } from "@/ui/content/LayerList";
 import { Tabs } from "@/ui/content/Tabs";
 import { Alert } from "@/ui/feedback/Alert";
 import { Checkbox } from "@/ui/form/Choice";
+import { ChipGroup } from "@/ui/form/ChipGroup";
+import { ColorField } from "@/ui/form/ColorField";
+import { Segmented } from "@/ui/form/Segmented";
 import { Select } from "@/ui/form/Select";
+import { Slider } from "@/ui/form/Slider";
 import { TextField } from "@/ui/form/TextField";
-import { CartaCapas } from "@/ui/game/CartaCapas";
-import { ArrowDown, ArrowUp, Plus, Sparkles, Trash2 } from "@/ui/icons/glyphs";
+import { CartaCapas, type CartaCapasHandle } from "@/ui/game/CartaCapas";
+import { PreviewStage } from "@/ui/game/PreviewStage";
+import cartaCapas from "@/ui/game/carta-capas/carta-capas.js";
+import type { CartaCapasApi } from "@/ui/game/carta-capas/carta-capas";
+import { ArrowDown, ArrowUp, Eye, EyeOff, Plus, Shuffle, Sparkles, X } from "@/ui/icons/glyphs";
 import { useConfirm } from "@/ui/overlay/Confirm";
 import { focusRing } from "@/ui/focus";
+import { cx } from "@/ui/variants";
 import type { CardDTO } from "./types";
 import { LibraryPicker, type LibraryEntry } from "@/features/admin/library/LibraryPicker";
 import { SaveToLibraryDialog, type SaveTarget } from "@/features/admin/library/SaveToLibraryDialog";
@@ -44,16 +61,23 @@ import { kindForLayer, layerFromPreset } from "@/domain/cards/library";
 type Notice = { tone: "success" | "warning" | "danger"; text: string } | null;
 type Upload = { id: number; name: string; status: "uploading" | "ok" | "warning" | "error"; message?: string };
 
+const lib = cartaCapas as unknown as CartaCapasApi;
 const asset = (key: string) => `/api/admin/assets/${key}`;
 const emptyConfig = (card: CardDTO): LayersConfig => ({ capas: [], marco: rarityTier(card.rarity), sello: null });
 const randomSeed = () => 1 + Math.floor(Math.random() * 9_999);
 /** Profundidad y margen de partida de la capa n (0 = fondo): el fondo casi quieto y con margen, el resto delante. */
 const defaultsFor = (n: number) => (n === 0 ? { profundidad: 0.2, margen: 5 } : { profundidad: Math.round((0.7 + n * 0.3) * 100) / 100 });
+const DEFAULT_CUSTOM = { color: "#6d5cff", brillo: "#d7ff3a" };
+const fixed = (v: number) => v.toFixed(2);
+const percent = (v: number) => `${Math.round(v * 100)} %`;
 
 /** Cambia las claves del almacén por enlaces del panel, para la vista previa (spec 017: con el encuadre completo). */
 function previewConfig(c: LayersConfig) {
+  // La intensidad del holo va aparte (`view`): moverla no vuelve a montar la carta.
+  const { holoIntensidad: _holoIntensidad, ...rest } = c;
+  void _holoIntensidad;
   return {
-    ...c,
+    ...rest,
     // Sin la animación de entrada: la vista previa se vuelve a montar con cada cambio.
     aparecer: false,
     capas: c.capas.map((l) => (isImageLayer(l) ? { ...l, encuadre: framingOf(l), src: asset(l.key) } : l)),
@@ -74,20 +98,49 @@ function defaultSelection(c: LayersConfig) {
   return chica >= 0 ? chica : c.capas.findIndex(isImageLayer);
 }
 
-function numberOr(v: string, fallback: number | undefined) {
-  const n = Number(v);
-  return v.trim() === "" || !Number.isFinite(n) ? fallback : n;
+/** Spec 025, RF-13: recorte del sello a su contenido, leyendo su transparencia (imagen del mismo dominio). */
+function measureSeal(key: string): Promise<ReturnType<typeof trimBox>> {
+  return new Promise((ok) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const k = Math.min(1, 1024 / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * k));
+        const h = Math.max(1, Math.round(img.naturalHeight * k));
+        const cv = document.createElement("canvas");
+        cv.width = w;
+        cv.height = h;
+        const cx2 = cv.getContext("2d");
+        if (!cx2) return ok(null);
+        cx2.drawImage(img, 0, 0, w, h);
+        const d = cx2.getImageData(0, 0, w, h).data;
+        ok(trimBox((i) => d[i * 4 + 3], w, h));
+      } catch {
+        ok(null);
+      }
+    };
+    img.onerror = () => ok(null);
+    img.src = asset(key);
+  });
+}
+
+/** Muestra de cada marco para las fichas de rareza (los degradados de carta-capas.js). */
+function frameSwatch(f: Frame, custom: LayersConfig["marcoColores"]) {
+  if (f === "ninguno") return "transparent";
+  if (f === "personalizado") return lib.marcoPersonalizado(custom ?? DEFAULT_CUSTOM)?.[0] ?? "transparent";
+  return lib.marcos[f]?.[0] ?? "transparent";
 }
 
 /**
- * Spec 016, RF-3 y RF-5 a RF-18: editor de la carta por capas dentro del editor de carta del panel (estilo actual del panel;
- * solo la vista previa va sobre fondo oscuro). Las imágenes se suben al área temporal y nada cambia en la carta hasta
- * «Guardar capas». Spec 017: la chica (sustituir, no quitar), el fondo (biblioteca o propio), el encuadre de cada capa
- * (arrastrando, con números o con el teclado) y el estilo automático.
+ * Spec 016, 017 y 025: editor de la carta por capas dentro del editor de carta del panel, con la distribución y los
+ * controles del configurador de Bruno (spec 025, RF-21 a RF-26): vista previa grande en escena oscura con sus ajustes
+ * debajo; a la derecha la chica, el fondo, el encuadre, la lista de capas (la de adelante arriba), la rareza y el
+ * sello. Las imágenes se suben al área temporal y nada cambia en la carta hasta «Guardar capas».
  */
 export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; library?: LibraryEntry[]; onSaved: (version: number) => void }) {
   const tt = useT();
   const t = useAdminLayersT();
+  const v4 = t.v4;
   const confirm = useConfirm();
   const router = useRouter();
   const [saved, setSaved] = useState<LayersConfig | null>(card.layers);
@@ -98,8 +151,15 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
   const [conflict, setConflict] = useState(false);
   const [busy, setBusy] = useState(false);
   const zone = useRef<HTMLDivElement>(null);
+  const live = useRef<CartaCapasHandle>(null);
   const seq = useRef(0);
   const [selected, setSelected] = useState(() => defaultSelection(card.layers ?? emptyConfig(card)));
+  const [openRow, setOpenRow] = useState(-1);
+  // Spec 025, RF-8 y RF-10: ajustes de la vista previa (no se guardan).
+  const [depth, setDepth] = useState(14);
+  const [tilt, setTilt] = useState(14);
+  const [holoPreview, setHoloPreview] = useState(false);
+  const [autoMove, setAutoMove] = useState(true);
   // Spec 017 (ampliación): biblioteca general de elementos.
   const [pickerOpen, setPickerOpen] = useState(false);
   const [saveTarget, setSaveTarget] = useState<SaveTarget | null>(null);
@@ -109,7 +169,14 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
   const cardLabel = card.name || `#${String(card.number).padStart(3, "0")}`;
   const drag = useRef<{ x0: number; y0: number; width: number; start: Framing; next: Framing; img: HTMLImageElement | null } | null>(null);
 
-  const preview = useMemo(() => (imageLayers(draft).some(isVisible) ? previewConfig(draft) : null), [draft]);
+  // La vista previa solo se vuelve a montar si cambia algo distinto de la intensidad del holo.
+  const { holoIntensidad: _hi, ...shape } = draft;
+  void _hi;
+  const shapeKey = JSON.stringify(shape);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const preview = useMemo(() => (imageLayers(draft).some(isVisible) ? previewConfig(draft) : null), [shapeKey]);
+  const holoIntensity = draft.holoIntensidad ?? DEFAULT_HOLO_INTENSITY;
+  const view = useMemo(() => ({ profundidad: depth, inclinacion: tilt, reposo: autoMove, holoIntensidad: holoIntensity }), [depth, tilt, autoMove, holoIntensity]);
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved ?? emptyConfig(card));
   const tier = rarityTier(card.rarity);
   // Spec 017, RF-13 y RF-14: el mismo criterio que aplica el servidor al guardar.
@@ -118,16 +185,24 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
   const backgroundLayer = imageLayers(draft).find((l) => l.rol === "fondo");
   const sel = isImageLayer(draft.capas[selected] ?? { particulas: "nieve" }) ? selected : defaultSelection(draft);
   const selLayer = sel >= 0 ? (draft.capas[sel] as ImageLayer) : null;
+  const holoShown = holoPreview || Boolean(draft.holo);
 
   const update = (fn: (c: LayersConfig) => LayersConfig) => setDraft((c) => fn(c));
   const setLayer = (i: number, patch: Partial<Layer>) => update((c) => ({ ...c, capas: c.capas.map((l, j) => (j === i ? ({ ...l, ...patch } as Layer) : l)) }));
-  const move = (i: number, to: number) =>
+  const move = (i: number, to: number) => {
     update((c) => {
       const capas = [...c.capas];
       const [l] = capas.splice(i, 1);
       capas.splice(to, 0, l);
       return { ...c, capas };
     });
+    if (openRow === i) setOpenRow(to);
+    if (selected === i) setSelected(to);
+  };
+  const removeLayer = (i: number) => {
+    update((c) => ({ ...c, capas: c.capas.filter((_, j) => j !== i) }));
+    setOpenRow(-1);
+  };
 
   /** Spec 017, RF-10 y RF-11: cambia el encuadre de la capa i, dentro de sus límites. */
   const setFraming = (i: number, patch: Partial<Framing>) =>
@@ -137,6 +212,12 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
       const encuadre = boundFraming({ ...framingOf(l), ...patch });
       return { ...c, capas: c.capas.map((x, j) => (j === i ? { ...l, encuadre } : x)) };
     });
+
+  // Abrir la fila de una imagen la elige también para encuadrarla.
+  function toggleRow(i: number, open: boolean) {
+    setOpenRow(open ? i : -1);
+    if (open && isImageLayer(draft.capas[i])) setSelected(i);
+  }
 
   /** La imagen que dibuja la capa i en la vista previa (las capas ocultas no se dibujan). */
   function renderedImage(i: number) {
@@ -214,6 +295,19 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
     return body.key as string;
   }
 
+  /** Spec 025, RF-13: pone el sello de imagen y, si trae mucho espacio transparente, lo recorta a su contenido. */
+  async function trimSeal(key: string) {
+    const box = await measureSeal(key);
+    update((c) => {
+      if (!isImageSeal(c.sello) || c.sello.key !== key) return c;
+      const { recorte: _r, relacion: _q, ...rest } = c.sello;
+      void _r;
+      void _q;
+      return { ...c, sello: box ? { ...rest, ...box } : rest };
+    });
+    if (box) setNotice({ tone: "success", text: v4.sealCropped });
+  }
+
   // Spec 017, RF-4: la chica nueva ocupa su capa con el mismo encuadre.
   async function replaceGirl(files: FileList | null) {
     const file = files?.[0];
@@ -225,17 +319,21 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
 
   /** Spec 017 (ampliación), RF-8: lo elegido en «Añadir de la biblioteca» (adornos y partículas se suman; fondo y sello se ponen). */
   function addFromLibrary(picked: LibraryEntry[]) {
+    let sealKey: string | null = null;
     update((c) => {
       let next = c;
       let n = imageLayers(c).length;
       for (const item of picked) {
         if (item.kind === "fondo" && item.key) next = setBackground(next, item.key);
-        else if (item.kind === "sello" && item.key) next = { ...next, sello: { key: item.key, esquina: next.sello?.esquina ?? "sup-izq", tamano: 36 } };
-        else if (item.kind === "adorno" && item.key) next = { ...next, capas: [...next.capas, { key: item.key, rol: "extra", ...defaultsFor(n++) }] };
+        else if (item.kind === "sello" && item.key) {
+          next = { ...next, sello: { key: item.key, esquina: next.sello?.esquina ?? "sup-izq", tamano: 36 } };
+          sealKey = item.key;
+        } else if (item.kind === "adorno" && item.key) next = { ...next, capas: [...next.capas, { key: item.key, rol: "extra", ...defaultsFor(n++) }] };
         else if (item.kind === "particulas" && item.particles) next = { ...next, capas: [...next.capas, layerFromPreset(item.particles, randomSeed())] };
       }
       return next;
     });
+    if (sealKey) void trimSeal(sealKey);
   }
 
   // Spec 017, RF-8: un fondo propio de esta carta (las reglas de las capas, RF-7).
@@ -247,23 +345,38 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
     if (key) update((c) => setBackground(c, key));
   }
 
-  // RF-6: varias capas a la vez; cada una se acepta o se rechaza con su motivo (RF-31) y se añaden en orden.
-  async function addLayers(files: FileList | null) {
-    if (!files?.length) return;
+  /**
+   * RF-6 y spec 025, RF-20: varias capas a la vez, ordenadas por nombre; el nombre propone su papel (fondo, chica,
+   * brillo, sello…). Cada una se acepta o se rechaza con su motivo y se ponen en su sitio.
+   */
+  async function addLayers(files: FileList | File[] | null) {
+    const list = [...(files ?? [])].filter((f) => /^image\//.test(f.type)).sort((a, b) => byNaturalName(a.name, b.name));
+    if (!list.length) return;
     setUploads([]);
-    const keys = await Promise.all([...files].map((f) => uploadOne(f, "layer")));
-    update((c) => {
-      let n = imageLayers(c).length;
-      const added = keys.filter((k): k is string => Boolean(k)).map((key) => ({ key, rol: "extra" as const, ...defaultsFor(n++) }));
-      return { ...c, capas: [...c.capas, ...added] };
+    // El papel de cada archivo depende de los anteriores (p. ej. solo el primer «sello» es el sello).
+    let sim = draft;
+    const plans: UploadPlan[] = list.map((f) => {
+      const plan = planUpload(f.name, sim);
+      sim = placeUpload(sim, `sim:${f.name}`, plan);
+      return plan;
     });
+    const keys = await Promise.all(list.map((f, i) => uploadOne(f, plans[i].kind === "seal" ? "seal" : plans[i].kind === "character" ? "character" : "layer")));
+    let sealKey: string | null = null;
+    update((c) => keys.reduce<LayersConfig>((acc, key, i) => (key ? placeUpload(acc, key, plans[i]) : acc), c));
+    keys.forEach((key, i) => {
+      if (key && plans[i].kind === "seal") sealKey = key;
+    });
+    if (sealKey) void trimSeal(sealKey);
   }
 
   async function setSealImage(files: FileList | null) {
     const file = files?.[0];
     if (!file) return;
     const key = await uploadOne(file, "seal");
-    if (key) update((c) => ({ ...c, sello: { key, esquina: c.sello?.esquina ?? "sup-izq", tamano: 36 } }));
+    if (key) {
+      update((c) => ({ ...c, sello: { key, esquina: c.sello?.esquina ?? "sup-izq", tamano: 36 } }));
+      void trimSeal(key);
+    }
   }
 
   /**
@@ -300,6 +413,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
     const next: LayersConfig = { ...withKeys(parsed.config, keys), estiloAuto: false };
     setDraft(next);
     setSelected(defaultSelection(next));
+    setOpenRow(-1);
     setNotice(parsed.changedBlends.length ? { tone: "warning", text: t.io.blends(parsed.changedBlends.join(", ")) } : { tone: "success", text: t.io.done });
   }
 
@@ -354,6 +468,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
     onSaved(body.version);
     setConflict(false);
     setUploads([]);
+    setOpenRow(-1);
   }
 
   async function forceSave() {
@@ -364,14 +479,107 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
     if (await confirm({ title: t.removeAll, body: t.confirmRemoveAll, confirmLabel: t.removeAll, tone: "danger" })) await send("DELETE");
   }
 
-  /** Nombre de una capa de imagen en el selector del encuadre: Chica, Fondo o Imagen n. */
-  function roleLabel(l: ImageLayer, i: number) {
+  // Spec 025, RF-9: oculta el sello y lo hace entrar con su animación y el destello.
+  const reveal = useRef<number | undefined>(undefined);
+  function testReveal() {
+    live.current?.ocultarSello();
+    window.clearTimeout(reveal.current);
+    reveal.current = window.setTimeout(() => live.current?.entrar(), 350);
+  }
+  useEffect(() => () => window.clearTimeout(reveal.current), []);
+
+  /** Nombre de una capa: Chica, Fondo, Imagen n o el tipo de partículas. */
+  function labelOf(l: Layer, i: number) {
+    if (!isImageLayer(l)) return v4.particleNames[l.particulas];
     if (l.rol === "personaje" || l.rol === "fondo") return t.roles[l.rol];
     return t.layerImage(draft.capas.slice(0, i + 1).filter((x) => isImageLayer(x) && x.rol !== "personaje" && x.rol !== "fondo").length);
   }
 
   const sealKind = !draft.sello ? "none" : isImageSeal(draft.sello) ? "image" : "text";
-  let imageN = 0;
+  const blendOptions = BLEND_MODES.map((m) => ({ value: m, label: v4.blendNames[m] }));
+  const frameOptions = [
+    ...TIERS.map((x) => ({ value: x, label: TIER_PRESETS[x].seal?.texto ?? x.toUpperCase(), swatch: frameSwatch(x, draft.marcoColores) })),
+    { value: "personalizado", label: v4.rarity.custom, swatch: frameSwatch("personalizado", draft.marcoColores) },
+    { value: "ninguno", label: v4.rarity.none, swatch: frameSwatch("ninguno", draft.marcoColores) },
+  ];
+  const custom = draft.marcoColores ?? DEFAULT_CUSTOM;
+  const borderValue = draft.borde ?? lib.marcos[draft.marco]?.[2] ?? 2.2;
+
+  /** Ajustes de una capa, dentro de su fila abierta (spec 025, RF-24). */
+  function layerSettings(l: Layer, i: number, label: string) {
+    const locked = isImageLayer(l) && l.rol === "personaje";
+    return (
+      <>
+        {!isImageLayer(l) && (
+          <>
+            <Select label={t.particleType} value={l.particulas} onValueChange={(v) => setLayer(i, { particulas: v as (typeof PARTICLE_TYPES)[number] })} options={PARTICLE_TYPES.map((p) => ({ value: p, label: v4.particleNames[p] }))} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Slider label={t.amount} value={l.cantidad ?? 60} min={0} max={200} onValueChange={(v) => setLayer(i, { cantidad: v })} />
+              <Slider label={t.size} value={l.tamano ?? 1} min={0.3} max={2.5} step={0.05} format={fixed} onValueChange={(v) => setLayer(i, { tamano: v })} />
+              <Slider label={t.speed} value={l.velocidad ?? 1} min={0.3} max={3} step={0.05} format={fixed} onValueChange={(v) => setLayer(i, { velocidad: v })} />
+            </div>
+            {/* Spec 025, RF-14 y RF-15: un solo color y otra variación (otra semilla). */}
+            <div className="flex flex-wrap items-center gap-3">
+              <Checkbox label={v4.singleColor} checked={Boolean(l.color)} onCheckedChange={(on) => setLayer(i, { color: on ? (l.color ?? "#ffd36e") : undefined })} data-testid="particles-single-color" />
+              {l.color && <ColorField label={t.color} value={l.color} onValueChange={(c) => setLayer(i, { color: c })} />}
+              <Button size="sm" variant="secondary" icon={<Shuffle className="size-4" aria-hidden />} onClick={() => setLayer(i, { semilla: randomSeed() })} data-testid="particles-reseed">
+                {v4.reseed}
+              </Button>
+            </div>
+          </>
+        )}
+        <Select label={t.blend} value={l.mezcla ?? "normal"} onValueChange={(v) => setLayer(i, { mezcla: v as (typeof BLEND_MODES)[number] })} options={blendOptions} />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Slider label={t.opacity} value={l.opacidad ?? 1} min={0} max={1} step={0.01} format={percent} onValueChange={(v) => setLayer(i, { opacidad: v })} />
+          <Slider label={t.depth} value={l.profundidad ?? 1} min={0} max={2.5} step={0.05} format={fixed} onValueChange={(v) => setLayer(i, { profundidad: v })} />
+        </div>
+        <Slider label={v4.marginLong} value={l.margen ?? 0} min={0} max={15} step={0.5} unit="%" onValueChange={(v) => setLayer(i, { margen: v })} />
+        {isImageLayer(l) && (
+          <>
+            {/* Spec 025, RF-1 y RF-2: brillo solo sobre el dibujo de la capa. */}
+            <Select
+              label={v4.gloss.title}
+              value={l.brillo?.tipo ?? "none"}
+              onValueChange={(v) => setLayer(i, { brillo: v === "none" ? undefined : { tipo: v as GlossType, intensidad: l.brillo?.intensidad ?? DEFAULT_GLOSS_INTENSITY } })}
+              options={[{ value: "none", label: v4.gloss.none }, ...GLOSS_TYPES.map((g) => ({ value: g, label: v4.gloss.types[g] }))]}
+            />
+            {l.brillo && (
+              <Slider label={v4.gloss.intensity} value={l.brillo.intensidad ?? DEFAULT_GLOSS_INTENSITY} min={0} max={1} step={0.01} format={percent} onValueChange={(v) => setLayer(i, { brillo: { ...l.brillo!, intensidad: v } })} data-testid="layer-gloss-intensity" />
+            )}
+          </>
+        )}
+        <div className="flex flex-wrap gap-2">
+          {/* Spec 025, RF-12: una imagen (no la chica) pasa a ser el sello. */}
+          {isImageLayer(l) && !locked && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {
+                update((c) => layerToSeal(c, i));
+                setOpenRow(-1);
+                setNotice({ tone: "success", text: v4.usedAsSeal });
+                void trimSeal(l.key);
+              }}
+              data-testid="layer-use-as-seal"
+            >
+              {v4.useAsSeal}
+            </Button>
+          )}
+          {/* Spec 017 (ampliación), RF-21: lo propio de la carta se puede guardar en la biblioteca (la chica no). */}
+          {(isImageLayer(l) ? kindForLayer(l) && !libraryKeys.has(l.key) : true) && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setSaveTarget(isImageLayer(l) ? { kind: kindForLayer(l)!, key: l.key, name: `${label} · ${cardLabel}` } : { kind: "particulas", particles: l, name: `${l.particulas} · ${cardLabel}` })}
+              data-testid="layer-save-to-library"
+            >
+              {t.pick.save}
+            </Button>
+          )}
+        </div>
+      </>
+    );
+  }
 
   return (
     <section className="space-y-4 border-t border-ui-line pt-5" data-testid="layers-editor" aria-labelledby={`layers-${card.id}`}>
@@ -382,13 +590,13 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
         <p className="text-sm text-ui-text-2">{t.intro}</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[260px_1fr]">
-        {/* RF-4, RF-5, RF-14: vista previa en vivo sobre fondo oscuro; el ratón se escucha en todo el recuadro. */}
-        {/* La vista previa acompaña al bajar por las secciones del editor. */}
-        <div className="space-y-2 self-start md:sticky md:top-0">
-          <div
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)]">
+        {/* Spec 025, RF-21: vista previa grande en escena oscura y, debajo, sus ajustes. Acompaña al bajar. */}
+        <div className="min-w-0 space-y-3 self-start lg:sticky lg:top-0">
+          <PreviewStage
             ref={zone}
-            className={`grid min-h-[360px] touch-none place-items-center rounded-l bg-ui-rail px-7 pb-6 pt-9 ${focusRing}`}
+            className={cx("min-h-[420px]", focusRing)}
+            hint={v4.stageHint}
             aria-label={t.previewLabel}
             aria-describedby={`framing-hint-${card.id}`}
             tabIndex={0}
@@ -399,9 +607,40 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
             onPointerCancel={onPointerUp}
             onKeyDownCapture={onKeyDown}
           >
-            {preview ? <CartaCapas tier={tier} image={card.midUrl ?? ""} config={preview} label={card.name || t.previewLabel} zone={zone} className="w-full" /> : <p className="px-2 text-center text-sm text-ui-text-3">{t.empty}</p>}
-          </div>
-          <p className="text-xs text-ui-text-3">{t.previewHint}</p>
+            {preview ? (
+              <CartaCapas ref={live} tier={tier} image={card.midUrl ?? ""} config={preview} holo={holoPreview} view={view} label={card.name || t.previewLabel} zone={zone} className="w-full max-w-[300px]" />
+            ) : (
+              <p className="px-2 text-center text-sm text-ui-text-3">{t.empty}</p>
+            )}
+          </PreviewStage>
+
+          {/* Spec 025, RF-8 a RF-10: ajustes de la vista previa (no se guardan) y la intensidad del holo (se guarda). */}
+          <Card className="space-y-4" data-testid="layers-preview-controls">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Slider label={v4.preview.depth} value={depth} min={0} max={30} unit=" px" onValueChange={setDepth} data-testid="preview-depth" />
+              <Slider label={v4.preview.tilt} value={tilt} min={0} max={26} unit="°" onValueChange={setTilt} data-testid="preview-tilt" />
+            </div>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Checkbox label={v4.preview.holo} checked={holoShown} disabled={Boolean(draft.holo)} onCheckedChange={setHoloPreview} data-testid="preview-holo" />
+              <Checkbox label={v4.preview.autoMove} checked={autoMove} onCheckedChange={setAutoMove} data-testid="preview-auto-move" />
+              <Button size="sm" variant="secondary" onClick={testReveal} disabled={!preview} data-testid="layers-test-reveal">
+                {v4.preview.reveal}
+              </Button>
+            </div>
+            {holoShown && (
+              <Slider
+                label={v4.preview.holoIntensity}
+                value={holoIntensity}
+                min={0}
+                max={1}
+                step={0.01}
+                format={percent}
+                onValueChange={(v) => update((c) => ({ ...c, holoIntensidad: v }))}
+                data-testid="layers-holo-intensity"
+              />
+            )}
+            <p className="text-xs text-ui-text-3">{v4.preview.note}</p>
+          </Card>
           <p id={`framing-hint-${card.id}`} className="text-xs text-ui-text-3">
             {t.framing.hint}
           </p>
@@ -410,8 +649,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
         <div className="min-w-0 space-y-4">
           {/* Spec 017, RF-4 y RF-5: la chica no se quita; se sustituye conservando el encuadre. */}
           {characterIndex >= 0 && (
-            <div className="space-y-2 rounded-l border border-ui-line bg-ui-nav p-3" data-testid="layers-character">
-              <h4 className="text-sm font-bold text-ui-text">{t.character.title}</h4>
+            <Card title={t.character.title} data-testid="layers-character">
               <div className="flex flex-wrap items-center gap-3">
                 {/* eslint-disable-next-line @next/next/no-img-element -- capa privada servida por la API del panel */}
                 <img src={asset((draft.capas[characterIndex] as ImageLayer).key)} alt="" className="h-16 w-12 shrink-0 rounded-s bg-ui-rail object-contain" />
@@ -421,13 +659,12 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
                   <input type="file" accept="image/png,image/webp" className="sr-only" onChange={(e) => void replaceGirl(e.target.files).finally(() => (e.target.value = ""))} data-testid="layers-replace-character" />
                 </label>
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Spec 017, RF-8: fondo de la biblioteca de la colección o propio de la carta. */}
-          <div className="space-y-2 rounded-l border border-ui-line bg-ui-nav p-3" data-testid="layers-background">
-            <h4 className="text-sm font-bold text-ui-text">{t.background.title}</h4>
-            {!backgroundLayer && <p className="text-xs text-ui-warning-text">{t.background.missing}</p>}
+          <Card title={t.background.title} data-testid="layers-background">
+            {!backgroundLayer && <p className="mb-2 text-xs text-ui-warning-text">{t.background.missing}</p>}
             <Tabs
               label={t.background.title}
               defaultValue={backgroundLayer && !backgrounds.some((b) => b.key === backgroundLayer.key) ? "own" : "library"}
@@ -481,142 +718,195 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
                 },
               ]}
             />
-          </div>
+          </Card>
 
-          {/* Spec 017, RF-10 y RF-11: encuadre de la capa elegida con números; también arrastrando y con el teclado. */}
+          {/* Spec 017, RF-10 y RF-11: encuadre de la capa elegida; también arrastrando y con el teclado. */}
           {selLayer && (
-            <div className="space-y-3 rounded-l border border-ui-line bg-ui-nav p-3" data-testid="layers-framing">
-              <h4 className="text-sm font-bold text-ui-text">{t.framing.title}</h4>
+            <Card title={t.framing.title} className="space-y-4" data-testid="layers-framing">
               <Select
                 label={t.framing.layer}
                 value={String(sel)}
                 onValueChange={(v) => setSelected(Number(v))}
-                options={draft.capas.flatMap((l, i) => (isImageLayer(l) ? [{ value: String(i), label: roleLabel(l, i) }] : []))}
+                options={draft.capas.flatMap((l, i) => (isImageLayer(l) ? [{ value: String(i), label: labelOf(l, i) }] : []))}
               />
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <TextField label={t.framing.x} type="number" step={1} min={-100} max={100} value={framingOf(selLayer).x} onChange={(e) => setFraming(sel, { x: numberOr(e.target.value, 0) })} data-testid="framing-x" />
-                <TextField label={t.framing.y} type="number" step={1} min={-100} max={100} value={framingOf(selLayer).y} onChange={(e) => setFraming(sel, { y: numberOr(e.target.value, 0) })} data-testid="framing-y" />
-                <TextField label={t.framing.scale} type="number" step={5} min={10} max={400} value={Math.round(framingOf(selLayer).escala * 100)} onChange={(e) => setFraming(sel, { escala: (numberOr(e.target.value, 100) ?? 100) / 100 })} data-testid="framing-scale" />
-                <TextField label={t.framing.rotation} type="number" step={1} min={-180} max={180} value={framingOf(selLayer).giro} onChange={(e) => setFraming(sel, { giro: numberOr(e.target.value, 0) })} data-testid="framing-rotation" />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Slider label={t.framing.x} value={framingOf(selLayer).x} min={-100} max={100} unit="%" onValueChange={(v) => setFraming(sel, { x: v })} data-testid="framing-x" />
+                <Slider label={t.framing.y} value={framingOf(selLayer).y} min={-100} max={100} unit="%" onValueChange={(v) => setFraming(sel, { y: v })} data-testid="framing-y" />
+                <Slider label={t.framing.scale} value={Math.round(framingOf(selLayer).escala * 100)} min={10} max={400} step={5} unit="%" onValueChange={(v) => setFraming(sel, { escala: v / 100 })} data-testid="framing-scale" />
+                <Slider label={t.framing.rotation} value={framingOf(selLayer).giro} min={-180} max={180} unit="°" onValueChange={(v) => setFraming(sel, { giro: v })} data-testid="framing-rotation" />
               </div>
               <Button size="sm" variant="ghost" onClick={() => update((c) => ({ ...c, capas: c.capas.map((l, j) => (j === sel && isImageLayer(l) ? resetFraming(l) : l)) }))} data-testid="framing-reset">
                 {t.framing.reset}
               </Button>
-            </div>
+            </Card>
           )}
 
           {/* Spec 017, RF-13 y RF-14: estilo automático (sigue a la rareza) o manual. */}
-          <div className="space-y-1 rounded-l border border-ui-line bg-ui-nav p-3" data-testid="layers-style">
+          <Card data-testid="layers-style">
             <div className="flex flex-wrap items-center gap-2">
               <h4 className="text-sm font-bold text-ui-text">{t.style.title}</h4>
               <Badge tone={autoStyle ? "success" : "neutral"}>{autoStyle ? t.style.auto(card.rarity ? tt.common.rarity[card.rarity] : "—", tier.toUpperCase()) : t.style.manual}</Badge>
             </div>
-            <p className="text-xs text-ui-text-3">{autoStyle ? t.style.autoNote : t.style.manualNote}</p>
-          </div>
+            <p className="mt-1 text-xs text-ui-text-3">{autoStyle ? t.style.autoNote : t.style.manualNote}</p>
+          </Card>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-ui-hover px-4 py-2 text-sm font-semibold text-ui-text hover:bg-ui-line">
-              <Plus className="size-4" aria-hidden />
-              {t.upload}
+          {/* Spec 025, RF-23 y RF-24: la lista de capas del configurador. */}
+          <Card title={v4.layersTitle} aside={<span className="text-xs font-extrabold uppercase italic tracking-wide text-ui-accent-text">{draft.capas.length ? v4.layersCount(draft.capas.length) : ""}</span>} className="space-y-3">
+            <label
+              className={cx("block cursor-pointer rounded-m border-2 border-dashed border-ui-line px-4 py-5 text-center transition-colors hover:border-ui-accent", focusRing)}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                void addLayers(e.dataTransfer.files);
+              }}
+            >
+              <span className="block text-sm font-extrabold uppercase italic tracking-wide text-ui-text">{v4.dropTitle}</span>
+              <span className="mt-1 block text-xs text-ui-text-3">{v4.dropHint}</span>
               <input type="file" multiple accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void addLayers(e.target.files).finally(() => (e.target.value = ""))} data-testid="layers-upload" />
             </label>
-            <Button size="sm" onClick={() => setPickerOpen(true)} data-testid="library-picker-open">
-              {t.pick.open}
-            </Button>
-            <Button size="sm" variant="secondary" icon={<Sparkles className="size-4" aria-hidden />} onClick={() => update((c) => ({ ...c, capas: [...c.capas, { particulas: "destellos-dorados", cantidad: 40, semilla: randomSeed(), profundidad: 0.55, margen: 4 }] }))}>
-              {t.addParticles}
-            </Button>
-            <Button size="sm" variant="secondary" onClick={() => update((c) => ({ ...applyTierStyle(c, tier, randomSeed()), estiloAuto: true }))} data-testid="layers-apply-rarity">
-              {t.applyRarity}
-            </Button>
-          </div>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" onClick={() => setPickerOpen(true)} data-testid="library-picker-open">
+                {t.pick.open}
+              </Button>
+            </div>
 
-          {uploads.length > 0 && (
-            <ul className="space-y-1 text-xs" data-testid="layers-uploads">
-              {uploads.map((u) => (
-                <li key={u.id} className={u.status === "error" ? "text-ui-danger-text" : u.status === "warning" ? "text-ui-warning-text" : "text-ui-text-2"}>
-                  {u.status === "uploading" ? t.uploading(u.name) : (u.message ?? `${u.name} ✓`)}
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {draft.capas.length === 0 ? (
-            <p className="text-sm text-ui-text-3">{t.empty}</p>
-          ) : (
-            // RF-6 a RF-10: de atrás (arriba) hacia adelante (abajo).
-            <ol className="space-y-3" data-testid="layers-list">
-              {draft.capas.map((l, i) => {
-                const label = isImageLayer(l) ? (l.rol === "personaje" || l.rol === "fondo" ? t.roles[l.rol] : t.layerImage(++imageN)) : t.layerParticles(l.particulas);
-                const locked = isImageLayer(l) && l.rol === "personaje";
-                return (
-                  <li key={i} className="space-y-3 rounded-l border border-ui-line bg-ui-nav p-3" data-testid="layer-row">
-                    <div className="flex flex-wrap items-center gap-3">
-                      {isImageLayer(l) ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- capa privada servida por la API del panel
-                        <img src={asset(l.key)} alt="" className="h-14 w-10 shrink-0 rounded-s bg-ui-rail object-cover" />
-                      ) : (
-                        <span aria-hidden className="grid h-14 w-10 shrink-0 place-items-center rounded-s bg-ui-rail">
-                          <Sparkles className="size-4 text-ui-text-3" />
-                        </span>
-                      )}
-                      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-ui-text">
-                        {label}
-                        {isImageLayer(l) && libraryKeys.has(l.key) && <span className="ml-2 text-xs font-normal text-ui-text-3">· {t.pick.fromLibrary}</span>}
-                      </span>
-                      <Checkbox label={t.visible} checked={l.visible !== false} disabled={locked} onCheckedChange={(v) => setLayer(i, { visible: v })} />
-                      <IconButton label={`${t.moveDown} · ${label}`} size="sm" disabled={i === 0} onClick={() => move(i, i - 1)}>
-                        <ArrowUp className="size-4" aria-hidden />
-                      </IconButton>
-                      <IconButton label={`${t.moveUp} · ${label}`} size="sm" disabled={i === draft.capas.length - 1} onClick={() => move(i, i + 1)}>
-                        <ArrowDown className="size-4" aria-hidden />
-                      </IconButton>
-                      <IconButton label={`${t.removeLayer} · ${label}`} size="sm" disabled={locked} title={locked ? t.characterLocked : undefined} onClick={() => update((c) => ({ ...c, capas: c.capas.filter((_, j) => j !== i) }))}>
-                        <Trash2 className="size-4" aria-hidden />
-                      </IconButton>
-                    </div>
-                    {/* Spec 017 (ampliación), RF-21: lo propio de la carta se puede guardar en la biblioteca (la chica no). */}
-                    {(isImageLayer(l) ? kindForLayer(l) && !libraryKeys.has(l.key) : true) && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => setSaveTarget(isImageLayer(l) ? { kind: kindForLayer(l)!, key: l.key, name: `${label} · ${cardLabel}` } : { kind: "particulas", particles: l, name: `${l.particulas} · ${cardLabel}` })}
-                        data-testid="layer-save-to-library"
-                      >
-                        {t.pick.save}
-                      </Button>
-                    )}
-                    <div className="grid gap-3 sm:grid-cols-4">
-                      {!isImageLayer(l) && (
-                        <Select label={t.particleType} value={l.particulas} onValueChange={(v) => setLayer(i, { particulas: v as (typeof PARTICLE_TYPES)[number] })} options={PARTICLE_TYPES.map((p) => ({ value: p, label: p }))} />
-                      )}
-                      <TextField label={t.depth} type="number" step={0.05} min={-3} max={3} value={l.profundidad ?? 1} onChange={(e) => setLayer(i, { profundidad: numberOr(e.target.value, undefined) })} />
-                      <TextField label={t.margin} type="number" step={1} min={0} max={30} value={l.margen ?? 0} onChange={(e) => setLayer(i, { margen: numberOr(e.target.value, undefined) })} />
-                      <Select label={t.blend} value={l.mezcla ?? "normal"} onValueChange={(v) => setLayer(i, { mezcla: v as (typeof BLEND_MODES)[number] })} options={BLEND_MODES.map((m) => ({ value: m, label: m }))} />
-                      <TextField label={t.opacity} type="number" step={0.05} min={0} max={1} value={l.opacidad ?? 1} onChange={(e) => setLayer(i, { opacidad: numberOr(e.target.value, undefined) })} />
-                      {!isImageLayer(l) && (
-                        <>
-                          <TextField label={t.amount} type="number" step={1} min={0} max={200} value={l.cantidad ?? 40} onChange={(e) => setLayer(i, { cantidad: numberOr(e.target.value, undefined) })} />
-                          <TextField label={t.size} type="number" step={0.1} min={0.2} max={5} value={l.tamano ?? 1} onChange={(e) => setLayer(i, { tamano: numberOr(e.target.value, undefined) })} />
-                          <TextField label={t.speed} type="number" step={0.1} min={0.2} max={5} value={l.velocidad ?? 1} onChange={(e) => setLayer(i, { velocidad: numberOr(e.target.value, undefined) })} />
-                          <TextField label={t.color} value={l.color ?? ""} maxLength={7} onChange={(e) => setLayer(i, { color: /^#[0-9a-fA-F]{6}$/.test(e.target.value) ? e.target.value : undefined })} />
-                        </>
-                      )}
-                    </div>
+            {uploads.length > 0 && (
+              <ul className="space-y-1 text-xs" data-testid="layers-uploads">
+                {uploads.map((u) => (
+                  <li key={u.id} className={u.status === "error" ? "text-ui-danger-text" : u.status === "warning" ? "text-ui-warning-text" : "text-ui-text-2"}>
+                    {u.status === "uploading" ? t.uploading(u.name) : (u.message ?? `${u.name} ✓`)}
                   </li>
-                );
-              })}
-            </ol>
-          )}
+                ))}
+              </ul>
+            )}
 
-          {/* RF-11 y RF-12: marco de rareza y sello (texto o imagen) en una esquina. */}
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Select label={t.frame} value={draft.marco} onValueChange={(v) => update((c) => ({ ...c, marco: v as (typeof TIERS)[number] }))} options={TIERS.map((x) => ({ value: x, label: x.toUpperCase() }))} />
-            <Select
-              label={t.seal}
+            <LayerList
+              frontLabel={v4.front}
+              backLabel={v4.back}
+              data-testid="layers-list"
+              action={
+                <Button size="sm" icon={<Sparkles className="size-4" aria-hidden />} onClick={() => update((c) => addParticles(c, randomSeed()))}>
+                  {t.addParticles}
+                </Button>
+              }
+            >
+              {draft.capas.length === 0 && <li className="text-sm text-ui-text-3">{t.empty}</li>}
+              {/* La de adelante arriba: se recorre al revés. */}
+              {draft.capas
+                .map((l, i) => ({ l, i }))
+                .reverse()
+                .map(({ l, i }) => {
+                  const label = labelOf(l, i);
+                  const locked = isImageLayer(l) && l.rol === "personaje";
+                  const shown = l.visible !== false;
+                  const blend = v4.blendNames[l.mezcla ?? "normal"];
+                  return (
+                    <LayerRow
+                      key={i}
+                      data-testid="layer-row"
+                      open={openRow === i}
+                      onOpenChange={(o) => toggleRow(i, o)}
+                      thumb={
+                        isImageLayer(l) ? (
+                          // eslint-disable-next-line @next/next/no-img-element -- capa privada servida por la API del panel
+                          <img src={asset(l.key)} alt="" className="size-full object-contain" />
+                        ) : (
+                          <Sparkles className="size-4 text-ui-k-oro" aria-hidden />
+                        )
+                      }
+                      title={
+                        <>
+                          {label}
+                          {isImageLayer(l) && libraryKeys.has(l.key) && <span className="ml-2 text-xs font-normal text-ui-text-3">· {t.pick.fromLibrary}</span>}
+                        </>
+                      }
+                      subtitle={isImageLayer(l) ? v4.summary(blend, fixed(l.profundidad ?? 1), Boolean(l.brillo)) : v4.particlesSummary(blend, fixed(l.profundidad ?? 1))}
+                      actions={
+                        <>
+                          <IconButton
+                            label={`${shown ? v4.hide : v4.show} · ${label}`}
+                            size="sm"
+                            aria-pressed={!shown}
+                            disabled={locked}
+                            title={locked ? t.characterLocked : undefined}
+                            onClick={() => setLayer(i, { visible: !shown })}
+                            data-testid="layer-visibility"
+                          >
+                            {shown ? <Eye className="size-4" aria-hidden /> : <EyeOff className="size-4" aria-hidden />}
+                          </IconButton>
+                          <IconButton label={`${t.moveUp} · ${label}`} size="sm" disabled={i === draft.capas.length - 1} onClick={() => move(i, i + 1)}>
+                            <ArrowUp className="size-4" aria-hidden />
+                          </IconButton>
+                          <IconButton label={`${t.moveDown} · ${label}`} size="sm" disabled={i === 0} onClick={() => move(i, i - 1)}>
+                            <ArrowDown className="size-4" aria-hidden />
+                          </IconButton>
+                          <IconButton label={`${t.removeLayer} · ${label}`} size="sm" disabled={locked} title={locked ? t.characterLocked : undefined} onClick={() => removeLayer(i)}>
+                            <X className="size-4" aria-hidden />
+                          </IconButton>
+                        </>
+                      }
+                    >
+                      {layerSettings(l, i, label)}
+                    </LayerRow>
+                  );
+                })}
+            </LayerList>
+          </Card>
+
+          {/* Spec 025, RF-11, RF-16 y RF-25: rareza (marco) en fichas, marco personalizado y grosor del borde. */}
+          <Card title={v4.rarity.title} className="space-y-4" data-testid="layers-rarity">
+            <ChipGroup
+              label={v4.rarity.frame}
+              hideLabel
+              value={draft.marco}
+              options={frameOptions}
+              onValueChange={(v) => update((c) => ({ ...c, marco: v as Frame, ...(v === "personalizado" && !c.marcoColores ? { marcoColores: DEFAULT_CUSTOM } : {}) }))}
+              data-testid="layers-frame"
+            />
+            {draft.marco === "personalizado" && (
+              <div className="flex flex-wrap gap-4" data-testid="layers-custom-frame">
+                <ColorField label={v4.rarity.color} value={custom.color} onValueChange={(color) => update((c) => ({ ...c, marcoColores: { ...custom, color } }))} data-testid="frame-color" />
+                <ColorField label={v4.rarity.shine} value={custom.brillo} onValueChange={(brillo) => update((c) => ({ ...c, marcoColores: { ...custom, brillo } }))} data-testid="frame-shine" />
+              </div>
+            )}
+            <div className="space-y-2 rounded-m border-2 border-dashed border-ui-line p-3">
+              <p className="text-xs text-ui-text-2">{v4.rarity.applyHint}</p>
+              <Button size="sm" onClick={() => update((c) => ({ ...applyTierStyle(c, tier, randomSeed()), estiloAuto: true }))} data-testid="layers-apply-rarity">
+                {t.applyRarity}
+              </Button>
+            </div>
+            <Slider
+              label={v4.rarity.border}
+              value={borderValue}
+              min={BORDER_RANGE.min}
+              max={BORDER_RANGE.max}
+              step={0.1}
+              format={(v) => v.toFixed(1)}
+              disabled={draft.marco === "ninguno"}
+              onValueChange={(v) => update((c) => ({ ...c, borde: v }))}
+              data-testid="layers-border"
+            />
+          </Card>
+
+          {/* RF-10 y spec 025, RF-25: sello de texto o de imagen, en una esquina. */}
+          <Card className="space-y-4" data-testid="layers-seal">
+            <Segmented
+              label={v4.seal.title}
               value={sealKind}
               onValueChange={(v) =>
-                update((c) => ({ ...c, sello: v === "none" ? null : v === "text" ? { texto: tier.toUpperCase(), estilo: "oro", esquina: c.sello?.esquina ?? "sup-izq", tamano: 14 } : c.sello && isImageSeal(c.sello) ? c.sello : null }))
+                update((c) => ({
+                  ...c,
+                  sello:
+                    v === "none"
+                      ? null
+                      : v === "text"
+                        ? { ...(TIER_PRESETS[tier].seal ?? { texto: "EX", estilo: "oro" as const, tamano: 14 }), esquina: c.sello?.esquina ?? "sup-izq" }
+                        : c.sello && isImageSeal(c.sello)
+                          ? c.sello
+                          : saved?.sello && isImageSeal(saved.sello)
+                            ? saved.sello
+                            : null,
+                }))
               }
               options={[
                 { value: "none", label: t.sealNone },
@@ -624,61 +914,70 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
                 { value: "image", label: t.sealImage },
               ]}
             />
-            {draft.sello && (
-              <Select label={t.sealCorner} value={draft.sello.esquina} onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, esquina: v as (typeof CORNERS)[number] } } : c))} options={CORNERS.map((x) => ({ value: x, label: t.corners[x] }))} />
+            {draft.sello && !isImageSeal(draft.sello) && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextField label={t.sealTextLabel} value={draft.sello.texto} maxLength={6} onChange={(e) => update((c) => (c.sello && !isImageSeal(c.sello) ? { ...c, sello: { ...c.sello, texto: e.target.value } } : c))} />
+                <Select label={t.sealStyle} value={draft.sello.estilo} onValueChange={(v) => update((c) => (c.sello && !isImageSeal(c.sello) ? { ...c, sello: { ...c.sello, estilo: v as (typeof SEAL_STYLES)[number] } } : c))} options={SEAL_STYLES.map((s) => ({ value: s, label: v4.seal.styles[s] }))} />
+              </div>
             )}
-          </div>
-          {draft.sello && !isImageSeal(draft.sello) && (
-            <div className="grid gap-3 sm:grid-cols-3">
-              <TextField label={t.sealTextLabel} value={draft.sello.texto} maxLength={8} onChange={(e) => update((c) => (c.sello && !isImageSeal(c.sello) ? { ...c, sello: { ...c.sello, texto: e.target.value } } : c))} />
-              <Select label={t.sealStyle} value={draft.sello.estilo} onValueChange={(v) => update((c) => (c.sello && !isImageSeal(c.sello) ? { ...c, sello: { ...c.sello, estilo: v as (typeof SEAL_STYLES)[number] } } : c))} options={SEAL_STYLES.map((s) => ({ value: s, label: s }))} />
-              <TextField label={t.sealSize} type="number" step={1} min={4} max={40} value={draft.sello.tamano ?? 14} onChange={(e) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: numberOr(e.target.value, undefined) } } : c))} />
-            </div>
-          )}
-          {sealKind === "image" && librarySeals.length > 0 && (
-            <div className="space-y-1">
-              <p className="text-xs font-semibold text-ui-text-2">{t.pick.sealLibrary}</p>
-              <ul className="flex flex-wrap gap-2">
-                {librarySeals.map((s) => {
-                  const chosen = isImageSeal(draft.sello) && draft.sello.key === s.key;
-                  return (
-                    <li key={s.key}>
-                      <button
-                        type="button"
-                        aria-pressed={chosen}
-                        aria-label={t.pick.choose(s.name)}
-                        title={s.name}
-                        onClick={() => update((c) => ({ ...c, sello: { key: s.key, esquina: c.sello?.esquina ?? "sup-izq", tamano: isImageSeal(c.sello) ? c.sello.tamano ?? 36 : 36 } }))}
-                        className={`grid h-14 w-20 place-items-center rounded-s border-2 bg-ui-rail p-1 ${chosen ? "border-ui-accent" : "border-transparent hover:border-ui-line"}`}
-                        data-testid="layers-seal-option"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element -- sello privado servido por la API del panel */}
-                        <img src={s.url} alt="" className="max-h-full max-w-full object-contain" />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-          {sealKind === "image" ? (
-            <div className="flex flex-wrap items-center gap-3">
-              {isImageSeal(draft.sello) && (
-                // eslint-disable-next-line @next/next/no-img-element -- sello privado servido por la API del panel
-                <img src={asset(draft.sello.key)} alt="" className="h-12 rounded-s bg-ui-rail object-contain p-1" />
-              )}
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-ui-hover px-4 py-2 text-sm font-semibold text-ui-text hover:bg-ui-line">
-                <Plus className="size-4" aria-hidden />
-                {t.sealUpload}
-                <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void setSealImage(e.target.files).finally(() => (e.target.value = ""))} />
-              </label>
-              {isImageSeal(draft.sello) && !libraryKeys.has(draft.sello.key) && (
-                <Button size="sm" variant="secondary" onClick={() => isImageSeal(draft.sello) && setSaveTarget({ kind: "sello", key: draft.sello.key, name: `${t.seal} · ${cardLabel}` })} data-testid="seal-save-to-library">
-                  {t.pick.save}
-                </Button>
-              )}
-            </div>
-          ) : null}
+            {sealKind === "image" && librarySeals.length > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-ui-text-2">{t.pick.sealLibrary}</p>
+                <ul className="flex flex-wrap gap-2">
+                  {librarySeals.map((s) => {
+                    const chosen = isImageSeal(draft.sello) && draft.sello.key === s.key;
+                    return (
+                      <li key={s.key}>
+                        <button
+                          type="button"
+                          aria-pressed={chosen}
+                          aria-label={t.pick.choose(s.name)}
+                          title={s.name}
+                          onClick={() => {
+                            update((c) => ({ ...c, sello: { key: s.key, esquina: c.sello?.esquina ?? "sup-izq", tamano: isImageSeal(c.sello) ? (c.sello.tamano ?? 36) : 36 } }));
+                            void trimSeal(s.key);
+                          }}
+                          className={`grid h-14 w-20 place-items-center rounded-s border-2 bg-ui-rail p-1 ${chosen ? "border-ui-accent" : "border-transparent hover:border-ui-line"}`}
+                          data-testid="layers-seal-option"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element -- sello privado servido por la API del panel */}
+                          <img src={s.url} alt="" className="max-h-full max-w-full object-contain" />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+            {sealKind === "image" && (
+              <div className="flex flex-wrap items-center gap-3 rounded-m border-2 border-ui-line p-2">
+                {isImageSeal(draft.sello) && (
+                  // eslint-disable-next-line @next/next/no-img-element -- sello privado servido por la API del panel
+                  <img src={asset(draft.sello.key)} alt="" className="h-10 rounded-s bg-ui-rail object-contain p-1" />
+                )}
+                <label className="ml-auto inline-flex cursor-pointer items-center gap-2 rounded-full bg-ui-hover px-4 py-2 text-sm font-semibold text-ui-text hover:bg-ui-line">
+                  <Plus className="size-4" aria-hidden />
+                  {isImageSeal(draft.sello) ? v4.seal.choose : t.sealUpload}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => void setSealImage(e.target.files).finally(() => (e.target.value = ""))} data-testid="layers-seal-upload" />
+                </label>
+                {isImageSeal(draft.sello) && !libraryKeys.has(draft.sello.key) && (
+                  <Button size="sm" variant="secondary" onClick={() => isImageSeal(draft.sello) && setSaveTarget({ kind: "sello", key: draft.sello.key, name: `${t.seal} · ${cardLabel}` })} data-testid="seal-save-to-library">
+                    {t.pick.save}
+                  </Button>
+                )}
+              </div>
+            )}
+            {draft.sello && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Select label={t.sealCorner} value={draft.sello.esquina} onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, esquina: v as (typeof CORNERS)[number] } } : c))} options={CORNERS.map((x) => ({ value: x, label: t.corners[x] }))} />
+                {isImageSeal(draft.sello) ? (
+                  <Slider label={t.sealSize} value={draft.sello.tamano ?? 36} min={10} max={60} unit="%" onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: v } } : c))} data-testid="seal-size" />
+                ) : (
+                  <Slider label={t.sealSize} value={draft.sello.tamano ?? 14} min={8} max={26} onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: v } } : c))} data-testid="seal-size" />
+                )}
+              </div>
+            )}
+          </Card>
 
           {conflict && (
             <div data-testid="layers-conflict">

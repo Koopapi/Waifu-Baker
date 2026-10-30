@@ -42,6 +42,9 @@ export function applyTierStyle(config: LayersConfig, tier: RarityTier, seed: num
 /** Semilla de las partículas que ya tiene la carta (para que el cambio de escalón no las recoloque) o una fija. */
 const particleSeed = (c: LayersConfig) => c.capas.find((l): l is ParticleLayer => !isImageLayer(l))?.semilla ?? 1;
 
+/** Spec 025, RF-17: un marco personalizado o «Sin marco» se conserva al cambiar la rareza. */
+const ownFrame = (c: LayersConfig) => c.marco === "personalizado" || c.marco === "ninguno";
+
 /**
  * Spec 017, RF-13: con el estilo automático, el cambio de rareza pone el estilo completo del escalón nuevo (marco,
  * partículas, sello y holo). Sin él:
@@ -53,9 +56,10 @@ export function retierLayers(config: LayersConfig, tier: RarityTier): { config: 
   if (config.estiloAuto) return { config: applyTierStyle(config, tier, particleSeed(config)), imageSealToReview: false };
   const preset = TIER_PRESETS[tier].seal;
   const seal = config.sello;
-  if (seal && isImageSeal(seal)) return { config: { ...config, marco: tier }, imageSealToReview: true };
+  const marco = ownFrame(config) ? config.marco : tier;
+  if (seal && isImageSeal(seal)) return { config: { ...config, marco }, imageSealToReview: true };
   const sello = seal && preset ? { ...preset, esquina: seal.esquina } : null;
-  return { config: { ...config, marco: tier, sello }, imageSealToReview: false };
+  return { config: { ...config, marco, sello }, imageSealToReview: false };
 }
 
 /** JSON con las claves ordenadas: la base de datos (jsonb) y la validación reordenan las claves de cada objeto. */
@@ -69,7 +73,7 @@ function stableJson(v: unknown): string {
 }
 
 /** Lo que forma el estilo de una carta: marco, sello, holo y partículas (no las capas de imagen ni su orden). */
-const styleOf = (c: LayersConfig) => stableJson([c.marco, c.sello, c.holo ?? false, c.capas.filter((l: Layer) => !isImageLayer(l))]);
+const styleOf = (c: LayersConfig) => stableJson([c.marco, c.marcoColores, c.sello, c.holo ?? false, c.capas.filter((l: Layer) => !isImageLayer(l))]);
 
 /**
  * Spec 017, RF-13 y RF-14: al guardar, si el administrador cambió a mano el marco, las partículas o el sello, la carta
