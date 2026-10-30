@@ -7,4 +7,5 @@
 - [x] T5 Componentes del sistema de diseño y su tabla. RF: 21 a 26.
 - [x] T6 Editor con la distribución del configurador y textos en/es. RF: 8 a 16, 21 a 28.
 - [x] T7 Pruebas unitarias, de integración y E2E (escritorio) en local.
-- [ ] T8 Demo del dueño en local, checklist en teléfono (iPhone y Android) y revisión de Bruno; `validation.md`.
+- [x] T8a Demo del dueño en local (aprobada el 29 oct 2026); `validation.md`.
+- [ ] T8b Checklist en teléfono (iPhone y Android) en el servidor de pruebas y revisión de Bruno.

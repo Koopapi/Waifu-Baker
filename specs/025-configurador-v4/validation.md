@@ -1,7 +1,7 @@
 # Validación — Spec 025
 
-Fecha: 29 oct 2026, en local (rama `spec/025-configurador-v4`, sin subir). Pendiente: demo del dueño, checklist en
-teléfono (iPhone y Android) y revisión de Bruno.
+Fecha: 29 oct 2026, en local (rama `spec/025-configurador-v4`). El dueño probó la demo en local y la aprobó el mismo
+día. Pendiente: checklist en teléfono (iPhone y Android) en el servidor de pruebas y revisión de Bruno.
 
 | RF | Evidencia | Estado |
 |---|---|---|
@@ -19,7 +19,7 @@ teléfono (iPhone y Android) y revisión de Bruno.
 | RF-14, RF-15 | E2E (un solo color, otra variación cambia la posición) | ✅ |
 | RF-16 a RF-19 | `carta-capas.test.ts`, `layers-v4.test.ts`, `flatten.test.ts`; E2E (personalizado, sin marco, se conserva al volver) | ✅ |
 | RF-20 | `layers-editing.test.ts`; E2E (`yuki_ssr` pasa a ser el sello) | ✅ |
-| RF-21 a RF-26 | `configurator.test.tsx`; E2E (columnas, «Adelante»/«Atrás», fila abierta, fichas, 390 px sin scroll); maqueta `maqueta.html` | ✅ (falta aprobación visual del dueño) |
+| RF-21 a RF-26 | `configurator.test.tsx`; E2E (columnas, «Adelante»/«Atrás», fila abierta, fichas, 390 px sin scroll); maqueta `maqueta.html` | ✅ (aprobado por el dueño en la demo) |
 | RF-27 | E2E `card-layers` y `card-assembly` adaptados, en verde | ✅ |
 | RF-28 | E2E `live-cards` (cambio de capas en 18+ publicada queda pendiente), en verde | ✅ |
 | RF-29, RF-30 | `layers-v4.test.ts` (importar y exportar v4, `ex`, degradado personalizado) | ✅ |
