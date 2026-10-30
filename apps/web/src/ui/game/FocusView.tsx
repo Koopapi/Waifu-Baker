@@ -36,7 +36,7 @@ export function FocusView({ label, onClose, className, inline, children }: Focus
   }, [inline, onClose]);
   if (!mounted) return null;
   const view = (
-    <div role="dialog" aria-modal="true" aria-label={label} className={cx("fixed inset-0 z-[var(--z-overlay)] overflow-hidden bg-ui-rail", className)} data-testid="focus-view">
+    <div role="dialog" aria-modal="true" aria-label={label} data-theme="kawaii" className={cx("fixed inset-0 z-[var(--z-overlay)] overflow-hidden bg-ui-rail", className)} data-testid="focus-view">
       {children}
     </div>
   );

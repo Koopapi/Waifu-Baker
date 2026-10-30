@@ -135,6 +135,7 @@ cualquier componente nuevo se añada a esta tabla.
 | Slider | Deslizador con nombre y valor (maqueta HTML de la spec 025, `specs/025-configurador-v4/maqueta.html`; pendiente de pasar a Pencil) |
 | ChipGroup | Fichas de rareza con muestra del marco (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | Segmented | Selector de opciones juntas (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| OptionCards | Tarjetas de opción con miniatura: el selector de tema (maqueta HTML de la spec 026; pendiente de pasar a Pencil) |
 | ColorField | Muestra de color con su valor (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | LayerList | Lista de capas con «Adelante» y «Atrás» (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | LayerRow | Fila de capa cerrada y abierta (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |

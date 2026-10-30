@@ -67,7 +67,7 @@ export function OpenAllBurst({
   const falling = cards.filter((c) => c.pack === torn - 1);
   const left = Math.max(0, packs - torn);
   return (
-    <section className="oa-burst" data-testid="open-all-burst" aria-live="polite">
+    <section className="oa-burst" data-theme="kawaii" data-testid="open-all-burst" aria-live="polite">
       <p className="oa-burst__counter" data-testid="burst-counter">
         {t.burstCounter(Math.min(torn, packs), packs)}
       </p>

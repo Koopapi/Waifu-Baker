@@ -38,7 +38,7 @@ export function SimulateStage({ setId, kind, label, code, name, art }: { setId: 
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
   return createPortal(
-    <div className="fixed inset-0 z-50 overflow-hidden bg-ui-rail" data-testid="simulate-focus">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-ui-rail" data-theme="kawaii" data-testid="simulate-focus">
       <OpeningStage
         draw={draw}
         shell={{ setId, code, name, art, kind, kindLabel }}

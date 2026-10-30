@@ -378,3 +378,79 @@
 [data-theme="street"] .ui-rail-link {
   border: 3px solid #ffffff;
 }
+
+/* Tarjetas de opción (selector de tema). */
+[data-theme="street"] .ui-option-card {
+  border: 3px solid var(--ui-ink);
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+[data-theme="street"] .ui-option-card[data-state="checked"] {
+  border-color: var(--ui-ink);
+  box-shadow: 5px 5px 0 var(--ui-accent);
+  outline: 3px solid var(--ui-ink);
+  outline-offset: 2px;
+}
+[data-theme="street"] .ui-option-card-dot {
+  border: 3px solid var(--ui-ink);
+}
+[data-theme="street"] .ui-option-card-dot > span {
+  background-color: var(--ui-ink);
+}
+[data-theme="street"] .ui-option-card-tag {
+  border: 2px solid var(--ui-ink);
+  border-radius: 0;
+  background-color: var(--ui-k-limon-oscuro);
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+}
+
+/* Reloj circular: aro de tinta y avance en rosa; las cifras en Dela Gothic caben dentro. */
+[data-theme="street"] .ui-ring-track {
+  stroke: var(--ui-ink);
+}
+[data-theme="street"] .ui-ring-value {
+  stroke: var(--ui-accent);
+  stroke-width: 5;
+  stroke-linecap: butt;
+}
+[data-theme="street"] .ui-ring .font-display {
+  font-size: 1rem;
+  font-weight: 400;
+}
+[data-theme="street"] .ui-nav-group {
+  color: var(--ui-accent-text);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+/* La franja de demo cabe en una línea a 390 px. */
+[data-theme="street"] .ui-banner {
+  white-space: nowrap;
+}
+[data-theme="street"] .ui-banner .ui-btn {
+  border-width: 2px;
+  font-size: 11px;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+
+/* Adornos (RF-22): franja índigo arriba del pie y trama de puntos en su extremo derecho, donde no hay texto. */
+[data-theme="street"] .ui-footer {
+  position: relative;
+  border-top: 8px solid var(--ui-k-lavanda);
+}
+@media (min-width: 640px) {
+  [data-theme="street"] .ui-footer::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 16px;
+    bottom: 10px;
+    width: 140px;
+    pointer-events: none;
+    background: radial-gradient(var(--ui-k-limon) 30%, transparent 32%) 0 0 / 14px 14px;
+  }
+}

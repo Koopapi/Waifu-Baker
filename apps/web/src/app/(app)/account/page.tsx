@@ -11,6 +11,8 @@ import { now } from "@/server/clock";
 import { cookieHistory, rewardsSummary } from "@/server/services/rewards";
 import { DeclareAdultForm, DeleteAccountButton } from "@/features/account/AccountForms";
 import { PatronBadge } from "@/features/economy/PatronBadge";
+import { ThemePicker } from "@/features/account/ThemePicker";
+import { requestTheme } from "@/server/auth/request-theme";
 
 /** Spec 001: RF-21 (suscripción), RF-18 a RF-20 (edad) y RF-22 (borrar cuenta). */
 export default async function CuentaPage() {
@@ -20,7 +22,7 @@ export default async function CuentaPage() {
   const t = all.account;
   const tc = all.rewards.cookies;
   const [rw, history, album] = await Promise.all([rewardsSummary(db, user.id, { now: now() }), cookieHistory(db, user.id, 30), getMyAlbum(db, user.id)]);
-  const locale = await getLocale();
+  const [locale, theme] = await Promise.all([getLocale(), requestTheme()]);
   const status = t.statusLabel[s.patronStatus ?? "none"] ?? t.statusLabel.none;
   return (
     <main className="mx-auto max-w-2xl space-y-8 px-4 py-6 md:px-8">
@@ -37,6 +39,11 @@ export default async function CuentaPage() {
           </Alert>
         </div>
       )}
+
+      {/* Spec 026, RF-4: el tema va primero. */}
+      <Card data-testid="account-theme" title={t.theme.title}>
+        <ThemePicker initial={theme} />
+      </Card>
 
       <Card className="space-y-3" data-testid="account-subscription" title={t.subscription}>
         <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm">
