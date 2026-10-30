@@ -1,7 +1,7 @@
 # Spec 026 — Tema Street pop seleccionable
 
-Estado: borrador para aprobación del dueño (29 oct 2026). Se trabaja **en local**; no se sube al servidor de pruebas
-hasta que el dueño lo pida.
+Estado: aprobada por el dueño el 29 oct 2026. Se trabaja **en local**; no se sube al servidor de pruebas hasta que el
+dueño lo pida. Siguiente paso: maquetas en HTML de las pantallas que Bruno no diseñó.
 
 Origen: el tema B «Street pop» del paquete de diseño de Bruno (`docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`,
 `docs/estilo-visual.md` y las pantallas `disenos/b-*.html`). Es referencia: entra solo lo que dice esta spec. El 23 oct
@@ -122,6 +122,6 @@ para todos.
 - Demo en local aprobada por el dueño, recorriendo la web completa en los dos temas en escritorio y teléfono.
 - `validation.md` con la evidencia de cada RF.
 
-## Dudas abiertas
-- [NECESITA ACLARACIÓN: ¿el selector se llama «Tema» y los temas «Kawaii» y «Street pop» en los dos idiomas, o prefieres
-  otros nombres?]
+## Decisiones
+- Nombres: el selector se llama «Tema» («Theme» en inglés) y los temas «Kawaii» y «Street pop» en los dos idiomas
+  (propuesta aprobada con la spec; se pueden cambiar en los diccionarios sin tocar la spec).
