@@ -34,6 +34,7 @@ export const errors: Record<string, Msg> = {
   choose_set: "Choose a set.",
   set_not_claimable: "That set isn't free: pick another one.",
   invalid_min_age: "The minimum age can only be 16 or 18.",
+  invalid_theme: "That theme does not exist.",
   album_hidden: "Your album is hidden: change the alias and request a review.",
   invalid_moderation_reason: "Choose a reason from the list.",
   note_too_long: (p: MsgParams) => `The note can be at most ${p.max} characters long.`,

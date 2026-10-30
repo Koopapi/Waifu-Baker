@@ -1,6 +1,6 @@
 # Plan — Spec 026: tema Street pop seleccionable
 
-Estado: borrador. Pendiente de que el dueño apruebe las maquetas (`maqueta.html`); hasta entonces no se escribe código.
+Estado: maquetas aprobadas por el dueño el 29 oct 2026.
 Todo en local, en la rama `spec/026-tema-street-pop` (sale de la 025, porque los componentes del configurador también
 llevan el tema).
 

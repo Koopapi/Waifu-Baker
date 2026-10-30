@@ -34,6 +34,7 @@ export const errors: Record<string, Msg> = {
   choose_set: "Elige una colección.",
   set_not_claimable: "Esa colección no es gratuita: elige otra.",
   invalid_min_age: "La edad mínima solo puede ser 16 o 18 años.",
+  invalid_theme: "Ese tema no existe.",
   album_hidden: "Tu álbum está oculto: cambia el alias y pide una revisión.",
   invalid_moderation_reason: "Elige un motivo de la lista.",
   note_too_long: (p) => `La nota puede tener como mucho ${p.max} caracteres.`,

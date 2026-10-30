@@ -1,7 +1,7 @@
 # Tareas — Spec 026
 
 - [x] T0 Spec aprobada y maquetas en HTML (`maqueta.html`).
-- [ ] T0b Aprobación de las maquetas por el dueño.
+- [x] T0b Aprobación de las maquetas por el dueño (29 oct 2026).
 - [ ] T1 Dominio y datos: `domain/ui/theme.ts`, migración `0019_tema.sql`, purga. RF-1 a RF-3, RF-6. Tests de unidad
   e integración.
 - [ ] T2 Servidor: `getThemeFor`/`setTheme`, `<html data-theme>` en la plantilla raíz, `generateViewport` y acción
