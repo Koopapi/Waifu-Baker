@@ -77,10 +77,16 @@ describe("tema Street pop", () => {
   });
 
   it("test_s026_solo_actua_bajo_el_tema_street", () => {
-    // Cada regla de la hoja empieza por el selector del tema: nada se escapa al kawaii.
-    const selectors = [...street.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/(^|})\s*([^{}@]+)\{/g)].map((m) => m[2].trim());
-    expect(selectors.length).toBeGreaterThan(30);
+    // Las variables empiezan por el selector del tema; la piel de los componentes va en un @scope que empieza en la raíz
+    // Street pop y se detiene en las zonas kawaii (RF-12 y RF-13): nada se escapa al kawaii.
+    const css = street.replace(/\/\*[\s\S]*?\*\//g, "");
+    const at = css.indexOf('@scope ([data-theme="street"]) to ([data-theme="kawaii"]) {');
+    expect(at).toBeGreaterThan(0);
+    const outside = css.slice(0, at);
+    const selectors = [...outside.matchAll(/(^|})\s*([^{}@]+)\{/g)].map((m) => m[2].trim());
+    expect(selectors.length).toBeGreaterThan(2);
     for (const sel of selectors) for (const part of sel.split(",")) expect(part.trim(), sel).toMatch(/^\[data-theme="street"\]/);
+    expect([...css.slice(at).matchAll(/\{/g)].length).toBeGreaterThan(40);
   });
 
   it("test_s026_rf12_una_zona_kawaii_vuelve_a_los_valores_oscuros", () => {
