@@ -5,7 +5,7 @@ import type { Page } from "@playwright/test";
 import { desktopOnly, expect, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
-import { LAB, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
+import { LAB, acceptGate, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
 
 const VIEWPORTS = [
   { name: "escritorio", width: 1360, height: 950 },
@@ -101,6 +101,8 @@ test(`barrido de calidad de todas las páginas (${theme})`, async ({ browser }) 
   if (theme === "street") {
     for (const p of [admin, fan]) {
       await p.goto("/account");
+      // El administrador solo ha usado el panel: la bienvenida (edad y términos) sale al entrar en «Mi cuenta».
+      await acceptGate(p);
       await dismissCelebration(p);
       const saved = p.waitForResponse((r) => r.request().method() === "POST" && new URL(r.url()).pathname === "/account");
       await p.getByRole("radio", { name: /Street pop/ }).click();

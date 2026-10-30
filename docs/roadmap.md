@@ -146,3 +146,8 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   marco» sí; 12 modos de mezcla; lo nuevo de la carta v4 se pasa a nuestra copia. Maquetas en HTML (Pencil sin cupo).
   Hallazgo: desde la 022 el marco de las cartas por capas salía con grosor 0 (corregido en esta spec). Las specs
   siguientes del roadmap corren un número.
+- 29 oct 2026: **spec 026 «tema Street pop seleccionable»** (en local hasta que el dueño pida subirla). Decisiones:
+  cualquier usuario lo elige en «Mi cuenta» y se guarda en su cuenta (sin sesión, kawaii); cambia toda la web y el
+  panel, salvo la mesa de apertura y el escenario de la carta, que siguen oscuros; las cartas y los colores de rareza no
+  cambian; estilo completo de Bruno (bordes de tinta, sombras duras, inclinados, franja y trama); las pegatinas se
+  redibujan. Maquetas en HTML.

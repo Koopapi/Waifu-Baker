@@ -93,6 +93,8 @@
 @scope ([data-theme="street"]) to ([data-theme="kawaii"]) {
   /* Títulos de página (RF-22): Dela Gothic en mayúsculas con la sombra doble rosa y turquesa. */
   main h1 {
+    /* Dela Gothic en mayúsculas es ancha: una palabra larga se corta antes que desbordar en el teléfono. */
+    overflow-wrap: anywhere;
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 0.01em;
@@ -114,6 +116,11 @@
     text-transform: uppercase;
     transform: skewX(-10deg);
     box-shadow: 4px 4px 0 var(--ui-ink);
+    /* Las mayúsculas ocupan más: si el texto no cabe en su columna, parte línea en vez de desbordar. */
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.05;
+    text-align: center;
   }
   .ui-btn:active {
     box-shadow: 1px 1px 0 var(--ui-ink);

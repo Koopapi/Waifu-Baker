@@ -92,6 +92,12 @@ El código vive en `apps/web/src/ui` y el diseño en `Waifu Baker/waifubaker.pen
 componente reutilizable en Pencil con las mismas variantes; el test `src/ui/pencil-map.test.ts` exige que
 cualquier componente nuevo se añada a esta tabla.
 
+**Temas (spec 026).** Kawaii (oscuro) es el de siempre. Street pop (claro, diseño de Bruno) vive en
+`src/ui/themes/street.css`: redefine las variables `ui-*` bajo `[data-theme="street"]` y da la piel de cada componente
+sobre sus clases `ui-*` (`ui-btn`, `ui-card`, `ui-field`…) dentro de un `@scope` que se detiene en las zonas marcadas con
+`data-theme="kawaii"` (mesa de apertura, «Abrir todos», escenario de la carta). Un componente nuevo lleva su clase
+`ui-*` y su regla en esa hoja; el catálogo `/sistema` tiene un interruptor para verlo en los dos temas.
+
 | Componente (código) | Componente en Pencil |
 |---|---|
 | Button | Button/Primary, Button/Secondary, Button/Danger, Button/Success, Button/Ghost (y fila «Estados») |
