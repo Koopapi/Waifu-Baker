@@ -132,6 +132,13 @@ cualquier componente nuevo se añada a esta tabla.
 | CartaCapas | Carta por capas (componente) con los cinco escalones N, R, SR, SSR y UR (lámina «Premios (spec 015) y cartas por capas (spec 016)») |
 | Armado por capas | Editor de la carta (chica, fondo, sello, adornos y partículas de la biblioteca o propios, encuadre, estilo automático, exportar e importar, «Guardar en la biblioteca»), página «Biblioteca» con pestañas por tipo, ventana «Añadir de la biblioteca» y aviso de cartas sin armar (lámina «Armado de cartas por capas (spec 017)») |
 | Cartas por capas en la web | Revelación con la carta viva, ficha con la carta viva y el interruptor «Mover con el teléfono», imágenes fijas con acabado holo, álbum público con marca de agua y revisión 18+ de cambios pendientes (lámina «Cartas por capas en la web (spec 018)») |
+| Slider | Deslizador con nombre y valor (maqueta HTML de la spec 025, `specs/025-configurador-v4/maqueta.html`; pendiente de pasar a Pencil) |
+| ChipGroup | Fichas de rareza con muestra del marco (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| Segmented | Selector de opciones juntas (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| ColorField | Muestra de color con su valor (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| LayerList | Lista de capas con «Adelante» y «Atrás» (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| LayerRow | Fila de capa cerrada y abierta (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
+| PreviewStage | Escena oscura de la vista previa (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | «Abrir todos» dinámico | Ráfaga de sobres con «Saltar», foco en las destacadas con la carta viva y resumen agrupado por rareza con totales (lámina «"Abrir todos" dinámico (spec 019)») |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales

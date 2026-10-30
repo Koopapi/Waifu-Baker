@@ -216,7 +216,7 @@ function CardEditor({
   };
 
   return (
-    <Modal open onOpenChange={(open) => !open && onClose()} size="xl" testId="card-editor" closeLabel={tt.common.close} title={t.cardN(pad(card.number))} description={t.chance(pct(locale, card.chance))}>
+    <Modal open onOpenChange={(open) => !open && onClose()} size="2xl" testId="card-editor" closeLabel={tt.common.close} title={t.cardN(pad(card.number))} description={t.chance(pct(locale, card.chance))}>
       <form action={save} className="grid gap-6 md:grid-cols-[300px_1fr]">
         <div>
           <CardPreview card={card} />

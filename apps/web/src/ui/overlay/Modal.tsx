@@ -7,7 +7,7 @@ import { cx, variants } from "../variants";
 
 const contentClasses = variants({
   base: "ui-modal fixed left-1/2 top-1/2 z-[var(--z-overlay)] max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-ui-line bg-ui-nav p-6 shadow-3",
-  variants: { size: { sm: "max-w-sm", md: "max-w-lg", lg: "max-w-2xl", xl: "max-w-3xl" } },
+  variants: { size: { sm: "max-w-sm", md: "max-w-lg", lg: "max-w-2xl", xl: "max-w-3xl", "2xl": "max-w-6xl" } },
   defaults: { size: "md" },
 });
 
@@ -21,7 +21,8 @@ export interface ModalProps {
   description?: React.ReactNode;
   /** Botones al pie, alineados a la derecha (el principal, el último). */
   footer?: React.ReactNode;
-  size?: "sm" | "md" | "lg" | "xl";
+  /** `2xl`: herramientas anchas, como el editor de cartas por capas (spec 025). */
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
   /** Identificador para las pruebas (por defecto «modal»). */
   testId?: string;
   /** Etiqueta del botón de cerrar (texto traducido). */

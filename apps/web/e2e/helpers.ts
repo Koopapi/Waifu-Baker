@@ -236,3 +236,16 @@ export async function openDeck(page: Page) {
   }
   await expect(page.locator(".summary")).toBeVisible();
 }
+
+/**
+ * Spec 025: mueve un deslizador (o un campo de color) a `value` como lo haría el navegador: el valor pasa por el
+ * setter nativo (React no lo ve como suyo) y se avisa con `input`. El navegador lo acota a su mínimo, máximo y paso.
+ */
+export async function setSlider(input: Locator, value: number | string) {
+  await input.evaluate((el, v) => {
+    const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+    set.call(el, String(v));
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
+}

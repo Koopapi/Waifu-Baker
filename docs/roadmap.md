@@ -139,3 +139,10 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   ahora se copia a `docs/waifu-baker/waifu-baker/abridor-sobres/` como referencia. Entra como **spec 023**, justo después
   de la 022; el aspecto de los sobres plata y gold se define ahí. Renumeración: 024 monedas y recompensas, 025 tiendas,
   026 repetidas, 027 tiers de Patreon, 028 Street pop, 029 publicar, 030 piloto.
+- 29 oct 2026: **spec 025 «configurador de cartas v4»**, pedida por el dueño con el paquete de Bruno
+  (`docs/waifu-baker/configurador-cartas/`). Decisiones: lo visual del configurador (distribución, deslizadores, lista
+  de capas, fichas, selector) como componentes del sistema de diseño con la paleta actual (las fuentes y colores del
+  configurador llegan con Street pop); se quedan los marcos de rareza y los sellos de la 022; marco personalizado y «Sin
+  marco» sí; 12 modos de mezcla; lo nuevo de la carta v4 se pasa a nuestra copia. Maquetas en HTML (Pencil sin cupo).
+  Hallazgo: desde la 022 el marco de las cartas por capas salía con grosor 0 (corregido en esta spec). Las specs
+  siguientes del roadmap corren un número.

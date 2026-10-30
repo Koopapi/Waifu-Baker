@@ -39,6 +39,9 @@ import { Users as PhUsersRound } from "@phosphor-icons/react/dist/ssr/Users";
 import { SpeakerHigh as PhVolume2 } from "@phosphor-icons/react/dist/ssr/SpeakerHigh";
 import { SpeakerSlash as PhVolumeX } from "@phosphor-icons/react/dist/ssr/SpeakerSlash";
 import { X as PhX } from "@phosphor-icons/react/dist/ssr/X";
+import { Eye as PhEye } from "@phosphor-icons/react/dist/ssr/Eye";
+import { EyeSlash as PhEyeOff } from "@phosphor-icons/react/dist/ssr/EyeSlash";
+import { Shuffle as PhShuffle } from "@phosphor-icons/react/dist/ssr/Shuffle";
 
 export interface GlyphProps extends IconProps {
   /** Se acepta por compatibilidad con los iconos anteriores; el grosor lo da el doble tono. */
@@ -92,3 +95,7 @@ export const UsersRound = duotone(PhUsersRound, "UsersRound");
 export const Volume2 = duotone(PhVolume2, "Volume2");
 export const VolumeX = duotone(PhVolumeX, "VolumeX");
 export const X = duotone(PhX, "X");
+// Spec 025: ocultar o mostrar una capa y «Otra variación».
+export const Eye = duotone(PhEye, "Eye");
+export const EyeOff = duotone(PhEyeOff, "EyeOff");
+export const Shuffle = duotone(PhShuffle, "Shuffle");

@@ -12,7 +12,7 @@ import {
   imageSealSchema,
   particleLayerSchema,
   textSealSchema,
-  TIERS,
+  FRAMES,
   type ImageLayer,
   type ImageSeal,
   type LayerRole,
@@ -57,13 +57,47 @@ export function exportCreatorConfig(config: LayersConfig, id: string): { json: R
     const { key, ...rest } = config.sello;
     sello = { src: nameFor(key, () => `${base}_sello.webp`), ...rest };
   }
-  const json: Record<string, unknown> = { id: base, etiqueta: base, marco: config.marco };
+  const json: Record<string, unknown> = { id: base, etiqueta: base, ...exportFrame(config) };
   if (config.borde !== undefined) json.borde = config.borde;
   if (config.holo) json.holo = true;
+  if (config.holo && config.holoIntensidad !== undefined) json.holoIntensidad = config.holoIntensidad;
   json.proporcion = Math.round(CANVAS_RATIO * 10_000) / 10_000;
   json.capas = capas;
   json.sello = sello;
   return { json, files };
+}
+
+/** Spec 025, RF-16: degradado del marco personalizado con la fórmula del configurador (oscuro = el color al 45 %). */
+export function customFrameGradient(color: string, brillo: string) {
+  const rgb = [1, 3, 5].map((i) => parseInt(color.slice(i, i + 2), 16));
+  const dark = `#${rgb.map((v) => Math.round(v * 0.45).toString(16).padStart(2, "0")).join("")}`;
+  return {
+    gradient: `linear-gradient(135deg,${dark} 0%,${brillo} 18%,${color} 34%,#ffffff 48%,${color} 62%,${brillo} 80%,${dark} 100%)`,
+    aura: `rgba(${rgb.join(",")},.25)`,
+  };
+}
+
+/**
+ * Spec 025, RF-30: el marco en el formato del configurador v4: `ex` en vez de `ur`, y el personalizado como su
+ * degradado con su aura (así lo escribe el configurador de Bruno).
+ */
+function exportFrame(c: LayersConfig): Record<string, unknown> {
+  if (c.marco === "ur") return { marco: "ex" };
+  if (c.marco === "personalizado" && c.marcoColores) {
+    const { gradient, aura } = customFrameGradient(c.marcoColores.color, c.marcoColores.brillo);
+    return { marco: gradient, aura };
+  }
+  return { marco: c.marco === "personalizado" ? "ninguno" : c.marco };
+}
+
+const CUSTOM_GRADIENT = /^linear-gradient\(135deg,\s*#[0-9a-f]{6} 0%,\s*(#[0-9a-f]{6}) 18%,\s*(#[0-9a-f]{6}) 34%,\s*#ffffff 48%/i;
+
+/** Spec 025, RF-29: lee el marco del configurador: un escalón (`ex` = `ur`), `ninguno` o el degradado personalizado. */
+function importFrame(marco: unknown): Pick<LayersConfig, "marco" | "marcoColores"> | null {
+  if (marco === "ex") return { marco: "ur" };
+  if ((FRAMES as readonly unknown[]).includes(marco) && marco !== "personalizado") return { marco: marco as LayersConfig["marco"] };
+  const m = typeof marco === "string" ? CUSTOM_GRADIENT.exec(marco) : null;
+  return m ? { marco: "personalizado", marcoColores: { color: m[2].toLowerCase(), brillo: m[1].toLowerCase() } } : null;
 }
 
 export type ImportedImageLayer = Omit<ImageLayer, "key"> & { src: string };
@@ -71,8 +105,10 @@ export type ImportedSeal = (Omit<ImageSeal, "key"> & { src: string }) | TextSeal
 export interface ImportedConfig {
   capas: (ImportedImageLayer | ParticleLayer)[];
   marco: LayersConfig["marco"];
+  marcoColores?: LayersConfig["marcoColores"];
   borde?: number;
   holo?: boolean;
+  holoIntensidad?: number;
   sello: ImportedSeal | null;
 }
 export type ImportKind = "layer" | "character" | "seal";
@@ -100,7 +136,8 @@ function guessRole(name: string, taken: Set<LayerRole>): LayerRole {
  */
 export function parseCreatorConfig(input: unknown): ImportResult {
   if (!isRecord(input)) return { ok: false, path: "" };
-  if (!(TIERS as readonly unknown[]).includes(input.marco)) return { ok: false, path: "marco" };
+  const frame = importFrame(input.marco);
+  if (!frame) return { ok: false, path: "marco" };
   if (!Array.isArray(input.capas)) return { ok: false, path: "capas" };
   if (input.capas.filter((c) => isRecord(c) && "src" in c).length > MAX_IMAGE_LAYERS) return { ok: false, path: "capas", max: MAX_IMAGE_LAYERS };
 
@@ -137,7 +174,15 @@ export function parseCreatorConfig(input: unknown): ImportResult {
   } else if (input.sello != null) return { ok: false, path: "sello" };
 
   const borde = typeof input.borde === "number" && input.borde >= 0 && input.borde <= 8 ? input.borde : undefined;
-  const config: ImportedConfig = { capas, marco: input.marco as LayersConfig["marco"], sello, ...(borde !== undefined ? { borde } : {}), ...(input.holo === true ? { holo: true } : {}) };
+  const holoIntensidad = typeof input.holoIntensidad === "number" && input.holoIntensidad >= 0 && input.holoIntensidad <= 1 ? input.holoIntensidad : undefined;
+  const config: ImportedConfig = {
+    capas,
+    ...frame,
+    sello,
+    ...(borde !== undefined ? { borde } : {}),
+    ...(input.holo === true ? { holo: true } : {}),
+    ...(input.holo === true && holoIntensidad !== undefined ? { holoIntensidad } : {}),
+  };
 
   const files = new Map<string, ImportKind>();
   for (const l of capas) if ("src" in l && !files.has(l.src)) files.set(l.src, l.rol === "personaje" ? "character" : "layer");

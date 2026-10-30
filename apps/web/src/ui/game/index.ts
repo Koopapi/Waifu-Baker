@@ -8,4 +8,5 @@ export { flights, useFlights } from "./flight";
 export { FocusView } from "./FocusView";
 export { SoundToggle } from "./SoundToggle";
 export { RingTimer } from "./RingTimer";
+export { PreviewStage } from "./PreviewStage";
 export { counterAt, splitDuration } from "./time";

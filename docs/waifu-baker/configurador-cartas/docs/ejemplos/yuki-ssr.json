@@ -1,0 +1,14 @@
+{
+  "id": "yuki",
+  "etiqueta": "yuki",
+  "marco": "ssr",
+  "proporcion": 0.706,
+  "capas": [
+    { "src": "cartas/yuki/yuki_1_fondo.webp", "profundidad": 0.2, "margen": 5 },
+    { "particulas": "destellos-dorados", "cantidad": 60, "semilla": 7, "profundidad": 0.55, "margen": 4 },
+    { "src": "cartas/yuki/yuki_3_personaje.webp", "profundidad": 1 },
+    { "src": "cartas/yuki/yuki_4_particulas1.webp", "profundidad": 1.3, "margen": 6, "mezcla": "overlay" },
+    { "src": "cartas/yuki/yuki_5_insignia.webp", "profundidad": 1.6 }
+  ],
+  "sello": { "src": "cartas/yuki/yuki_ssr.webp", "esquina": "sup-izq", "tamano": 36 }
+}

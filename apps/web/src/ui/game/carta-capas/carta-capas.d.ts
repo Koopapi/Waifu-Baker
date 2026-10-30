@@ -1,7 +1,14 @@
-// Tipos de carta-capas.js v3 (paquete de diseño Street pop, docs/waifu-baker/codigo/carta-capas). El script es
+// Tipos de carta-capas.js v4 (paquete de diseño Street pop, docs/waifu-baker/codigo/carta-capas). El script es
 // de terceros y se copia tal cual; si se actualiza, se revisan estos tipos con su LEEME.
 
-export type CartaTier = "n" | "r" | "sr" | "ssr" | "ur";
+export type CartaTier = "n" | "r" | "sr" | "ssr" | "ur" | "ex";
+/** v4: brillo que se pinta solo sobre el dibujo de una capa de imagen. */
+export type TipoBrillo = "holo" | "destello" | "oro" | "plata";
+export interface Brillo {
+  tipo: TipoBrillo;
+  /** 0 a 1 (0,7 por defecto). */
+  intensidad?: number;
+}
 export type Esquina = "sup-izq" | "sup-der" | "inf-izq" | "inf-der";
 
 /** Waifu Baker, spec 017: posición (x, y en %), escala, giro y ajuste de una capa de imagen. */
@@ -21,6 +28,7 @@ export interface CapaImagen {
   mezcla?: string;
   opacidad?: number;
   visible?: boolean;
+  brillo?: Brillo;
 }
 
 export interface CapaParticulas {
@@ -42,11 +50,15 @@ export type Sello = { src: string; esquina?: Esquina; tamano?: number; recorte?:
 export interface CartaConfig {
   capas?: (CapaImagen | CapaParticulas)[];
   /** `'ninguno'` cuando la imagen ya trae su marco (las cartas compuestas con el marco de Pencil). */
-  marco?: CartaTier | "ninguno" | string;
+  marco?: CartaTier | "ninguno" | "personalizado" | string;
+  /** Waifu Baker, spec 025: los dos colores (#rrggbb) del marco personalizado. */
+  marcoColores?: { color: string; brillo: string };
   borde?: number;
   aura?: string | null;
   sello?: Sello | null;
   holo?: boolean;
+  /** v4: 0 a 1 (0,4 por defecto). */
+  holoIntensidad?: number;
   proporcion?: number;
   profundidad?: number;
   inclinacion?: number;
@@ -71,10 +83,16 @@ export interface CartaInstancia {
 
 export interface CartaCapasApi {
   /** Listas cerradas para lo que acaba dentro de `style` o de atributos (la config puede venir de la BD). */
-  seguro: { mezcla(m: unknown): string; esquina(e: unknown): string; color(c: unknown): string | null; encuadre(e: unknown): string };
+  seguro: { mezcla(m: unknown): string; esquina(e: unknown): string; color(c: unknown): string | null; encuadre(e: unknown): string; url(u: unknown): string | null };
   montar(el: HTMLElement, config: CartaConfig): CartaInstancia;
   montarRareza(el: HTMLElement, rareza: CartaTier, imagen: string | (CapaImagen | CapaParticulas)[], extra?: Partial<CartaConfig>): CartaInstancia;
   desdeRareza(rareza: CartaTier, imagen: string | (CapaImagen | CapaParticulas)[], extra?: Partial<CartaConfig>): CartaConfig;
+  /** Marcos de cada escalón: degradado, aura y grosor. */
+  marcos: Record<string, [string, string, number?]>;
+  /** v4: nombres de los brillos por capa. */
+  brillos: Record<TipoBrillo, string>;
+  /** Spec 025: degradado y aura del marco personalizado, o null si los colores no son válidos. */
+  marcoPersonalizado(c: { color?: string; brillo?: string } | null | undefined): [string, string] | null;
   version: number;
 }
 

@@ -1,12 +1,13 @@
 /*!
- * carta-capas.js v3 · Waifu Baker
+ * carta-capas.js v4 · Waifu Baker
  * Carta por capas con parallax, partículas, modos de mezcla, marco de rareza,
  * sello flotante (imagen o texto) y holo opcional. Sin dependencias.
  *
  * Uso:
  *   const carta = CartaCapas.montar(document.querySelector('#carta'), {
  *     etiqueta: 'Yuki, SSR',
- *     marco: 'ssr',                       // 'ur' | 'ssr' | 'sr' | 'r' | 'n' | 'ninguno' | un gradiente CSS
+ *     marco: 'ssr',                       // 'ur' ('ex') | 'ssr' | 'sr' | 'r' | 'n' | 'ninguno' | 'personalizado'
+ *     marcoColores: { color: '#6d5cff', brillo: '#d7ff3a' },   // solo con 'personalizado' (Waifu Baker, spec 025)
  *     borde: 2.2,                         // grosor del marco en % del ancho (sin él, el de su escalón)
  *     capas: [                            // de atrás hacia adelante
  *       { src: 'yuki_1_fondo.webp',       profundidad: 0.2,  margen: 5 },
@@ -28,7 +29,10 @@
  *   carta.listo.then(...);         // promesa: todas las capas cargaron
  *   carta.destruir();
  *
- * Capas de imagen:     { src, profundidad, margen, mezcla, opacidad }
+ * Capas de imagen:     { src, profundidad, margen, mezcla, opacidad, brillo }
+ *   brillo (v4): { tipo: 'holo' | 'destello' | 'oro' | 'plata', intensidad: 0..1 }. El efecto se pinta
+ *   SOLO sobre el dibujo de esa capa (usa la propia imagen como máscara), nunca en la transparencia.
+ * Holo (v4): { holo: true, holoIntensidad: 0..1 } (0.4 por defecto) controla qué tan fuerte se ve el holo de la carta.
  * Capas de partículas: { particulas: '<tipo>', cantidad, tamano, velocidad, color, semilla,
  *                        profundidad, margen, mezcla, opacidad }
  *   Tipos: ver CartaCapas.particulas (destellos-dorados, destellos-arcoiris, confeti, burbujas,
@@ -57,7 +61,7 @@
     r:   ['linear-gradient(135deg,#9fd3ff 0%,#3b82f6 100%)', 'rgba(59,130,246,.22)', 2.9],
     n:   ['linear-gradient(180deg,#c9ced6 0%,#8e949e 100%)', 'rgba(220,225,235,.12)', 1.9]
   };
-  MARCOS.epica = MARCOS.sr; MARCOS.rara = MARCOS.r; MARCOS.comun = MARCOS.n;
+  MARCOS.ex = MARCOS.ur; MARCOS.epica = MARCOS.sr; MARCOS.rara = MARCOS.r; MARCOS.comun = MARCOS.n;
 
   var SELLOS = {
     oro:      ['linear-gradient(180deg,#fffbe0 0%,#f7d774 38%,#c3861c 58%,#fbe39a 100%)', '#2c1a04'],
@@ -120,7 +124,13 @@
     '@keyframes cc-rise{0%{opacity:0;transform:translate(0,0) rotate(0deg)}12%{opacity:1}80%{opacity:.9}100%{opacity:0;transform:translate(var(--sw),-165cqw) rotate(var(--rot))}}',
     '@keyframes cc-pulse{0%,100%{opacity:.12;transform:scale(.85)}50%{opacity:.7;transform:scale(1.1)}}',
     '.cc-holo{position:absolute;inset:0;pointer-events:none;z-index:6;opacity:0;transition:opacity .35s;mix-blend-mode:color-dodge;filter:brightness(.72) saturate(1.15);background:repeating-linear-gradient(115deg,#ff7aa8 0%,#ffd36e 7%,#8af0c4 14%,#6ec8ff 21%,#c79bff 28%,#ff7aa8 35%);background-size:280% 280%;background-position:calc(var(--px)*100%) calc(var(--py)*100%)}',
-    '.cc-card.cc-con-holo .cc-holo{opacity:calc(.2 + var(--hyp)*.42)}',
+    '.cc-card.cc-con-holo .cc-holo{opacity:calc(var(--cc-holo-i,.4) * (.5 + var(--hyp)*1.05))}',
+    '.cc-brillo{position:absolute;inset:0;pointer-events:none;-webkit-mask-size:cover;mask-size:cover;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}',
+    '.cc-brillo-holo{mix-blend-mode:color-dodge;background:repeating-linear-gradient(115deg,#ff7aa8 0%,#ffd36e 7%,#8af0c4 14%,#6ec8ff 21%,#c79bff 28%,#ff7aa8 35%);background-size:280% 280%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:calc(var(--cc-bi,.7) * (.55 + var(--hyp)*.6))}',
+    '.cc-brillo-destello{mix-blend-mode:screen;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.95) 50%,transparent 58%);background-size:320% 100%;background-repeat:no-repeat;animation:cc-destello 3.2s ease-in-out infinite;opacity:var(--cc-bi,.7)}',
+    '@keyframes cc-destello{0%{background-position:100% 0}65%,100%{background-position:0% 0}}',
+    '.cc-brillo-oro{mix-blend-mode:overlay;background:linear-gradient(115deg,#5a3a0a 0%,#ffe9a8 18%,#b8862c 34%,#fff7d6 48%,#a87420 62%,#ffe08a 80%,#5a3a0a 100%);background-size:260% 260%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:var(--cc-bi,.7)}',
+    '.cc-brillo-plata{mix-blend-mode:overlay;background:linear-gradient(115deg,#4a505c 0%,#f2f5fa 18%,#9aa1b0 34%,#ffffff 48%,#8a91a0 62%,#e4e8ef 80%,#4a505c 100%);background-size:260% 260%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:var(--cc-bi,.7)}',
     '.cc-glare{position:absolute;inset:0;pointer-events:none;z-index:7;mix-blend-mode:overlay;background:radial-gradient(farthest-corner circle at calc(var(--px)*100%) calc(var(--py)*100%),rgba(255,255,255,.45) 0%,rgba(255,255,255,.08) 34%,transparent 62%);opacity:calc(.2 + var(--hyp)*.55)}',
     '.cc-sweep{position:absolute;inset:0;pointer-events:none;z-index:7;mix-blend-mode:overlay;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.75) 50%,transparent 65%);transform:translateX(-130%)}',
     '.cc-card.cc-entra .cc-sweep{animation:cc-sweep 1.1s .2s ease-out both}',
@@ -145,16 +155,16 @@
     '.cc-sello.cc-pop > *{animation:cc-pop .75s cubic-bezier(.2,1.6,.4,1) both,cc-bob 3.4s ease-in-out .75s infinite}',
     '@keyframes cc-bob{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-1.8cqw) rotate(-2.5deg)}}',
     '@keyframes cc-pop{0%{opacity:0;transform:scale(.2) rotate(-18deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}',
-    '@media (prefers-reduced-motion:reduce){.ccp{animation:none!important;opacity:.6;transform:none}.cc-sello > *,.cc-sello.cc-pop > *{animation:none;opacity:1;transform:none}.cc-card.cc-entra .cc-sweep{animation:none}}'
+    '@media (prefers-reduced-motion:reduce){.cc-brillo-destello{animation:none;background-position:50% 0}.ccp{animation:none!important;opacity:.6;transform:none}.cc-sello > *,.cc-sello.cc-pop > *{animation:none;opacity:1;transform:none}.cc-card.cc-entra .cc-sweep{animation:none}}'
   ].join('\n');
 
   function inyectarCSS() {
     var prev = document.getElementById('carta-capas-css');
-    if (prev && prev.getAttribute('data-v') === '2') return;
+    if (prev && prev.getAttribute('data-v') === '4') return;
     if (prev) prev.remove();
     var s = document.createElement('style');
     s.id = 'carta-capas-css';
-    s.setAttribute('data-v', '2');
+    s.setAttribute('data-v', '4');
     s.textContent = CSS;
     document.head.appendChild(s);
   }
@@ -178,6 +188,20 @@
   function mezclaSegura(m) { return MEZCLAS.indexOf(m) >= 0 ? m : 'normal'; }
   function esquinaSegura(e) { return ESQUINAS.indexOf(e) >= 0 ? e : 'sup-izq'; }
   function colorSeguro(c) { return typeof c === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(c) ? c : null; }
+  // v4: la imagen de la capa también va dentro de `url()` (máscara del brillo): solo rutas sin comillas, paréntesis,
+  // barras invertidas ni espacios (los enlaces firmados del sitio y las `data:` en base64 las cumplen).
+  function urlSegura(u) { return typeof u === 'string' && /^[^"'()\\\s<>]+$/.test(u) ? u : null; }
+  function intensidad(v, d) { return Math.max(0, Math.min(1, num(v, d))); }
+  var BRILLOS = { holo: 'Holográfico', destello: 'Destello que pasa', oro: 'Metálico dorado', plata: 'Metálico plateado' };
+  // Waifu Baker, spec 025: marco personalizado con dos colores, con la fórmula del configurador de Bruno (oscuro =
+  // el color al 45 %, brillo, color, blanco, color, brillo, oscuro) y aura del color al 25 %.
+  function hexRgb(h) { h = h.slice(1); if (h.length === 3) h = h.replace(/./g, '$&$&'); var n = parseInt(h.slice(0, 6), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function marcoPersonalizado(mc) {
+    var b = mc && colorSeguro(mc.color), l = mc && colorSeguro(mc.brillo);
+    if (!b || !l) return null;
+    var c = hexRgb(b), d = '#' + c.map(function (v) { return ('0' + Math.round(v * .45).toString(16)).slice(-2); }).join('');
+    return ['linear-gradient(135deg,' + d + ' 0%,' + l + ' 18%,' + b + ' 34%,#ffffff 48%,' + b + ' 62%,' + l + ' 80%,' + d + ' 100%)', 'rgba(' + c.join(',') + ',.25)'];
+  }
 
   function particulasHTML(c, semilla) {
     var p = PARTICULAS[c.particulas] || PARTICULAS['destellos-dorados'];
@@ -226,7 +250,13 @@
         return '<div class="cc-capa cc-part" data-p="' + prof + '" style="' + estilo + '">' + particulasHTML(cfg, 7 + id + i) + '</div>';
       }
       if (!c.src) return '';
-      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false" style="' + encuadreEstilo(c.encuadre) + '"></div>';
+      var br = '', b = c.brillo, u = urlSegura(c.src);
+      if (b && BRILLOS.hasOwnProperty(b.tipo) && u) {
+        // La máscara sigue el encuadre de la imagen: va dentro del mismo recuadro transformado.
+        var m = 'url(&quot;' + esc(u) + '&quot;)', aj = c.encuadre && c.encuadre.ajuste === 'contener' ? 'contain' : 'cover';
+        br = '<div class="cc-brillo cc-brillo-' + b.tipo + '" style="--cc-bi:' + intensidad(b.intensidad, .7) + ';-webkit-mask-image:' + m + ';mask-image:' + m + ';-webkit-mask-size:' + aj + ';mask-size:' + aj + ';' + encuadreEstilo(c.encuadre).replace(/object-fit:contain;/, '') + '"></div>';
+      }
+      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false" style="' + encuadreEstilo(c.encuadre) + '">' + br + '</div>';
     }
 
     function selloHTML() {
@@ -257,12 +287,14 @@
       if (sello && selloOculto) sello.classList.add('cc-oculto');
 
       var sin = !op.marco || op.marco === 'ninguno';
-      var m = MARCOS[op.marco] || [op.marco, null];
+      var m = op.marco === 'personalizado' ? marcoPersonalizado(op.marcoColores) || MARCOS.n : MARCOS[op.marco] || [op.marco, null];
       card.classList.toggle('cc-sin-marco', sin);
       card.style.setProperty('--cc-marco', sin ? 'none' : m[0]);
       card.style.setProperty('--cc-aura', op.aura || m[1] || 'rgba(255,255,255,.12)');
-      card.style.setProperty('--cc-borde', num(op.borde, m[2] || 2.2) + 'cqw');
+      // Sin grosor guardado, el de su escalón (`num(null)` daría 0: el marco desaparecía).
+      card.style.setProperty('--cc-borde', (op.borde == null ? m[2] || 2.2 : num(op.borde, m[2] || 2.2)) + 'cqw');
       card.classList.toggle('cc-con-holo', !!op.holo);
+      card.style.setProperty('--cc-holo-i', intensidad(op.holoIntensidad, .4));
 
       if (primera && op.aparecer) {
         card.classList.add('cc-cargando');
@@ -350,7 +382,7 @@
     }
     if (!op.estatica) raf = requestAnimationFrame(cuadro);
 
-    var SIN_REDIBUJO = { holo: 1, profundidad: 1, inclinacion: 1, reposo: 1 };
+    var SIN_REDIBUJO = { holo: 1, holoIntensidad: 1, profundidad: 1, inclinacion: 1, reposo: 1 };
 
     return {
       elemento: card,
@@ -360,7 +392,7 @@
         Object.assign(op, cambios);
         var redibujar = Object.keys(cambios).some(function (k) { return !SIN_REDIBUJO[k]; });
         if (redibujar) render();
-        else card.classList.toggle('cc-con-holo', !!op.holo);
+        else { card.classList.toggle('cc-con-holo', !!op.holo); card.style.setProperty('--cc-holo-i', intensidad(op.holoIntensidad, .4)); }
       },
       ocultarSello: function () {
         selloOculto = true;
@@ -409,7 +441,7 @@
     ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'LEG', estilo: 'oro', tamano: 13 }, holo: false },
     ur:  { marco: 'ur',  particulas: { particulas: 'destellos-arcoiris', cantidad: 65 }, sello: { texto: 'EX', estilo: 'arcoiris', tamano: 14 }, holo: true }
   };
-  PRESETS.comun = PRESETS.n; PRESETS.rara = PRESETS.r; PRESETS.epica = PRESETS.sr;
+  PRESETS.ex = PRESETS.ur; PRESETS.comun = PRESETS.n; PRESETS.rara = PRESETS.r; PRESETS.epica = PRESETS.sr;
 
   function hash(s) {
     s = String(s || ''); var h = 2166136261;
@@ -437,7 +469,7 @@
     return montar(el, desdeRareza(rareza, imagen, extra));
   }
 
-  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro, encuadre: encuadreEstilo }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, version: 3 };
+  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro, encuadre: encuadreEstilo, url: urlSegura }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, brillos: BRILLOS, marcoPersonalizado: marcoPersonalizado, version: 4 };
   global.CartaCapas = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : {});
