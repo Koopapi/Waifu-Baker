@@ -34,7 +34,7 @@ export function ChipGroup({ label, options, hideLabel = false, className, ...res
             key={o.value}
             value={o.value}
             className={cx(
-              "inline-flex items-center gap-2 rounded-m border-2 border-ui-line px-3 py-1.5 text-xs font-extrabold uppercase italic tracking-wide text-ui-text-2 transition-colors duration-[var(--duration-fast)] hover:border-ui-hover hover:text-ui-text",
+              "ui-chip inline-flex items-center gap-2 rounded-m border-2 border-ui-line px-3 py-1.5 text-xs font-extrabold uppercase italic tracking-wide text-ui-text-2 transition-colors duration-[var(--duration-fast)] hover:border-ui-hover hover:text-ui-text",
               "data-[state=checked]:border-ui-accent data-[state=checked]:bg-ui-accent data-[state=checked]:text-ui-on-accent",
               focusRing,
             )}

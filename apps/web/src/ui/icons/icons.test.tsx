@@ -16,8 +16,10 @@ describe("spec 014 — iconos", () => {
       const svg = renderToStaticMarkup(<Sticker name={name} className="size-10" />);
       expect(svg, name).toMatch(/^<svg[^>]*aria-hidden="true"/);
       expect(svg, name).toContain("size-10");
-      expect(svg, name).toContain('stroke="var(--ui-k-blanco)"');
+      // Spec 026: el contorno sale del tema (blanco en kawaii, tinta en Street pop).
+      expect(svg, name).toContain('stroke="var(--ui-k-contorno)"');
     }
+    expect(readFileSync(path.join(__dirname, "..", "tokens.css"), "utf8")).toMatch(/--ui-k-contorno: #ffffff;/);
     expect(renderToStaticMarkup(<Sticker name="cookie" title="Galletas" />)).toContain("<title>Galletas</title>");
     // Un tamaño pedido sustituye al de por defecto (no compiten dos clases size-*).
     expect(renderToStaticMarkup(<Sticker name="cookie" className="size-4" />)).not.toContain("size-10");

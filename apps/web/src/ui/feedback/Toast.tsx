@@ -41,7 +41,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
           <div
             key={i.id}
             role={i.kind === "error" ? "alert" : "status"}
-            className="toast-in pointer-events-auto flex w-full items-start gap-3 rounded-lg border border-ui-line bg-ui-raised px-3.5 py-3 shadow-2"
+            className="toast-in ui-toast pointer-events-auto flex w-full items-start gap-3 rounded-lg border border-ui-line bg-ui-raised px-3.5 py-3 shadow-2"
             data-testid="toast"
             data-kind={i.kind}
           >

@@ -15,7 +15,7 @@ export function Card({ title, aside, interactive, as: As = "section", className,
     <As
       className={cx(
         // Spec 014, RF-2: superficie con degradado sutil, borde luminoso y sombra.
-        "rounded-xl border border-k-lavanda/15 bg-ui-nav bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]",
+        "ui-card rounded-xl border border-k-lavanda/15 bg-ui-nav bg-linear-to-b from-ui-raised to-ui-nav p-5 shadow-[var(--shadow-glow)]",
         interactive && "transition-[border-color,transform] duration-[var(--duration-fast)] hover:-translate-y-0.5 hover:border-k-lavanda/40",
         className,
       )}
@@ -23,7 +23,7 @@ export function Card({ title, aside, interactive, as: As = "section", className,
     >
       {(title || aside) && (
         <div className="mb-3 flex items-baseline justify-between gap-3">
-          {title && <h2 className="text-base font-semibold text-ui-text">{title}</h2>}
+          {title && <h2 className="ui-card-title text-base font-semibold text-ui-text">{title}</h2>}
           {aside && <div className="text-sm text-ui-text-2">{aside}</div>}
         </div>
       )}

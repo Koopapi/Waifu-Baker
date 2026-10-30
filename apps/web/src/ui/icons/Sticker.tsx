@@ -7,8 +7,9 @@ export type StickerName = (typeof STICKERS)[number];
 
 const INK = "var(--ui-k-tinta)";
 const BLUSH = "var(--ui-k-rubor)";
-// El borde blanco va por detrás del relleno (`paintOrder`), así solo se ve hacia fuera, como una pegatina recortada.
-const out = { stroke: "var(--ui-k-blanco)", strokeWidth: 6, strokeLinejoin: "round" as const, paintOrder: "stroke" as const };
+// El borde (blanco en kawaii, tinta en Street pop) va por detrás del relleno (`paintOrder`): solo se ve hacia fuera,
+// como una pegatina recortada.
+const out = { stroke: "var(--ui-k-contorno)", strokeWidth: 6, strokeLinejoin: "round" as const, paintOrder: "stroke" as const };
 const STAR = "M7 0 L9 5 L14 7 L9 9 L7 14 L5 9 L0 7 L5 5 Z";
 const HEART = "M7 12 C1 8 0 5 0 3.5 C0 1.5 1.6 0 3.5 0 C5 0 6.3 0.9 7 2.2 C7.7 0.9 9 0 10.5 0 C12.4 0 14 1.5 14 3.5 C14 5 13 8 7 12 Z";
 

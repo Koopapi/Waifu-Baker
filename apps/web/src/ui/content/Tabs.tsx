@@ -23,7 +23,7 @@ export function Tabs({ label, items, className, ...rest }: TabsProps) {
             key={i.value}
             value={i.value}
             className={cx(
-              "-mb-px border-b-2 border-transparent px-3 py-2 text-sm font-medium text-ui-text-2 transition-colors duration-[var(--duration-fast)] hover:text-ui-text data-[state=active]:border-ui-accent data-[state=active]:text-ui-text",
+              "ui-tab -mb-px border-b-2 border-transparent px-3 py-2 text-sm font-medium text-ui-text-2 transition-colors duration-[var(--duration-fast)] hover:text-ui-text data-[state=active]:border-ui-accent data-[state=active]:text-ui-text",
               focusRing,
             )}
           >

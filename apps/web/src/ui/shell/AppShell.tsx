@@ -144,7 +144,7 @@ export function AppShell(p: ShellProps) {
           id="app-drawer"
           data-testid="app-drawer"
           data-open={open}
-          className={`fixed inset-y-0 left-0 z-40 flex w-[312px] max-w-[88vw] transition-transform duration-200 ease-out md:sticky md:top-[var(--banner-h)] md:h-[calc(100dvh-var(--banner-h))] md:max-w-none md:translate-x-0 ${
+          className={`ui-ink fixed inset-y-0 left-0 z-40 flex w-[312px] max-w-[88vw] transition-transform duration-200 ease-out md:sticky md:top-[var(--banner-h)] md:h-[calc(100dvh-var(--banner-h))] md:max-w-none md:translate-x-0 ${
             open ? "translate-x-0 shadow-3" : "-translate-x-full"
           }`}
           {...(open ? { role: "dialog", "aria-modal": true, "aria-label": t.menu } : {})}
@@ -184,7 +184,7 @@ export function AppShell(p: ShellProps) {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-[var(--banner-h)] z-20 flex h-[52px] shrink-0 items-center gap-3 border-b border-ui-rail bg-ui-bg/95 px-4 backdrop-blur md:px-6">
+          <header className="ui-topbar sticky top-[var(--banner-h)] z-20 flex h-[52px] shrink-0 items-center gap-3 border-b border-ui-rail bg-ui-bg/95 px-4 backdrop-blur md:px-6">
             <button
               ref={menuButton}
               type="button"
@@ -198,7 +198,7 @@ export function AppShell(p: ShellProps) {
               <Menu className="size-6" aria-hidden />
             </button>
             {current && <Icon name={current.icon} className="hidden size-5 text-ui-text-3 md:block" />}
-            <p className="truncate text-base font-bold" data-testid="section-title">
+            <p className="ui-topbar-title truncate text-base font-bold" data-testid="section-title">
               {current?.label ?? p.header.title}
             </p>
             <div className="ml-auto flex items-center gap-2">{p.topActions}</div>
@@ -208,7 +208,7 @@ export function AppShell(p: ShellProps) {
       </div>
 
       {p.tabs && (
-        <nav aria-label={t.tabs.packs} className="fixed inset-x-0 bottom-0 z-20 flex h-16 border-t border-ui-rail bg-ui-rail pb-[env(safe-area-inset-bottom)] md:hidden" data-testid="tab-bar">
+        <nav aria-label={t.tabs.packs} className="ui-ink ui-tabbar fixed inset-x-0 bottom-0 z-20 flex h-16 border-t border-ui-rail bg-ui-rail pb-[env(safe-area-inset-bottom)] md:hidden" data-testid="tab-bar">
           {p.tabs.map((i) => {
             const active = isActive(path, i) && current?.href.startsWith(i.href);
             return (
@@ -217,7 +217,7 @@ export function AppShell(p: ShellProps) {
                 href={i.href}
                 aria-current={active ? "page" : undefined}
                 data-fly-target={i.flyTarget}
-                className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 text-[11px] ${active ? "font-bold text-ui-text" : "text-ui-text-3 hover:text-ui-text-2"}`}
+                className={`ui-tab-link relative flex flex-1 flex-col items-center justify-center gap-0.5 text-[11px] ${active ? "font-bold text-ui-text" : "text-ui-text-3 hover:text-ui-text-2"}`}
               >
                 <Icon name={i.icon} className={`size-[22px] ${active ? "text-ui-accent-text" : ""}`} />
                 {i.label}
@@ -269,7 +269,7 @@ function RailLink(p: { href: string; label: string; active: boolean; badge?: num
         title={p.label}
         aria-label={p.label}
         aria-current={p.active ? "page" : undefined}
-        className={`relative grid size-12 place-items-center overflow-hidden transition-[border-radius,background-color,color] duration-150 ${
+        className={`ui-rail-link relative grid size-12 place-items-center overflow-hidden transition-[border-radius,background-color,color] duration-150 ${
           p.active ? "rounded-2xl" : "rounded-3xl hover:rounded-2xl"
         } ${
           p.image
@@ -300,7 +300,7 @@ function NavLink({ item, active }: { item: NavItem; active: boolean }) {
       target={item.external ? "_blank" : undefined}
       aria-current={active ? "page" : undefined}
       data-fly-target={item.flyTarget}
-      className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm ${
+      className={`ui-nav-link flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm ${
         active ? "bg-ui-hover font-semibold text-ui-text" : "font-medium text-ui-text-2 hover:bg-ui-raised hover:text-ui-text"
       }`}
     >

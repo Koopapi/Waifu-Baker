@@ -2,7 +2,7 @@ import { CircleAlert, CircleCheck, Info, TriangleAlert } from "@/ui/icons/glyphs
 import { cx, variants } from "../variants";
 
 const alertClasses = variants({
-  base: "flex gap-3 rounded-l border p-4 text-sm",
+  base: "ui-alert flex gap-3 rounded-l border p-4 text-sm",
   variants: {
     tone: {
       info: "border-ui-info/40 bg-ui-info/10",

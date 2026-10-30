@@ -19,7 +19,7 @@ export function Segmented({ label, options, className, ...rest }: SegmentedProps
       <p id={id} className="text-sm font-medium text-ui-text">
         {label}
       </p>
-      <RRadioGroup.Root aria-labelledby={id} orientation="horizontal" className="inline-flex overflow-hidden rounded-m border-2 border-ui-line" {...rest}>
+      <RRadioGroup.Root aria-labelledby={id} orientation="horizontal" className="ui-seg inline-flex overflow-hidden rounded-m border-2 border-ui-line" {...rest}>
         {options.map((o, i) => (
           <RRadioGroup.Item
             key={o.value}

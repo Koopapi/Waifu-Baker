@@ -1,0 +1,380 @@
+/*
+ * Spec 026: tema Street pop (diseño de Bruno, `docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`). Solo actúa
+ * bajo `[data-theme="street"]`: el kawaii no cambia. Los colores redefinen las variables de `tokens.css`; la forma
+ * (bordes de tinta, sombras duras, inclinación, mayúsculas) se pone sobre las clases `ui-*` de los componentes de
+ * `src/ui`. Va fuera de las capas de Tailwind a propósito: así manda sobre sus utilidades sin tocar las clases.
+ * Contraste (RF-24 y RF-25): lo comprueba `themes/street.test.ts`.
+ */
+[data-theme="street"] {
+  color-scheme: light;
+  --ui-ink: #17132b;
+  /* Fondos: lila de página, superficies blancas. `--ui-rail` es el pozo de los campos (blanco). */
+  --ui-rail: #ffffff;
+  --ui-nav: #ffffff;
+  --ui-bg: #ece4fa;
+  --ui-raised: #ffffff;
+  --ui-hover: #e2d8f6;
+  --ui-line: #736b8f;
+  /* Texto en tinta. */
+  --ui-text: #17132b;
+  --ui-text-2: #4a4368;
+  --ui-text-3: #554e72;
+  /* Acento: rosa neón como fondo (texto en tinta); el texto de acento es índigo (el rosa nunca es texto). */
+  --ui-accent: #ff3ea5;
+  --ui-accent-hover: #ff5cb3;
+  --ui-accent-deep: #17132b;
+  --ui-accent-text: #3b2fc9;
+  --ui-on-accent: #17132b;
+  /* Estados: sólidos planos con texto de tinta, y su versión oscura para texto sobre lila o blanco. */
+  --ui-success: #3fe0d0;
+  --ui-success-text: #04665c;
+  --ui-warning: #ffd93d;
+  --ui-warning-text: #744b00;
+  --ui-danger: #ff5a5f;
+  --ui-danger-text: #b0102b;
+  --ui-info: #8fa6ff;
+  --ui-info-text: #3b2fc9;
+  /* Pegatinas y adornos (RF-23): colores planos de Bruno y contorno de tinta. */
+  --ui-k-chicle: #ff3ea5;
+  --ui-k-lavanda: #3b2fc9;
+  --ui-k-menta: #3fe0d0;
+  --ui-k-celeste: #3fe0d0;
+  --ui-k-limon: #ffd93d;
+  --ui-k-melocoton: #ff9a62;
+  --ui-k-tinta: #17132b;
+  --ui-k-rubor: #ff3ea5;
+  --ui-k-chicle-claro: #ffffff;
+  --ui-k-lavanda-claro: #ffffff;
+  --ui-k-menta-claro: #ffffff;
+  --ui-k-celeste-claro: #ffffff;
+  --ui-k-limon-oscuro: #c6f432;
+  --ui-k-rosa-claro: #ffffff;
+  --ui-k-galleta: #ffc94d;
+  --ui-k-chocolate: #17132b;
+  --ui-k-llama: #ff6a3d;
+  --ui-k-contorno: #17132b;
+  /* Tipografías (RF-18). */
+  --ui-font-body: var(--font-archivo), "Arial Narrow", system-ui, sans-serif;
+  --ui-font-display: var(--font-dela), system-ui, sans-serif;
+  /* Sombras duras sin difuminar (RF-20). */
+  --shadow-relief: 4px 4px 0 var(--ui-ink);
+  --shadow-relief-soft: 4px 4px 0 var(--ui-ink);
+  --shadow-sticker: 3px 3px 0 var(--ui-ink);
+  --shadow-glow: 6px 6px 0 var(--ui-ink);
+}
+
+/* Zonas de tinta (riel, barra lateral, barra de abajo, avisos): texto claro sobre tinta. */
+[data-theme="street"] .ui-ink,
+[data-theme="street"] .ui-toast,
+[data-theme="street"] .ui-tooltip {
+  --ui-rail: #17132b;
+  --ui-nav: #17132b;
+  --ui-raised: #2a2347;
+  --ui-hover: #332b55;
+  --ui-line: #4a4368;
+  --ui-text: #ffffff;
+  --ui-text-2: #e3ddf3;
+  --ui-text-3: #c9c1e0;
+  --ui-accent-text: #c6f432;
+  background-color: #17132b;
+  color: #ffffff;
+}
+
+/* Página: lila con franjas diagonales muy suaves. */
+[data-theme="street"] body {
+  background-image: repeating-linear-gradient(-28deg, transparent 0 46px, rgb(59 47 201 / 0.05) 46px 92px);
+  background-attachment: fixed;
+}
+
+/* Títulos de página (RF-22): Dela Gothic en mayúsculas con la sombra doble rosa y turquesa. */
+[data-theme="street"] main h1 {
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  text-shadow: 3px 3px 0 var(--ui-accent), 6px 6px 0 var(--ui-k-menta);
+}
+[data-theme="street"] h2 {
+  font-weight: 400;
+}
+
+/* Botones (RF-19 a RF-21): caja de tinta inclinada, sombra dura, Archivo itálica gruesa en mayúsculas. */
+[data-theme="street"] .ui-btn {
+  border: 3px solid var(--ui-ink);
+  border-radius: 0;
+  background-image: none;
+  color: var(--ui-ink);
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+  box-shadow: 4px 4px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-btn:active {
+  box-shadow: 1px 1px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-btn-primary {
+  background-color: var(--ui-accent);
+}
+[data-theme="street"] .ui-btn-secondary {
+  background-color: #ffffff;
+}
+[data-theme="street"] .ui-btn-ghost {
+  border-color: transparent;
+  box-shadow: none;
+  background-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+[data-theme="street"] .ui-btn-ghost:hover {
+  background-color: var(--ui-hover);
+}
+[data-theme="street"] .ui-btn-on-accent {
+  box-shadow: none;
+}
+/* Los botones grandes con varias líneas de texto van rectos (RF-21). */
+[data-theme="street"] .ui-btn-block {
+  transform: none;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  border-radius: 10px;
+}
+[data-theme="street"] .ui-ink .ui-btn {
+  border-color: #ffffff;
+}
+[data-theme="street"] .ui-icon-btn {
+  border-radius: 6px;
+}
+
+/* Campos (RF-20). */
+[data-theme="street"] .ui-field {
+  border: 3px solid var(--ui-ink);
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: var(--ui-ink);
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-field[aria-invalid="true"] {
+  border-color: var(--ui-danger-text);
+}
+[data-theme="street"] .ui-check {
+  border: 3px solid var(--ui-ink);
+  background-color: #ffffff;
+}
+[data-theme="street"] input.ui-check {
+  border-radius: 3px;
+}
+[data-theme="street"] .ui-check:checked,
+[data-theme="street"] .ui-check[data-state="checked"] {
+  background-color: var(--ui-accent);
+  border-color: var(--ui-ink);
+}
+[data-theme="street"] .ui-switch {
+  border: 3px solid var(--ui-ink);
+  box-sizing: content-box;
+}
+[data-theme="street"] .ui-option,
+[data-theme="street"] .ui-chip {
+  border: 3px solid var(--ui-ink);
+  border-radius: 0;
+  background-color: #ffffff;
+  color: var(--ui-ink);
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+}
+[data-theme="street"] .ui-option[data-state="checked"],
+[data-theme="street"] .ui-chip[data-state="checked"] {
+  background-color: var(--ui-accent);
+  box-shadow: 3px 3px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-seg {
+  border: 3px solid var(--ui-ink);
+  border-radius: 0;
+  background-color: #ffffff;
+  box-shadow: 3px 3px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-seg > * {
+  border-color: var(--ui-ink);
+}
+[data-theme="street"] .ui-color {
+  border: 3px solid var(--ui-ink);
+}
+[data-theme="street"] .ui-slider {
+  height: 14px;
+  border: 3px solid var(--ui-ink);
+  border-radius: 0;
+  background: linear-gradient(to right, var(--ui-accent) var(--fill), #ffffff var(--fill));
+}
+[data-theme="street"] .ui-slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 26px;
+  border: 3px solid #ffffff;
+  border-radius: 2px;
+  background: var(--ui-ink);
+  box-shadow: 0 0 0 2px var(--ui-ink);
+}
+[data-theme="street"] .ui-slider::-moz-range-thumb {
+  width: 14px;
+  height: 22px;
+  border: 3px solid #ffffff;
+  border-radius: 2px;
+  background: var(--ui-ink);
+}
+
+/* Superficies (RF-20). */
+[data-theme="street"] .ui-card {
+  border: 3px solid var(--ui-ink);
+  border-radius: 10px;
+  background-color: #ffffff;
+  background-image: none;
+  box-shadow: 6px 6px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-card:hover {
+  border-color: var(--ui-ink);
+}
+[data-theme="street"] .ui-popover,
+[data-theme="street"] .ui-modal {
+  border: 3px solid var(--ui-ink);
+  background-color: #ffffff;
+  box-shadow: 6px 6px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-popover {
+  border-radius: 8px;
+}
+[data-theme="street"] .ui-modal {
+  border-radius: 12px;
+}
+[data-theme="street"] .ui-overlay {
+  background-color: rgb(23 19 43 / 0.6);
+}
+[data-theme="street"] .ui-tooltip {
+  border-radius: 4px;
+}
+[data-theme="street"] .ui-toast {
+  border: 3px solid var(--ui-ink);
+  border-radius: 0;
+  box-shadow: 5px 5px 0 var(--ui-accent);
+}
+[data-theme="street"] .ui-table {
+  border: 3px solid var(--ui-ink);
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 5px 5px 0 var(--ui-ink);
+}
+[data-theme="street"] .ui-table thead tr {
+  background-color: var(--ui-ink);
+}
+[data-theme="street"] .ui-table th {
+  color: #ffffff;
+  font-style: italic;
+  font-weight: 900;
+}
+[data-theme="street"] .ui-alert {
+  border: 3px solid var(--ui-ink);
+  border-left-width: 12px;
+  border-radius: 4px;
+  background-color: #ffffff;
+}
+[data-theme="street"] .ui-alert[data-tone="info"] {
+  border-left-color: var(--ui-k-lavanda);
+}
+[data-theme="street"] .ui-alert[data-tone="success"] {
+  border-left-color: var(--ui-success);
+}
+[data-theme="street"] .ui-alert[data-tone="warning"] {
+  border-left-color: var(--ui-warning);
+}
+[data-theme="street"] .ui-alert[data-tone="danger"] {
+  border-left-color: var(--ui-danger);
+}
+[data-theme="street"] .ui-empty {
+  border: 3px dashed var(--ui-line);
+  border-radius: 10px;
+  background-color: rgb(255 255 255 / 0.45);
+}
+[data-theme="street"] .ui-layer-row {
+  border: 3px solid var(--ui-ink);
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+/* Etiquetas (RF-19 y RF-21). */
+[data-theme="street"] .ui-badge {
+  border: 2px solid var(--ui-ink);
+  border-radius: 0;
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+  transform: skewX(-10deg);
+}
+[data-theme="street"] .ui-badge-sticker {
+  font-family: var(--ui-font-body);
+}
+[data-theme="street"] .ui-count {
+  border: 2px solid var(--ui-ink);
+  border-radius: 0;
+  background-color: var(--ui-k-limon-oscuro);
+  color: var(--ui-ink);
+  font-weight: 900;
+}
+[data-theme="street"] .ui-tab {
+  font-style: italic;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+[data-theme="street"] .ui-progress {
+  height: 16px;
+  border: 3px solid var(--ui-ink);
+  border-radius: 0;
+  background-color: #ffffff;
+  transform: skewX(-12deg);
+}
+[data-theme="street"] .ui-progress-bar {
+  border: 0;
+  border-radius: 0;
+  background-image: none;
+  background-color: var(--ui-accent);
+}
+
+/* Estructura (riel, barra lateral, barra superior y barra de abajo). */
+[data-theme="street"] .ui-banner {
+  border-bottom: 3px solid var(--ui-ink);
+  font-weight: 800;
+}
+[data-theme="street"] .ui-topbar {
+  border-bottom: 3px solid var(--ui-ink);
+  background-color: #ffffff;
+  backdrop-filter: none;
+}
+[data-theme="street"] .ui-topbar-title {
+  font-family: var(--ui-font-display);
+  font-weight: 400;
+}
+[data-theme="street"] .ui-nav-link,
+[data-theme="street"] .ui-tab-link {
+  border-radius: 0;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+[data-theme="street"] .ui-nav-link[aria-current="page"],
+[data-theme="street"] .ui-tab-link[aria-current="page"] {
+  background-color: var(--ui-accent);
+  color: var(--ui-ink);
+  transform: skewX(-10deg);
+}
+[data-theme="street"] .ui-nav-link[aria-current="page"] {
+  box-shadow: 3px 3px 0 #ffffff;
+}
+[data-theme="street"] .ui-nav-link[aria-current="page"] svg,
+[data-theme="street"] .ui-tab-link[aria-current="page"] svg {
+  color: var(--ui-ink);
+}
+[data-theme="street"] .ui-rail-link {
+  border: 3px solid #ffffff;
+}

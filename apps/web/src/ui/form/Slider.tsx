@@ -48,7 +48,7 @@ export function Slider({ label, value, min, max, step = 1, format, unit = "", on
         onChange={(e) => onValueChange(Number(e.target.value))}
         style={{ "--fill": `${fill}%` } as React.CSSProperties}
         className={cx(
-          "block h-2 w-full cursor-pointer appearance-none rounded-full bg-[linear-gradient(to_right,var(--ui-accent)_var(--fill),var(--ui-hover)_var(--fill))] disabled:cursor-not-allowed",
+          "ui-slider block h-2 w-full cursor-pointer appearance-none rounded-full bg-[linear-gradient(to_right,var(--ui-accent)_var(--fill),var(--ui-hover)_var(--fill))] disabled:cursor-not-allowed",
           "[&::-webkit-slider-thumb]:size-[18px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-ui-on-accent [&::-webkit-slider-thumb]:bg-ui-accent [&::-webkit-slider-thumb]:shadow-1",
           "[&::-moz-range-thumb]:size-[14px] [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-ui-on-accent [&::-moz-range-thumb]:bg-ui-accent",
           focusRing,
