@@ -29,4 +29,19 @@ export const account = {
     button: "Delete my account",
     confirm: "Delete your account? You have 30 days to change your mind by signing in again.",
   },
+  // Spec 026: the theme picker.
+  theme: {
+    title: "Theme",
+    body: "Choose how Waifu Baker looks. It is saved to your account and follows you on all your devices.",
+    names: { kawaii: "Kawaii", street: "Street pop" },
+    descriptions: {
+      kawaii: "Dark and soft, with pastel stickers. The classic one.",
+      street: "Light, with ink outlines and hard shadows. Designed by Bruno.",
+    },
+    active: "Active",
+    cardsNote: "Your cards look the same in both themes. The table where you open packs stays dark so holo and shine stand out.",
+    saveFailed: "We couldn't save your theme. We switched back to the previous one.",
+    previewTitle: "My collection",
+    previewButton: "Open pack",
+  },
 };

@@ -6,6 +6,8 @@ import { SiteFooter } from "@/features/legal/SiteFooter";
 import { TimeZoneCookie } from "@/features/rewards/TimeZoneCookie";
 import { ToastProvider } from "@/ui/feedback/Toast";
 import { ConfirmProvider } from "@/ui/overlay/Confirm";
+import { requestTheme } from "@/server/auth/request-theme";
+import { THEME_META } from "@/ui/theme-meta";
 import "./globals.css";
 
 // Spec 014: tipografías redondeadas (licencia OFL). Nunito para el texto y Fredoka para títulos y logotipo.
@@ -25,13 +27,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const viewport: Viewport = { themeColor: "#241b29", colorScheme: "dark" };
+// Spec 026: los controles nativos del navegador (barras, calendario, autocompletar) y la barra del sistema siguen al tema.
+export async function generateViewport(): Promise<Viewport> {
+  return THEME_META[await requestTheme()];
+}
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const locale = await getLocale();
+  const [locale, theme] = await Promise.all([getLocale(), requestTheme()]);
   return (
     // Los navegadores y sus extensiones añaden atributos a <html> y <body> antes de hidratar (p. ej. Chrome en iPhone).
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} data-theme={theme} suppressHydrationWarning>
       <body suppressHydrationWarning className={`${body.variable} ${geistMono.variable} ${display.variable} antialiased`}>
         <I18nProvider locale={locale}>
           <ToastProvider>
