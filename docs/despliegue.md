@@ -65,8 +65,9 @@ Variables de entorno (las marcadas con † también como variables de compilaci�
 | `CONTACT_EMAIL` | `waifubaker@waifubaker.com` | igual |
 | `DEV_LOGIN`, `DEMO_MODE` | **nunca** | **nunca** |
 
-Pruebas pide además una contraseña compartida (autenticación básica de la propia web con `SITE_BASIC_AUTH`); la
-comprobación de salud `/api/health` queda libre.
+Pruebas pide además una contraseña compartida (autenticación básica de la propia web con `SITE_BASIC_AUTH`); quedan
+libres la comprobación de salud `/api/health` y los avisos de Patreon `/api/webhooks/patreon` (Patreon no conoce la
+contraseña; la web solo acepta avisos firmados con `PATREON_WEBHOOK_SECRET`).
 
 Patreon: en el portal de clientes de Patreon, añadir `https://waifubaker.com/api/auth/callback/patreon` (y la de
 pruebas) como URL de redirección.
