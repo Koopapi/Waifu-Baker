@@ -35,5 +35,6 @@ export function middleware(req: NextRequest) {
   return NextResponse.next({ request: { headers } });
 }
 
-// Todo salvo los ficheros estáticos de Next y la comprobación de salud (la usa Coolify, sin contraseña).
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/health).*)"] };
+// Todo salvo los ficheros estáticos de Next, la comprobación de salud (la usa Coolify, sin contraseña) y los avisos de
+// Patreon (no conocen la contraseña de pruebas; la web los acepta solo con su firma).
+export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico|api/health|api/webhooks/patreon).*)"] };
