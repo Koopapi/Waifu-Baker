@@ -22,9 +22,11 @@ describe("integración continua", () => {
         "pnpm lint",
         "pnpm typecheck",
         "pnpm test",
-        "pnpm exec playwright test --project=chromium-desktop",
+        "pnpm exec playwright test --project=chromium-desktop --shard=${{ matrix.shard }}/2",
       ]),
     );
+    // Desde el 30 oct 2026 el E2E va en dos mitades en paralelo: entre las dos corren toda la batería.
+    expect(workflow).toMatch(/^\s+shard: \[1, 2\]$/m);
     // Ningún paso de comprobación se salta los fallos.
     expect(workflow).not.toMatch(/continue-on-error:\s*true/);
   });

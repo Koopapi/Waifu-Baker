@@ -8,8 +8,10 @@ const allowed = () => isDevLoginEnabled(process.env) && process.env.NODE_ENV !==
 // Código con el que `next dev` vuelve a lanzar su proceso servidor (el mismo que usa su vigilante de memoria).
 const RESTART_EXIT_CODE = 77;
 // `next dev` se reinicia solo, a mitad de lo que esté sirviendo, al pasar del 80 % del montón: aquí se
-// reinicia antes y entre dos tests, que es cuando no rompe ninguna navegación.
-const RESTART_RATIO = 0.4;
+// reinicia antes y entre dos tests, que es cuando no rompe ninguna navegación. Con todas las rutas compiladas el
+// servidor ya ocupa ~43 % del montón (3,6 de 8,4 GB, oct 2026): con un umbral más bajo se reiniciaba y recompilaba
+// antes de cada test (3-4 min cada vez en CI).
+const RESTART_RATIO = 0.6;
 
 /**
  * Solo desarrollo y E2E: el servidor de desarrollo de Next retiene memoria en cada página servida y,
