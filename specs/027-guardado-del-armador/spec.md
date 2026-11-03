@@ -1,7 +1,8 @@
 # Spec 027 — Guardado claro del armador de cartas
 
-Estado: borrador del 3 nov 2026, pendiente de aprobación del dueño. Decisión ya tomada por el dueño (3 nov 2026):
-el borrador automático vive en el navegador y, además, cada guardado crea una versión en el servidor («Ambos»).
+Estado: **aprobada por el dueño el 3 nov 2026** («Eso me gusta, apruebo»). Decisiones del dueño: el borrador
+automático vive en el navegador y, además, cada guardado crea una versión en el servidor («Ambos»); se conservan
+10 versiones por carta; el borrador y las imágenes sin guardar viven 5 días. Siguiente paso: plan y tareas.
 
 Origen: el dueño reportó el 2 nov 2026 que al guardar una carta «a veces se guarda sin capas», que un clic en falso
 fuera de la ventana de la carta la cierra sin aviso y perdiendo el trabajo, y pidió que guardar sea más claro, con
@@ -71,7 +72,7 @@ para volver a un estado anterior. Las specs 016, 017 y 025 dejaron fuera a prop�
 - RF-14: SI la carta guardada cambió después de escribirse el borrador (otro administrador guardó), ENTONCES EL SISTEMA
   lo dirá al ofrecer el borrador, y al guardar lo recuperado aplicará el aviso de conflicto de la spec 016 (RF-17 y
   RF-18).
-- RF-15: EL SISTEMA conservará un borrador, y las imágenes subidas que use y aún no se hayan guardado, durante 7 días
+- RF-15: EL SISTEMA conservará un borrador, y las imágenes subidas que use y aún no se hayan guardado, durante 5 días
   desde el último cambio (hoy las imágenes sin guardar se borran a las 24 h).
 - RF-16: SI al recuperar un borrador falta alguna de sus imágenes, ENTONCES EL SISTEMA cargará el resto, quitará las
   capas que las usaban y dirá cuáles faltan.
@@ -79,7 +80,7 @@ para volver a un estado anterior. Las specs 016, 017 y 025 dejaron fuera a prop�
 ### Versiones (en el servidor)
 - RF-17: CUANDO se guarde una carta, EL SISTEMA creará una versión con su ficha, su configuración de capas, la fecha y
   hora y el nombre del administrador que guardó.
-- RF-18: EL SISTEMA conservará las últimas 20 versiones de cada carta y borrará las más antiguas al pasar de 20.
+- RF-18: EL SISTEMA conservará las últimas 10 versiones de cada carta y borrará las más antiguas al pasar de 10.
 - RF-19: EL SISTEMA mostrará en la ventana de la carta la lista de sus versiones, cada una con fecha, hora, quién guardó,
   qué cambió (ficha, capas o ambas) y una vista previa de la carta en esa versión.
 - RF-20: CUANDO el administrador elija «Volver a esta versión», EL SISTEMA cargará esa versión en la ventana como
@@ -127,7 +128,7 @@ para volver a un estado anterior. Las specs 016, 017 y 025 dejaron fuera a prop�
 - Importar una configuración del creador (spec 017): entra como cambios sin guardar y, por tanto, al borrador.
 - Volver a una versión en una colección 18+ publicada: queda pendiente de revisión como cualquier otro cambio.
 - Versión cuya imagen falte por un error del almacén: se trata como RF-16 y se registra en la auditoría.
-- Carta con 20 versiones y 8 capas cada una: guardar sigue tardando lo mismo que hoy; solo se borra la versión más
+- Carta con 10 versiones y 8 capas cada una: guardar sigue tardando lo mismo que hoy; solo se borra la versión más
   antigua.
 
 ## Fuera de alcance
@@ -147,5 +148,4 @@ nueva. Reproducir en la demo el caso que reportó el dueño (editar capas y guar
 pierden capas. Documentación del panel actualizada. Demo del dueño en `pruebas`.
 
 ## Dudas abiertas
-- [NECESITA ACLARACIÓN: ¿20 versiones por carta bastan (RF-18), o quieres otro número?]
-- [NECESITA ACLARACIÓN: ¿7 días de vida para el borrador y las imágenes sin guardar (RF-15) te parece bien?]
+- Ninguna. (Resueltas el 3 nov 2026: 10 versiones por carta y 5 días de vida del borrador.)
