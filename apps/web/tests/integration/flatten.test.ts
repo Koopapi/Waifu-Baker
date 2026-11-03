@@ -1,4 +1,5 @@
 // Spec 018: la imagen fija de una carta armada sale del mismo carta-capas.js (Chromium sin ventana).
+import { randomFillSync } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import sharp from "sharp";
 import type { LayersConfig } from "@/domain/cards/layers";
@@ -23,6 +24,24 @@ async function images() {
   const fondo = await sharp(await testImage({ width: 1400, height: 1982, hue: 0 })).webp().toBuffer();
   const chica = await sharp(await testImage({ width: 800, height: 1200, hue: 220, cutout: true })).webp().toBuffer();
   return new Map([["k/fondo", fondo], ["k/chica", chica]]);
+}
+
+/** Capa pesada de decodificar (ruido rojizo a calidad 100), opaca solo en su franja horizontal `i` de `n`. */
+async function heavyLayer(i: number, n: number) {
+  const w = 1400, h = 1982;
+  const raw = Buffer.alloc(w * h * 4);
+  randomFillSync(raw);
+  const y0 = Math.floor((i * h) / n), y1 = Math.floor(((i + 1) * h) / n);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const p = (y * w + x) * 4;
+      raw[p] = (raw[p] >> 2) + 160;
+      raw[p + 1] >>= 2;
+      raw[p + 2] >>= 2;
+      raw[p + 3] = y >= y0 && y < y1 ? 255 : 0;
+    }
+  }
+  return sharp(raw, { raw: { width: w, height: h, channels: 4 } }).webp({ quality: 100, alphaQuality: 100 }).toBuffer();
 }
 
 const config: LayersConfig = {
@@ -68,6 +87,23 @@ describe("spec 018 — imagen fija", () => {
     // La pública no es la misma imagen reducida: lleva la marca de agua encima.
     const plain = await sharp(out.full).resize(FLAT_SIZES.public.width, FLAT_SIZES.public.height).png().toBuffer();
     expect(await meanDiff(out.public, plain)).toBeGreaterThan(2);
+  }, SLOW);
+
+  // 3 nov 2026: en el servidor (pocos núcleos) la foto se tomaba antes de que Chromium decodificara las capas grandes y
+  // salían cartas sin la chica o sin el fondo. Ocho capas pesadas, cada una opaca solo en su franja: todas deben salir.
+  it("test_s018_rf1_salen_todas_las_capas_aunque_pesen", async () => {
+    const n = 8;
+    const imgs = new Map<string, Buffer>();
+    const capas: LayersConfig["capas"] = [];
+    for (let i = 0; i < n; i++) {
+      imgs.set(`k/${i}`, await heavyLayer(i, n));
+      capas.push({ key: `k/${i}`, rol: i === 0 ? "fondo" : i === 1 ? "personaje" : "extra", profundidad: 0.2 + i * 0.3, margen: 4 });
+    }
+    const png = await flattenCard({ ...config, capas }, imgs);
+    for (let i = 0; i < n; i++) {
+      const [r, , , a] = await pixel(png, 700, Math.floor(((i + 0.5) * 1982) / n));
+      expect([i, a, r > 120]).toEqual([i, 255, true]);
+    }
   }, SLOW);
 
   it("test_s018_rf4_si_falta_una_imagen_no_se_genera", async () => {

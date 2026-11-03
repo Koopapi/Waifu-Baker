@@ -90,6 +90,12 @@ export async function flattenCard(config: LayersConfig, images: Map<string, Buff
     await page.evaluate(async (c) => {
       const api = (window as unknown as { CartaCapas: { montar: (el: HTMLElement, c: unknown) => { listo: Promise<void> } } }).CartaCapas;
       await api.montar(document.getElementById("carta")!, c).listo;
+      // Las capas llevan `decoding="async"`: Chromium puede pintar (y fotografiar) antes de decodificar las imágenes
+      // grandes, y en el servidor, con pocos núcleos, salían cartas sin la chica o sin el fondo. Se espera a que todas
+      // estén decodificadas y a las fuentes, y un par de cuadros para que el compositor las pinte.
+      await Promise.all(Array.from(document.images).map((im) => im.decode()));
+      await document.fonts.ready;
+      await new Promise((ok) => requestAnimationFrame(() => requestAnimationFrame(ok)));
     }, cfg);
     const shot = await page.locator("#carta").screenshot({ omitBackground: true, animations: "disabled", timeout: 15_000 });
     return await sharp(shot).resize(FLAT_SIZES.full.width, FLAT_SIZES.full.height, { fit: "fill" }).png().toBuffer();
