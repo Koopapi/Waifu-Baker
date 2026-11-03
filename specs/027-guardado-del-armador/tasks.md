@@ -1,9 +1,8 @@
 # Tareas — Spec 027
 
 - [x] T0 Spec aprobada por el dueño (3 nov 2026: 10 versiones, borrador de 5 días).
-- [ ] T0b Maqueta HTML de la ventana (estado, pregunta al cerrar, aviso de borrador, lista de versiones) y aprobación
-  del dueño.
-- [ ] T1 Dominio y datos: `domain/cards/versions.ts`, `domain/cards/draft.ts`, migración `0020_versiones_de_carta.sql`
+- [x] T0b Maqueta: descartada por el dueño el 3 nov 2026 (quiere desplegar a pruebas al despertar).
+- [x] T1 Dominio y datos: `domain/cards/versions.ts`, `domain/cards/draft.ts`, migración `0020_versiones_de_carta.sql`
   con la siembra de la versión 1, `TEMP_LAYER_TTL_MS` a 5 días. RF-15, RF-18, RF-21, RF-25. Tests de unidad e
   integración.
 - [ ] T2 Servicio `saveCard` en una transacción (ficha + capas + imagen fija + versión + auditoría); `updateCard` y
