@@ -1,98 +1,43 @@
-import { createHash, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import sharp from "sharp";
-import { and, asc, desc, eq, inArray, or, sql } from "drizzle-orm";
-import { cards, characters, dropTables, sets } from "@/db/schema";
-import { canEdit, type EditableField, type SetStatus } from "@/domain/catalog/collection-rules";
-import { consecutiveNumbers, isCardComplete, rarityCounts, rarityGaps, type Rarity } from "@/domain/catalog/card-rules";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { cards, cardVersions, characters, dropTables, sets } from "@/db/schema";
+import { consecutiveNumbers, isCardComplete, rarityCounts, rarityGaps } from "@/domain/catalog/card-rules";
 import { validateUpload } from "@/domain/catalog/upload-rules";
 import { mapLimit } from "@/lib/map-limit";
 import { drawPack } from "@/domain/catalog/draw";
 import type { PackKind } from "@/domain/catalog/default-odds";
 import { cryptoRng } from "@/server/rng";
-import { composeCard, type CardSize } from "@/server/cards/compose";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { AdminError, isUniqueViolation } from "@/server/errors";
 import { auditChange, recordAudit } from "./audit";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
-import type { LayersConfig } from "@/domain/cards/layers";
-import { configFromCharacter, replaceCharacter, retierLayers } from "@/domain/cards/layers-rarity";
+import { configFromCharacter, replaceCharacter } from "@/domain/cards/layers-rarity";
 import { characterLayer, imageKeys, layerKey } from "@/domain/cards/layers";
 import { prepareCharacterImage } from "@/server/cards/character-images";
-import { releaseLayerImages } from "./card-layers";
-import { renderCardFlat, storeFlat } from "@/server/cards/flat-store";
+import { sheetOf } from "@/domain/cards/versions";
+import { insertVersion, saveCard } from "./card-save";
+import {
+  applyPatch,
+  assertEditable,
+  composeAndStore,
+  composedKeys,
+  deleteKeys,
+  lockSet,
+  needsRecompose,
+  pendingFlatKeys,
+  pick,
+  releaseLayerImages,
+  retierIfLayered,
+  sha256,
+  type CardPatch,
+  type CardRow,
+} from "./card-shared";
+export type { CardPatch } from "./card-shared";
 
-type CardRow = typeof cards.$inferSelect;
-type Variant = CardRow["variant"];
 const COMPOSE_PARALLEL = 4;
 const EXT: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp" };
-
-const sha256 = (b: Buffer) => createHash("sha256").update(b).digest("hex");
-
-async function lockSet(db: DbLike, setId: string) {
-  const [set] = await db.select().from(sets).where(eq(sets.id, setId)).for("update");
-  if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
-  return set;
-}
-
-function assertEditable(status: SetStatus, field: EditableField) {
-  if (!canEdit(status, field)) {
-    throw new AdminError("locked", "Esta colección ya está publicada: no se pueden añadir, quitar ni cambiar rarezas, variantes o números.", { what: "cards" });
-  }
-}
-
-/** Compone la carta y guarda sus 4 tamaños. Las claves llevan la huella del contenido. */
-/**
- * La imagen que ve el coleccionista. Spec 018, RF-1 y RF-2: una carta por capas lleva su imagen fija (sacada de
- * carta-capas.js); solo una carta sin capas (anterior a la spec 017) se sigue componiendo con el marco de Pencil.
- */
-async function composeAndStore(store: CardStore, card: Pick<CardRow, "id" | "setId" | "number" | "rarity" | "originalKey" | "layers">, setCode: string) {
-  if (card.layers) return storeFlat(store, card, await renderCardFlat(store, card.layers));
-  const original = card.originalKey ? await store.get(card.originalKey) : null;
-  if (!original) throw new AdminError("missing_original", "No se encontró la imagen original de la carta.", { what: "original" });
-  let composed;
-  try {
-    composed = await composeCard(original.body, { number: card.number, rarity: card.rarity, setCode });
-  } catch {
-    throw new AdminError("unreadable", "No se pudo leer la imagen: el archivo parece dañado.");
-  }
-  const tag = sha256(composed.full).slice(0, 10);
-  const keys = {} as Record<CardSize, string>;
-  for (const size of ["full", "mid", "thumb", "public"] as const) {
-    keys[size] = `sets/${card.setId}/cards/${card.id}/${size}.${tag}.webp`;
-    await store.put(keys[size], composed[size]);
-  }
-  return { keyFull: keys.full, keyMid: keys.mid, keyThumb: keys.thumb, keyPublic: keys.public, blurhash: composed.blurhash };
-}
-
-/**
- * Borra imágenes que ya no se usan. Las claves llevan la huella del contenido, así que una imagen
- * recompuesta idéntica (p. ej. «sin rareza» → común, mismo marco) tiene la MISMA clave: nunca se
- * borra una clave que siga referenciada por alguna carta.
- */
-async function deleteKeys(store: CardStore, keys: (string | null | undefined)[], db?: DbLike) {
-  let candidates = [...new Set(keys.filter((k): k is string => Boolean(k)))];
-  if (db && candidates.length) {
-    const inUse = await db
-      .select({ a: cards.keyFull, b: cards.keyMid, c: cards.keyThumb, d: cards.keyPublic, e: cards.originalKey, f: cards.pendingOriginalKey })
-      .from(cards)
-      .where(
-        or(
-          inArray(cards.keyFull, candidates),
-          inArray(cards.keyMid, candidates),
-          inArray(cards.keyThumb, candidates),
-          inArray(cards.keyPublic, candidates),
-          inArray(cards.originalKey, candidates),
-          inArray(cards.pendingOriginalKey, candidates),
-        ),
-      );
-    const used = new Set(inUse.flatMap((r) => Object.values(r)).filter(Boolean));
-    candidates = candidates.filter((k) => !used.has(k));
-  }
-  await Promise.all(candidates.map((k) => store.delete(k)));
-}
-
-const composedKeys = (c: Pick<CardRow, "keyFull" | "keyMid" | "keyThumb" | "keyPublic">) => [c.keyFull, c.keyMid, c.keyThumb, c.keyPublic];
 
 export interface UploadFile {
   body: Buffer;
@@ -154,6 +99,8 @@ export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId:
         entityId: id,
         after: { setId, number: row.number, filename: file.filename },
       });
+      // Spec 027, RF-17: la carta nace con su versión 1 (a la que se puede volver).
+      await insertVersion(tx, { cardId: id, ficha: sheetOf(row), layers: row.layers ?? null, changed: "ambas", pending: false, actorUserId });
       return { created: row, setCode: set.code };
     }));
   } catch (e) {
@@ -176,94 +123,15 @@ export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId:
   }
 }
 
-export interface CardPatch {
-  name?: string;
-  flavorText?: string;
-  characterId?: string | null;
-  rarity?: Rarity | null;
-  variant?: Variant;
-}
-
-const FIELD_RULE: Record<keyof CardPatch, EditableField> = {
-  name: "name",
-  flavorText: "flavorText",
-  characterId: "name",
-  rarity: "rarity",
-  variant: "variant",
-};
-
-function applyPatch(cur: CardRow, patch: CardPatch, status: SetStatus) {
-  const next = {
-    name: patch.name === undefined ? cur.name : patch.name.trim(),
-    flavorText: patch.flavorText === undefined ? cur.flavorText : patch.flavorText.trim(),
-    characterId: patch.characterId === undefined ? cur.characterId : patch.characterId,
-    rarity: patch.rarity === undefined ? cur.rarity : patch.rarity,
-    variant: patch.variant === undefined ? cur.variant : patch.variant,
-  };
-  if (next.name.length > 60) throw new AdminError("invalid_name", "El nombre de la carta admite hasta 60 caracteres.", { entity: "card", max: 60 });
-  for (const key of Object.keys(FIELD_RULE) as (keyof CardPatch)[]) {
-    if (next[key] !== cur[key]) assertEditable(status, FIELD_RULE[key]);
-  }
-  return next;
-}
-
 /**
- * Solo cambia la imagen si cambia el marco (rareza) o el número: la carta no lleva más texto. Spec 018: la carta por
- * capas no lleva número dibujado, así que solo la rareza la cambia.
+ * RF-14 y RF-16: edita la ficha de una carta con control de versión y regenera la imagen si cambia lo que se ve. Desde la
+ * spec 027 es el guardado único de la carta (`saveCard`) solo con la ficha: crea una versión y queda en la auditoría.
  */
-const needsRecompose = (cur: CardRow, next: { rarity: Rarity | null; number?: number }) =>
-  cur.rarity !== next.rarity || (!cur.layers && next.number !== undefined && cur.number !== next.number);
-
-/**
- * Spec 016, RF-25: si cambia la rareza de una carta con capas, su marco y su sello de texto siguen al escalón nuevo.
- * Devuelve las columnas a cambiar y si queda un sello de imagen que hay que revisar a mano.
- */
-function retierIfLayered(cur: CardRow, rarity: Rarity | null): { patch: { layers?: LayersConfig }; sealToReview: boolean } {
-  if (!cur.layers || !rarity || cur.rarity === rarity) return { patch: {}, sealToReview: false };
-  const r = retierLayers(cur.layers as LayersConfig, rarityTier(rarity));
-  return { patch: { layers: r.config }, sealToReview: r.imageSealToReview };
-}
-
-/** RF-14 y RF-16: edita una carta con control de versión y regenera si cambia lo que se ve. */
 export async function updateCard(db: DbLike, store: CardStore, actorUserId: string, cardId: string, expectedVersion: number, patch: CardPatch) {
-  const toDelete: (string | null)[] = [];
-  let sealToReview = false;
-  const result = await db.transaction(async (tx) => {
-    const [cur] = await tx.select().from(cards).where(eq(cards.id, cardId)).for("update");
-    if (!cur) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
-    if (cur.version !== expectedVersion) {
-      throw new AdminError("stale_version", "La carta cambió desde que la abriste. Recarga para ver la versión actual.", { entity: "card" });
-    }
-    const [set] = await tx.select().from(sets).where(eq(sets.id, cur.setId));
-    const next = applyPatch(cur, patch, set.status);
-    // Spec 016, RF-25 y spec 018, RF-3: primero el estilo del escalón nuevo; la imagen fija se saca ya con él.
-    const retier = retierIfLayered(cur, next.rarity);
-    sealToReview = retier.sealToReview;
-    let keys = {};
-    if (needsRecompose(cur, next)) {
-      keys = await composeAndStore(store, { ...cur, ...next, ...retier.patch }, set.code);
-      toDelete.push(...composedKeys(cur));
-    }
-    const merged = { ...cur, ...next, ...keys };
-    try {
-      const [row] = await tx
-        .update(cards)
-        .set({ ...next, ...keys, ...retier.patch, status: isCardComplete(merged) ? "ready" : "draft", version: cur.version + 1, updatedAt: sql`now()` })
-        .where(and(eq(cards.id, cardId), eq(cards.version, expectedVersion)))
-        .returning();
-      await auditChange(tx, { actorUserId, action: "card_update", entityType: "card", entityId: cardId, before: pick(cur), after: next });
-      return row;
-    } catch (e) {
-      if ((e as { code?: string }).code === "23503") throw new AdminError("not_found", "El personaje elegido ya no existe.", { entity: "chosen_character" });
-      throw e;
-    }
-  });
-  await deleteKeys(store, toDelete, db);
+  const r = await saveCard(db, store, actorUserId, cardId, { ficha: patch, expectedVersion });
   // Spec 016, RF-25: el panel avisa si la carta tiene un sello de imagen que ya no encaja con su rareza.
-  return { ...result, layersSealToReview: sealToReview };
+  return { ...r.card, layersSealToReview: r.layersSealToReview };
 }
-
-const pick = (c: CardRow) => ({ name: c.name, flavorText: c.flavorText, characterId: c.characterId, rarity: c.rarity, variant: c.variant });
 
 /** RF-14: aplica personaje, rareza o variante a varias cartas; todo o nada. Spec 016, RF-25: retoca las cartas con capas. */
 export async function bulkUpdateCards(
@@ -346,17 +214,24 @@ export async function reorderCards(db: DbLike, store: CardStore, actorUserId: st
 /** Quita una carta de una colección en borrador y renumera las siguientes (RF-15). */
 export async function deleteCard(db: DbLike, store: CardStore, actorUserId: string, cardId: string) {
   let toDelete: (string | null)[] = [];
+  let layerKeys: string[] = [];
+  let setId = "";
   await db.transaction(async (tx) => {
     const [card] = await tx.select().from(cards).where(eq(cards.id, cardId));
     if (!card) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
     const set = await lockSet(tx, card.setId);
     assertEditable(set.status, "removeCard");
+    setId = card.setId;
+    // Spec 027: las versiones se van con la carta (en cascada) y sus imágenes se sueltan si ya nadie las usa.
+    const versions = await tx.select({ layers: cardVersions.layers }).from(cardVersions).where(eq(cardVersions.cardId, cardId));
+    layerKeys = [...imageKeys(card.layers), ...imageKeys(card.layersPending), ...versions.flatMap((v) => imageKeys(v.layers))];
     await tx.delete(cards).where(eq(cards.id, cardId));
     const rest = await tx.select().from(cards).where(eq(cards.setId, set.id)).orderBy(asc(cards.number)).for("update");
-    toDelete = [card.originalKey, card.pendingOriginalKey, ...composedKeys(card), ...(await renumber(tx, store, set, rest, rest.map((r) => r.id)))];
+    toDelete = [card.originalKey, card.pendingOriginalKey, ...composedKeys(card), ...pendingFlatKeys(card.pendingKeys), ...(await renumber(tx, store, set, rest, rest.map((r) => r.id)))];
     await recordAudit(tx, { actorUserId, action: "card_delete", entityType: "card", entityId: cardId, before: { number: card.number, name: card.name } });
   });
   await deleteKeys(store, toDelete, db);
+  await releaseLayerImages(db, store, setId, layerKeys);
 }
 
 /** La última versión de la tabla de un tipo de sobre (spec 022, RF-12). */

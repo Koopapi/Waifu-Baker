@@ -63,7 +63,7 @@ export function retierLayers(config: LayersConfig, tier: RarityTier): { config: 
 }
 
 /** JSON con las claves ordenadas: la base de datos (jsonb) y la validación reordenan las claves de cada objeto. */
-function stableJson(v: unknown): string {
+export function stableJson(v: unknown): string {
   if (Array.isArray(v)) return `[${v.map(stableJson).join(",")}]`;
   if (v && typeof v === "object") {
     const entries = Object.entries(v as Record<string, unknown>).filter(([, x]) => x !== undefined);

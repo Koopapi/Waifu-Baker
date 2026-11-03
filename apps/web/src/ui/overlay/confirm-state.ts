@@ -7,7 +7,15 @@ export interface ConfirmRequest {
   cancelLabel?: string;
   /** «danger»: acción irreversible, botón en rojo. */
   tone?: "danger" | "default";
+  /**
+   * Spec 027, RF-7: una tercera opción entre confirmar y cancelar (p. ej. «Descartar» junto a «Guardar y cerrar» y
+   * «Seguir editando»). Solo la ve quien pregunta con `useChoice`.
+   */
+  secondary?: { label: string; tone?: "danger" | "default" };
 }
+
+/** Lo que contestó quien vio la pregunta. */
+export type ConfirmAnswer = "confirm" | "secondary" | "cancel";
 
 export interface ConfirmState {
   queue: { id: number; request: ConfirmRequest }[];

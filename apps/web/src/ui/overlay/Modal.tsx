@@ -29,6 +29,11 @@ export interface ModalProps {
   closeLabel?: string;
   /** Solo para tests: sin portal, dentro del árbol. */
   inline?: boolean;
+  /**
+   * Spec 027, RF-6: con cambios sin guardar, ni un clic fuera ni Escape cierran la ventana; el botón de cerrar sigue
+   * pidiendo cerrar (y quien la abrió decide qué preguntar).
+   */
+  preventClose?: boolean;
   children?: React.ReactNode;
 }
 
@@ -36,7 +41,7 @@ export interface ModalProps {
  * Spec 011, RF-6 y RF-14: ventana modal. Radix atrapa el foco, cierra con Escape o al pulsar fuera y devuelve el
  * foco al elemento que la abrió.
  */
-export function Modal({ open, onOpenChange, title, description, footer, size, closeLabel = "Close", inline, testId = "modal", children }: ModalProps) {
+export function Modal({ open, onOpenChange, title, description, footer, size, closeLabel = "Close", inline, preventClose = false, testId = "modal", children }: ModalProps) {
   // Sin un Dialog.Trigger, Radix no sabe a quién devolver el foco: se recuerda quién lo tenía al abrir.
   const opener = useRef<HTMLElement | null>(null);
   useEffect(() => {
@@ -48,6 +53,13 @@ export function Modal({ open, onOpenChange, title, description, footer, size, cl
       <Dialog.Content
         className={contentClasses({ size })}
         data-testid={testId}
+        data-prevent-close={preventClose || undefined}
+        onInteractOutside={(e) => {
+          if (preventClose) e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          if (preventClose) e.preventDefault();
+        }}
         onCloseAutoFocus={(e) => {
           if (!opener.current) return;
           e.preventDefault();

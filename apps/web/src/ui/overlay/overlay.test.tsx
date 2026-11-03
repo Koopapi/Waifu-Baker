@@ -31,6 +31,33 @@ describe("superposiciones", () => {
     expect(out).toContain("Cancel");
   });
 
+  it("test_s027_rf6_con_cambios_sin_guardar_la_ventana_no_se_cierra_desde_fuera", () => {
+    const out = renderToStaticMarkup(
+      <Modal open onOpenChange={() => {}} title="Card 001" preventClose inline>
+        <p>Body</p>
+      </Modal>,
+    );
+    // Radix no cierra con clic fuera ni con Escape cuando la ventana lo impide; el botón de cerrar sigue ahí.
+    expect(out).toMatch(/data-prevent-close="true"/);
+    expect(out).toMatch(/aria-label="Close"/);
+    expect(renderToStaticMarkup(<Modal open onOpenChange={() => {}} title="Card 001" inline />)).not.toMatch(/data-prevent-close/);
+  });
+
+  it("test_s027_rf7_la_pregunta_al_cerrar_ofrece_guardar_descartar_o_seguir", () => {
+    const out = renderToStaticMarkup(
+      <ConfirmDialogView
+        inline
+        request={{ title: "Unsaved changes", body: "What do you want to do?", confirmLabel: "Save and close", secondary: { label: "Discard", tone: "danger" }, cancelLabel: "Keep editing" }}
+        onAnswer={() => {}}
+      />,
+    );
+    expect(out).toMatch(/data-testid="confirm-accept"[^>]*>Save and close/);
+    expect(out).toMatch(/<button[^>]*class="[^"]*bg-ui-danger[^"]*"[^>]*data-testid="confirm-secondary"[^>]*>Discard/);
+    expect(out).toContain("Keep editing");
+    // Sin opción secundaria, solo dos botones (como siempre).
+    expect(renderToStaticMarkup(<ConfirmDialogView inline request={{ title: "Delete?" }} onAnswer={() => {}} />)).not.toMatch(/confirm-secondary/);
+  });
+
   it("test_s011_rf12_las_peticiones_se_atienden_de_una_en_una", () => {
     let s = confirmReducer({ queue: [] }, { type: "ask", id: 1, request: { title: "A" } });
     s = confirmReducer(s, { type: "ask", id: 2, request: { title: "B" } });

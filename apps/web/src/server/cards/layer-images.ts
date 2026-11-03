@@ -64,8 +64,11 @@ export async function prepareLayerImage(file: UploadFile, kind: LayerUploadKind)
   return { body: out, width: stored.width ?? 0, height: stored.height ?? 0, scaled };
 }
 
-/** Spec 016 (RNF): lo que lleva más de 24 h en el área temporal no se guardó nunca; se borra. Devuelve cuántas. */
-export const TEMP_LAYER_TTL_MS = 24 * 60 * 60 * 1000;
+/**
+ * Spec 016 (RNF) y spec 027, RF-15: lo que lleva más de 5 días en el área temporal no se guardó nunca; se borra. Devuelve
+ * cuántas. (Eran 24 h; un borrador recuperable del navegador vive 5 días y necesita sus imágenes.)
+ */
+export const TEMP_LAYER_TTL_MS = 5 * 24 * 60 * 60 * 1000;
 export async function purgeTempLayers(store: CardStore, now: Date): Promise<number> {
   const stale = (await store.list("tmp/layers")).filter((f) => now.getTime() - f.modifiedAt.getTime() > TEMP_LAYER_TTL_MS);
   for (const f of stale) await store.delete(f.key);

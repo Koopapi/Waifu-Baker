@@ -83,7 +83,10 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
       const n = String(i).padStart(3, "0");
       await page.click(`[aria-label="Editar carta ${n}"]`);
       await page.fill('[data-testid="card-editor"] input[name="name"]', `Carta de prueba ${n}`);
-      await page.click('[data-testid="card-editor"] >> text=Guardar');
+      // Spec 027, RF-3: el único «Guardar» deja la ventana abierta; sin cambios, Escape la cierra.
+      await page.click('[data-testid="layers-save"]');
+      await expect(page.locator('[data-testid="save-status"]')).toHaveAttribute("data-state", "saved");
+      await page.keyboard.press("Escape");
       await expect(page.locator('[data-testid="card-editor"]')).toHaveCount(0);
     }
     await expect(page.locator("[data-card-tile] >> text=Lista")).toHaveCount(IMAGES.length);

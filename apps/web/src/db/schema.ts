@@ -20,6 +20,7 @@ import {
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import type { Theme } from "@/domain/ui/theme";
 import type { LayersConfig } from "@/domain/cards/layers";
+import type { CardSheet } from "@/domain/cards/versions";
 import type { ParticlePreset } from "@/domain/cards/library";
 import type { PickedPhrase } from "@/domain/expeditions/report";
 import type { DurationLoot, Rating, ZoneLoot } from "@/domain/expeditions/rules";
@@ -158,6 +159,29 @@ export const cards = pgTable(
     uniqueIndex("cards_set_sha_uq").on(t.setId, t.originalSha256),
     index("cards_set_rarity_idx").on(t.setId, t.rarity),
   ],
+);
+
+/**
+ * Spec 027, RF-17 a RF-25: versiones de una carta. Cada guardado de la ventana de la carta deja una foto de su ficha y
+ * de su configuración de capas (las imágenes siguen en el almacén por su clave). Se conservan las últimas 10 por carta.
+ */
+export const cardVersions = pgTable(
+  "card_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    cardId: uuid("card_id")
+      .notNull()
+      .references(() => cards.id, { onDelete: "cascade" }),
+    number: integer("number").notNull(),
+    ficha: jsonb("ficha").$type<CardSheet>().notNull(),
+    layers: jsonb("layers").$type<LayersConfig>(),
+    changed: text("changed").notNull(),
+    /** RF-23: el guardado quedó pendiente de revisión 18+. */
+    pending: boolean("pending").notNull().default(false),
+    actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("card_versions_card_number_uq").on(t.cardId, t.number), check("card_versions_changed_check", sql`${t.changed} in ('ficha', 'capas', 'ambas')`)],
 );
 
 export const libraryKind = pgEnum("library_kind", ["fondo", "sello", "adorno", "particulas"]);
