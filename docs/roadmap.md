@@ -151,3 +151,9 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   panel, salvo la mesa de apertura y el escenario de la carta, que siguen oscuros; las cartas y los colores de rareza no
   cambian; estilo completo de Bruno (bordes de tinta, sombras duras, inclinados, franja y trama); las pegatinas se
   redibujan. Maquetas en HTML.
+- 3 nov 2026: **spec 027 «guardado claro del armador»** aprobada e implementada sin maqueta (decisión del dueño: quiere
+  desplegarla a pruebas al despertar). Origen: la ventana de la carta tenía dos «Guardar» (el de la ficha cerraba la
+  ventana y tiraba las capas sin guardar) y se cerraba con clic fuera o Escape sin avisar. Ahora: un solo «Guardar»
+  (ficha y capas en una transacción, todo o nada), estado siempre visible, cierre con pregunta (guardar, descartar o
+  seguir), borrador automático en el navegador (0,5 s; 5 días, igual que las imágenes temporales) y 10 versiones por
+  carta con «Volver a esta versión». Rama `spec/027-guardado-del-armador`, PR a `pruebas`.

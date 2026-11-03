@@ -311,4 +311,5 @@ las fuentes gratis (RN-20 a RN-23 siguen; RN-100 y siguientes de la spec 009 y R
 | Premio que vuela | 0,7 s por pegatina, escalonadas 90 ms (3 galletas, 1 sobre); el destino rebota 0,42 s |
 | Estampado de la pegatina del día | 0,45 s antes de que vuele el premio |
 | Celebración | una a la vez, en orden; confeti de 70 piezas; vibración de 30 ms |
-| Capas de una carta | hasta 8 de imagen (700 × 991 ± 1 %, mín. 700 px, ≤ 20 MB, se guardan en WebP); partículas aparte; temporales borradas a las 24 h |
+| Capas de una carta | hasta 8 de imagen (700 × 991 ± 1 %, mín. 700 px, ≤ 20 MB, se guardan en WebP); partículas aparte; temporales borradas a los 5 días (spec 027; antes 24 h) |
+| Guardado de la carta (spec 027) | un solo «Guardar» para ficha y capas (todo o nada); con cambios sin guardar la ventana no se cierra sin preguntar; borrador automático en el navegador a los 0,5 s, vive 5 días; 10 versiones por carta, nunca se reescriben; las imágenes que use una versión conservada no se borran |

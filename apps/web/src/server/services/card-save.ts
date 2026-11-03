@@ -204,6 +204,8 @@ export interface VersionSummary {
   actorName: string | null;
   changed: ChangedPart;
   pending: boolean;
+  /** La configuración de capas de la versión (claves del almacén), para la carta mini de la lista (RF-19). */
+  layers: LayersConfig | null;
 }
 
 /** RF-19: las versiones conservadas de una carta, la más reciente primero. */
@@ -211,12 +213,12 @@ export async function listVersions(db: DbLike, cardId: string): Promise<VersionS
   const [card] = await db.select({ id: cards.id }).from(cards).where(eq(cards.id, cardId));
   if (!card) throw new AdminError("not_found", "La carta no existe.", { entity: "card" });
   const rows = await db
-    .select({ number: cardVersions.number, createdAt: cardVersions.createdAt, changed: cardVersions.changed, pending: cardVersions.pending, actorName: users.displayName })
+    .select({ number: cardVersions.number, createdAt: cardVersions.createdAt, changed: cardVersions.changed, pending: cardVersions.pending, actorName: users.displayName, layers: cardVersions.layers })
     .from(cardVersions)
     .leftJoin(users, eq(users.id, cardVersions.actorUserId))
     .where(eq(cardVersions.cardId, cardId))
     .orderBy(desc(cardVersions.number));
-  return rows.map((r) => ({ number: r.number, createdAt: r.createdAt, changed: r.changed as ChangedPart, pending: r.pending, actorName: r.actorName || null }));
+  return rows.map((r) => ({ number: r.number, createdAt: r.createdAt, changed: r.changed as ChangedPart, pending: r.pending, actorName: r.actorName || null, layers: r.layers ?? null }));
 }
 
 /** RF-20: la foto completa de una versión, para cargarla en la ventana como cambios sin guardar. */
