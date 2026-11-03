@@ -12,14 +12,14 @@
   `listVersions` y `getVersion`. RF-16, RF-19, RF-20. Tests de integración.
 - [x] T4 Sistema de diseño: `SaveStatus`, `confirm()` con opción secundaria (`useChoice`), `Modal` con `preventClose`;
   catálogo `/sistema` y `docs/DESIGN.md`. RF-4, RF-6, RF-7. Tests de componentes.
-- [ ] T5 `useCardDraft`: estado único de la ventana, borrador en el navegador con retraso, `beforeunload`, caducidad,
+- [x] T5 `useCardDraft`: estado único de la ventana, borrador en el navegador con retraso, `beforeunload`, caducidad,
   `no-storage`. RF-5, RF-9, RF-10, RF-13. Tests de unidad.
-- [ ] T6 Ventana de la carta: ficha controlada, un solo «Guardar», estado visible, cierre con pregunta, descartar;
+- [x] T6 Ventana de la carta: ficha controlada, un solo «Guardar», estado visible, cierre con pregunta, descartar;
   `LayersEditor` controlado por props. RF-1, RF-3, RF-5 a RF-8. Tests existentes del editor en verde.
-- [ ] T7 Aviso de borrador al abrir (recuperar / descartar, aviso de carta cambiada, capas sin imagen). RF-11, RF-12,
+- [x] T7 Aviso de borrador al abrir (recuperar / descartar, aviso de carta cambiada, capas sin imagen). RF-11, RF-12,
   RF-14, RF-16.
-- [ ] T8 `VersionsPanel`: lista plegable con carta mini viva y «Volver a esta versión» (`restoredFrom`). RF-19 a RF-21.
-- [ ] T9 Diccionarios en inglés y español, revisión en los dos temas y en teléfono (390 px).
+- [x] T8 `VersionsPanel`: lista plegable con carta mini viva y «Volver a esta versión» (`restoredFrom`). RF-19 a RF-21.
+- [x] T9 Diccionarios en inglés y español, revisión en los dos temas y en teléfono (390 px).
 - [ ] T10 E2E `card-save.spec.ts` en 4 proyectos, suite completa, `validation.md`, documentación del panel,
   `docs/roadmap.md`.
 - [ ] T11 Demo del dueño en `pruebas` (reproducir el caso «editar capas y guardar la ficha»).

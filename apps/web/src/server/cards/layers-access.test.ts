@@ -15,9 +15,30 @@ function walk(dir: string): string[] {
   });
 }
 
-const ROUTES = ["app/api/admin/cards/[id]/layers/route.ts", "app/api/admin/layer-uploads/route.ts", "app/api/admin/library/route.ts", "app/api/admin/cards/[id]/layers/export/route.ts"];
-/** Donde se puede leer la configuración por capas: el esquema, los servicios del panel (capas y fondos) y el panel. */
-const ALLOWED = [/^db\/schema\.ts$/, /^server\/services\/card-layers\.ts$/, /^server\/services\/cards\.ts$/, /^server\/services\/library\.ts$/, /^server\/services\/live-card\.ts$/, /^app\/admin\//, /^app\/api\/admin\//, /^features\/admin\//];
+const ROUTES = [
+  "app/api/admin/cards/[id]/layers/route.ts",
+  "app/api/admin/layer-uploads/route.ts",
+  "app/api/admin/library/route.ts",
+  "app/api/admin/cards/[id]/layers/export/route.ts",
+  // Spec 027: guardado único, versiones y claves presentes de un borrador.
+  "app/api/admin/cards/[id]/route.ts",
+  "app/api/admin/cards/[id]/versions/route.ts",
+  "app/api/admin/cards/[id]/versions/[n]/route.ts",
+  "app/api/admin/cards/[id]/layers/present/route.ts",
+];
+/** Donde se puede leer la configuración por capas: el esquema, los servicios del panel (capas, guardado y fondos) y el panel. */
+const ALLOWED = [
+  /^db\/schema\.ts$/,
+  /^server\/services\/card-layers\.ts$/,
+  /^server\/services\/card-save\.ts$/,
+  /^server\/services\/card-shared\.ts$/,
+  /^server\/services\/cards\.ts$/,
+  /^server\/services\/library\.ts$/,
+  /^server\/services\/live-card\.ts$/,
+  /^app\/admin\//,
+  /^app\/api\/admin\//,
+  /^features\/admin\//,
+];
 
 describe("spec 016 — acceso a las capas", () => {
   it("test_s016_rf1_las_rutas_de_capas_exigen_administrador_y_responden_404_al_resto", () => {

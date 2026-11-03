@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import type { Rarity } from "@/domain/catalog/card-rules";
+import { sameLayers } from "@/domain/cards/versions";
+import type { Notice } from "./useCardDraft";
 import {
   BLEND_MODES,
   BORDER_RANGE,
@@ -58,7 +60,6 @@ import { LibraryPicker, type LibraryEntry } from "@/features/admin/library/Libra
 import { SaveToLibraryDialog, type SaveTarget } from "@/features/admin/library/SaveToLibraryDialog";
 import { kindForLayer, layerFromPreset } from "@/domain/cards/library";
 
-type Notice = { tone: "success" | "warning" | "danger"; text: string } | null;
 type Upload = { id: number; name: string; status: "uploading" | "ok" | "warning" | "error"; message?: string };
 
 const lib = cartaCapas as unknown as CartaCapasApi;
@@ -137,19 +138,37 @@ function frameSwatch(f: Frame, custom: LayersConfig["marcoColores"]) {
  * debajo; a la derecha la chica, el fondo, el encuadre, la lista de capas (la de adelante arriba), la rareza y el
  * sello. Las imágenes se suben al área temporal y nada cambia en la carta hasta «Guardar capas».
  */
-export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; library?: LibraryEntry[]; onSaved: (version: number) => void }) {
+export function LayersEditor({
+  card,
+  library = [],
+  draft,
+  setDraft,
+  saved,
+  rarity,
+  notice,
+  setNotice,
+  onRemoveAll,
+  busy = false,
+}: {
+  card: CardDTO;
+  library?: LibraryEntry[];
+  /** Spec 027: el estado vive en la ventana de la carta (`useCardDraft`); el editor solo lo muestra y lo cambia. */
+  draft: LayersConfig;
+  setDraft: (next: LayersConfig | ((c: LayersConfig) => LayersConfig)) => void;
+  saved: LayersConfig | null;
+  /** La rareza de la ficha que se va a guardar (el estilo automático la sigue). */
+  rarity: Rarity | null;
+  notice: Notice;
+  setNotice: (n: Notice) => void;
+  /** Spec 016, RF-18: quitar todas las capas (pasa por el guardado único). */
+  onRemoveAll: () => void;
+  busy?: boolean;
+}) {
   const tt = useT();
   const t = useAdminLayersT();
   const v4 = t.v4;
   const confirm = useConfirm();
-  const router = useRouter();
-  const [saved, setSaved] = useState<LayersConfig | null>(card.layers);
-  const [draft, setDraft] = useState<LayersConfig>(card.layers ?? emptyConfig(card));
-  const [version, setVersion] = useState(card.version);
   const [uploads, setUploads] = useState<Upload[]>([]);
-  const [notice, setNotice] = useState<Notice>(null);
-  const [conflict, setConflict] = useState(false);
-  const [busy, setBusy] = useState(false);
   const zone = useRef<HTMLDivElement>(null);
   const live = useRef<CartaCapasHandle>(null);
   const seq = useRef(0);
@@ -177,8 +196,8 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
   const preview = useMemo(() => (imageLayers(draft).some(isVisible) ? previewConfig(draft) : null), [shapeKey]);
   const holoIntensity = draft.holoIntensidad ?? DEFAULT_HOLO_INTENSITY;
   const view = useMemo(() => ({ profundidad: depth, inclinacion: tilt, reposo: autoMove, holoIntensidad: holoIntensity }), [depth, tilt, autoMove, holoIntensity]);
-  const dirty = JSON.stringify(draft) !== JSON.stringify(saved ?? emptyConfig(card));
-  const tier = rarityTier(card.rarity);
+  const dirty = !sameLayers(draft, saved ?? emptyConfig(card));
+  const tier = rarityTier(rarity);
   // Spec 017, RF-13 y RF-14: el mismo criterio que aplica el servidor al guardar.
   const autoStyle = Boolean(settleAutoStyle(saved, draft, tier).estiloAuto);
   const characterIndex = draft.capas.findIndex((l) => isImageLayer(l) && l.rol === "personaje");
@@ -417,66 +436,9 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
     setNotice(parsed.changedBlends.length ? { tone: "warning", text: t.io.blends(parsed.changedBlends.join(", ")) } : { tone: "success", text: t.io.done });
   }
 
-  async function send(method: "PUT" | "DELETE", force = false) {
-    setBusy(true);
-    setNotice(null);
-    try {
-      const res = await fetch(`/api/admin/cards/${card.id}/layers`, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(method === "PUT" ? { config: draft, version, force } : { version, force }),
-      });
-      const body = await res.json().catch(() => ({ ok: false, message: tt.admin.serverError(res.status) }));
-      if (body.code === "stale_version") {
-        setConflict(true);
-        return;
-      }
-      if (!body.ok) {
-        setNotice({ tone: "danger", text: body.message });
-        return;
-      }
-      setConflict(false);
-      setSaved(body.layers);
-      setDraft(body.layers ?? emptyConfig(card));
-      setSelected(defaultSelection(body.layers ?? emptyConfig(card)));
-      setVersion(body.version);
-      onSaved(body.version);
-      // Spec 018, RF-18: en una 18+ publicada, lo guardado queda pendiente de revisión.
-      setNotice(
-        method === "DELETE"
-          ? { tone: "success", text: t.removed }
-          : body.pending
-            ? { tone: "warning", text: t.pending.saved }
-            : body.repeated?.length
-              ? { tone: "warning", text: `${t.saved} ${t.repeated}` }
-              : { tone: "success", text: t.saved },
-      );
-      router.refresh();
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  // RF-20: recargar descarta los cambios y muestra lo guardado por el otro administrador.
-  async function reload() {
-    const res = await fetch(`/api/admin/cards/${card.id}/layers`);
-    const body = await res.json();
-    if (!body.ok) return;
-    setSaved(body.layers);
-    setDraft(body.layers ?? emptyConfig(card));
-    setVersion(body.version);
-    onSaved(body.version);
-    setConflict(false);
-    setUploads([]);
-    setOpenRow(-1);
-  }
-
-  async function forceSave() {
-    if (await confirm({ title: t.forceSave, body: t.confirmForce, confirmLabel: t.forceSave, tone: "danger" })) await send("PUT", true);
-  }
-
+  // Spec 027: guardar, recargar tras un conflicto y guardar encima viven en la ventana de la carta (useCardDraft).
   async function removeAll() {
-    if (await confirm({ title: t.removeAll, body: t.confirmRemoveAll, confirmLabel: t.removeAll, tone: "danger" })) await send("DELETE");
+    if (await confirm({ title: t.removeAll, body: t.confirmRemoveAll, confirmLabel: t.removeAll, tone: "danger" })) onRemoveAll();
   }
 
   // Spec 025, RF-9: oculta el sello y lo hace entrar con su animación y el destello.
@@ -746,7 +708,7 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
           <Card data-testid="layers-style">
             <div className="flex flex-wrap items-center gap-2">
               <h4 className="text-sm font-bold text-ui-text">{t.style.title}</h4>
-              <Badge tone={autoStyle ? "success" : "neutral"}>{autoStyle ? t.style.auto(card.rarity ? tt.common.rarity[card.rarity] : "—", tier.toUpperCase()) : t.style.manual}</Badge>
+              <Badge tone={autoStyle ? "success" : "neutral"}>{autoStyle ? t.style.auto(rarity ? tt.common.rarity[rarity] : "—", tier.toUpperCase()) : t.style.manual}</Badge>
             </div>
             <p className="mt-1 text-xs text-ui-text-3">{autoStyle ? t.style.autoNote : t.style.manualNote}</p>
           </Card>
@@ -980,26 +942,6 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
             )}
           </Card>
 
-          {conflict && (
-            <div data-testid="layers-conflict">
-              <Alert
-                tone="warning"
-                title={t.conflictTitle}
-                actions={
-                  <>
-                    <Button size="sm" variant="secondary" onClick={() => void reload()} data-testid="layers-reload">
-                      {t.reload}
-                    </Button>
-                    <Button size="sm" variant="danger" onClick={() => void forceSave()} disabled={busy} data-testid="layers-force">
-                      {t.forceSave}
-                    </Button>
-                  </>
-                }
-              >
-                {t.conflictBody}
-              </Alert>
-            </div>
-          )}
           {notice && (
             <div data-testid="layers-notice">
               <Alert tone={notice.tone}>{notice.text}</Alert>
@@ -1007,9 +949,6 @@ export function LayersEditor({ card, library = [], onSaved }: { card: CardDTO; l
           )}
 
           <div className="flex flex-wrap items-center gap-3">
-            <Button onClick={() => void send("PUT")} loading={busy} disabled={!dirty || conflict} data-testid="layers-save">
-              {t.save}
-            </Button>
             {/* Spec 017, RF-17 y RF-18: el formato del creador de cartas. */}
             {saved && (
               <Button variant="secondary" asChild title={t.io.exportHint}>

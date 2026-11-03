@@ -1,7 +1,7 @@
 // Spec 027, RF-1 a RF-3: el guardado único de la carta (ficha y capas en una sola operación).
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { characters } from "@/db/schema";
+import { cards, characters } from "@/db/schema";
 import { db } from "@/db/client";
 import { RARITIES } from "@/domain/catalog/card-rules";
 import { toCardDTO } from "@/features/admin/cards/dto";
@@ -29,6 +29,17 @@ const body = z.object({ ficha: ficha.optional(), layers: z.unknown().optional(),
 async function fail(e: unknown) {
   if (isAdminError(e)) return Response.json({ ok: false, code: e.code, message: translateError(await getDict(), e) }, { status: STATUS[e.code] ?? 422 });
   throw e;
+}
+
+/** Spec 016, RF-18 (conflicto): la carta tal como está guardada, para recargar la ventana. */
+export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  const session = await adminFromRequest("/api/admin/cards");
+  const { id } = await params;
+  if (!session || !z.string().uuid().safeParse(id).success) return notFoundResponse();
+  const [row] = await db.select().from(cards).where(eq(cards.id, id));
+  if (!row) return notFoundResponse();
+  const [ch] = row.characterId ? await db.select({ name: characters.name }).from(characters).where(eq(characters.id, row.characterId)) : [];
+  return Response.json({ ok: true, card: toCardDTO(row, { characterName: ch?.name ?? null, chance: 0 }) });
 }
 
 /** RF-1 y RF-2: guarda ficha y capas juntas; si algo falla, nada cambia y se dice por qué. */
