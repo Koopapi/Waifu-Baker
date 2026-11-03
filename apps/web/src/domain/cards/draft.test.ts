@@ -42,6 +42,13 @@ describe("spec 027 — borrador en el navegador", () => {
     expect(parseDraft(JSON.stringify(draft), CARD, draft.savedAt)).toEqual(draft);
   });
 
+  it("test_s027_rf12_rf14_el_borrador_recuerda_sobre_que_version_de_la_carta_se_hizo", () => {
+    // Al recuperarlo, la ventana compara `baseVersion` con la versión actual de la carta para avisar si cambió.
+    expect(parseDraft(JSON.stringify(draft), CARD, draft.savedAt)?.baseVersion).toBe(3);
+    expect(parseDraft(JSON.stringify({ ...draft, restoredFrom: 2 }), CARD, draft.savedAt)?.restoredFrom).toBe(2);
+    expect(parseDraft(JSON.stringify({ ...draft, baseVersion: 0 }), CARD, draft.savedAt)).toBeNull();
+  });
+
   it("test_s027_rf4_sin_almacen_la_ventana_sigue_y_lo_indica", () => {
     const broken: DraftStorage = {
       getItem: () => {

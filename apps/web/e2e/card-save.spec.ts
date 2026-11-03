@@ -73,7 +73,7 @@ test("guardado claro del armador: un solo Guardar, cierre con pregunta, borrador
     await expect(name).toHaveValue("Carta guardada");
   });
 
-  await test.step("RF-9 a RF-13: con cambios, salir avisa y, al volver, el borrador se ofrece y se recupera", async () => {
+  await test.step("RF-9, RF-10, RF-11, RF-12 y RF-13: con cambios, salir avisa y, al volver, el borrador se ofrece y se recupera", async () => {
     await name.fill("Desde el borrador");
     // RF-10: el borrador se escribe solo, poco después del cambio.
     await expect.poll(() => draftsInBrowser(admin)).toBe(1);
@@ -120,5 +120,27 @@ test("guardado claro del armador: un solo Guardar, cierre con pregunta, borrador
     await expect(rows).toHaveCount(before + 1);
     await expect(rows.first()).toContainText(`Versión ${before + 1}`);
     await expect(rows.nth(2)).toContainText("ficha y capas");
+  });
+
+  await test.step("RF-14: si otro administrador guardó después de escribirse el borrador, se avisa y al guardarlo salta el conflicto", async () => {
+    await name.fill("Borrador viejo");
+    await expect.poll(() => draftsInBrowser(admin)).toBe(1);
+    const other = await login(browser, "admin-guardado-2", true);
+    await openEditor(other, setId);
+    await other.locator('[data-testid="card-editor"] input[name="name"]').fill("Otro admin");
+    await other.click('[data-testid="layers-save"]');
+    await expect(other.locator('[data-testid="save-status"]')).toHaveAttribute("data-state", "saved");
+    await admin.reload();
+    await openEditor(admin, setId);
+    await expect(name).toHaveValue("Otro admin");
+    await expect(admin.locator('[data-testid="card-draft-offer"]')).toContainText("La carta cambió después de este borrador");
+    await admin.click('[data-testid="draft-recover"]');
+    await expect(name).toHaveValue("Borrador viejo");
+    await save.click();
+    await expect(admin.locator('[data-testid="layers-conflict"]')).toBeVisible();
+    await admin.click('[data-testid="layers-reload"]');
+    await expect(admin.locator('[data-testid="layers-conflict"]')).toHaveCount(0);
+    await expect(name).toHaveValue("Otro admin");
+    await expect(status).toHaveAttribute("data-state", "clean");
   });
 });
