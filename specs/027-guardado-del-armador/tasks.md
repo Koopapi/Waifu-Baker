@@ -5,7 +5,7 @@
 - [x] T1 Dominio y datos: `domain/cards/versions.ts`, `domain/cards/draft.ts`, migración `0020_versiones_de_carta.sql`
   con la siembra de la versión 1, `TEMP_LAYER_TTL_MS` a 5 días. RF-15, RF-18, RF-21, RF-25. Tests de unidad e
   integración.
-- [ ] T2 Servicio `saveCard` en una transacción (ficha + capas + imagen fija + versión + auditoría); `updateCard` y
+- [x] T2 Servicio `saveCard` en una transacción (ficha + capas + imagen fija + versión + auditoría); `updateCard` y
   `saveCardLayers` como envoltorios; `releaseLayerImages` y `deleteCard` con las versiones. RF-1, RF-2, RF-17, RF-22,
   RF-23, RF-24. Tests de integración.
 - [ ] T3 Rutas: `PUT /api/admin/cards/[id]`, `GET …/versions`, `GET …/versions/[n]`, `POST …/layers/present`;

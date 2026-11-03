@@ -78,8 +78,8 @@ describe("spec 017 — la chica crea la carta", () => {
       expect(capas[1]).toMatchObject({ rol: "personaje", encuadre: { x: 12, y: -4, escala: 1.3, giro: 8, ajuste: "contener" } });
       expect(capas[1].key).not.toBe(before[1].key);
       expect(await store.get(capas[1].key)).not.toBeNull();
-      // La chica anterior ya no la usa ninguna carta: se borra.
-      expect(await store.get(before[1].key)).toBeNull();
+      // La chica anterior ya no la usa la carta, pero sí sus versiones conservadas (spec 027, RF-22): se queda.
+      expect(await store.get(before[1].key)).not.toBeNull();
     });
   });
 });

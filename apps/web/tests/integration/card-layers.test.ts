@@ -142,13 +142,15 @@ describe("spec 016 — guardar capas", () => {
     });
   });
 
-  it("test_s016_libera_las_imagenes_que_ya_no_usa_ninguna_carta", async () => {
+  it("test_s016_una_imagen_que_la_carta_ya_no_usa_se_conserva_mientras_una_version_la_use", async () => {
     await inRollback(async (tx) => {
       const { admin, store, card, stage } = await setup(tx);
       const r1 = await saveCardLayers(tx, store, admin.id, card.id, { config: config([await stage(10)]), expectedVersion: card.version });
       const old = (r1.card.layers!.capas[0] as { key: string }).key;
       await saveCardLayers(tx, store, admin.id, card.id, { config: config([await stage(200)]), expectedVersion: r1.card.version });
-      expect(await store.get(old)).toBeNull();
+      // Spec 027, RF-22: la versión anterior de la carta sigue usando la imagen; se suelta cuando ninguna versión
+      // conservada la use (card-save.test.ts).
+      expect(await store.get(old)).not.toBeNull();
     });
   });
 });
