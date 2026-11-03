@@ -58,6 +58,9 @@ export function useCardDraft(initial: CardDTO, texts: SaveTexts, onSaved: (versi
   const router = useRouter();
   const [card, setCard] = useState<CardDTO>(initial);
   const [draft, setDraftState] = useState<DraftSnapshot>(() => snapshotOf(initial));
+  // La versión de la carta sobre la que se hicieron los cambios: la actual, o la del borrador recuperado (RF-14), para
+  // que el servidor avise del conflicto (spec 016, RF-17) si otro administrador guardó entre tanto.
+  const [baseVersion, setBaseVersion] = useState(initial.version);
   const [busy, setBusy] = useState(false);
   const [conflict, setConflict] = useState(false);
   const [savedAt, setSavedAt] = useState<Date | null>(null);
@@ -91,13 +94,13 @@ export function useCardDraft(initial: CardDTO, texts: SaveTexts, onSaved: (versi
       return;
     }
     timer.current = setTimeout(() => {
-      const ok = writeDraft(storage(), { cardId: card.id, baseVersion: card.version, ficha: draft.ficha, layers: draft.layers, savedAt: Date.now(), ...(restoredFrom ? { restoredFrom } : {}) });
+      const ok = writeDraft(storage(), { cardId: card.id, baseVersion, ficha: draft.ficha, layers: draft.layers, savedAt: Date.now(), ...(restoredFrom ? { restoredFrom } : {}) });
       setStorageOk(ok);
     }, DRAFT_WRITE_DELAY_MS);
     return () => {
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [dirty, draft, card.id, card.version, restoredFrom]);
+  }, [dirty, draft, card.id, baseVersion, restoredFrom]);
 
   // RF-9: salir o recargar con cambios sin guardar pide confirmación al navegador.
   useEffect(() => {
@@ -119,6 +122,7 @@ export function useCardDraft(initial: CardDTO, texts: SaveTexts, onSaved: (versi
     (next: CardDTO) => {
       const merged = { ...next, chance: card.chance };
       setCard(merged);
+      setBaseVersion(merged.version);
       setDraftState(snapshotOf(merged));
       setRestoredFrom(null);
       setConflict(false);
@@ -134,7 +138,7 @@ export function useCardDraft(initial: CardDTO, texts: SaveTexts, onSaved: (versi
       setNotice(null);
       try {
         const sendLayers = opts.layersOverride !== undefined || layersChanged;
-        const body: Record<string, unknown> = { version: card.version, force: Boolean(opts.force) };
+        const body: Record<string, unknown> = { version: baseVersion, force: Boolean(opts.force) };
         const patch = fichaPatch(saved.ficha, draft.ficha);
         if (Object.keys(patch).length) body.ficha = patch;
         if (sendLayers) body.layers = opts.layersOverride !== undefined ? opts.layersOverride : draft.layers;
@@ -168,12 +172,13 @@ export function useCardDraft(initial: CardDTO, texts: SaveTexts, onSaved: (versi
         setBusy(false);
       }
     },
-    [card.id, card.version, saved.ficha, draft.ficha, draft.layers, layersChanged, restoredFrom, texts, applyCard, router],
+    [card.id, baseVersion, saved.ficha, draft.ficha, draft.layers, layersChanged, restoredFrom, texts, applyCard, router],
   );
 
   /** RF-8: descarta los cambios (y el borrador) y vuelve a lo guardado. */
   const discard = useCallback(() => {
     setDraftState(snapshotOf(card));
+    setBaseVersion(card.version);
     setRestoredFrom(null);
     setConflict(false);
     setNotice(null);
@@ -209,10 +214,12 @@ export function useCardDraft(initial: CardDTO, texts: SaveTexts, onSaved: (versi
       }
     }
     setDraftState({ ficha: d.ficha, layers });
+    // RF-14: los cambios se hicieron sobre la versión del borrador; si la carta cambió, guardar avisará del conflicto.
+    setBaseVersion(Math.min(d.baseVersion, card.version));
     setRestoredFrom(d.restoredFrom ?? null);
     setPendingDraft(null);
     setNotice(missing.length ? { tone: "warning", text: texts.draftMissing(missing.length) } : { tone: "success", text: texts.draftRecovered });
-  }, [pendingDraft, card.id, texts]);
+  }, [pendingDraft, card.id, card.version, texts]);
 
   const dismissDraft = useCallback(() => {
     clearDraft(storage(), card.id);
