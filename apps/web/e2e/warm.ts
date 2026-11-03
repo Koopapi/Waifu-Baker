@@ -49,6 +49,11 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   { method: "GET", path: "/api/demo/card/1" },
   // Specs 016 a 018: capas del panel, biblioteca, exportar y carta viva del coleccionista.
   { method: "GET", path: `/api/admin/cards/${ID}/layers` },
+  // Spec 027: guardado único de la carta, versiones y claves presentes de un borrador.
+  { method: "GET", path: `/api/admin/cards/${ID}` },
+  { method: "GET", path: `/api/admin/cards/${ID}/versions` },
+  { method: "GET", path: `/api/admin/cards/${ID}/versions/1` },
+  { method: "POST", path: `/api/admin/cards/${ID}/layers/present`, body: "{}" },
   { method: "GET", path: `/api/admin/cards/${ID}/layers/export` },
   { method: "POST", path: "/api/admin/layer-uploads", body: "{}" },
   { method: "POST", path: "/api/admin/library", body: "{}" },

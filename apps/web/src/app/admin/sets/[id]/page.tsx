@@ -20,6 +20,7 @@ import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
 import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
+import { toCardDTO } from "@/features/admin/cards/dto";
 import { getDict, getLocale } from "@/i18n/server";
 import { adminLayersDictionaries } from "@/i18n/admin-layers";
 import { missingParts } from "@/domain/cards/layers";
@@ -50,28 +51,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   const slots = overview.odds?.slots ?? [];
   const cardCounts = Object.fromEntries(RARITIES.map((r) => [r, counts[r]])) as Record<Rarity, number>;
   const chances = cardChances(overview.cards, slots);
-  const cards: CardDTO[] = overview.cards.map((c) => ({
-    id: c.id,
-    number: c.number,
-    name: c.name,
-    flavorText: c.flavorText,
-    rarity: c.rarity,
-    variant: c.variant,
-    characterId: c.characterId,
-    characterName: c.characterName,
-    status: c.status,
-    version: c.version,
-    thumbUrl: assetUrl(c.keyThumb),
-    midUrl: assetUrl(c.keyMid),
-    fullUrl: assetUrl(c.keyFull),
-    adultReviewedAt: c.adultReviewedAt ? c.adultReviewedAt.toISOString() : null,
-    pendingArtUrl: assetUrl(c.pendingOriginalKey),
-    pendingLayersUrl: assetUrl(c.pendingKeys?.mid ?? null),
-    chance: chances.get(c.id) ?? 0,
-    // Spec 018, RF-18: el editor trabaja sobre el cambio pendiente de revisión, si lo hay.
-    layers: c.layersPending ?? c.layers,
-    hasOriginal: Boolean(c.originalKey),
-  }));
+  const cards: CardDTO[] = overview.cards.map((c) => toCardDTO(c, { characterName: c.characterName, chance: chances.get(c.id) ?? 0 }));
   const unreviewed = set.isAdult ? cards.filter((c) => !c.adultReviewedAt || c.pendingArtUrl || c.pendingLayersUrl).length : 0;
   // Spec 018, RF-21: cartas con cambios de capas pendientes de revisión, enlazadas.
   const pendingLayers = cards.filter((c) => c.pendingLayersUrl);

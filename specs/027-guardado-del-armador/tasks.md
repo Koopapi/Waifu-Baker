@@ -8,7 +8,7 @@
 - [x] T2 Servicio `saveCard` en una transacción (ficha + capas + imagen fija + versión + auditoría); `updateCard` y
   `saveCardLayers` como envoltorios; `releaseLayerImages` y `deleteCard` con las versiones. RF-1, RF-2, RF-17, RF-22,
   RF-23, RF-24. Tests de integración.
-- [ ] T3 Rutas: `PUT /api/admin/cards/[id]`, `GET …/versions`, `GET …/versions/[n]`, `POST …/layers/present`;
+- [x] T3 Rutas: `PUT /api/admin/cards/[id]`, `GET …/versions`, `GET …/versions/[n]`, `POST …/layers/present`;
   `listVersions` y `getVersion`. RF-16, RF-19, RF-20. Tests de integración.
 - [ ] T4 Sistema de diseño: `SaveStatus`, `confirm()` con opción secundaria (`useChoice`), `Modal` con `preventClose`;
   catálogo `/sistema` y `docs/DESIGN.md`. RF-4, RF-6, RF-7. Tests de componentes.
