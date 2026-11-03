@@ -6,6 +6,7 @@ import { sound, useSoundMuted } from "@/features/sound/engine";
 import { Bell, Gift, Package, Settings, Sparkles, Trash2 } from "@/ui/icons/glyphs";
 import {
   Alert,
+  SaveStatus,
   AnimatedCounter,
   Avatar,
   Badge,
@@ -38,6 +39,7 @@ import {
   TextArea,
   TextField,
   Tooltip,
+  useChoice,
   useConfirm,
   useOptimisticAction,
   useToast,
@@ -61,9 +63,11 @@ function Section({ id, title, children }: { id: string; title: string; children:
 export function Catalog() {
   const toast = useToast();
   const confirm = useConfirm();
+  const choose = useChoice();
   const [modal, setModal] = useState(false);
   const [focus, setFocus] = useState(false);
   const [confirmed, setConfirmed] = useState("—");
+  const [chosen, setChosen] = useState("—");
   const [count, setCount] = useState(240);
   const [set, setSet] = useState("s1");
   const [until] = useState(() => new Date(Date.now() + 4 * 3600_000 + 12 * 60_000).toISOString());
@@ -196,6 +200,14 @@ export function Catalog() {
           <Alert tone="warning" title="Almost there">2 cards still need a rarity.</Alert>
           <Alert tone="danger" title="Couldn’t publish">Slot 3 does not add up to 100 %.</Alert>
         </div>
+        {/* Spec 027, RF-4: el estado de guardado de la ventana de la carta. */}
+        <div className="flex flex-wrap gap-6" data-testid="catalog-save-status">
+          <SaveStatus state="clean" label="No changes" />
+          <SaveStatus state="dirty" label="Unsaved changes" />
+          <SaveStatus state="saving" label="Saving…" />
+          <SaveStatus state="saved" label="Saved at 14:05" />
+          <SaveStatus state="no-storage" label="Unsaved changes" detail="No draft in this browser" />
+        </div>
         <EmptyState title="No packs yet" icon={<Package className="size-8" aria-hidden />} action={<Button variant="secondary">See what you can get</Button>}>
           Packs you receive will show up here.
         </EmptyState>
@@ -223,6 +235,17 @@ export function Catalog() {
           </Button>
           <span className="text-sm text-ui-text-2" data-testid="confirm-result">
             Answer: {confirmed}
+          </span>
+          {/* Spec 027, RF-7: la pregunta con tres opciones (guardar y cerrar, descartar, seguir editando). */}
+          <Button
+            variant="secondary"
+            data-testid="open-choice"
+            onClick={async () => setChosen(await choose({ title: "Unsaved changes", body: "Save them before closing?", confirmLabel: "Save and close", secondary: { label: "Discard", tone: "danger" }, cancelLabel: "Keep editing" }))}
+          >
+            Close with changes…
+          </Button>
+          <span className="text-sm text-ui-text-2" data-testid="choice-result">
+            Choice: {chosen}
           </span>
           <Menu
             trigger={

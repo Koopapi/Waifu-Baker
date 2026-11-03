@@ -10,7 +10,7 @@
   RF-23, RF-24. Tests de integración.
 - [x] T3 Rutas: `PUT /api/admin/cards/[id]`, `GET …/versions`, `GET …/versions/[n]`, `POST …/layers/present`;
   `listVersions` y `getVersion`. RF-16, RF-19, RF-20. Tests de integración.
-- [ ] T4 Sistema de diseño: `SaveStatus`, `confirm()` con opción secundaria (`useChoice`), `Modal` con `preventClose`;
+- [x] T4 Sistema de diseño: `SaveStatus`, `confirm()` con opción secundaria (`useChoice`), `Modal` con `preventClose`;
   catálogo `/sistema` y `docs/DESIGN.md`. RF-4, RF-6, RF-7. Tests de componentes.
 - [ ] T5 `useCardDraft`: estado único de la ventana, borrador en el navegador con retraso, `beforeunload`, caducidad,
   `no-storage`. RF-5, RF-9, RF-10, RF-13. Tests de unidad.

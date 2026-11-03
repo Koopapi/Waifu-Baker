@@ -4,11 +4,11 @@ import { AlertDialog } from "radix-ui";
 import { useT } from "@/i18n/client";
 import { buttonClasses } from "../action/classes";
 import { cx } from "../variants";
-import type { ConfirmRequest } from "./confirm-state";
+import type { ConfirmAnswer, ConfirmRequest } from "./confirm-state";
 import { overlayClasses } from "./overlay-classes";
 
-/** Vista del modal de confirmación; `onAnswer(true)` al confirmar. */
-export function ConfirmDialogView({ request, onAnswer, inline, returnFocus }: { request: ConfirmRequest; onAnswer: (ok: boolean) => void; inline?: boolean; returnFocus?: HTMLElement | null }) {
+/** Vista del modal de confirmación; `onAnswer("confirm")` al confirmar (spec 027: o `"secondary"`, si la hay). */
+export function ConfirmDialogView({ request, onAnswer, inline, returnFocus }: { request: ConfirmRequest; onAnswer: (answer: ConfirmAnswer) => void; inline?: boolean; returnFocus?: HTMLElement | null }) {
   const t = useT().common;
   const danger = request.tone === "danger";
   const body = (
@@ -30,10 +30,15 @@ export function ConfirmDialogView({ request, onAnswer, inline, returnFocus }: { 
           <AlertDialog.Description className="sr-only">{request.title}</AlertDialog.Description>
         )}
         <div className="mt-6 flex flex-wrap justify-end gap-2">
-          <AlertDialog.Cancel className={buttonClasses({ variant: "ghost" })} onClick={() => onAnswer(false)}>
+          <AlertDialog.Cancel className={buttonClasses({ variant: "ghost" })} onClick={() => onAnswer("cancel")}>
             {request.cancelLabel ?? t.cancel}
           </AlertDialog.Cancel>
-          <AlertDialog.Action className={cx(buttonClasses({ variant: danger ? "danger" : "primary" }))} onClick={() => onAnswer(true)} data-testid="confirm-accept">
+          {request.secondary && (
+            <AlertDialog.Action className={buttonClasses({ variant: request.secondary.tone === "danger" ? "danger" : "secondary" })} onClick={() => onAnswer("secondary")} data-testid="confirm-secondary">
+              {request.secondary.label}
+            </AlertDialog.Action>
+          )}
+          <AlertDialog.Action className={cx(buttonClasses({ variant: danger ? "danger" : "primary" }))} onClick={() => onAnswer("confirm")} data-testid="confirm-accept">
             {request.confirmLabel ?? t.confirm}
           </AlertDialog.Action>
         </div>
@@ -41,7 +46,7 @@ export function ConfirmDialogView({ request, onAnswer, inline, returnFocus }: { 
     </>
   );
   return (
-    <AlertDialog.Root open onOpenChange={(open) => !open && onAnswer(false)}>
+    <AlertDialog.Root open onOpenChange={(open) => !open && onAnswer("cancel")}>
       {inline ? body : <AlertDialog.Portal>{body}</AlertDialog.Portal>}
     </AlertDialog.Root>
   );
