@@ -157,3 +157,9 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   (ficha y capas en una transacción, todo o nada), estado siempre visible, cierre con pregunta (guardar, descartar o
   seguir), borrador automático en el navegador (0,5 s; 5 días, igual que las imágenes temporales) y 10 versiones por
   carta con «Volver a esta versión». Rama `spec/027-guardado-del-armador`, PR a `pruebas`.
+- 5 nov 2026: **spec 028 «valores por defecto, ajustes del panel y cartas de portada»** implementada en local (sin
+  maqueta; el dueño fuera). Sello de texto 15 y borde 3,0 en toda carta nueva o re-estilada; las cartas guardadas no
+  cambian (la migración 0021 les escribe el grosor con el que se veían). Probabilidades iniciales nuevas (plata EX
+  0,20 % y legendaria 9,5 % por sobre; gold 5,9 % y 43 %), garantía de EX a 20 sobres gold con su propio contador,
+  «al menos una por sobre» en la página pública. Todo se cambia en `/admin/settings`, con auditoría; además, de 3 a 5
+  cartas de portada en abanico (componente `CardFan`). Rama `spec/028-valores-por-defecto`, sin push.

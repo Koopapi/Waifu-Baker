@@ -75,7 +75,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 |---|---|---|---|
 | RN-50 | Rarezas, de menor a mayor: Común, Poco común, Rara, Épica, Legendaria, Secreta. | Vigente | 003 |
 | RN-51 | Cada sobre tiene entre 1 y 10 cartas (5 por defecto). Cada ranura tiene sus porcentajes por rareza, que deben sumar 100 %. Dentro de una rareza, todas las cartas tienen la misma probabilidad. | Vigente | 003 RF-6, RF-20 |
-| RN-52 | Probabilidades iniciales de una colección nueva: ranuras normales 70 / 25 / 5 (común / poco común / rara); penúltima ranura 60 / 30 / 8 / 2 (poco común / rara / épica / legendaria); última ranura con rara o mejor garantizada: 75 / 18 / 6 / 1 (rara / épica / legendaria / secreta). | Vigente | 003 |
+| RN-52 | (Sustituida por RN-226, spec 028.) Probabilidades iniciales de una colección nueva: ranuras normales 70 / 25 / 5 (común / poco común / rara); penúltima ranura 60 / 30 / 8 / 2 (poco común / rara / épica / legendaria); última ranura con rara o mejor garantizada: 75 / 18 / 6 / 1 (rara / épica / legendaria / secreta). | Vigente | 003 |
 | RN-53 | Una carta rara o mejor puede salir holo; la probabilidad se fija por colección (20 % por defecto). | Vigente | 003 RF-20 |
 | RN-54 | **Protección de mala suerte**: tras N−1 sobres seguidos de una colección sin épica o mejor, el siguiente garantiza al menos una (sustituye la carta de la última ranura). N es de 0 a 100, 10 por defecto; 0 la desactiva. | Vigente | 004 RF-12, RF-13 |
 | RN-55 | El contador de protección es de cada usuario y colección, y vuelve a cero al salir una épica o mejor. | Vigente | 004 RF-14 |
@@ -273,6 +273,21 @@ las fuentes gratis (RN-20 a RN-23 siguen; RN-100 y siguientes de la spec 009 y R
 | RN-222 | El patron tiene 3 espacios de expedición en lugar de 2 (excepción deliberada a «sin ventajas por pagar»). Al dejar de serlo, las que están fuera terminan y no envía otra hasta tener menos de 2 en curso. A quien no es patron se le dice cómo conseguir el tercero. | Vigente | 021 RF-13 a RF-15 |
 | RN-223 | Al añadir una regla de tier, el panel propone 8 sobres al mes. Valores de arranque: SFW 8; 18+: 8 SFW + 8 adultos. | Vigente | 021 RF-16 |
 
+## 21. Valores por defecto, ajustes y portada (spec 028)
+
+Decisiones del dueño del 5 nov 2026: el sello y el borde de partida, probabilidades «justas, pero que la EX sea
+difícil», garantía de EX a 20 sobres gold, todo cambiable en el panel, y cartas de portada.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-224 | Toda carta nueva (al subir a la chica) y toda carta a la que se le aplica el estilo de su rareza (también al cambiar la rareza con estilo automático) sale con el sello de texto a 15 y el borde a 3,0, o con los valores que el administrador haya puesto en el panel (sello 4 a 40, borde 0 a 8). El sello de imagen no cambia (36 %). Sin estilo automático, al cambiar la rareza el sello de texto conserva su tamaño. | Vigente | 028 RF-1 a RF-3, RF-15 |
+| RN-225 | Una carta sin grosor de borde guardado se ve con 3,0 en la carta viva, la imagen fija y el editor. Las cartas guardadas antes de la spec no cambian de aspecto: la migración les escribió el grosor con el que se veían. Importar sin tamaño de sello o sin borde usa los valores por defecto. | Vigente | 028 RF-4 a RF-7 |
+| RN-226 | Probabilidades que se proponen a una colección nueva (cambiables en el panel; cada fila debe sumar 100 y la última respetar la garantía del sobre): plata, ranuras normales 72/22/5/1/0 (C/R/E/L/EX), mejorada 35/48/14/3/0, última 0/80/16/3,8/0,2; gold, normales 40/38/17/4,5/0,5, mejorada 0/52/34/12,5/1,5, última 0/0/72/25/3. Las colecciones ya creadas o publicadas no cambian. Sustituye a RN-52. | Vigente | 028 RF-8 a RF-10, RF-16, RF-18 |
+| RN-227 | **Garantía de EX**: tras N−1 sobres gold seguidos de una colección sin EX, el siguiente gold trae una (sustituye la carta de la última ranura). N es 20 por defecto para las colecciones nuevas (0 la desactiva; las publicadas antes de la spec no la tienen). El contador es de cada coleccionista y colección, solo cuenta sobres gold y vuelve a cero con cualquier EX. La garantía de épica sigue contando solo los plata. | Vigente | 028 RF-12, RF-13, RF-17 |
+| RN-228 | La página pública de probabilidades muestra, por tipo de sobre, la probabilidad de que un sobre traiga al menos una carta de cada rareza y la garantía de EX. | Vigente | 028 RF-11, RF-14 |
+| RN-229 | Cada cambio de los ajustes del panel (valores de cartas, probabilidades, garantías, cartas de portada) queda en la auditoría con el valor anterior y el nuevo, y solo vale para lo que se cree o re-estile después. | Vigente | 028 RF-18, RF-19 |
+| RN-230 | **Cartas de portada**: el administrador elige de 3 a 5 cartas de colecciones publicadas que no sean 18+, en orden de izquierda a derecha; la portada (también la de la demo) las muestra en abanico con su imagen pública con marca de agua, con sesión y sin ella. Si una deja de valer (colección archivada o 18+, carta borrada) deja de mostrarse; sin ninguna, la portada es la de siempre. | Vigente | 028 RF-20 a RF-23 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -282,7 +297,7 @@ las fuentes gratis (RN-20 a RN-23 siguen; RN-100 y siguientes de la spec 009 y R
 | Regalo del panel | 1 a 20 sobres, motivo de 3 a 200 caracteres |
 | Cartas por sobre | 1 a 10 (5 por defecto) |
 | Probabilidad de holo (rara o mejor) | 20 % por defecto, configurable |
-| Protección de mala suerte | N de 0 a 100, 10 por defecto |
+| Protección de mala suerte | épica: N de 0 a 100, 10 por defecto (plata); EX: 20 por defecto (gold, spec 028) |
 | «Abrir todos» | hasta 50 sobres; ráfaga de 6 s como mucho; hasta 10 destacadas |
 | Nota de moderación | hasta 300 caracteres |
 | Espera entre revisiones de un álbum oculto | 7 días |
@@ -312,4 +327,6 @@ las fuentes gratis (RN-20 a RN-23 siguen; RN-100 y siguientes de la spec 009 y R
 | Estampado de la pegatina del día | 0,45 s antes de que vuele el premio |
 | Celebración | una a la vez, en orden; confeti de 70 piezas; vibración de 30 ms |
 | Capas de una carta | hasta 8 de imagen (700 × 991 ± 1 %, mín. 700 px, ≤ 20 MB, se guardan en WebP); partículas aparte; temporales borradas a los 5 días (spec 027; antes 24 h) |
+| Sello de texto y borde de partida (spec 028) | 15 y 3,0, cambiables en el panel (4 a 40 y 0 a 8) |
+| Cartas de portada (spec 028) | 3 a 5, de colecciones publicadas no 18+ |
 | Guardado de la carta (spec 027) | un solo «Guardar» para ficha y capas (todo o nada); con cambios sin guardar la ventana no se cierra sin preguntar; borrador automático en el navegador a los 0,5 s, vive 5 días; 10 versiones por carta, nunca se reescriben; las imágenes que use una versión conservada no se borran |
