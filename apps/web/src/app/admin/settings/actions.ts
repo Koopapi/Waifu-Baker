@@ -5,7 +5,8 @@ import { getDict, getLocale } from "@/i18n/server";
 import { adminDefaultsDictionaries } from "@/i18n/admin-defaults";
 import type { CardDefaults } from "@/domain/cards/card-defaults";
 import type { OddsTables, PityDefaults } from "@/domain/catalog/default-odds";
-import { setCardDefaults, setCoverCards, setMinAge, setOddsDefaults, setPityDefaults } from "@/server/services/settings";
+import type { BondSettings } from "@/domain/bonds/settings";
+import { setBondSettings, setCardDefaults, setCoverCards, setMinAge, setOddsDefaults, setPityDefaults } from "@/server/services/settings";
 
 /** Spec 010, RF-17: cambia la edad mínima de la web (16 o 18). */
 export async function setMinAgeAction(age: number): Promise<ActionState> {
@@ -46,5 +47,13 @@ export async function setCoverCardsAction(ids: string[]): Promise<ActionState> {
   return adminAction("setCoverCards", ["/admin/settings", "/"], async ({ db, actorId }) => {
     await setCoverCards(db, actorId, Array.isArray(ids) ? ids.map(String) : []);
     return (await panelT()).cover.saved;
+  });
+}
+
+/** Spec 029, RF-22: puntos, polvo, factor holo, costes de fabricar y títulos del vínculo. */
+export async function setBondSettingsAction(values: BondSettings): Promise<ActionState> {
+  return adminAction("setBondSettings", ["/admin/settings"], async ({ db, actorId }) => {
+    await setBondSettings(db, actorId, values);
+    return (await panelT()).bond.saved;
   });
 }

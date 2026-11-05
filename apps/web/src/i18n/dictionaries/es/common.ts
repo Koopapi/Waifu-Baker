@@ -29,6 +29,7 @@ export const common: typeof en = {
     sealedBadge: (n) => `${n} sobres sin abrir`,
     readyBadge: (n) => `${n} recompensas listas`,
     cookies: (n) => `${n.toLocaleString("es")} galletas`,
+    dust: (n) => `${n.toLocaleString("es")} de polvo`,
     progress: (owned, total) => `${owned} / ${total} cartas`,
     noCollections: "Abre tu primer sobre para empezar una colección.",
     tabs: { packs: "Sobres", collection: "Colección", games: "Juegos", rewards: "Recompensas", account: "Cuenta" },

@@ -16,6 +16,8 @@ export const ROUTES = [
   "/collection",
   `/collection/${ID}`,
   "/collection/album",
+  // Spec 029: línea de personaje.
+  `/collection/character/${ID}`,
   "/account",
   "/rewards",
   "/games",

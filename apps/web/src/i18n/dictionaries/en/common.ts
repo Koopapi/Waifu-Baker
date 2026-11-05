@@ -28,6 +28,7 @@ export const common = {
     sealedBadge: (n: number) => `${n} sealed packs`,
     readyBadge: (n: number) => `${n} rewards ready`,
     cookies: (n: number) => `${n.toLocaleString("en")} cookies`,
+    dust: (n: number) => `${n.toLocaleString("en")} dust`,
     progress: (owned: number, total: number) => `${owned} / ${total} cards`,
     noCollections: "Open your first pack to start a collection.",
     tabs: { packs: "Packs", collection: "Collection", games: "Games", rewards: "Rewards", account: "Account" },
