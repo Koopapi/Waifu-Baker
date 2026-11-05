@@ -1,0 +1,58 @@
+// Spec 028: textos de los ajustes del panel (valores por defecto, probabilidades y garantías de colecciones nuevas,
+// cartas de portada). Solo los importa el panel, así que no viajan a las páginas del coleccionista.
+import type { adminDefaults as en } from "../en/admin-defaults";
+
+export const adminDefaults: typeof en = {
+  cards: {
+    heading: "Cartas nuevas",
+    help: "Toda carta nueva empieza con estos valores, y «Aplicar estilo de la rareza» vuelve a ellos. Las cartas ya guardadas no cambian.",
+    sealSize: "Tamaño del sello de texto",
+    border: "Grosor del borde",
+    save: "Guardar valores de las cartas",
+    saved: "Valores de las cartas guardados. Valen para las cartas que se creen o re-estilen desde ahora.",
+  },
+  odds: {
+    heading: "Probabilidades de las colecciones nuevas",
+    help: "Con lo que empieza una colección nueva, por ranura. Cada fila debe sumar 100. Las colecciones publicadas conservan las suyas.",
+    kinds: { silver: "Sobre plata", gold: "Sobre gold" },
+    rows: { base: "Ranuras normales", boosted: "Ranura mejorada", guaranteed: "Última ranura" },
+    row: "Ranura",
+    sum: "Suma",
+    cell: (row: string, rarity: string) => `${row}, ${rarity}`,
+    save: "Guardar probabilidades",
+    saved: "Probabilidades guardadas. Valen para las colecciones que se creen desde ahora.",
+  },
+  pity: {
+    heading: "Garantías de las colecciones nuevas",
+    help: "Sobres seguidos: con uno menos y sin ninguna carta de esa rareza, el siguiente la trae. 0 la desactiva.",
+    epic: "Garantía de Épica (sobres plata)",
+    ex: "Garantía de EX (sobres gold)",
+    packs: "sobres",
+    save: "Guardar garantías",
+    saved: "Garantías guardadas. Valen para las colecciones que se creen desde ahora.",
+  },
+  cover: {
+    heading: "Cartas de portada",
+    help: "De 3 a 5 cartas de colecciones publicadas que no sean 18+, en abanico en la portada pública con su imagen con marca de agua. El orden va de izquierda a derecha.",
+    add: "Añadir una carta",
+    search: "Buscar una carta",
+    noResults: "No hay cartas con ese nombre.",
+    noCandidates: "Todavía no hay cartas de colecciones publicadas que no sean 18+.",
+    empty: "Sin cartas elegidas: la portada no muestra el abanico.",
+    count: (n: number) => `${n} de 5`,
+    invalid: "Ya no vale: no se mostrará",
+    left: (name: string) => `Mover ${name} a la izquierda`,
+    right: (name: string) => `Mover ${name} a la derecha`,
+    remove: (name: string) => `Quitar ${name}`,
+    save: "Guardar cartas de portada",
+    saved: "Cartas de portada guardadas.",
+    noName: "Sin nombre",
+  },
+  oddsEditor: {
+    exPity: "Garantía de EX",
+    exPityAria: "Sobres gold seguidos sin EX antes de que el siguiente traiga una",
+    exPityTitle: "Con un sobre menos seguido sin EX, el siguiente sobre gold trae una (sustituye la última ranura). 0 la desactiva.",
+    disabled: "desactivada",
+    packs: "sobres",
+  },
+};
