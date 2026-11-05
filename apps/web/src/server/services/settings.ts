@@ -130,7 +130,7 @@ export async function listCoverCandidates(db: DbLike): Promise<CoverCandidate[]>
     .innerJoin(sets, eq(sets.id, cards.setId))
     .where(and(eq(sets.status, "published"), eq(sets.isAdult, false), isNotNull(cards.keyPublic)))
     .orderBy(asc(sets.code), asc(cards.number), asc(cards.variant));
-  return rows.map(({ keyPublic: _k, setStatus: _s, setIsAdult: _a, ...c }) => c);
+  return rows.map((c) => ({ id: c.id, setCode: c.setCode, number: c.number, name: c.name, rarity: c.rarity, keyThumb: c.keyThumb }));
 }
 
 /** Las elegidas que siguen valiendo, en su orden (RF-22: las que dejaron de valer no salen). */

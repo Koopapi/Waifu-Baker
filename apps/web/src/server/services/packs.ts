@@ -2,8 +2,8 @@ import { randomBytes } from "node:crypto";
 import { and, asc, count, desc, eq, inArray, isNotNull, isNull, sql } from "drizzle-orm";
 import { cards, dropTables, packOpenings, packs, pityCounters, sets, userCards, users } from "@/db/schema";
 import type { Rarity } from "@/domain/catalog/card-rules";
-import { drawPackWithPity } from "@/domain/catalog/draw";
-import { isEpicPlus, nextPityCounter, pityActive } from "@/domain/catalog/pity";
+import { drawPackWithGuarantee } from "@/domain/catalog/draw";
+import { isEpicPlus, isEx, nextPityCounter, pityActive } from "@/domain/catalog/pity";
 import { hmacRng } from "@/domain/random";
 import type { PackKind } from "@/domain/catalog/default-odds";
 import type { DbLike } from "@/server/db-types";
@@ -137,10 +137,12 @@ export async function openPack(
       .from(pityCounters)
       .where(and(eq(pityCounters.userId, user.id), eq(pityCounters.setId, set.id)))
       .for("update");
-    const active = silver && pityActive(counter.packsSinceEpic, odds.pityThreshold);
+    // Spec 028, RF-12: en los gold, la garantía de EX con su propio contador y su propio umbral.
+    const active = silver ? pityActive(counter.packsSinceEpic, odds.pityThreshold) : pityActive(counter.packsSinceEx, odds.exPityThreshold);
+    const floor = active ? (silver ? "epic" : "ex") : null;
 
     const seed = input.seed ?? randomBytes(32);
-    const result = drawPackWithPity({ cards: pool, slots: odds.slots, holoChance: odds.holoChance }, hmacRng(seed), active, { unique: true });
+    const result = drawPackWithGuarantee({ cards: pool, slots: odds.slots, holoChance: odds.holoChance }, hmacRng(seed), floor, { unique: true });
 
     const draws: StoredRoll[] = [];
     for (const d of result.draws) {
@@ -170,12 +172,15 @@ export async function openPack(
       })
       .returning();
     await tx.update(packs).set({ status: "opened", openedAt: sql`now()` }).where(eq(packs.id, pack.id));
-    if (silver) {
-      await tx
-        .update(pityCounters)
-        .set({ packsSinceEpic: nextPityCounter(counter.packsSinceEpic, draws.some((d) => isEpicPlus(d.rarity))), updatedAt: sql`now()` })
-        .where(and(eq(pityCounters.userId, user.id), eq(pityCounters.setId, set.id)));
-    }
+    // Spec 028, RF-13: cada contador cuenta solo los sobres de su tipo y vuelve a 0 con su rareza.
+    await tx
+      .update(pityCounters)
+      .set(
+        silver
+          ? { packsSinceEpic: nextPityCounter(counter.packsSinceEpic, draws.some((d) => isEpicPlus(d.rarity))), updatedAt: sql`now()` }
+          : { packsSinceEx: nextPityCounter(counter.packsSinceEx, draws.some((d) => isEx(d.rarity))), updatedAt: sql`now()` },
+      )
+      .where(and(eq(pityCounters.userId, user.id), eq(pityCounters.setId, set.id)));
 
     return {
       openingId: opening.id,

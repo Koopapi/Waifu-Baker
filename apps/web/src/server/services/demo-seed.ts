@@ -24,6 +24,7 @@ import { ackOpenings, openPack } from "./packs";
 import { adjustCookies } from "./rewards";
 import { upsertUserFromLogin } from "./users";
 import { giftPacks } from "./users-admin";
+import { getCardDefaults } from "./settings";
 import { grantWelcomePack, setWelcomeSet } from "./welcome";
 
 /** Nombres reales que nunca pueden aparecer en las cartas de la demo (RF-12). */
@@ -71,7 +72,8 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
     files.push({ file: { body: await opts.readImage(c.file), mime: MIME[ext] ?? "image/webp", filename: path.basename(c.file) }, name: c.title, rarity: c.rarity, character: c.character });
   }
   // Spec 017, RF-20: la chica recortada de la muestra crea su carta como cualquier otra.
-  const sample = opts.sample ? parseCreatorConfig(opts.sample.config) : null;
+  // Spec 028, RF-5: lo que falte en la configuración de muestra (sello, borde) sale con los valores por defecto.
+  const sample = opts.sample ? parseCreatorConfig(opts.sample.config, await getCardDefaults(db)) : null;
   if (sample && !sample.ok) throw new Error(`Configuración de muestra no válida (${sample.path})`);
   const sampleGirl = sample?.ok ? sample.files.find((f) => f.kind === "character") : undefined;
   if (opts.sample && sampleGirl) {

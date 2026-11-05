@@ -154,8 +154,9 @@ describe("spec 028 — cartas ya guardadas", () => {
       const admin = await makeAdmin(tx);
       const { cards: list } = await createPublishedSet(tx, admin.id, { code: "MIG1", rarities: ["common", "rare", "epic"], slots: [{ common: 100 }, { rare: 100 }] });
       const strip = (l: Record<string, unknown>, marco: string) => {
-        const { borde: _b, ...rest } = l;
-        return { ...rest, marco };
+        const rest: Record<string, unknown> = { ...l, marco };
+        delete rest.borde;
+        return rest;
       };
       const frames = ["ssr", "personalizado", "ninguno"];
       for (const [i, c] of list.entries()) {
