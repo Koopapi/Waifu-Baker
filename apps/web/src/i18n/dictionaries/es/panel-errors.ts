@@ -42,4 +42,20 @@ export const panelErrors: Record<string, Msg> = {
   pack_not_pending: "Esa expedición no tiene un sobre por elegir.",
   not_enough_fragments: (p) => `Te faltan fragmentos de mapa: tienes ${p.have} de ${p.need}.`,
   free_adult: "Una colección 18+ no puede ser gratuita.",
+  // Spec 028: ajustes de cartas nuevas, colecciones nuevas y portada.
+  invalid_card_defaults: (p) => `El sello de texto va de ${p.sealMin} a ${p.sealMax} y el borde de ${p.borderMin} a ${p.borderMax}.`,
+  invalid_odds_defaults: (p) => {
+    if (p.reason === "range") return "Cada probabilidad va de 0 a 100.";
+    const where = `Sobre ${p.kind === "gold" ? "gold" : "plata"}, ${({ base: "ranuras normales", boosted: "ranura mejorada", guaranteed: "última ranura" } as Record<string, string>)[String(p.row)] ?? String(p.row)}`;
+    if (p.reason === "slot_sum") return `${where}: suma ${p.sum} % en vez de 100 %. No se guardó nada.`;
+    if (p.reason === "guarantee_slot") return `${where}: solo puede dar ${p.kind === "gold" ? "Épica" : "Rara"} o mejor. No se guardó nada.`;
+    return `${where}: las probabilidades no pueden ser negativas. No se guardó nada.`;
+  },
+  invalid_pity_defaults: (p) => `Cada garantía es un número entero de sobres de ${p.min} a ${p.max} (0 la desactiva).`,
+  invalid_cover_cards: (p) =>
+    p.reason === "duplicate"
+      ? "Cada carta de portada solo se puede elegir una vez."
+      : p.reason === "invalid"
+        ? "Solo valen cartas de colecciones publicadas que no sean 18+."
+        : `Elige de ${p.min} a ${p.max} cartas de portada (o ninguna).`,
 };

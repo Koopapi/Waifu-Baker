@@ -42,4 +42,20 @@ export const panelErrors: Record<string, Msg> = {
   pack_not_pending: "That expedition has no pack to choose.",
   not_enough_fragments: (p) => `You need more map fragments: you have ${p.have} of ${p.need}.`,
   free_adult: "An 18+ set can't be free.",
+  // Spec 028: settings for new cards, new sets and the home page.
+  invalid_card_defaults: (p) => `The text seal size goes from ${p.sealMin} to ${p.sealMax} and the border from ${p.borderMin} to ${p.borderMax}.`,
+  invalid_odds_defaults: (p) => {
+    if (p.reason === "range") return "Each chance goes from 0 to 100.";
+    const where = `${p.kind === "gold" ? "Gold" : "Silver"} pack, ${({ base: "normal slots", boosted: "boosted slot", guaranteed: "last slot" } as Record<string, string>)[String(p.row)] ?? String(p.row)}`;
+    if (p.reason === "slot_sum") return `${where}: adds up to ${p.sum}% instead of 100%. Nothing was saved.`;
+    if (p.reason === "guarantee_slot") return `${where}: it can only give ${p.kind === "gold" ? "Epic" : "Rare"} or better. Nothing was saved.`;
+    return `${where}: chances can't be negative. Nothing was saved.`;
+  },
+  invalid_pity_defaults: (p) => `Each guarantee is a whole number of packs from ${p.min} to ${p.max} (0 turns it off).`,
+  invalid_cover_cards: (p) =>
+    p.reason === "duplicate"
+      ? "Each home page card can only be chosen once."
+      : p.reason === "invalid"
+        ? "Only cards from published sets that aren't 18+ can be on the home page."
+        : `Choose ${p.min} to ${p.max} cards for the home page (or none).`,
 };
