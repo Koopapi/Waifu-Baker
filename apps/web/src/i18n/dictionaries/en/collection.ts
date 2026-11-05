@@ -78,6 +78,8 @@ export const collection = {
     featuredSaved: "Featured cards saved.",
   },
   publicAlbum: {
+    // Spec 029, RF-12.
+    mastery: "Mastery",
     unavailable: "This album is not available",
     unavailableBody: "It may be private, or its link may have changed. Ask its owner for the current link.",
     notFoundTitle: "Album not found",

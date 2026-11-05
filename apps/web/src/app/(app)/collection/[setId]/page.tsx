@@ -7,6 +7,7 @@ import { requireUser } from "@/server/auth/require-user";
 import { cardImageUrl } from "@/server/cards/image-urls";
 import { myBinder } from "@/server/services/collection";
 import { expeditionInfoForCards } from "@/server/services/expeditions";
+import { characterOfCards } from "@/server/services/bonds";
 import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
 import { PatreonNotice } from "@/features/economy/PatreonNotice";
 import { Alert } from "@/ui/feedback/Alert";
@@ -19,11 +20,8 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
   const user = await requireUser(`/collection/${setId}`);
   const [b, t, patron] = await Promise.all([myBinder(db, user.id, setId), getDict(), isPatronUser(db, user.id)]);
   if (!b) notFound();
-  const info = await expeditionInfoForCards(
-    db,
-    user.id,
-    b.slots.flatMap((s) => (s.owned ? [s.owned.cardId] : [])),
-  );
+  const ownedIds = b.slots.flatMap((s) => (s.owned ? [s.owned.cardId] : []));
+  const [info, characterOf] = await Promise.all([expeditionInfoForCards(db, user.id, ownedIds), characterOfCards(db, ownedIds)]);
   const slots: BinderSlotDTO[] = b.slots.map((s) =>
     s.owned
       ? {
@@ -34,6 +32,8 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
             thumb: cardImageUrl(s.owned.cardId, "thumb", user.id),
             mid: cardImageUrl(s.owned.cardId, "mid", user.id),
             bondLevel: info.bonds.get(s.owned.cardId) ?? 1,
+            // Spec 029, RF-15: enlace a la línea de su personaje.
+            characterId: characterOf.get(s.owned.cardId) ?? null,
             away: { normal: info.away.get(`${s.owned.cardId}:normal`) ?? null, holo: info.away.get(`${s.owned.cardId}:holo`) ?? null },
           },
         }

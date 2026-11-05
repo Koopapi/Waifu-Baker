@@ -11,8 +11,11 @@ import {
   Avatar,
   Badge,
   Button,
+  BondBar,
   Card,
   CardFan,
+  CardLine,
+  GainSummary,
   CartaCapas,
   Celebration,
   Checkbox,
@@ -151,6 +154,15 @@ export function Catalog() {
         <div className="flex justify-center">
           <CardFan cards={TIERS.map(([tier, file]) => ({ key: tier, src: `/lab/${file}.webp` }))} />
         </div>
+        {/* Spec 029: vínculo, línea de personaje y resumen de lo que se gana al reciclar. */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <BondBar label="Bond with Aiko" levelLabel="Level 3" title="Friend" pointsLabel="160 / 300 points" value={10} max={150} hint="Level 5: holo on all her cards" />
+          <GainSummary rows={[{ label: "Copies", value: "3" }, { label: "Bond points", value: "75" }, { label: "Dust", value: "22" }, { label: "Level", value: "1 → 2" }]} />
+        </div>
+        <CardLine
+          label="Character line (sample)"
+          items={TIERS.slice(0, 4).map(([tier, file], i) => ({ key: tier, label: `00${i + 1} · ${tier.toUpperCase()}`, image: `/lab/${file}.webp`, owned: i !== 2, missingLabel: "Missing", detail: i === 0 ? "x3 · 2 to recycle" : undefined }))}
+        />
       </Section>
 
       <Section id="action" title="Action">

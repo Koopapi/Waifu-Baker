@@ -23,6 +23,8 @@ export interface BinderSlotDTO {
     mid: string;
     /** Spec 020, RF-25: vínculo de su personaje y hora de vuelta si está de expedición (por versión). */
     bondLevel: number;
+    /** Spec 029: su personaje, para ir a su línea. */
+    characterId: string | null;
     away: { normal: string | null; holo: string | null };
   } | null;
 }

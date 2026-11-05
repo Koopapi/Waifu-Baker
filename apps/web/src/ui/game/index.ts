@@ -1,4 +1,5 @@
 export { AnimatedCounter } from "./AnimatedCounter";
+export { BondBar, type BondBarProps } from "./BondBar";
 export { CardFan, fanLayout, type CardFanItem } from "./CardFan";
 export { CartaCapas, CARD_RATIO, type CartaCapasHandle, type CartaCapasProps } from "./CartaCapas";
 export { Celebration } from "./Celebration";

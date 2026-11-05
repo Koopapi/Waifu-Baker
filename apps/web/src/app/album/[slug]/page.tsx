@@ -64,7 +64,14 @@ export default async function PublicAlbumPage({ params }: { params: Promise<{ sl
                 <li key={c.cardId} className={`w-[min(40vw,200px)] rarity-${c.rarity ?? "common"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element -- imagen pública con marca de agua */}
                   <img src={img(c.cardId)} alt={c.name} className="aspect-[700/991] w-full rounded-l object-cover shadow-3" />
-                  <p className="mt-2 text-center text-sm">{c.name}</p>
+                  <p className="mt-2 text-center text-sm">
+                    {c.name}
+                    {c.mastered && (
+                      <span className="ml-1 rounded-full bg-ui-accent px-2 py-0.5 text-[11px] font-bold text-ui-on-accent" data-testid="album-mastery">
+                        {t.collection.publicAlbum.mastery}
+                      </span>
+                    )}
+                  </p>
                   <p className="text-center text-xs text-ui-text-3">
                     {c.setCode} · {pad(c.number)} · {c.rarity ? t.common.rarity[c.rarity] : ""}
                   </p>
