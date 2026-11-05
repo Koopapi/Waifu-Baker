@@ -47,6 +47,8 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   { method: "GET", path: `/api/album/AAAAAAAAAAAA/img?c=${ID}` },
   { method: "GET", path: "/api/cards/img" },
   { method: "GET", path: "/api/demo/card/1" },
+  // Spec 028: imagen de una carta de portada.
+  { method: "GET", path: `/api/cover/${ID}` },
   // Specs 016 a 018: capas del panel, biblioteca, exportar y carta viva del coleccionista.
   { method: "GET", path: `/api/admin/cards/${ID}/layers` },
   // Spec 027: guardado único de la carta, versiones y claves presentes de un borrador.
