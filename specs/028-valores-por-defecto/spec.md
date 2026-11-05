@@ -1,6 +1,7 @@
-# Spec 028 — Valores por defecto del armador
+# Spec 028 — Valores por defecto, ajustes del panel y cartas de portada
 
-Estado: borrador del 5 nov 2026, pendiente de aprobación del dueño.
+Estado: borrador del 5 nov 2026 con las decisiones del dueño (garantía de EX a 10 sobres gold, sello de imagen sin
+cambios, valores configurables y cartas de portada). Pendiente de aprobación.
 
 Origen: el dueño pidió el 5 nov 2026 que el tamaño del sello quede siempre en 15 por defecto y el grosor del borde en
 3,0, porque hoy cada carta nueva sale con valores que luego corrige a mano; el mismo día pidió ajustar las
@@ -50,9 +51,37 @@ en todos los sitios donde nace una carta o se le aplica un estilo.
 - RF-11: EL SISTEMA mostrará en la página pública de probabilidades, por tipo de sobre, la probabilidad de que un sobre
   traiga al menos una carta de cada rareza.
 
+- RF-12: MIENTRAS un coleccionista lleve 9 sobres gold seguidos de una colección sin ninguna EX, EL SISTEMA le
+  garantizará una EX en el siguiente sobre gold de esa colección (como la garantía de Épica del plata, por coleccionista
+  y colección).
+- RF-13: CUANDO un sobre gold traiga una EX, EL SISTEMA pondrá a cero ese contador.
+- RF-14: EL SISTEMA publicará la garantía de EX en la página de probabilidades.
+
 Resultado esperado (sobres de 5 cartas): plata, al menos una EX 0,20 % y una Legendaria 9,5 %; gold, EX 5,9 % y
 Legendaria 43 %. Un coleccionista gratuito (unos 60 plata y 4 gold al mes) saca una EX cada 2,7 meses y 7-8
 Legendarias al mes; un patron Premium, una EX cada 1,6 meses. Hoy es una EX cada 1,3 meses (gratuito).
+Con la garantía a 10 sobres gold (RF-12), el sobre gold trae EX en el 12,9 % de los casos en promedio: una EX cada
+1,5 meses (gratuito) y cada 0,9 meses (Premium). Con 20 sobres serían 2,1 y 1,2 meses; el número se cambia en el panel
+(RF-17).
+
+### Ajustes del panel (decisión del dueño)
+- RF-15: EL SISTEMA permitirá al administrador cambiar en `/admin/ajustes` el tamaño por defecto del sello de texto
+  (4 a 40) y el grosor por defecto del borde (0 a 8).
+- RF-16: EL SISTEMA permitirá al administrador cambiar en `/admin/ajustes` las probabilidades iniciales por ranura de
+  los sobres plata y gold; SI no suman 100 por ranura, ENTONCES EL SISTEMA no las guardará e indicará cuál falla.
+- RF-17: EL SISTEMA permitirá al administrador cambiar los sobres de la garantía de Épica (plata) y de EX (gold) que se
+  proponen a una colección nueva.
+- RF-18: EL SISTEMA aplicará los ajustes solo a lo que se cree o re-estile después de guardarlos (RF-6 y RF-10).
+- RF-19: EL SISTEMA registrará en la auditoría cada cambio de ajustes con el valor anterior y el nuevo.
+
+### Cartas de portada (decisión del dueño)
+- RF-20: EL SISTEMA permitirá al administrador elegir en `/admin/ajustes` de 3 a 5 cartas de portada, solo de
+  colecciones publicadas que no sean 18+, y su orden.
+- RF-21: MIENTRAS haya cartas de portada elegidas, EL SISTEMA las mostrará en abanico en la portada pública, con su
+  imagen pública con marca de agua, a quien tenga sesión y a quien no.
+- RF-22: SI una carta de portada deja de ser válida (su colección se archiva o pasa a 18+, o la carta se borra),
+  ENTONCES EL SISTEMA dejará de mostrarla sin romper la portada.
+- RF-23: MIENTRAS no haya cartas de portada válidas, EL SISTEMA mostrará la portada como hoy, sin abanico.
 
 ## Requisitos no funcionales
 - Los valores viven en un solo sitio del dominio (hoy están repartidos entre el dominio, el editor y la carta viva).
@@ -61,13 +90,14 @@ Legendarias al mes; un patron Premium, una EX cada 1,6 meses. Hoy es una EX cada
 ## Casos límite
 - Carta con marco personalizado o «Sin marco»: el borde por defecto es 3,0 para el personalizado; «Sin marco» no usa
   borde.
-- Sello de imagen: no cambia (su tamaño sigue en 36 %). [NECESITA ACLARACIÓN: ¿también debe cambiar?]
-- Carta antigua que nunca se tocó a mano (estilo automático): se queda como está hasta que se le aplique el estilo
-  otra vez (RF-6). [NECESITA ACLARACIÓN: ¿o prefieres que «Regenerar imágenes» las actualice a 15 y 3,0?]
+- Sello de imagen: no cambia (su tamaño sigue en 36 %), decisión del dueño.
+- Carta antigua con estilo automático: se queda como está hasta que se le aplique el estilo otra vez (RF-6);
+  «Regenerar imágenes» no la cambia.
 - Demo (`pnpm demo`) y colecciones de prueba: las cartas que se arman solas salen con 15 y 3,0.
 
 ## Fuera de alcance
-- Hacer los valores configurables desde el panel (`/admin/ajustes`). [NECESITA ACLARACIÓN: ¿lo quieres ahora?]
+- Cambiar las probabilidades de colecciones ya publicadas (siguen congeladas).
+- Cartas de portada de colecciones 18+ o sin publicar.
 - Cambiar otros valores por defecto (partículas, holo, brillo).
 
 ## Criterios de finalización
@@ -75,7 +105,4 @@ Cada RF con su test en verde (unidad para el dominio, integración para crear y 
 15 y 3,0 en los deslizadores); suite completa en verde; comprobar en la demo que una carta nueva sale con esos valores.
 
 ## Dudas abiertas
-- [NECESITA ACLARACIÓN: ¿garantía de EX en el sobre gold (por ejemplo, a los 30 sobres gold sin EX, el siguiente la trae), como la de Épica del plata?]
-- [NECESITA ACLARACIÓN: ¿cambia también el sello de imagen?]
-- [NECESITA ACLARACIÓN: ¿las cartas antiguas con estilo automático se actualizan al regenerar?]
-- [NECESITA ACLARACIÓN: ¿configurable desde el panel ahora o después?]
+- Ninguna. Supuesto mío, no preguntado: las cartas antiguas con estilo automático no se actualizan al regenerar.
