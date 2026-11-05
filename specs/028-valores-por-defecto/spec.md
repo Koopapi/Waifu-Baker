@@ -3,7 +3,8 @@
 Estado: borrador del 5 nov 2026, pendiente de aprobación del dueño.
 
 Origen: el dueño pidió el 5 nov 2026 que el tamaño del sello quede siempre en 15 por defecto y el grosor del borde en
-3,0, porque hoy cada carta nueva sale con valores que luego corrige a mano.
+3,0, porque hoy cada carta nueva sale con valores que luego corrige a mano; el mismo día pidió ajustar las
+probabilidades iniciales para que sean justas y la EX sea difícil (RF-8 a RF-11).
 
 ## Contexto y objetivo
 Hoy una carta nueva, o una a la que se le aplica el estilo de su rareza, sale con el sello de texto a 10, 12, 13 o 14
@@ -38,6 +39,21 @@ en todos los sitios donde nace una carta o se le aplica un estilo.
 - RF-7: EL SISTEMA mostrará la carta igual en la vista previa del editor, en la apertura, en la ficha y en la imagen
   fija con estos valores.
 
+### Probabilidades iniciales (añadido el 5 nov 2026, a petición del dueño: «justas, pero que la EX sea difícil»)
+- RF-8: CUANDO se cree una colección, EL SISTEMA le propondrá en el sobre plata estas probabilidades por ranura:
+  ranuras normales Común 72, Rara 22, Épica 5, Legendaria 1, EX 0; ranura mejorada Común 35, Rara 48, Épica 14,
+  Legendaria 3, EX 0; última ranura Rara 80, Épica 16, Legendaria 3,8, EX 0,2.
+- RF-9: CUANDO se cree una colección, EL SISTEMA le propondrá en el sobre gold: ranuras normales Común 40, Rara 38,
+  Épica 17, Legendaria 4,5, EX 0,5; ranura mejorada Rara 52, Épica 34, Legendaria 12,5, EX 1,5; última ranura Épica 72,
+  Legendaria 25, EX 3.
+- RF-10: EL SISTEMA conservará sin cambios las probabilidades de las colecciones ya publicadas (versiones congeladas).
+- RF-11: EL SISTEMA mostrará en la página pública de probabilidades, por tipo de sobre, la probabilidad de que un sobre
+  traiga al menos una carta de cada rareza.
+
+Resultado esperado (sobres de 5 cartas): plata, al menos una EX 0,20 % y una Legendaria 9,5 %; gold, EX 5,9 % y
+Legendaria 43 %. Un coleccionista gratuito (unos 60 plata y 4 gold al mes) saca una EX cada 2,7 meses y 7-8
+Legendarias al mes; un patron Premium, una EX cada 1,6 meses. Hoy es una EX cada 1,3 meses (gratuito).
+
 ## Requisitos no funcionales
 - Los valores viven en un solo sitio del dominio (hoy están repartidos entre el dominio, el editor y la carta viva).
 - Sin cambios en las cartas del coleccionista salvo las que se creen o se re-estilen a partir de ahora.
@@ -59,6 +75,7 @@ Cada RF con su test en verde (unidad para el dominio, integración para crear y 
 15 y 3,0 en los deslizadores); suite completa en verde; comprobar en la demo que una carta nueva sale con esos valores.
 
 ## Dudas abiertas
+- [NECESITA ACLARACIÓN: ¿garantía de EX en el sobre gold (por ejemplo, a los 30 sobres gold sin EX, el siguiente la trae), como la de Épica del plata?]
 - [NECESITA ACLARACIÓN: ¿cambia también el sello de imagen?]
 - [NECESITA ACLARACIÓN: ¿las cartas antiguas con estilo automático se actualizan al regenerar?]
 - [NECESITA ACLARACIÓN: ¿configurable desde el panel ahora o después?]

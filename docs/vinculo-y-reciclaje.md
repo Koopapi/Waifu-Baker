@@ -115,13 +115,12 @@ reciclar y jugar.
 
 ## 5. Decisiones del dueño (5 nov 2026)
 
-1. Barra única o nivel por carta: pidió que se explique mejor (ver respuesta en el chat del 5 nov; recomendación: barra
-   única).
+1. **Barra única de vínculo** por personaje (confirmado tras la explicación).
 2. **Reciclar da las dos cosas** (vínculo y polvo), sin romper el balance. Propuesta: 100 % de los puntos de vínculo
    de la tabla 3.1 y **la mitad** del polvo de la tabla 3.3; en nivel 10, el polvo completo.
 3. **Efectos por nivel y poder: sí, los dos.** El holo que da el nivel 5 es solo visual y **no** suma el +15 % de poder
    de la versión holo.
-4. Última copia: valorar el abuso (ver 6).
+4. **Cada versión (normal y holo) conserva siempre una copia** (confirmado; ver 6).
 5. **La Rara da más** puntos que la Común (25 contra 10).
 6. **Fabricar cualquier carta publicada** que el coleccionista pueda ver (EX y carta del mes, no).
 
