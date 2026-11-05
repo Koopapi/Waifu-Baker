@@ -2,12 +2,14 @@
 // personaje, los ajustes con auditoría y el simulador.
 import { describe, expect, it } from "vitest";
 import { and, eq, inArray, sql } from "drizzle-orm";
-import { auditLog, characterBonds, characters, expeditionProfiles, libraryItems, packs, sets, userCards, userRewards, users } from "@/db/schema";
+import { auditLog, cards, characterBonds, characters, expeditionProfiles, libraryItems, packs, sets, userCards, userRewards, users } from "@/db/schema";
 import { FACTORY_BOND_SETTINGS } from "@/domain/bonds/settings";
 import { BOND_THRESHOLDS } from "@/domain/expeditions/rules";
 import { characterLine, craftCard, previewRecycle, recycle, simulateBond } from "@/server/services/bonds";
 import { getBondSettings, setBondSettings } from "@/server/services/settings";
 import { purgeAccount } from "@/server/services/account";
+import { liveCardConfig } from "@/server/services/live-card";
+import { activateAlbum, publicAlbum, setFeatured } from "@/server/services/album";
 import { upsertUserFromLogin } from "@/server/services/users";
 import { inRollback, testDb } from "./db";
 import { createPublishedSet, makeAdmin } from "./factories";
@@ -240,6 +242,54 @@ describe("spec 029 — baja de cuenta", () => {
       await purgeAccount(tx, w.fan.id);
       expect(await w.xp()).toBe(0);
       expect(await w.dust()).toBe(0);
+    });
+  });
+});
+
+describe("spec 029 — lo que se ve con el vínculo", () => {
+  it("test_s029_rf9_rf10_rf11_la_carta_viva_del_dueno_lleva_los_efectos_de_su_nivel", async () => {
+    await inRollback(async (tx) => {
+      const w = await world(tx);
+      await w.give(w.r.id, 1);
+      const at = async (xp: number) => {
+        await tx.insert(characterBonds).values({ userId: w.fan.id, characterId: w.characterId, xp }).onConflictDoUpdate({ target: [characterBonds.userId, characterBonds.characterId], set: { xp } });
+        return (await liveCardConfig(tx, w.fan.id, w.r.id))!.config;
+      };
+      const l1 = await at(0);
+      expect(l1.capas.some((l) => "brillo" in l && l.brillo)).toBe(false);
+      const l3 = await at(150);
+      expect(l3.capas.find((l) => "rol" in l && l.rol === "personaje")).toMatchObject({ brillo: { tipo: "destello" } });
+      expect(Boolean(l3.holo)).toBe(false);
+      expect((await at(500)).holo).toBe(true);
+      const l7 = await at(1000);
+      expect(l7).toMatchObject({ marco: "personalizado", marcoColores: { color: "#ff5fa2" } });
+      expect(l7.capas.some((l) => "particulas" in l && l.particulas === "corazones")).toBe(true);
+    });
+  });
+
+  it("test_s029_rf13_los_efectos_son_del_dueno_del_vinculo_y_la_imagen_publica_no_cambia", async () => {
+    await inRollback(async (tx) => {
+      const w = await world(tx);
+      const other = await upsertUserFromLogin(tx, { patreonUserId: "fan-bond-other", displayName: "Otra", role: "user" });
+      await w.give(w.r.id, 1);
+      await tx.insert(userCards).values({ userId: other.id, cardId: w.r.id, holo: false, qty: 1 });
+      await tx.insert(characterBonds).values({ userId: w.fan.id, characterId: w.characterId, xp: 1000 });
+      expect((await liveCardConfig(tx, w.fan.id, w.r.id))!.config.marco).toBe("personalizado");
+      expect((await liveCardConfig(tx, other.id, w.r.id))!.config.marco).not.toBe("personalizado");
+      const [before] = await tx.select({ key: cards.keyPublic }).from(cards).where(eq(cards.id, w.r.id));
+      expect(before.key).toBe(w.r.keyPublic);
+    });
+  });
+
+  it("test_s029_rf12_en_el_nivel_10_el_album_publico_muestra_la_insignia_de_maestria", async () => {
+    await inRollback(async (tx) => {
+      const w = await world(tx);
+      await w.give(w.r.id, 1);
+      const album = await activateAlbum(tx, w.fan.id, "Bonda");
+      await setFeatured(tx, w.fan.id, [w.r.id]);
+      expect((await publicAlbum(tx, album.slug))!.featured[0].mastered).toBe(false);
+      await tx.insert(characterBonds).values({ userId: w.fan.id, characterId: w.characterId, xp: 2500 });
+      expect((await publicAlbum(tx, album.slug))!.featured[0].mastered).toBe(true);
     });
   });
 });
