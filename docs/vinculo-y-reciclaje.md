@@ -113,7 +113,35 @@ reciclar y jugar.
 | 031 Tiendas | galletas (cosméticos, relojes) y diamantes (sobres) | motor |
 | 032 Tiers de Patreon | booster y premium 1 a 3, escudos, carta del mes | motor |
 
-## 5. Lo que tiene que decidir el dueño
+## 5. Decisiones del dueño (5 nov 2026)
+
+1. Barra única o nivel por carta: pidió que se explique mejor (ver respuesta en el chat del 5 nov; recomendación: barra
+   única).
+2. **Reciclar da las dos cosas** (vínculo y polvo), sin romper el balance. Propuesta: 100 % de los puntos de vínculo
+   de la tabla 3.1 y **la mitad** del polvo de la tabla 3.3; en nivel 10, el polvo completo.
+3. **Efectos por nivel y poder: sí, los dos.** El holo que da el nivel 5 es solo visual y **no** suma el +15 % de poder
+   de la versión holo.
+4. Última copia: valorar el abuso (ver 6).
+5. **La Rara da más** puntos que la Común (25 contra 10).
+6. **Fabricar cualquier carta publicada** que el coleccionista pueda ver (EX y carta del mes, no).
+
+## 6. Balance y abusos
+
+- **Poder:** el vínculo tiene tope (nivel 10 = +18 %). Una EX holo en su terreno pasa de 34,5 a 40,7; un equipo de 3,
+  de 103,5 a 122,1. Además la calificación tope es Excelente (poder ÷ dificultad ≥ 1,4) y el botín está fijado por
+  calificación: el poder de más **no da más botín**, así que no hay excedente que rompa el juego.
+- **Ciclo fabricar → reciclar:** fabricar cuesta 20 veces el polvo que devuelve reciclar la misma carta (2,5 %). No
+  hay forma de ganar polvo o vínculo dando vueltas. Además, una carta fabricada recién no se puede reciclar si es la
+  única copia.
+- **Holo visual del nivel 5:** cosmético; el poder de holo solo lo da la carta holo real (si no, se contaría dos veces).
+- **Última copia:** cada versión (normal y holo) conserva siempre una copia. Si se permitiera reciclar la normal
+  teniendo la holo, la ganancia sería una copia más de puntos (pequeña), pero el coleccionista perdería esa carta del
+  álbum y, sin intercambio, solo la recuperaría fabricándola: se protege su colección, no se gana balance.
+- **Cuentas múltiples:** sin intercambio entre cuentas, no se puede pasar vínculo, polvo ni cartas de una a otra.
+- **Sobres de regalo diarios:** el ritmo de repetidas lo marca el sorteo publicado; el simulador mostrará «días para
+  llegar al nivel 10» para ajustar los puntos antes de publicar.
+
+## 7. Preguntas originales
 
 1. ¿Una sola barra (vínculo, como aquí) o nivel aparte por carta (economía v2)? Recomiendo la barra única.
 2. ¿Al reciclar se elige vínculo o polvo (como aquí), o siempre da las dos cosas en menor cantidad?
