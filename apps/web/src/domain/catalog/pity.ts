@@ -14,3 +14,6 @@ export function pityActive(packsSinceEpic: number, threshold: number): boolean {
 export function nextPityCounter(packsSinceEpic: number, hadEpicPlus: boolean): number {
   return hadEpicPlus ? 0 : packsSinceEpic + 1;
 }
+
+/** Spec 028, RF-12 y RF-13: la garantía de EX de los sobres gold usa las mismas reglas con su propio contador. */
+export const isEx = (r: Rarity) => r === "ex";
