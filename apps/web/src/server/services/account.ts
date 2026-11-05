@@ -1,6 +1,6 @@
 import { and, eq, isNotNull, isNull, lte, sql } from "drizzle-orm";
 import { DEFAULT_THEME } from "@/domain/ui/theme";
-import { albums, cookieLedger, packs, patreonLinks, pityCounters, tierRules, userCards, userRewards, users } from "@/db/schema";
+import { albums, characterBonds, cookieLedger, packs, patreonLinks, pityCounters, tierRules, userCards, userRewards, users } from "@/db/schema";
 import { RECOVERY_DAYS, accountState, purgeDate } from "@/domain/accounts/lifecycle";
 import { hasAdultTier, entitledPacks, isPatron } from "@/domain/patreon/membership";
 import type { DbLike } from "@/server/db-types";
@@ -82,6 +82,8 @@ export async function purgeAccount(db: DbLike, userId: string) {
     await tx.delete(userCards).where(eq(userCards.userId, userId));
     await tx.delete(albums).where(eq(albums.userId, userId));
     await tx.delete(pityCounters).where(eq(pityCounters.userId, userId));
+    // Spec 029, caso límite: el vínculo se borra con la cuenta (el polvo va en las recompensas).
+    await tx.delete(characterBonds).where(eq(characterBonds.userId, userId));
     await tx.delete(patreonLinks).where(eq(patreonLinks.userId, userId));
     // Spec 009: cargas, racha y galletas.
     await tx.delete(userRewards).where(eq(userRewards.userId, userId));

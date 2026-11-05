@@ -155,6 +155,13 @@
       "when": 1793864716797,
       "tag": "0021_valores_por_defecto",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793866126832,
+      "tag": "0022_vinculo_y_reciclaje",
+      "breakpoints": true
     }
   ]
 }

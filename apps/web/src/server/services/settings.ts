@@ -6,6 +6,7 @@ import type { OddsTables, PityDefaults } from "@/domain/catalog/default-odds";
 import { oddsTablesProblems, oddsTablesSchema, parseOddsTables, parsePityDefaults, pityDefaultsSchema } from "@/domain/catalog/odds-defaults";
 import { coverIdsSchema, coverSelectionProblem, isValidCover, parseCoverIds } from "@/domain/catalog/cover-cards";
 import type { Rarity } from "@/domain/catalog/card-rules";
+import { bondSettingsSchema, parseBondSettings, type BondSettings } from "@/domain/bonds/settings";
 import type { DbLike } from "@/server/db-types";
 import { AdminError, AppError } from "@/server/errors";
 import { recordAudit } from "./audit";
@@ -176,4 +177,22 @@ export async function coverCardImageKey(db: DbLike, cardId: string): Promise<str
   if (!ids.includes(cardId)) return null;
   const [c] = await validCovers(db, [cardId]);
   return c?.keyPublic ?? null;
+}
+
+// Spec 029, RF-14 y RF-22: puntos, polvo, factor holo, costes de fabricar y títulos del vínculo.
+const BOND_SETTINGS_KEY = "bond_settings";
+
+export async function getBondSettings(db: DbLike): Promise<BondSettings> {
+  return parseBondSettings(await readSetting(db, BOND_SETTINGS_KEY));
+}
+
+export async function setBondSettings(db: DbLike, actorUserId: string, input: BondSettings): Promise<BondSettings> {
+  const r = bondSettingsSchema.safeParse(input);
+  if (!r.success) {
+    throw new AdminError("invalid_bond_settings", "Puntos y polvo van de 0 a 100 000, el factor holo de 1 a 5, los costes de 1 a 1 000 000 y cada título hasta 30 caracteres.", { field: String(r.error.issues[0]?.path[0] ?? "") });
+  }
+  const value = parseBondSettings(r.data);
+  const before = await getBondSettings(db);
+  await writeSetting(db, actorUserId, BOND_SETTINGS_KEY, before, value);
+  return value;
 }
