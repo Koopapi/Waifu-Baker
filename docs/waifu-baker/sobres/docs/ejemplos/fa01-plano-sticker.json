@@ -1,0 +1,15 @@
+{
+  "id": "fa01",
+  "nombre": "FAN ART · VOL. 1",
+  "codigo": "FA01",
+  "cartas": 5,
+  "vista": "plano",
+  "apertura": "sticker",
+  "capas": [
+    { "src": "sobres/fa01/sobre_fa01_fondo.webp", "profundidad": 0.25, "margen": 3 },
+    { "particulas": "destellos-arcoiris", "cantidad": 18, "tamano": 0.9, "semilla": 41, "profundidad": 0.6, "margen": 4 },
+    { "src": "sobres/fa01/sobre_fa01_personaje.webp", "profundidad": 1, "margen": 2 },
+    { "src": "sobres/fa01/sobre_fa01_efecto.webp", "profundidad": 1.3, "margen": 3, "mezcla": "overlay" }
+  ],
+  "sellos": { "arriba": "#FF3EA5", "abajo": "#C6F432" }
+}

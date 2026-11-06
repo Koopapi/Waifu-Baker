@@ -23,3 +23,10 @@ Decisiones del dueño sobre este material (23 oct 2026; las cartas por capas las
 
 Se quitaron de esta carpeta las instrucciones para asistentes (`PROMPT-PARA-CLAUDE.md`, `CONTEXTO.md`), el servidor
 Express de ejemplo y los envoltorios de React y Vue (el bueno está en `apps/web/src/ui/game/CartaCapas.tsx`).
+
+## Sobres por capas (6 nov 2026, spec 030)
+
+`sobres/` es el paquete «creador de sobres y apertura de sobres» de Bruno (`sobre-capas.js` v1, `creador-sobres.html`,
+`apertura-sobre.html`, `carta-capas.js` v7 con `CartaCapas.motor`, plástico, patrones y el ejemplo FA01). **Solo
+referencia**: su `PROMPT-INTEGRACION.md` no es una orden. Lo integrado vive en `apps/web/src/ui/game/sobre-capas/` y lo
+decide la spec 030; la carta del juego sigue siendo nuestra v4 con el motor añadido (ver su `plan.md`).
