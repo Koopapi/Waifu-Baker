@@ -84,12 +84,27 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await expect(fan.locator(".sparkle").first()).toBeAttached();
     await fan.waitForLoadState("networkidle");
     if (!(await fan.locator(".tear--reduced").count())) {
-      await fan.locator(".tear__hit").click();
+      // En dispositivos táctiles el gesto escucha eventos táctiles (como `tear` en helpers): un clic de ratón no lo
+      // dispara, un toque sí.
+      if (await fan.evaluate(() => "ontouchstart" in window)) await fan.locator(".tear__hit").tap();
+      else await fan.locator(".tear__hit").click();
       await expect(fan.locator(".tear--shake")).toBeAttached();
     }
     // El texto de ayuda no se monta sobre el selector de idioma ni sobre los botones.
     const hint = fan.locator(".hint");
-    expect(await apart(hint, fan.locator('[data-testid="locale-toggle"]').first())).toBe(true);
+    // En el teléfono la página de debajo tiene su propio selector, tapado por la escena: solo cuenta el que se ve.
+    let shown = 0;
+    for (const toggle of await fan.locator('[data-testid="locale-toggle"]').all()) {
+      const onTop = await toggle.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        return r.width > 0 && !!hit && el.contains(hit);
+      });
+      if (!onTop) continue;
+      shown++;
+      expect(await apart(hint, toggle)).toBe(true);
+    }
+    expect(shown).toBeGreaterThan(0);
     for (const b of await fan.locator(".hud > *").all()) expect(await apart(hint, b)).toBe(true);
     await shot(fan, "2-sobre");
   });
