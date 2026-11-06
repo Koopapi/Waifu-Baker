@@ -29,6 +29,7 @@ const eslintConfig = [
       "src/ui/game/carta-capas/carta-capas.js",
       // Spec 030: el sobre de Bruno (sobre-capas.js), copiado con cambios pequeños marcados.
       "src/ui/game/sobre-capas/sobre-capas.js",
+      "src/ui/game/sobre-capas/miniatura.js",
     ],
   },
 ];

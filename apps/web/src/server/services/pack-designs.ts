@@ -147,7 +147,8 @@ export async function savePackDesign(db: DbLike, store: CardStore, actorUserId: 
   }
   const inUse = await keysInUse(db, setId);
   for (const k of before) if (!inUse.has(k)) await store.delete(k);
-  return row;
+  // Para el editor: la clave guardada de cada imagen nueva (sigue con ella sin volver a subirla).
+  return Object.assign(row, { keys: Object.fromEntries(keyOf) as Record<string, string> });
 }
 
 /**

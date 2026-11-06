@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     const row = await savePackDesign(db, getCardStore(), session.user.id, setId, kind as (typeof PACK_KINDS)[number], { design, uploads, thumb: thumb instanceof File ? await toUpload(thumb) : null });
     revalidatePath(`/admin/sets/${setId}`);
     revalidatePath("/packs");
-    return Response.json({ ok: true, version: row.version, updatedAt: row.updatedAt.toISOString() });
+    return Response.json({ ok: true, version: row.version, updatedAt: row.updatedAt.toISOString(), design: row.design, keys: row.keys });
   } catch (e) {
     if (isAdminError(e)) return Response.json({ ok: false, code: e.code, path: e.params?.path ?? null, message: translateError(await getDict(), e) }, { status: e.code === "not_found" ? 404 : 422 });
     throw e;

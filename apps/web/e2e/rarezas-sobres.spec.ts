@@ -32,7 +32,7 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
     await admin.click('[data-testid="simulate-gold-link"]');
     await admin.waitForURL(/simulate\?k=gold$/);
     // Spec 023: el simulador usa el mismo sobre, con su foil gold.
-    await expect(admin.locator('[data-testid="tear-pack"] .pack-shell[data-kind="gold"]')).toBeVisible();
+    await expect(admin.locator('[data-testid="tear-pack"][data-kind="gold"] .sc-sobre')).toBeVisible();
     await tear(admin);
     await openDeck(admin);
     await expect(admin.locator(".summary__row")).toHaveCount(2);

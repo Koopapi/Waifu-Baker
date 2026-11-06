@@ -53,7 +53,7 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
   useEffect(() => {
     if (!clickable || !active) return;
     const a = document.activeElement;
-    if (!a || a === document.body || a.classList.contains("card3d") || a.classList.contains("pack__strip")) el.current?.focus({ preventScroll: true });
+    if (!a || a === document.body || a.classList.contains("card3d") || a.classList.contains("pack__strip") || a.classList.contains("sc-sobre")) el.current?.focus({ preventScroll: true });
   }, [clickable, active]);
 
   useEffect(() => {

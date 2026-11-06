@@ -61,12 +61,12 @@ describe("spec 030 — revisión automática", () => {
     };
     const d = { ...design(), logo: { key: "logo-x" }, sellos: { ...design().sellos, patron: { key: "pat-x" } } };
     const issues = reviewDesign(d, { nombre: "UN NOMBRE MUY LARGO DE SET", codigo: "X" }, (k) => facts[k]);
-    expect(issues.map((i) => i.code)).toEqual(["transparent_background", "size", "crosses_line", "long_name", "logo_missing", "pattern_missing"]);
-    expect(issues.find((i) => i.code === "size")).toMatchObject({ level: "bad", width: 800, height: 1200, sameRatio: false });
+    expect(issues.map((i) => i.kind)).toEqual(["transparent_background", "size", "crosses_line", "long_name", "logo_missing", "pattern_missing"]);
+    expect(issues.find((i) => i.kind === "size")).toMatchObject({ level: "bad", width: 800, height: 1200, sameRatio: false });
     // Con la proporción correcta es un aviso, no un error.
-    expect(reviewDesign(design(), info, (k) => (k === "k2" ? ok(500, 875) : ok()))[0]).toMatchObject({ code: "size", level: "warn", sameRatio: true });
-    expect(reviewDesign(design(), info, (k) => (k === "k1" ? ok() : undefined))).toEqual([{ level: "bad", code: "missing_file", name: "personaje.webp" }]);
-    expect(reviewDesign(empty(), { nombre: "", codigo: "" }, () => undefined).map((i) => i.code)).toEqual(["no_background", "no_band"]);
+    expect(reviewDesign(design(), info, (k) => (k === "k2" ? ok(500, 875) : ok()))[0]).toMatchObject({ kind: "size", level: "warn", sameRatio: true });
+    expect(reviewDesign(design(), info, (k) => (k === "k1" ? ok() : undefined))).toEqual([{ level: "bad", kind: "missing_file", name: "personaje.webp" }]);
+    expect(reviewDesign(empty(), { nombre: "", codigo: "" }, () => undefined).map((i) => i.kind)).toEqual(["no_background", "no_band"]);
   });
 
   it("test_s030_rf9_la_lectura_de_pixeles_ve_transparencia_y_arte_en_la_linea", () => {

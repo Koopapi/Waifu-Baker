@@ -72,16 +72,16 @@ export function analyzePixels(data: ArrayLike<number>, w: number, h: number) {
 }
 
 export type ReviewIssue =
-  | { level: "bad"; code: "no_background" }
-  | { level: "bad"; code: "missing_file"; name: string }
-  | { level: "bad" | "warn"; code: "size"; name: string; width: number; height: number; sameRatio: boolean }
-  | { level: "bad"; code: "unreadable"; name: string }
-  | { level: "warn"; code: "transparent_background"; name: string }
-  | { level: "warn"; code: "crosses_line"; name: string }
-  | { level: "warn"; code: "long_name"; length: number }
-  | { level: "warn"; code: "no_band" }
-  | { level: "bad"; code: "logo_missing" }
-  | { level: "bad"; code: "pattern_missing" };
+  | { level: "bad"; kind: "no_background" }
+  | { level: "bad"; kind: "missing_file"; name: string }
+  | { level: "bad" | "warn"; kind: "size"; name: string; width: number; height: number; sameRatio: boolean }
+  | { level: "bad"; kind: "unreadable"; name: string }
+  | { level: "warn"; kind: "transparent_background"; name: string }
+  | { level: "warn"; kind: "crosses_line"; name: string }
+  | { level: "warn"; kind: "long_name"; length: number }
+  | { level: "warn"; kind: "no_band" }
+  | { level: "bad"; kind: "logo_missing" }
+  | { level: "bad"; kind: "pattern_missing" };
 
 /**
  * RF-9: la revisión automática del creador de Bruno. Avisa, sin impedir guardar, de imágenes que no miden
@@ -91,26 +91,26 @@ export type ReviewIssue =
 export function reviewDesign(d: PackDesign, info: Pick<PackInfo, "nombre" | "codigo">, facts: (ref: string) => ImageFacts | undefined): ReviewIssue[] {
   const out: ReviewIssue[] = [];
   const images = d.capas.filter(isPackImageLayer).filter((l) => l.visible !== false);
-  if (images.length === 0) out.push({ level: "bad", code: "no_background" });
+  if (images.length === 0) out.push({ level: "bad", kind: "no_background" });
   images.forEach((l, i) => {
     const name = l.nombre || l.key;
     const f = facts(l.key);
-    if (!f) return void out.push({ level: "bad", code: "missing_file", name });
+    if (!f) return void out.push({ level: "bad", kind: "missing_file", name });
     if (f.width !== PACK_CANVAS.width || f.height !== PACK_CANVAS.height) {
       const sameRatio = f.height > 0 && Math.abs(f.width / f.height - PACK_CANVAS.width / PACK_CANVAS.height) < 0.004;
-      out.push({ level: sameRatio ? "warn" : "bad", code: "size", name, width: f.width, height: f.height, sameRatio });
+      out.push({ level: sameRatio ? "warn" : "bad", kind: "size", name, width: f.width, height: f.height, sameRatio });
     }
     if (!f.analysis) return;
-    if ("error" in f.analysis) return void out.push({ level: "bad", code: "unreadable", name });
-    if (i === 0 && f.analysis.transparent) out.push({ level: "warn", code: "transparent_background", name });
-    if (i > 0 && f.analysis.crossesLine) out.push({ level: "warn", code: "crosses_line", name });
+    if ("error" in f.analysis) return void out.push({ level: "bad", kind: "unreadable", name });
+    if (i === 0 && f.analysis.transparent) out.push({ level: "warn", kind: "transparent_background", name });
+    if (i > 0 && f.analysis.crossesLine) out.push({ level: "warn", kind: "crosses_line", name });
   });
   const nombre = info.nombre.trim();
-  if (nombre.length > LONG_NAME) out.push({ level: "warn", code: "long_name", length: nombre.length });
-  if (!nombre && !info.codigo.trim()) out.push({ level: "warn", code: "no_band" });
-  if (typeof d.logo === "object" && !facts(d.logo.key)) out.push({ level: "bad", code: "logo_missing" });
+  if (nombre.length > LONG_NAME) out.push({ level: "warn", kind: "long_name", length: nombre.length });
+  if (!nombre && !info.codigo.trim()) out.push({ level: "warn", kind: "no_band" });
+  if (typeof d.logo === "object" && !facts(d.logo.key)) out.push({ level: "bad", kind: "logo_missing" });
   const sp = d.sellos.patron;
-  if (sp && "key" in sp && !facts(sp.key)) out.push({ level: "bad", code: "pattern_missing" });
+  if (sp && "key" in sp && !facts(sp.key)) out.push({ level: "bad", kind: "pattern_missing" });
   return out;
 }
 

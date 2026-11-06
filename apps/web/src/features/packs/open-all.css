@@ -101,8 +101,9 @@
 }
 .oa-burst__stack {
   position: relative;
-  width: 150px;
-  aspect-ratio: 2 / 3;
+  width: 140px;
+  /* Spec 030: la proporción del sobre por capas (1000 × 1750). */
+  aspect-ratio: 1000 / 1750;
 }
 .oa-burst__pack {
   position: absolute;
@@ -114,8 +115,30 @@
 }
 .oa-burst__pack--torn {
   z-index: 5;
-  /* Spec 023, RF-20: primero sale volando la tira (pack-shell.css) y después el sobre baja y se desvanece. */
+  /* Spec 023, RF-20 (spec 030): primero sale volando la tira por la línea de rasgado y después el sobre baja y se desvanece. */
   animation: oaTear 0.4s 0.3s ease-in forwards;
+}
+/* Spec 030: el sobre partido por la línea de rasgado (y = 230 de 1750): el cuerpo se queda y la tira sale volando. */
+.oa-torn {
+  position: relative;
+}
+.oa-torn__body {
+  clip-path: inset(13.14% 0 0 0);
+}
+.oa-torn__strip {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 86.86% 0);
+  animation: oaStrip 0.6s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
+}
+@keyframes oaStrip {
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(70%, -170%) rotate(32deg);
+  }
 }
 @keyframes oaTear {
   to {
@@ -154,11 +177,61 @@
   }
 }
 .oa-focus__card {
+  position: relative;
+  isolation: isolate;
   width: min(72vw, 300px);
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
+}
+/* Spec 030, RF-25: el efecto especial de Bruno en las Legendarias y EX destacadas. */
+.oa-focus__rays {
+  position: absolute;
+  inset: -60%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: repeating-conic-gradient(rgb(247 220 138 / 0.85) 0 5deg, transparent 5deg 14deg);
+  -webkit-mask: radial-gradient(circle, #000 15%, transparent 62%);
+  mask: radial-gradient(circle, #000 15%, transparent 62%);
+  animation: oaRays 2.6s ease-out forwards;
+}
+@keyframes oaRays {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+    transform: scale(1) rotate(40deg);
+  }
+}
+.oa-focus__star {
+  position: absolute;
+  z-index: 3;
+  right: -14px;
+  top: -18px;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  background: #c6f432;
+  color: #17132b;
+  font-family: var(--font-dela), "Dela Gothic One", var(--ui-font-display), sans-serif;
+  font-size: 20px;
+  pointer-events: none;
+  clip-path: polygon(99% 59.9%, 68.2% 62.3%, 77.6% 91.7%, 54.2% 71.6%, 40.1% 99%, 37.7% 68.2%, 8.3% 77.6%, 28.4% 54.2%, 1% 40.1%, 31.8% 37.7%, 22.4% 8.3%, 45.8% 28.4%, 59.9% 1%, 62.3% 31.8%, 91.7% 22.4%, 71.6% 45.8%);
+  transform: rotate(-12deg);
+  animation: oaStar 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes oaStar {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
 }
 .oa-focus__ribbon {
   padding: 6px 16px;
@@ -221,8 +294,10 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .oa-burst__pack--torn,
+  .oa-torn__strip,
   .oa-burst__card,
-  .oa-focus__ribbon {
+  .oa-focus__ribbon,
+  .oa-focus__star {
     animation: none;
     opacity: 1;
   }

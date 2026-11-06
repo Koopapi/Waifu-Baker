@@ -203,8 +203,10 @@ const patternUrl = (p: PackPatternRef, url: (key: string) => string) => ("inclui
 export function toRegistro(d: PackDesign, info: PackInfo, url: (key: string) => string): PackRegistro {
   const capas = d.capas.map((l): Record<string, unknown> => {
     if (!isPackImageLayer(l)) return { ...l };
-    const { key, nombre: _nombre, brillo, ...rest } = l;
+    const { key, brillo, ...rest } = l;
+    // El nombre del archivo solo sirve en el editor: no va al registro.
     const out: Record<string, unknown> = { ...rest, src: url(key) };
+    delete out.nombre;
     if (brillo) {
       const { patron, ...b } = brillo;
       out.brillo = brillo.tipo !== "ondas" ? { tipo: b.tipo, intensidad: b.intensidad } : { ...b, ...(patron === null ? { patron: null } : patron ? { patron: patternUrl(patron, url) } : {}) };
