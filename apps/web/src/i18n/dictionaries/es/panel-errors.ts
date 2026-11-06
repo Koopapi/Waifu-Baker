@@ -3,6 +3,9 @@ import type { Msg } from "../../types";
 // Errores que solo se traducen en el servidor (rutas y acciones del panel de capas, spec 017): no van en el
 // diccionario general, que viaja a todas las páginas del coleccionista. Los suma `getDict()`.
 export const panelErrors: Record<string, Msg> = {
+  // Spec 030: diseño del sobre (RF-12: dice qué campo falla).
+  invalid_pack_design: (p) => `El diseño del sobre no es válido${p.path ? ` (${p.path})` : ""}. No se guardó.`,
+  pack_upload_missing: (p) => `No llegó una imagen del diseño${p.path ? ` (${p.path})` : ""}: vuelve a añadirla y guarda.`,
   no_layers: "Esta carta todavía no tiene capas que exportar.",
   character_required: "La chica no se puede quitar ni ocultar; puedes sustituirla.",
   character_type: "La chica debe subirse en PNG o WebP (con transparencia).",

@@ -20,6 +20,7 @@ import {
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import type { Theme } from "@/domain/ui/theme";
 import type { LayersConfig } from "@/domain/cards/layers";
+import type { PackDesign } from "@/domain/packs/design";
 import type { CardSheet } from "@/domain/cards/versions";
 import type { ParticlePreset } from "@/domain/cards/library";
 import type { PickedPhrase } from "@/domain/expeditions/report";
@@ -640,4 +641,26 @@ export const adminLoginCodes = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("admin_login_codes_account_idx").on(t.accountId, t.createdAt)],
+);
+
+/**
+ * Spec 030, RF-1, RF-10 y RF-14: el diseño del sobre por capas de cada colección, uno para el plata y otro para el gold
+ * (formato del creador de Bruno). Las imágenes son claves del almacén propio; la miniatura de 500 × 875 la genera el
+ * navegador al guardar. Sin fila, el sobre básico (RF-15).
+ */
+export const packDesigns = pgTable(
+  "pack_designs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    setId: uuid("set_id")
+      .notNull()
+      .references(() => sets.id, { onDelete: "cascade" }),
+    kind: packKind("kind").notNull(),
+    design: jsonb("design").$type<PackDesign>().notNull(),
+    thumbKey: text("thumb_key").notNull(),
+    version: integer("version").notNull().default(1),
+    updatedBy: uuid("updated_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("pack_designs_set_kind_uq").on(t.setId, t.kind)],
 );
