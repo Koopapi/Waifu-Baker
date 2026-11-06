@@ -82,7 +82,7 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
         { ...rewards, label: sh.tabs.rewards },
         { ...account, label: sh.tabs.account },
       ]}
-      user={{ name: user.displayName || "—", detail: <CookiesDetail cookies={s.cookies} /> }}
+      user={{ name: user.displayName || "—", detail: <CookiesDetail cookies={s.cookies} dust={s.dust} /> }}
       userActions={<SignOutButton label={t.common.nav.signOut} />}
       topActions={
         <>

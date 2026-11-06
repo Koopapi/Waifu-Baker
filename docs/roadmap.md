@@ -163,3 +163,8 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   0,20 % y legendaria 9,5 % por sobre; gold 5,9 % y 43 %), garantía de EX a 20 sobres gold con su propio contador,
   «al menos una por sobre» en la página pública. Todo se cambia en `/admin/settings`, con auditoría; además, de 3 a 5
   cartas de portada en abanico (componente `CardFan`). Rama `spec/028-valores-por-defecto`, sin push.
+- 5 nov 2026: **spec 029 «vínculo de personaje y reciclaje»** implementada en local sobre la 028. Reciclar repetidas
+  (cada versión guarda una copia) da puntos al vínculo del personaje (la barra de la spec 020) y polvo; el nivel se ve en
+  sus cartas (destello en el 3, holo en el 5, marco de vínculo en el 7, maestría en el 10); página de línea de personaje;
+  fabricar con polvo (no EX ni holo); ajustes y simulador en `/admin/settings`. Rama `spec/029-vinculo-y-reciclaje`,
+  sin push; la verificación larga (build, budget, E2E de las dos specs) queda en `/Volumes/KoopaDev/wb-029/e2e-resultado.log`.

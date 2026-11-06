@@ -51,6 +51,7 @@ export const panelErrors: Record<string, Msg> = {
     if (p.reason === "guarantee_slot") return `${where}: solo puede dar ${p.kind === "gold" ? "Épica" : "Rara"} o mejor. No se guardó nada.`;
     return `${where}: las probabilidades no pueden ser negativas. No se guardó nada.`;
   },
+  invalid_bond_settings: "Puntos y polvo van de 0 a 100 000, el factor holo de 1 a 5, los costes de 1 a 1 000 000 y cada título hasta 30 caracteres.",
   invalid_pity_defaults: (p) => `Cada garantía es un número entero de sobres de ${p.min} a ${p.max} (0 la desactiva).`,
   invalid_cover_cards: (p) =>
     p.reason === "duplicate"

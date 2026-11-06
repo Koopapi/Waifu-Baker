@@ -288,6 +288,21 @@ difícil», garantía de EX a 20 sobres gold, todo cambiable en el panel, y cart
 | RN-229 | Cada cambio de los ajustes del panel (valores de cartas, probabilidades, garantías, cartas de portada) queda en la auditoría con el valor anterior y el nuevo, y solo vale para lo que se cree o re-estile después. | Vigente | 028 RF-18, RF-19 |
 | RN-230 | **Cartas de portada**: el administrador elige de 3 a 5 cartas de colecciones publicadas que no sean 18+, en orden de izquierda a derecha; la portada (también la de la demo) las muestra en abanico con su imagen pública con marca de agua, con sesión y sin ella. Si una deja de valer (colección archivada o 18+, carta borrada) deja de mostrarse; sin ninguna, la portada es la de siempre. | Vigente | 028 RF-20 a RF-23 |
 
+## 22. Vínculo de personaje y reciclaje (spec 029)
+
+Decisiones del dueño del 5 nov 2026 (`docs/vinculo-y-reciclaje.md`, sección 5). El vínculo de la spec 020 es la única
+barra (RN-209 y RN-214 siguen); sustituye el nivel por carta de la economía v2.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-231 | Se reciclan solo repetidas: cada versión (normal y holo) de cada carta conserva siempre una copia. Una carta sin personaje no se recicla; las de una colección archivada sí; las 18+, solo con el doble filtro. Reciclar es irreversible, se confirma viendo antes copias, puntos, polvo y el nivel en que queda, y se puede hacer con todas las repetidas de un personaje en un paso. | Vigente | 029 RF-1, RF-4, RF-5 |
+| RN-232 | Cada copia reciclada suma al vínculo de su personaje Común 10, Rara 25, Épica 60, Legendaria 150 o EX 400 puntos (× 1,5 si es holo) y da la mitad de su polvo (5, 15, 40, 120 o 300; × 1,5 holo). Con el vínculo al nivel 10 da el polvo completo y ningún punto. Expediciones y reciclaje suben la misma barra. | Vigente | 029 RF-2, RF-3, RF-8 |
+| RN-233 | Reciclar y fabricar son transacciones con bloqueo: dos peticiones a la vez nunca dejan una versión en cero ni dan puntos o polvo de más, y el polvo nunca baja de cero. Cada reciclaje y cada fabricación quedan en la auditoría. | Vigente | 029 RF-6, RF-7, RF-21 |
+| RN-234 | Lo que da el vínculo, en todas las cartas del personaje y solo para su dueño (y la insignia en su álbum público): nivel 3, destello sobre la chica; 5, holo visual (no suma el poder de la holo); 7, marco de vínculo y partículas; 10, insignia de maestría. Cada nivel sigue dando +2 % de poder. Las imágenes públicas con marca de agua no cambian. Títulos por defecto: Conocida (2), Amiga (3), Cómplice (5), Inseparable (7) y Alma gemela (10). | Vigente | 029 RF-8 a RF-14 |
+| RN-235 | Cada personaje tiene su página en la colección con su línea (las que tiene y las que faltan), la barra de vínculo y lo siguiente que desbloquea, sus repetidas y el botón de fabricar. Completar la línea no da nada. | Vigente | 029 RF-15, RF-16 |
+| RN-236 | **Polvo**: solo se gana reciclando, se ve junto a las galletas y sirve para fabricar una copia normal de una carta publicada que se pueda ver: Común 100, Rara 300, Épica 800, Legendaria 2500. No se fabrican la EX, la carta del mes, versiones holo ni cartas de colecciones sin publicar o archivadas; sin polvo suficiente, se dice el motivo. Vínculo y polvo se borran con la cuenta. | Vigente | 029 RF-17 a RF-20 |
+| RN-237 | El administrador cambia puntos, polvo, factor holo, costes de fabricar y títulos (con auditoría; cada reciclaje usa los valores del momento) y simula los días hasta el nivel 10 de un coleccionista gratuito y de un patron. | Vigente | 029 RF-22, RF-23 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -329,4 +344,5 @@ difícil», garantía de EX a 20 sobres gold, todo cambiable en el panel, y cart
 | Capas de una carta | hasta 8 de imagen (700 × 991 ± 1 %, mín. 700 px, ≤ 20 MB, se guardan en WebP); partículas aparte; temporales borradas a los 5 días (spec 027; antes 24 h) |
 | Sello de texto y borde de partida (spec 028) | 15 y 3,0, cambiables en el panel (4 a 40 y 0 a 8) |
 | Cartas de portada (spec 028) | 3 a 5, de colecciones publicadas no 18+ |
+| Reciclar (spec 029) | puntos 10 / 25 / 60 / 150 / 400 y polvo 5 / 15 / 40 / 120 / 300 (mitad hasta el nivel 10), holo × 1,5; fabricar 100 / 300 / 800 / 2500 |
 | Guardado de la carta (spec 027) | un solo «Guardar» para ficha y capas (todo o nada); con cambios sin guardar la ventana no se cierra sin preguntar; borrador automático en el navegador a los 0,5 s, vive 5 días; 10 versiones por carta, nunca se reescriben; las imágenes que use una versión conservada no se borran |

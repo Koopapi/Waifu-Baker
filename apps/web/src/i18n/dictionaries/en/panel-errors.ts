@@ -51,6 +51,7 @@ export const panelErrors: Record<string, Msg> = {
     if (p.reason === "guarantee_slot") return `${where}: it can only give ${p.kind === "gold" ? "Epic" : "Rare"} or better. Nothing was saved.`;
     return `${where}: chances can't be negative. Nothing was saved.`;
   },
+  invalid_bond_settings: "Points and dust go from 0 to 100,000, the holo factor from 1 to 5, crafting costs from 1 to 1,000,000 and each title up to 30 characters.",
   invalid_pity_defaults: (p) => `Each guarantee is a whole number of packs from ${p.min} to ${p.max} (0 turns it off).`,
   invalid_cover_cards: (p) =>
     p.reason === "duplicate"

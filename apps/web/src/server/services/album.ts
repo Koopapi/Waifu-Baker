@@ -1,4 +1,6 @@
 import { randomBytes } from "node:crypto";
+import { bondEffects } from "@/domain/bonds/effects";
+import { bondLevelsOf, characterOfCards } from "./bonds";
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { albums, cards, sets, userCards, users } from "@/db/schema";
 import { buildBinder } from "@/domain/collection/binder";
@@ -117,7 +119,11 @@ export async function publicAlbum(db: DbLike, slug: string) {
     return { setId: s.id, code: s.code, name: s.name, ...b };
   });
   const ownedVisible = new Map(collections.flatMap((c) => c.slots.filter((s) => s.owned).map((s) => [s.owned!.cardId, { ...s.owned!, setCode: c.code, number: s.number }])));
-  const featured = row.album.featuredCardIds.filter((id) => ownedVisible.has(id)).map((id) => ownedVisible.get(id)!);
+  const featuredRaw = row.album.featuredCardIds.filter((id) => ownedVisible.has(id)).map((id) => ownedVisible.get(id)!);
+  // Spec 029, RF-12 y RF-13: la insignia de maestría (vínculo de nivel 10) junto a la carta; las imágenes no cambian.
+  const characterOf = await characterOfCards(db, featuredRaw.map((c) => c.cardId));
+  const levels = await bondLevelsOf(db, userId, [...characterOf.values()]);
+  const featured = featuredRaw.map((c) => ({ ...c, mastered: bondEffects(levels.get(characterOf.get(c.cardId) ?? "") ?? 1).mastery }));
   return {
     slug: row.album.slug,
     alias: row.album.alias,
