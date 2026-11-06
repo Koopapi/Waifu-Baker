@@ -9,7 +9,13 @@ import { expect, test } from "./fixtures";
 import { LAB, choose, createPublishedSet, login, setSlider } from "./helpers";
 
 async function openEditor(page: Page, setId: string, n: string) {
-  await page.goto(`/admin/sets/${setId}`);
+  // Tras una subida la página se refresca sola; en WebKit ese refresco interrumpe un goto a la misma dirección. Si
+  // pasa, la página ya llega a donde queríamos: se espera a que cargue.
+  await page.goto(`/admin/sets/${setId}`).catch(async (e: Error) => {
+    if (!/interrupted by another navigation/.test(e.message)) throw e;
+    await page.waitForURL(`**/admin/sets/${setId}`);
+    await page.waitForLoadState("networkidle");
+  });
   await page.click(`[aria-label="Editar carta ${n}"]`);
   const editor = page.locator('[data-testid="layers-editor"]');
   await expect(editor).toBeVisible();
