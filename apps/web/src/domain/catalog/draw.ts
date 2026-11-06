@@ -80,11 +80,19 @@ export interface PityResult {
  * cero, con los pesos sumados de todo el sobre).
  */
 export function drawPackWithPity(input: DrawInput, rng: Rng, pity: boolean, opts: DrawOptions = {}): PityResult {
-  const draws: PityDraw[] = drawPack(input, rng, opts);
-  const epicIdx = RARITIES.indexOf("epic");
-  if (!pity || draws.some((d) => RARITIES.indexOf(d.rarity) >= epicIdx)) return { draws, pityApplied: false };
+  return drawPackWithGuarantee(input, rng, pity ? "epic" : null, opts);
+}
 
-  const top = RARITIES.slice(epicIdx);
+/**
+ * La misma protección para cualquier rareza mínima (`floor`): épica en los sobres plata (spec 004) y EX en los gold
+ * (spec 028, RF-12). Sin `floor`, es el sorteo normal.
+ */
+export function drawPackWithGuarantee(input: DrawInput, rng: Rng, floor: Rarity | null, opts: DrawOptions = {}): PityResult {
+  const draws: PityDraw[] = drawPack(input, rng, opts);
+  const floorIdx = floor ? RARITIES.indexOf(floor) : -1;
+  if (!floor || draws.some((d) => RARITIES.indexOf(d.rarity) >= floorIdx)) return { draws, pityApplied: false };
+
+  const top = RARITIES.slice(floorIdx);
   const last = input.slots[input.slots.length - 1] ?? {};
   let weights: Partial<Slot> = Object.fromEntries(top.map((r) => [r, last[r] ?? 0]));
   if (top.every((r) => !weights[r])) {

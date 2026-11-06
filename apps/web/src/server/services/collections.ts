@@ -7,6 +7,7 @@ import { PACK_KINDS, type PackKind, defaultSlots } from "@/domain/catalog/defaul
 import type { DbLike } from "@/server/db-types";
 import { AdminError, isUniqueViolation } from "@/server/errors";
 import { auditChange, recordAudit } from "./audit";
+import { getOddsDefaults, getPityDefaults } from "./settings";
 
 const CODE_RE = /^[A-Z0-9]{2,8}$/;
 
@@ -47,8 +48,18 @@ export async function createSet(
         .insert(sets)
         .values({ code, name, slug: code.toLowerCase(), isAdult: input.isAdult, packSize })
         .returning();
-      // Spec 022, RF-12: una tabla por tipo de sobre.
-      await tx.insert(dropTables).values(PACK_KINDS.map((kind) => ({ setId: set.id, kind, slots: defaultSlots(packSize, kind), pityThreshold: kind === "silver" ? 10 : 0 })));
+      // Spec 022, RF-12: una tabla por tipo de sobre. Spec 028, RF-8, RF-9, RF-16 a RF-18: con las probabilidades y las
+      // garantías vigentes en los ajustes (épica en la plata, EX en la gold).
+      const [tables, pity] = await Promise.all([getOddsDefaults(tx), getPityDefaults(tx)]);
+      await tx.insert(dropTables).values(
+        PACK_KINDS.map((kind) => ({
+          setId: set.id,
+          kind,
+          slots: defaultSlots(packSize, kind, tables),
+          pityThreshold: kind === "silver" ? pity.epic : 0,
+          exPityThreshold: kind === "gold" ? pity.ex : 0,
+        })),
+      );
       await recordAudit(tx, {
         actorUserId,
         action: "set_create",
@@ -101,8 +112,9 @@ export async function updateSet(db: DbLike, actorUserId: string, setId: string, 
       await tx.update(cards).set({ adultReviewedBy: null, adultReviewedAt: null }).where(eq(cards.setId, setId));
     }
     if (next.packSize !== cur.packSize) {
+      const tables = await getOddsDefaults(tx);
       for (const kind of PACK_KINDS) {
-        await tx.update(dropTables).set({ slots: defaultSlots(next.packSize, kind), updatedAt: sql`now()` }).where(and(eq(dropTables.setId, setId), eq(dropTables.kind, kind)));
+        await tx.update(dropTables).set({ slots: defaultSlots(next.packSize, kind, tables), updatedAt: sql`now()` }).where(and(eq(dropTables.setId, setId), eq(dropTables.kind, kind)));
       }
     }
     await auditChange(tx, {
@@ -170,7 +182,10 @@ async function editableDropTable(db: DbLike, setId: string, kind: PackKind = "si
   return dt;
 }
 
-/** RF-20: guarda pesos por ranura y probabilidad de holo de una colección en borrador. */
+/**
+ * RF-20: guarda pesos por ranura y probabilidad de holo de una colección en borrador. `pityThreshold` es la garantía del
+ * tipo de sobre: de épica en la plata (spec 004) y, desde la spec 028 (RF-12), de EX en la gold.
+ */
 export async function saveOdds(
   db: DbLike,
   actorUserId: string,
@@ -196,17 +211,18 @@ export async function saveOdds(
     const dt = await editableDropTable(tx, setId, kind);
     if (dt.publishedAt) throw new AdminError("locked", "Esta versión de probabilidades ya está publicada.", { what: "odds_version" });
     const slots = input.slots.map((s) => ({ common: 0, rare: 0, epic: 0, legendary: 0, ex: 0, ...s }));
-    // Spec 022, RF-18: la protección de mala suerte solo existe en el sobre plata.
+    // Spec 022, RF-18: la protección de épica solo existe en el sobre plata; spec 028, RF-12: la de EX, en el gold.
     const pityThreshold = kind === "gold" ? 0 : (input.pityThreshold ?? dt.pityThreshold);
-    await tx.update(dropTables).set({ slots, holoChance: input.holoChance, pityThreshold, updatedAt: sql`now()` }).where(eq(dropTables.id, dt.id));
+    const exPityThreshold = kind === "gold" ? (input.pityThreshold ?? dt.exPityThreshold) : 0;
+    await tx.update(dropTables).set({ slots, holoChance: input.holoChance, pityThreshold, exPityThreshold, updatedAt: sql`now()` }).where(eq(dropTables.id, dt.id));
     await tx.update(sets).set({ version: cur.version + 1, updatedAt: sql`now()` }).where(eq(sets.id, setId));
     await auditChange(tx, {
       actorUserId,
       action: "odds_update",
       entityType: "set",
       entityId: setId,
-      before: { kind, slots: dt.slots, holoChance: dt.holoChance, pityThreshold: dt.pityThreshold },
-      after: { kind, slots, holoChance: input.holoChance, pityThreshold },
+      before: { kind, slots: dt.slots, holoChance: dt.holoChance, pityThreshold: dt.pityThreshold, exPityThreshold: dt.exPityThreshold },
+      after: { kind, slots, holoChance: input.holoChance, pityThreshold, exPityThreshold },
     });
   });
 }

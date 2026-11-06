@@ -12,6 +12,7 @@ import {
   Badge,
   Button,
   Card,
+  CardFan,
   CartaCapas,
   Celebration,
   Checkbox,
@@ -144,6 +145,11 @@ export function Catalog() {
               </li>
             ))}
           </ul>
+        </div>
+        {/* Spec 028: abanico de la portada pública y de la demo. */}
+        <p className="max-w-2xl text-sm text-ui-text-2">Card fan (home page): 1 to 5 cards, the middle one in front. Decorative.</p>
+        <div className="flex justify-center">
+          <CardFan cards={TIERS.map(([tier, file]) => ({ key: tier, src: `/lab/${file}.webp` }))} />
         </div>
       </Section>
 

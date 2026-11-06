@@ -11,6 +11,7 @@ import { AdminError } from "@/server/errors";
 import { createCharacter } from "./characters";
 import { reviewCard, updateCard, uploadCardImage, type UploadFile } from "./cards";
 import { saveCardLayers } from "./card-layers";
+import { getOddsDefaults } from "./settings";
 import { createSet, publishSet, saveOdds, setFreeSet } from "./collections";
 import { ensureLibraryImage } from "./library";
 import { upsertUserFromLogin } from "./users";
@@ -83,7 +84,7 @@ export async function seedPublishedSet(db: DbLike, store: CardStore, actorUserId
   }
   await assembleSetCards(db, store, actorUserId, set.id);
   await saveOdds(db, actorUserId, set.id, await setVersion(db, set.id), { slots: input.slots, holoChance: (input.holoPercent ?? 0) / 100 });
-  const gold = input.gold ?? onlyPresent(defaultSlots(input.packSize, "gold"), new Set(input.cards.map((c) => c.rarity)));
+  const gold = input.gold ?? onlyPresent(defaultSlots(input.packSize, "gold", await getOddsDefaults(db)), new Set(input.cards.map((c) => c.rarity)));
   await saveOdds(db, actorUserId, set.id, await setVersion(db, set.id), { kind: "gold", slots: gold, holoChance: (input.holoPercent ?? 0) / 100 });
   const { problems } = await publishSet(db, actorUserId, set.id, await setVersion(db, set.id));
   if (problems.length) throw new Error(`No se pudo publicar ${input.code}: ${problems.map((p) => p.message).join(" ")}`);

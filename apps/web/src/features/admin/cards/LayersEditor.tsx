@@ -28,7 +28,9 @@ import {
   type Layer,
   type LayersConfig,
 } from "@/domain/cards/layers";
-import { applyTierStyle, replaceCharacter, settleAutoStyle, TIER_PRESETS } from "@/domain/cards/layers-rarity";
+import { applyTierStyle, replaceCharacter, settleAutoStyle, tierTextSeal, TIER_PRESETS } from "@/domain/cards/layers-rarity";
+import { DEFAULT_BORDER } from "@/domain/cards/card-defaults";
+import { useCardDefaults } from "./card-defaults-context";
 import { addParticles, byNaturalName, placeUpload, planUpload, trimBox, layerToSeal, type UploadPlan } from "@/domain/cards/layers-editing";
 import { parseCreatorConfig, withKeys } from "@/domain/cards/layers-io";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
@@ -168,6 +170,7 @@ export function LayersEditor({
   const t = useAdminLayersT();
   const v4 = t.v4;
   const confirm = useConfirm();
+  const defaults = useCardDefaults();
   const [uploads, setUploads] = useState<Upload[]>([]);
   const zone = useRef<HTMLDivElement>(null);
   const live = useRef<CartaCapasHandle>(null);
@@ -199,7 +202,7 @@ export function LayersEditor({
   const dirty = !sameLayers(draft, saved ?? emptyConfig(card));
   const tier = rarityTier(rarity);
   // Spec 017, RF-13 y RF-14: el mismo criterio que aplica el servidor al guardar.
-  const autoStyle = Boolean(settleAutoStyle(saved, draft, tier).estiloAuto);
+  const autoStyle = Boolean(settleAutoStyle(saved, draft, tier, defaults).estiloAuto);
   const characterIndex = draft.capas.findIndex((l) => isImageLayer(l) && l.rol === "personaje");
   const backgroundLayer = imageLayers(draft).find((l) => l.rol === "fondo");
   const sel = isImageLayer(draft.capas[selected] ?? { particulas: "nieve" }) ? selected : defaultSelection(draft);
@@ -414,7 +417,7 @@ export function LayersEditor({
     } catch {
       return fail(t.io.invalid(""));
     }
-    const parsed = parseCreatorConfig(raw);
+    const parsed = parseCreatorConfig(raw, defaults);
     if (!parsed.ok) return fail(parsed.max ? t.io.tooMany(parsed.max) : t.io.invalid(parsed.path));
     const byName = new Map(list.map((f) => [f.name, f]));
     const missing = parsed.files.filter((f) => !byName.has(f.name)).map((f) => f.name);
@@ -465,7 +468,8 @@ export function LayersEditor({
     { value: "ninguno", label: v4.rarity.none, swatch: frameSwatch("ninguno", draft.marcoColores) },
   ];
   const custom = draft.marcoColores ?? DEFAULT_CUSTOM;
-  const borderValue = draft.borde ?? lib.marcos[draft.marco]?.[2] ?? 2.2;
+  // Spec 028, RF-4: sin grosor guardado, el mismo 3,0 que usa la carta viva.
+  const borderValue = draft.borde ?? DEFAULT_BORDER;
 
   /** Ajustes de una capa, dentro de su fila abierta (spec 025, RF-24). */
   function layerSettings(l: Layer, i: number, label: string) {
@@ -834,15 +838,15 @@ export function LayersEditor({
             )}
             <div className="space-y-2 rounded-m border-2 border-dashed border-ui-line p-3">
               <p className="text-xs text-ui-text-2">{v4.rarity.applyHint}</p>
-              <Button size="sm" onClick={() => update((c) => ({ ...applyTierStyle(c, tier, randomSeed()), estiloAuto: true }))} data-testid="layers-apply-rarity">
+              <Button size="sm" onClick={() => update((c) => ({ ...applyTierStyle(c, tier, randomSeed(), defaults), estiloAuto: true }))} data-testid="layers-apply-rarity">
                 {t.applyRarity}
               </Button>
             </div>
             <Slider
               label={v4.rarity.border}
               value={borderValue}
-              min={BORDER_RANGE.min}
-              max={BORDER_RANGE.max}
+              min={Math.min(BORDER_RANGE.min, borderValue)}
+              max={Math.max(BORDER_RANGE.max, borderValue)}
               step={0.1}
               format={(v) => v.toFixed(1)}
               disabled={draft.marco === "ninguno"}
@@ -863,7 +867,7 @@ export function LayersEditor({
                     v === "none"
                       ? null
                       : v === "text"
-                        ? { ...(TIER_PRESETS[tier].seal ?? { texto: "EX", estilo: "oro" as const, tamano: 14 }), esquina: c.sello?.esquina ?? "sup-izq" }
+                        ? { ...tierTextSeal(tier, defaults), esquina: c.sello?.esquina ?? "sup-izq" }
                         : c.sello && isImageSeal(c.sello)
                           ? c.sello
                           : saved?.sello && isImageSeal(saved.sello)
@@ -936,7 +940,7 @@ export function LayersEditor({
                 {isImageSeal(draft.sello) ? (
                   <Slider label={t.sealSize} value={draft.sello.tamano ?? 36} min={10} max={60} unit="%" onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: v } } : c))} data-testid="seal-size" />
                 ) : (
-                  <Slider label={t.sealSize} value={draft.sello.tamano ?? 14} min={8} max={26} onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: v } } : c))} data-testid="seal-size" />
+                  <Slider label={t.sealSize} value={draft.sello.tamano ?? 14} min={Math.min(8, draft.sello.tamano ?? 14)} max={Math.max(26, draft.sello.tamano ?? 14)} onValueChange={(v) => update((c) => (c.sello ? { ...c, sello: { ...c.sello, tamano: v } } : c))} data-testid="seal-size" />
                 )}
               </div>
             )}

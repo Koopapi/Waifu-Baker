@@ -13,7 +13,7 @@ describe("spec 016 — estilo de la rareza", () => {
   it("test_s016_rf9_aplicar_el_estilo_pone_marco_particulas_y_sello_del_escalon", () => {
     const out = applyTierStyle(config, "ssr", 42);
     expect(out.marco).toBe("ssr");
-    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 13, esquina: "sup-izq" });
+    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 15, esquina: "sup-izq" });
     // Las partículas del preset sustituyen a las que había y van entre el fondo y la personaje.
     expect(out.capas).toEqual([
       { key: key(1), profundidad: 0.2 },
@@ -25,7 +25,7 @@ describe("spec 016 — estilo de la rareza", () => {
   it("test_s022_rf9_el_escalon_n_no_lleva_particulas_y_su_sello_es_la_c", () => {
     const out = applyTierStyle(config, "n", 1);
     expect(out.capas.every((l) => "key" in l)).toBe(true);
-    expect(out.sello).toEqual({ texto: "C", estilo: "plata", tamano: 10, esquina: "sup-izq" });
+    expect(out.sello).toEqual({ texto: "C", estilo: "plata", tamano: 15, esquina: "sup-izq" });
     expect(out.holo).toBe(false);
   });
 
@@ -49,14 +49,15 @@ describe("spec 016 — cambio de rareza de una carta con capas", () => {
   it("test_s016_rf25_el_marco_y_el_sello_de_texto_siguen_al_escalon_nuevo_y_las_particulas_no_cambian", () => {
     const { config: out, imageSealToReview } = retierLayers(withText, "ssr");
     expect(out.marco).toBe("ssr");
-    // El sello de texto pasa al del escalón, pero conserva la esquina que eligió el administrador.
-    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 13, esquina: "inf-der" });
+    // El sello de texto pasa al del escalón, pero conserva la esquina que eligió el administrador (y, desde la spec 028,
+    // su tamaño: ya no hay tamaño por escalón).
+    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 12, esquina: "inf-der" });
     expect(out.capas).toEqual(withText.capas);
     expect(imageSealToReview).toBe(false);
   });
 
   it("test_s016_rf25_al_bajar_a_comun_el_sello_de_texto_pasa_a_la_c", () => {
-    expect(retierLayers(withText, "n").config.sello).toEqual({ texto: "C", estilo: "plata", tamano: 10, esquina: "inf-der" });
+    expect(retierLayers(withText, "n").config.sello).toEqual({ texto: "C", estilo: "plata", tamano: 12, esquina: "inf-der" });
   });
 
   it("test_s016_rf25_el_sello_de_imagen_se_mantiene_y_avisa_de_que_hay_que_revisarlo", () => {
@@ -111,7 +112,7 @@ describe("spec 017 — estilo automático", () => {
     const manual = { ...armada, estiloAuto: false };
     const out = retierLayers(manual, "ssr").config;
     expect(out.marco).toBe("ssr");
-    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 13, esquina: "inf-der" });
+    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 12, esquina: "inf-der" });
     expect(out.capas).toEqual(manual.capas);
   });
 

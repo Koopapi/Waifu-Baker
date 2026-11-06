@@ -15,6 +15,7 @@ import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
+import { getCardDefaults } from "@/server/services/settings";
 import { AdultBadge, StatusBadge } from "@/features/admin/ui";
 import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
@@ -35,7 +36,7 @@ const EMPTY_SLOT: Record<Rarity, number> = { common: 0, rare: 0, epic: 0, legend
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters, packArts, library] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listLibrary(db)]);
+  const [overview, characters, packArts, library, cardDefaults] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listLibrary(db), getCardDefaults(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -158,7 +159,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
                 version={set.version}
                 slots={overview.gold.slots.map((s) => ({ ...EMPTY_SLOT, ...s }))}
                 holoChance={overview.gold.holoChance}
-                pityThreshold={0}
+                pityThreshold={overview.gold.exPityThreshold}
                 locked={!canEdit(set.status, "odds")}
                 cardCounts={cardCounts}
               />
@@ -226,6 +227,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           characters={characters.map((c) => ({ id: c.id, name: c.name }))}
           library={library.map((i) => ({ id: i.id, kind: i.kind, name: i.name, key: i.key, url: assetUrl(i.key), particles: i.particles }))}
           perms={perms}
+          cardDefaults={cardDefaults}
         />
       </section>
     </div>

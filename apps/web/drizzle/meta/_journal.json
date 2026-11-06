@@ -148,6 +148,13 @@
       "when": 1793693012218,
       "tag": "0020_versiones_de_carta",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793864716797,
+      "tag": "0021_valores_por_defecto",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import lib from "./carta-capas.js";
 import type { CartaCapasApi } from "./carta-capas";
+import { DEFAULT_BORDER, LEGACY_FRAME_BORDER } from "@/domain/cards/card-defaults";
 
 const api = lib as unknown as CartaCapasApi;
 const src = readFileSync(path.resolve(__dirname, "carta-capas.js"), "utf8");
@@ -127,8 +128,23 @@ describe("spec 025 — carta-capas v4 en nuestra copia", () => {
 });
 
 describe("spec 025 — grosor del marco", () => {
-  it("test_s025_rf11_sin_grosor_guardado_el_marco_usa_el_de_su_escalon", () => {
-    // Antes `num(null, …)` devolvía 0 y el marco no se veía.
-    expect(src).toMatch(/op\.borde == null \? m\[2\] \|\| 2\.2 : num\(op\.borde, m\[2\] \|\| 2\.2\)/);
+  it("test_s025_rf11_sin_grosor_guardado_el_marco_se_sigue_viendo", () => {
+    // Antes `num(null, …)` devolvía 0 y el marco no se veía. Desde la spec 028, el grosor sin guardar es 3.
+    expect(src).toMatch(/op\.borde == null \? BORDE : num\(op\.borde, BORDE\)/);
+  });
+});
+
+describe("spec 028 — grosor por defecto del marco", () => {
+  it("test_s028_rf4_sin_grosor_guardado_la_carta_viva_y_la_imagen_fija_usan_3", () => {
+    // La imagen fija se dibuja con este mismo script en Chromium (server/cards/flatten.ts).
+    expect(src).toMatch(new RegExp(`var BORDE = ${DEFAULT_BORDER};`));
+    expect(src).toMatch(/--cc-borde:3cqw/);
+  });
+
+  it("test_s028_rf6_el_grosor_de_antes_de_cada_marco_es_el_que_rellena_la_migracion", () => {
+    const marcos = (api as unknown as { marcos: Record<string, [string, string, number]> }).marcos;
+    for (const tier of ["n", "r", "sr", "ssr", "ur"] as const) expect(marcos[tier][2], tier).toBe(LEGACY_FRAME_BORDER[tier]);
+    const migration = readFileSync(path.resolve(__dirname, "../../../../drizzle/0021_valores_por_defecto.sql"), "utf8");
+    for (const [frame, border] of Object.entries(LEGACY_FRAME_BORDER)) expect(migration).toContain(`WHEN '${frame}' THEN ${border}`);
   });
 });

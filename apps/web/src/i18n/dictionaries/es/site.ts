@@ -59,6 +59,10 @@ export const site: typeof en = {
     pity: (n) =>
       `Protección de mala suerte (solo sobres plata): si abres ${n} sobres plata seguidos de esta colección sin ninguna carta Épica o superior, el siguiente trae al menos una (sustituye a la carta de la última ranura). El contador es tuyo y de esta colección.`,
     noPity: "Esta colección no tiene protección de mala suerte.",
+    // Spec 028, RF-11 y RF-14.
+    exPity: (n: number) =>
+      `Garantía de EX (solo sobres gold): si abres ${n} sobres gold seguidos de esta colección sin ninguna EX, el siguiente trae una (sustituye la carta de la última ranura). El contador es tuyo y solo de esta colección.`,
+    atLeastOne: "Probabilidad de que un sobre traiga al menos una carta de cada rareza",
     // Spec 022, RF-14, RF-15 y RF-20.
     guarantee: { silver: "Cada sobre plata trae al menos una carta Rara o mejor.", gold: "Cada sobre gold trae al menos una carta Épica o mejor." },
     slot: "Ranura",
