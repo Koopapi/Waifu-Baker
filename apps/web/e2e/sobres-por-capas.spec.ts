@@ -128,7 +128,7 @@ test("sobres por capas: diseñar, guardar, recargar y abrir con una Legendaria",
     await expect(fan.locator('.stage[data-phase="opening"], .stage[data-phase="deck"]').first()).toBeVisible();
   });
 
-  await test.step("RF-19 a RF-22: el mazo queda listo, late antes de la Legendaria y sale con el efecto especial", async () => {
+  await test.step("RF-19, RF-20, RF-21 y RF-22: el mazo queda listo, late antes de la Legendaria y sale con el efecto especial", async () => {
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible({ timeout: 15_000 });
     // RF-19: el sobre se fue y las cartas están boca abajo, derechas, y solo se ve la de arriba (RF-20).
     await expect(fan.locator('[data-testid="tear-pack"]')).toHaveCount(0);
