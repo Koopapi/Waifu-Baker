@@ -2,7 +2,7 @@
 // lote → editar probabilidades → simular sobre → publicar → comprobar bloqueos → regalar un sobre.
 import type { Browser, Page } from "@playwright/test";
 import { DESKTOP, desktopOnly, expect, test } from "./fixtures";
-import { assembleSet, choose, openDeck, tick, untickAdmin } from "./helpers";
+import { assembleSet, choose, openDeck, tear, tick, untickAdmin } from "./helpers";
 import { readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -142,13 +142,8 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   await test.step("RF-23: simular un sobre con las cartas reales", async () => {
     await page.click('[data-testid="simulate-link"]');
     await page.waitForURL(/simulate$/);
-    const strip = (await page.locator(".pack__strip").boundingBox())!;
-    const sx = strip.x + strip.width * 0.3;
-    const sy = strip.y + strip.height / 2;
-    await page.mouse.move(sx, sy);
-    await page.mouse.down();
-    for (let i = 1; i <= 12; i++) await page.mouse.move(sx + (220 * i) / 12, sy);
-    await page.mouse.up();
+    // Spec 030: el mismo sobre de Bruno que verá el coleccionista.
+    await tear(page);
     // Spec 023: el mazo (de menor a mayor rareza) se revela y se aparte carta a carta.
     await openDeck(page);
     await expect(page.locator(".summary__row")).toHaveCount(2);

@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import type { LabCard } from "@/features/opening/fakePack";
 import { liveImageUrls } from "@/domain/cards/live";
-import type { PackArtData } from "@/features/packs/PackArt";
 import { ackOpeningAction, openNextPackAction, resumeOpeningAction } from "@/app/packs/actions";
 import { useT } from "@/i18n/client";
 import { LocaleToggle } from "@/i18n/LocaleToggle";
 import type { PackKind } from "@/domain/catalog/default-odds";
+import type { PackViewData } from "@/domain/packs/view";
 import { PackKindTag } from "./PackKindTag";
 
 // Spec 013, RF-13: la escena (GSAP, gestos y partículas) se descarga aparte, después de pintar la página.
@@ -34,7 +34,7 @@ async function preload(cards: LabCard[]) {
 }
 
 /** Conecta la escena de apertura con los sobres reales del usuario. */
-export function PackOpener({ setId, setCode, setName, art, kind, sealed, resumePackId }: { setId: string; setCode: string; setName: string; art: PackArtData; kind: PackKind; sealed: number; resumePackId: string | null }) {
+export function PackOpener({ setId, setCode, setName, view, kind, sealed, resumePackId }: { setId: string; setCode: string; setName: string; view: PackViewData; kind: PackKind; sealed: number; resumePackId: string | null }) {
   const t = useT();
   const [remaining, setRemaining] = useState(sealed);
   const resume = useRef(resumePackId);
@@ -60,8 +60,9 @@ export function PackOpener({ setId, setCode, setName, art, kind, sealed, resumeP
     <>
       <OpeningStage
         draw={draw}
-        // Spec 023: el sobre nuevo de su tipo; si había una apertura sin terminar, se retoma en el mazo (RF-22).
-        shell={{ setId, code: setCode, name: setName, art, kind, kindLabel: t.common.packKind[kind] }}
+        // Spec 030: el sobre de la colección y tipo (su diseño o el básico); si había una apertura sin terminar, se
+        // retoma en el mazo (spec 023, RF-22).
+        view={view}
         setLine={`${setCode} · ${setName}`}
         autoOpen={Boolean(resumePackId)}
         onFinished={onFinished}

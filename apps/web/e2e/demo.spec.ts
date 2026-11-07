@@ -23,12 +23,14 @@ test("demo: portada con papeles, coleccionista y cambio a administrador", async 
     await expect(page.locator(`text=${es.site.demo.enterAdmin}`)).toBeVisible();
     await page.click('[data-testid="demo-enter-collector"]');
     await page.waitForURL(/\/packs$/);
-    // Spec 015, RF-6: los 3 sobres de muestra se celebran como regalo la primera vez que entra.
+    // Spec 015, RF-6: los sobres de muestra se celebran como regalo la primera vez que entra: 3 plata y, desde la spec
+    // 030, 1 gold para ver el sobre básico.
     const celebration = page.locator('[data-testid="celebration-dialog"]');
     await expect(celebration).toBeVisible();
-    await expect(celebration).toContainText(es.rewards.fx.arrivals.title(3));
+    await expect(celebration).toContainText(es.rewards.fx.arrivals.title(4));
     await dismissCelebration(page);
     await expect(page.locator('[data-testid="group-FA01"] >> text=x3')).toBeVisible();
+    await expect(page.locator('[data-testid="group-FA01-gold"] >> text=x1')).toBeVisible();
     await expect(page.locator('[data-testid="cookie-balance"]')).toContainText("240");
   });
 

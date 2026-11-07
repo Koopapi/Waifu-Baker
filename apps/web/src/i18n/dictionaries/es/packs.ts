@@ -83,4 +83,22 @@ export const packs: typeof en = {
     newTitle: "¡Nueva!",
     dismissCard: "Apartar la carta",
   },
+  // Spec 030: el sobre por capas de Bruno y su apertura.
+  sobre: {
+    tear: { hint: "Desliza el dedo por la línea", aria: "Desliza por la línea punteada o pulsa Intro para abrirlo." },
+    sticker: { hint: "Despega el sticker de arriba →", aria: "Despega el sticker de arriba deslizando hacia la derecha, o pulsa Intro para abrirlo." },
+    pack: "Sobre",
+    card: "carta",
+    cards: "cartas",
+    guideSeal: "Sello",
+    guideTear: "Rasgado",
+    guideLogo: "Logo",
+    guideSet: "Set",
+    opened: "¡Abierto!",
+    nextCard: "Siguiente carta",
+    flipCard: "Voltear la carta",
+    summaryTitle: "Tu sobre",
+    special: (name, rarity, i, n) => `¡${name} · ${rarity}! · ${i} de ${n}`,
+    progress: (i, n) => `Carta ${i} de ${n}`,
+  },
 };

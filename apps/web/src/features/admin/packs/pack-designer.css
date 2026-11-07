@@ -1,0 +1,108 @@
+/* Spec 030: la escena del editor de sobres (la del creador de Bruno): el sobre y, detrás, el mazo de cartas de muestra. */
+
+.pack-designer__logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--ui-accent);
+  color: var(--ui-on-accent);
+  font-family: var(--font-dela), "Dela Gothic One", var(--ui-font-display), sans-serif;
+  font-size: 15px;
+  transform: rotate(-6deg);
+  box-shadow: 3px 3px 0 var(--ui-k-menta);
+}
+
+/* Fondo de la escena: rayos (el de PreviewStage), oscuro o claro. */
+.pack-designer__stage[data-scene="oscuro"]::before,
+.pack-designer__stage[data-scene="claro"]::before,
+.pack-designer__stage[data-scene="oscuro"]::after,
+.pack-designer__stage[data-scene="claro"]::after {
+  display: none;
+}
+.pack-designer__stage[data-scene="claro"] {
+  background: var(--ui-text);
+}
+
+.pack-designer__pill {
+  margin: 0;
+  max-width: 100%;
+  padding: 7px 16px;
+  border: 3px solid var(--ui-rail);
+  border-radius: 999px;
+  background: var(--ui-text);
+  color: var(--ui-rail);
+  font-size: 13px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 var(--ui-k-chicle);
+}
+.pack-designer__pill--shake {
+  animation: pack-designer-push 0.45s;
+}
+@keyframes pack-designer-push {
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.pack-designer__zone {
+  position: relative;
+  width: min(300px, 68vw);
+  aspect-ratio: 1000 / 1750;
+  container-type: inline-size;
+  margin: 18px 0 6px;
+}
+.pack-designer__host {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+/* Cartas: escondidas hasta abrir, todas derechas y solo se ve la de arriba (RF-3, como la apertura). */
+.pack-designer__deck {
+  position: absolute;
+  z-index: 2;
+  left: 8cqw;
+  top: 28cqw;
+  width: 84cqw;
+  aspect-ratio: 700 / 991;
+}
+.pack-designer__deck[data-step="hidden"] {
+  visibility: hidden;
+}
+.pack-designer__deck[data-step="rise"] {
+  transform: translateY(-52%);
+  transition: transform 0.75s;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.pack-designer__deck[data-step="center"] {
+  transform: scale(1.04);
+  transition: transform 0.6s;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.pack-designer__card {
+  position: absolute;
+  inset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pack-designer__pill--shake {
+    animation: none;
+  }
+  .pack-designer__deck {
+    transition: none;
+  }
+}

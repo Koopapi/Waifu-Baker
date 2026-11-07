@@ -37,11 +37,11 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   await test.step("RF-5, RF-8 y RF-19: «Mis sobres» muestra el sobre compuesto con la portada y el plural correcto", async () => {
     await fan.goto("/packs");
     await expect(fan.getByText("Tienes 3 sobres sin abrir.")).toBeVisible();
-    // Spec 023: el sobre nuevo (`PackShell`) con la portada en su ventana y una línea de dientes.
-    const art = fan.locator('[data-testid="group-KAW1"] .pack-shell');
-    await expect(art.locator('img[src*="k=cover"]')).toBeVisible();
+    // Spec 030, RF-15 y RF-16: el sobre básico de Bruno con la portada, en miniatura (la dibuja el navegador).
+    const art = fan.locator('[data-testid="group-KAW1"] [data-testid="pack-thumb"]');
+    await expect(art).toHaveAttribute("data-art", /k=cover/);
+    await expect(art.locator("img")).toBeVisible();
     await expect.poll(() => art.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
-    await expect(art.locator(".pack-shell__teeth")).toHaveCount(1);
     // El texto de los botones de apertura cabe en el botón, también en pantalla ancha (dos columnas de tarjetas).
     const fits = async () => {
       const buttons = await fan.locator('[data-testid="group-KAW1"] a').all();
@@ -62,11 +62,11 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await admin.locator('[data-testid="pack-image-input"]').setInputFiles(path.join(LAB, "05.webp"));
     await expect(admin.getByText(es.admin.set.pack.uploaded)).toBeVisible();
     await fan.goto("/packs");
-    await expect(fan.locator('[data-testid="group-KAW1"] .pack-shell__window img[src*="k=pack"]')).toBeVisible();
+    await expect(fan.locator('[data-testid="group-KAW1"] [data-testid="pack-thumb"][data-art*="k=pack"] img')).toBeVisible();
     await admin.getByRole("button", { name: es.admin.set.pack.remove }).click();
     await expect(admin.getByText(es.admin.set.pack.removed)).toBeVisible();
     await fan.goto("/packs");
-    await expect(fan.locator('[data-testid="group-KAW1"] .pack-shell__window img[src*="k=pack"]')).toHaveCount(0);
+    await expect(fan.locator('[data-testid="group-KAW1"] [data-testid="pack-thumb"][data-art*="k=pack"]')).toHaveCount(0);
   });
 
   await test.step("RF-1 a RF-4 y RF-24: estilo kawaii con pegatinas y botones con relieve", async () => {
@@ -79,17 +79,33 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
 
   await test.step("RF-8, RF-9, RF-11 y RF-15: la apertura con el sobre de la colección, destellos y agitado", async () => {
     await fan.locator('[data-testid="group-KAW1"]').getByRole("link", { name: es.packs.mine.openOne }).click();
-    // Spec 023: el sobre nuevo (con la imagen de la colección) se agita al tocar la tira sin arrastrar.
-    await expect(fan.locator('[data-testid="tear-pack"] .pack-shell')).toBeVisible();
+    // Spec 030: el sobre de Bruno (con la imagen de la colección) sacude la indicación al tocarlo sin deslizar.
+    await expect(fan.locator('[data-testid="tear-pack"] .sc-sobre')).toBeVisible();
     await expect(fan.locator(".sparkle").first()).toBeAttached();
     await fan.waitForLoadState("networkidle");
     if (!(await fan.locator(".tear--reduced").count())) {
-      await fan.locator(".tear__hit").click();
+      // El sobre escucha eventos de puntero: en el teléfono, un toque con el dedo; en escritorio, un clic. Flota y se
+      // balancea siempre (nunca está «quieto» para Playwright), así que se toca sin esperar a que pare.
+      const sobre = fan.locator('[data-testid="tear-pack"] .sc-sobre');
+      if (await fan.evaluate(() => "ontouchstart" in window)) await sobre.tap({ force: true });
+      else await sobre.click({ force: true });
       await expect(fan.locator(".tear--shake")).toBeAttached();
     }
     // El texto de ayuda no se monta sobre el selector de idioma ni sobre los botones.
     const hint = fan.locator(".hint");
-    expect(await apart(hint, fan.locator('[data-testid="locale-toggle"]').first())).toBe(true);
+    // En el teléfono la página de debajo tiene su propio selector, tapado por la escena: solo cuenta el que se ve.
+    let shown = 0;
+    for (const toggle of await fan.locator('[data-testid="locale-toggle"]').all()) {
+      const onTop = await toggle.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        return r.width > 0 && !!hit && el.contains(hit);
+      });
+      if (!onTop) continue;
+      shown++;
+      expect(await apart(hint, toggle)).toBe(true);
+    }
+    expect(shown).toBeGreaterThan(0);
     for (const b of await fan.locator(".hud > *").all()) expect(await apart(hint, b)).toBe(true);
     await shot(fan, "2-sobre");
   });
@@ -120,7 +136,7 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
 
   await test.step("RF-8: «Abrir todos» muestra el mismo sobre", async () => {
     await fan.goto(`/packs/${setId}/all`);
-    await expect(fan.locator(".pack-shell img[src*='k=cover']")).toBeVisible();
+    await expect(fan.locator('[data-testid="pack-thumb"] img').first()).toBeVisible();
   });
 
   await test.step("RF-16 y RF-17: recompensas con anillo y racha de pegatinas sin desbordes", async () => {

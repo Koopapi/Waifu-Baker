@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useRef } from "react";
 import type { CSSProperties, MutableRefObject } from "react";
 import { useT } from "@/i18n/client";
 import type { LabCard } from "./fakePack";
-import { CartaCapas } from "@/ui/game/CartaCapas";
+import { CartaCapas, type CartaCapasHandle } from "@/ui/game/CartaCapas";
 import type { Tilt, TiltMode } from "./useTiltSource";
 
 interface Props {
@@ -20,6 +20,11 @@ interface Props {
   tease?: number;
   /** Spec 018, RF-6: muestra la carta viva sobre la cara (al revelarla); si no, la imagen fija. */
   showLive?: boolean;
+  /**
+   * Spec 030, RF-27: monta la carta viva antes de revelarla (oculta tras el dorso) para que cargue sus capas a tiempo;
+   * la entrada se hace al pasar a `showLive`.
+   */
+  preloadLive?: boolean;
   /** Spec 023: gestos del mazo (toque y deslizamiento); con ellos, `onClick` queda solo para el teclado. */
   gesture?: React.HTMLAttributes<HTMLDivElement>;
   /** Nombre accesible de la acción (voltear o apartar). */
@@ -36,11 +41,18 @@ const MAX_RY = 14;
  *   .card3d__inner volteo rotationY (GSAP)
  */
 export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
-  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false, gesture, actionLabel },
+  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false, preloadLive = false, gesture, actionLabel },
   ref,
 ) {
   const t = useT();
   const el = useRef<HTMLDivElement | null>(null);
+  const live = useRef<CartaCapasHandle>(null);
+  const liveMounted = (showLive || preloadLive) && Boolean(card.live);
+
+  // RF-27: al revelarse, la carta viva (ya montada si se precargó) hace su entrada en cuanto sus capas estén listas.
+  useEffect(() => {
+    if (showLive) live.current?.entrarAlCargar();
+  }, [showLive]);
 
   const setRefs = (node: HTMLDivElement | null) => {
     el.current = node;
@@ -53,7 +65,7 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
   useEffect(() => {
     if (!clickable || !active) return;
     const a = document.activeElement;
-    if (!a || a === document.body || a.classList.contains("card3d") || a.classList.contains("pack__strip")) el.current?.focus({ preventScroll: true });
+    if (!a || a === document.body || a.classList.contains("card3d") || a.classList.contains("pack__strip") || a.classList.contains("sc-sobre")) el.current?.focus({ preventScroll: true });
   }, [clickable, active]);
 
   useEffect(() => {
@@ -130,14 +142,15 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
             <div className="holo holo--glare" />
             {card.holo && <div className="holo holo--foil" />}
             {/* Spec 018, RF-6 y RF-9: la carta viva encima de la imagen fija, con su entrada y su brillo holo. */}
-            {showLive && card.live && (
+            {liveMounted && card.live && (
               <CartaCapas
+                ref={live}
                 tier={card.live.tier}
                 image=""
                 config={card.live.config}
                 holo={card.holo}
                 label={card.name}
-                entrance
+                sealHidden
                 className="card3d__live"
                 // En línea: el CSS de carta-capas.js se inyecta después y pondría `.cc` en `position: relative`.
                 style={{ position: "absolute", inset: 0, aspectRatio: "auto" }}

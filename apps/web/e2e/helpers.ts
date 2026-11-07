@@ -5,6 +5,21 @@ import path from "node:path";
 
 export const LAB = path.resolve(__dirname, "../public/lab");
 
+/**
+ * `page.goto` que tolera la recarga sola de la página anterior: tras guardar un formulario o al entrar en «Mis sobres»
+ * (que marca los sobres como vistos) la página se refresca, y en WebKit ese refresco interrumpe el goto siguiente. Si
+ * pasa, se vuelve a ir a la dirección pedida cuando la recarga termina.
+ */
+export async function go(page: Page, url: string) {
+  try {
+    await page.goto(url);
+  } catch (e) {
+    if (!/interrupted by another navigation/.test((e as Error).message)) throw e;
+    await page.waitForLoadState("networkidle");
+    await page.goto(url);
+  }
+}
+
 /** El administrador entra siempre en escritorio; el resto, con el dispositivo del proyecto. */
 export async function login(browser: Browser, name: string, admin: boolean, next = "/admin", opts: { keepCelebration?: boolean } = {}): Promise<Page> {
   const page = await (await browser.newContext(admin ? DESKTOP : {})).newPage();
@@ -124,46 +139,54 @@ export async function giftPacks(page: Page, userName: string, code: string, coun
   await seed(page, { action: "gift", userName, setCode: code, count, reason: "Regalo del test E2E", kind });
 }
 
-/** Rasga el sobre arrastrando la tira; con movimiento reducido, pulsa el botón que la sustituye. */
+/**
+ * Spec 030: arrastra por la línea de rasgado del sobre de Bruno (y = 230 de 1750) de `from` a `to` (fracciones del
+ * ancho). En los dispositivos táctiles se mandan eventos de puntero con el dedo (el sobre escucha eventos de puntero,
+ * también en el teléfono); en escritorio, el ratón. Con apertura de sticker, se tira de la esquina de arriba.
+ */
+export async function dragLine(page: Page, from: number, to: number) {
+  const sobre = page.locator('[data-testid="tear-pack"] .sc-sobre');
+  await sobre.waitFor({ state: "visible" });
+  const sticker = (await page.locator('[data-testid="tear-pack"][data-apertura="sticker"]').count()) > 0;
+  const yFrac = sticker ? (230 / 1750) * 0.5 : 230 / 1750;
+  if (await page.evaluate(() => "ontouchstart" in window)) {
+    await sobre.evaluate(
+      async (el, { from, to, yFrac }) => {
+        const r = el.getBoundingClientRect();
+        const y = r.top + r.height * yFrac;
+        const fire = (type: string, f: number) =>
+          el.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, pointerId: 7, pointerType: "touch", isPrimary: true, clientX: r.left + r.width * f, clientY: y, buttons: type === "pointerup" ? 0 : 1 }));
+        fire("pointerdown", from);
+        for (let i = 1; i <= 14; i++) {
+          await new Promise((res) => setTimeout(res, 16));
+          fire("pointermove", from + ((to - from) * i) / 14);
+        }
+        fire("pointerup", to);
+      },
+      { from, to, yFrac },
+    );
+    return;
+  }
+  const box = (await sobre.boundingBox())!;
+  const y = box.y + box.height * yFrac;
+  await page.mouse.move(box.x + box.width * from, y);
+  await page.mouse.down();
+  for (let i = 1; i <= 14; i++) await page.mouse.move(box.x + box.width * (from + ((to - from) * i) / 14), y);
+  await page.mouse.up();
+}
+
+/** Abre el sobre rasgándolo por la línea (o despegando el sticker); con movimiento reducido, pulsa el botón. */
 export async function tear(page: Page) {
-  await page.waitForSelector(".pack__strip");
+  await page.locator('[data-testid="tear-pack"] .sc-sobre').waitFor({ state: "visible" });
   await page.waitForLoadState("networkidle");
   // Spec 023: «Abrir sin deslizar» está siempre; con movimiento reducido es la única forma de abrir.
   if (await page.locator(".tear--reduced").count()) {
     await page.click(".pack__cta");
     return;
   }
-  // En dispositivos táctiles el gesto escucha eventos táctiles: se simula un arrastre con el dedo.
-  if (await page.evaluate(() => "ontouchstart" in window)) {
-    await page.evaluate(async () => {
-      const el = document.querySelector<HTMLElement>(".pack__strip")!;
-      const r = el.getBoundingClientRect();
-      const sx = r.left + r.width * 0.3;
-      const sy = r.top + r.height / 2;
-      // WebKit no deja construir Touch: un Event genérico con las mismas propiedades sirve en ambos motores.
-      const fire = (type: string, x: number) => {
-        const t = { identifier: 1, target: el, clientX: x, clientY: sy, pageX: x, pageY: sy, screenX: x, screenY: sy };
-        const live = type === "touchend" ? [] : [t];
-        const ev = new Event(type, { bubbles: true, cancelable: true });
-        Object.defineProperties(ev, { touches: { value: live }, targetTouches: { value: live }, changedTouches: { value: [t] } });
-        el.dispatchEvent(ev);
-      };
-      fire("touchstart", sx);
-      for (let i = 1; i <= 12; i++) {
-        await new Promise((res) => setTimeout(res, 16));
-        fire("touchmove", sx + (220 * i) / 12);
-      }
-      fire("touchend", sx + 220);
-    });
-    return;
-  }
-  const strip = (await page.locator(".pack__strip").boundingBox())!;
-  const sx = strip.x + strip.width * 0.3;
-  const sy = strip.y + strip.height / 2;
-  await page.mouse.move(sx, sy);
-  await page.mouse.down();
-  for (let i = 1; i <= 12; i++) await page.mouse.move(sx + (220 * i) / 12, sy);
-  await page.mouse.up();
+  const sticker = (await page.locator('[data-testid="tear-pack"][data-apertura="sticker"]').count()) > 0;
+  if (sticker) await dragLine(page, 0.05, 1.05);
+  else await dragLine(page, 0.08, 0.94);
 }
 
 /**

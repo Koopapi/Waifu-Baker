@@ -162,6 +162,13 @@
       "when": 1793866126832,
       "tag": "0022_vinculo_y_reciclaje",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793989663989,
+      "tag": "0023_sobres_por_capas",
+      "breakpoints": true
     }
   ]
 }

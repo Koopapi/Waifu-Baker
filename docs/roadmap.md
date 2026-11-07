@@ -168,3 +168,8 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   sus cartas (destello en el 3, holo en el 5, marco de vínculo en el 7, maestría en el 10); página de línea de personaje;
   fabricar con polvo (no EX ni holo); ajustes y simulador en `/admin/settings`. Rama `spec/029-vinculo-y-reciclaje`,
   sin push; la verificación larga (build, budget, E2E de las dos specs) queda en `/Volumes/KoopaDev/wb-029/e2e-resultado.log`.
+- 6 nov 2026: **spec 030 «sobres por capas»** implementada en local sobre la 029. Editor de sobres en el panel (plata y
+  gold por colección, con la distribución del creador de Bruno), el sobre de Bruno (`sobre-capas.js`) en «Mis sobres»,
+  la apertura, «Abrir todos» y el simulador, coreografía de Bruno y efecto especial de Legendaria y EX; sobre básico sin
+  diseño. Rama `spec/030-sobres-por-capas`, sin push. Pendiente: la E2E completa en los cuatro proyectos, `pnpm build`
+  y `pnpm budget`, la comparación lado a lado y la prueba en un teléfono real.

@@ -88,7 +88,8 @@ describe("spec 022 — marcos de las cinco rarezas", () => {
 describe("spec 025 — carta-capas v4 en nuestra copia", () => {
   it("test_s025_rf1_rf2_el_brillo_va_dentro_de_la_capa_con_su_imagen_como_mascara", () => {
     expect(api.version).toBe(4);
-    expect(Object.keys(api.brillos)).toEqual(["holo", "destello", "oro", "plata"]);
+    // Spec 030: más «ondas», que solo usan los sobres (el editor de cartas sigue con los cuatro de GLOSS_TYPES).
+    expect(Object.keys(api.brillos)).toEqual(["holo", "destello", "oro", "plata", "ondas"]);
     // El brillo es un hijo de la capa (se mueve con ella) y usa la imagen de la capa como máscara.
     expect(src).toMatch(/'<div class="cc-brillo cc-brillo-' \+ b\.tipo/);
     expect(src).toMatch(/mask-image:' \+ m/);
@@ -146,5 +147,40 @@ describe("spec 028 — grosor por defecto del marco", () => {
     for (const tier of ["n", "r", "sr", "ssr", "ur"] as const) expect(marcos[tier][2], tier).toBe(LEGACY_FRAME_BORDER[tier]);
     const migration = readFileSync(path.resolve(__dirname, "../../../../drizzle/0021_valores_por_defecto.sql"), "utf8");
     for (const [frame, border] of Object.entries(LEGACY_FRAME_BORDER)) expect(migration).toContain(`WHEN '${frame}' THEN ${border}`);
+  });
+});
+
+describe("spec 030 — motor compartido con sobre-capas.js", () => {
+  it("test_s030_rnf_el_motor_dibuja_la_misma_capa_que_la_carta_con_los_valores_seguros", () => {
+    expect(api.version).toBe(4);
+    expect(typeof api.motor.inyectarCSS).toBe("function");
+    const html = api.motor.capaHTML({ src: "/a.webp", mezcla: "overlay", profundidad: 0.25, margen: 3 }, 0, { semilla: 5 });
+    expect(html).toContain('data-p="0.25"');
+    expect(html).toContain("mix-blend-mode:overlay");
+    expect(html).toContain("inset:-3%");
+    // Una mezcla, un color o una URL manipulados no llegan al HTML (la configuración del sobre viene de la BD).
+    const bad = api.motor.capaHTML({ src: "/a.webp", mezcla: 'x;background:url(https://evil)', brillo: { tipo: "holo" } }, 0);
+    expect(bad).not.toContain("evil");
+    expect(api.motor.capaHTML({ src: 'x") ; background:url(https://evil', brillo: { tipo: "holo" } }, 0)).not.toContain("mask-image");
+    expect(api.motor.capaHTML({ particulas: "confeti", cantidad: 3, color: "red;x:url(y)" }, 1)).not.toContain("red;x");
+    expect(api.motor.particulasHTML({ particulas: "nieve", cantidad: 4 }, 3).match(/<i /g)).toHaveLength(4);
+  });
+
+  it("test_s030_rf5_el_brillo_ondas_usa_el_patron_o_arcos_css", () => {
+    const own = api.motor.capaHTML({ src: "/f.webp", brillo: { tipo: "ondas", intensidad: 0.8, patron: "/p.webp", patronTamano: 120 } }, 0);
+    expect(own).toContain("cc-brillo-ondas");
+    expect(own).toContain("--cc-ot:120%");
+    expect(own).toContain("mask-image:url(&quot;/p.webp&quot;)");
+    const css = api.motor.capaHTML({ src: "/f.webp", brillo: { tipo: "ondas", patron: null } }, 0);
+    expect(css).toContain("cc-ondas-css");
+    // Un patrón con caracteres que rompen el CSS se descarta y quedan los arcos.
+    expect(api.motor.capaHTML({ src: "/f.webp", brillo: { tipo: "ondas", patron: "x)';y" } }, 0)).toContain("cc-ondas-css");
+  });
+
+  it("test_s030_rnf_la_capa_de_la_carta_sigue_saliendo_del_mismo_codigo", () => {
+    expect(src).toMatch(/function capaHTML\(c, i\) \{ return capaHTMLBase\(c, i, 7 \+ id \+ i, op\.estatica\); \}/);
+    // Lo de la 025 y la 028 sigue: personalizado, grosor por defecto y valores seguros.
+    expect(typeof api.marcoPersonalizado).toBe("function");
+    expect(api.seguro.mezcla("hue")).toBe("hue");
   });
 });

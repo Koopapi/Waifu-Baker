@@ -91,6 +91,14 @@ export function createSoundEngine(deps: Deps) {
       if (howler) fire();
       else void this.preload().then(fire);
     },
+    /**
+     * Spec 030: un sonido que suena fuera del motor (el rasgado sintetizado del sobre de Bruno): solo se anota, con el
+     * mismo evento que los demás y sin sonar si está silenciado.
+     */
+    note(name: SoundName) {
+      if (isMuted()) return;
+      deps.emit("wb:sound", name);
+    },
     /** RF-9 y RF-10 */
     vibrate(pattern: number[] | null) {
       if (!pattern || isMuted()) return;
