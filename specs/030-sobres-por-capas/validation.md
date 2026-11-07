@@ -2,15 +2,26 @@
 
 Generado por `apps/web/scripts/rf-coverage.mjs` el 2026-11-06. Vitest: 905 de 905 tests en verde. E2E: `pnpm e2e`.
 
-**Veredicto: spec cumplida en unidad, integración y la E2E de la 030 en `chromium-desktop`** (25 de 25 RF con al menos
-un test en verde; el paso E2E del RF-20 se renombró después de generar la tabla para que lo cuente el script).
+**Veredicto: spec cumplida en unidad, integración y E2E en los cuatro proyectos** (25 de 25 RF con al menos un test en
+verde; el paso E2E del RF-20 se renombró después de generar la tabla para que lo cuente el script).
 
-**Pendiente (6 nov 2026, el dueño pidió no lanzar la verificación larga):** la E2E completa (`pnpm e2e`) en los cuatro
-proyectos (`chromium-desktop`, `pixel-7`, `iphone-14`, `reduced-motion`), incluidas las E2E adaptadas al sobre nuevo
-(`apertura-nueva`, `kawaii`, `collector`, `admin-panel`, `rarezas-sobres`, `sound`) y la de esta spec en los otros tres
-proyectos; `pnpm build` y `pnpm budget`; la comparación lado a lado con `creador-sobres.html` y `apertura-sobre.html` y
-la prueba en un teléfono real. Corrido: `pnpm exec playwright test e2e/sobres-por-capas.spec.ts --project=chromium-desktop`
-(1 test en verde, 1,0 min).
+**E2E completa (6–7 nov 2026):** `pnpm build` y `pnpm budget` en verde (la página más pesada, expediciones, 225,2 kB de
+250). `pnpm e2e` en `chromium-desktop`, `pixel-7`, `iphone-14` y `reduced-motion`: 99 en verde, 10 fallos y 44 omitidas
+(2,9 h). La E2E de esta spec y las adaptadas al sobre nuevo (`apertura-nueva`, `collector`, `admin-panel`,
+`rarezas-sobres`, `sound`, `live-cards`) pasaron en los cuatro proyectos a la primera. Los 10 fallos eran de las pruebas,
+no del juego, y se arreglaron:
+- `demo` (los cuatro): esperaba 3 sobres de regalo y la demo de la 030 regala 4 (3 plata y 1 gold).
+- `kawaii` (escritorio, Pixel e iPhone): el sobre de Bruno flota y se balancea siempre, y Playwright esperaba a que
+  estuviera quieto para tocarlo; ahora se toca sin esperar.
+- `defaults` y `vinculo` (iPhone): la página se refresca sola tras guardar o al entrar en «Mis sobres» y WebKit corta
+  el `goto` siguiente; el ayudante `go` de `e2e/helpers.ts` lo reintenta. La subida espera a que la página cargue.
+- `theme` (iPhone): leía la inclinación del botón a mitad de su transición; ahora espera a que acabe.
+
+Repetidas tras los arreglos: `kawaii`, `demo`, `defaults`, `vinculo` y `theme` en los cuatro proyectos (22 en verde y 2
+fallos en iPhone, `defaults` y `theme`), y después esas dos en `iphone-14` (en verde).
+
+**Pendiente:** la comparación lado a lado con `creador-sobres.html` y `apertura-sobre.html` y la prueba en un teléfono
+real (60 fps y el lag de la Legendaria y la EX).
 
 | RF | Requisito | Tests unitarios / integración | Pasos E2E | Estado |
 |---|---|---|---|---|
@@ -33,11 +44,11 @@ la prueba en un teléfono real. Corrido: `pnpm exec playwright test e2e/sobres-p
 | RF-17 | MIENTRAS el sobre esté cerrado, EL SISTEMA no dejará ver ninguna carta, aunque se incline al máximo. | ✓ mientras_esta_cerrado_no_se_ve_ninguna_carta | RF-17 y RF-18: el sobre diseñado, cerrado sin cartas a la vista, se abre con la animación de Bruno | Cumplido |
 | RF-18 | CUANDO el coleccionista rasgue el sobre o despegue el sticker según su diseño, EL SISTEMA lo abrirá con la | ✓ el_rasgado_del_sobre_se_anota_sin_sonar_dos_veces_y_respeta_el_silencio | RF-17 y RF-18: el sobre diseñado, cerrado sin cartas a la vista, se abre con la animación de Bruno | Cumplido |
 | RF-19 | CUANDO el sobre se abra, EL SISTEMA hará subir las cartas boca abajo desde dentro a los 0,38 s, ocultará el | ✓ las_cartas_suben_a_0_38_el_sobre_se_va_a_1_25_y_el_mazo_queda_a_1_9 | RF-19, RF-20, RF-21 y RF-22: el mazo queda listo, late antes de la Legendaria y sale con el efecto especial | Cumplido |
-| RF-20 | EL SISTEMA mostrará las cartas derechas, con solo la de arriba visible; al tocarla, arrastrarla o pulsar el | — | RF-19, RF-20, RF-21 y RF-22: el mazo queda listo, late antes de la Legendaria y sale con el efecto especial | Cumplido (E2E en chromium-desktop) |
+| RF-20 | EL SISTEMA mostrará las cartas derechas, con solo la de arriba visible; al tocarla, arrastrarla o pulsar el | — | RF-19, RF-20, RF-21 y RF-22: el mazo queda listo, late antes de la Legendaria y sale con el efecto especial | Cumplido (E2E en los cuatro proyectos) |
 | RF-21 | CUANDO la carta de arriba sea Legendaria o EX, EL SISTEMA hará latir el mazo antes de voltearla. | ✓ el_mazo_late_antes_de_voltear_una_legendaria_o_ex | — | Cumplido |
 | RF-22 | CUANDO se revele una Legendaria o una EX, EL SISTEMA la presentará con el efecto especial: rayos dorados, | ✓ el_efecto_especial_es_de_la_legendaria_y_la_ex | RF-19, RF-20, RF-21 y RF-22: el mazo queda listo, late antes de la Legendaria y sale con el efecto especial | Cumplido |
 | RF-23 | EL SISTEMA mostrará los puntos de avance del mazo y, al final, el resumen con el diseño de Bruno, conservando | ✓ un_punto_por_carta_y_ninguno_con_una_sola | RF-23: el resumen «Tu sobre» con miniaturas, rareza y «¡Nueva!» | Cumplido |
 | RF-24 | EL SISTEMA conservará el resto del flujo de la spec 023: la tirada la decide el servidor al confirmar la | — | RF-15 y RF-24: el plata se abre con el sobre básico y el flujo de siempre | Cumplido |
 | RF-25 | CUANDO empiece «Abrir todos», EL SISTEMA mantendrá su ráfaga y su ritmo actuales con el sobre nuevo, y | — | RF-25: «Abrir todos» con el sobre nuevo y el efecto especial en la Legendaria destacada | Cumplido |
-| RF-26 | CUANDO se revele una Legendaria o una EX, EL SISTEMA mostrará solo el efecto especial, con la vibración de | ✓ test_s030_rf26_especial_sin_efectos_viejos<br>✓ test_s030_rf26_las_demas_conservan_sus_efectos | RF-21 y RF-22 de la E2E de la 030 (escritorio) | Cumplido (unidad y E2E de escritorio; móvil pendiente) |
-| RF-27 | MIENTRAS una carta con versión viva esté arriba del mazo sin revelar, EL SISTEMA la irá cargando oculta, para | — | live-cards: revelación viva con su entrada (escritorio) | Cumplido en escritorio; falta medir en un teléfono real |
+| RF-26 | CUANDO se revele una Legendaria o una EX, EL SISTEMA mostrará solo el efecto especial, con la vibración de | ✓ test_s030_rf26_especial_sin_efectos_viejos<br>✓ test_s030_rf26_las_demas_conservan_sus_efectos | RF-21 y RF-22 de la E2E de la 030 | Cumplido (unidad y E2E en los cuatro proyectos) |
+| RF-27 | MIENTRAS una carta con versión viva esté arriba del mazo sin revelar, EL SISTEMA la irá cargando oculta, para | — | live-cards: revelación viva con su entrada | Cumplido en E2E (cuatro proyectos); falta medir en un teléfono real |

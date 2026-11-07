@@ -84,9 +84,11 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
     await expect(fan.locator(".sparkle").first()).toBeAttached();
     await fan.waitForLoadState("networkidle");
     if (!(await fan.locator(".tear--reduced").count())) {
-      // El sobre escucha eventos de puntero: en el teléfono, un toque con el dedo; en escritorio, un clic.
-      if (await fan.evaluate(() => "ontouchstart" in window)) await fan.locator('[data-testid="tear-pack"] .sc-sobre').tap();
-      else await fan.locator('[data-testid="tear-pack"] .sc-sobre').click();
+      // El sobre escucha eventos de puntero: en el teléfono, un toque con el dedo; en escritorio, un clic. Flota y se
+      // balancea siempre (nunca está «quieto» para Playwright), así que se toca sin esperar a que pare.
+      const sobre = fan.locator('[data-testid="tear-pack"] .sc-sobre');
+      if (await fan.evaluate(() => "ontouchstart" in window)) await sobre.tap({ force: true });
+      else await sobre.click({ force: true });
       await expect(fan.locator(".tear--shake")).toBeAttached();
     }
     // El texto de ayuda no se monta sobre el selector de idioma ni sobre los botones.

@@ -55,7 +55,8 @@ test("tema: elegir Street pop, guardarlo en la cuenta y verlo en otro navegador"
     expect(await fan.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe("rgb(236, 228, 250)");
     expect(await fan.locator("main h1").first().evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/Dela/i);
     // RF-21: los botones van inclinados.
-    expect(await fan.locator("main .ui-btn").first().evaluate((el) => getComputedStyle(el).transform)).not.toBe("none");
+    // Se espera a que termine la transición del botón (en WebKit, recién recargada, puede leerse aún sin inclinar).
+    await expect.poll(() => fan.locator("main .ui-btn").first().evaluate((el) => getComputedStyle(el).transform)).not.toBe("none");
   });
 
   await test.step("RNF: a 390 px no hay scroll horizontal", async () => {

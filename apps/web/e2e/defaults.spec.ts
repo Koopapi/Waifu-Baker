@@ -6,16 +6,11 @@
 import type { Page } from "@playwright/test";
 import path from "node:path";
 import { expect, test } from "./fixtures";
-import { LAB, choose, createPublishedSet, login, setSlider } from "./helpers";
+import { LAB, choose, createPublishedSet, go, login, setSlider } from "./helpers";
 
 async function openEditor(page: Page, setId: string, n: string) {
-  // Tras una subida la página se refresca sola; en WebKit ese refresco interrumpe un goto a la misma dirección. Si
-  // pasa, la página ya llega a donde queríamos: se espera a que cargue.
-  await page.goto(`/admin/sets/${setId}`).catch(async (e: Error) => {
-    if (!/interrupted by another navigation/.test(e.message)) throw e;
-    await page.waitForURL(`**/admin/sets/${setId}`);
-    await page.waitForLoadState("networkidle");
-  });
+  // Tras una subida la página se refresca sola (en WebKit ese refresco interrumpe el goto).
+  await go(page, `/admin/sets/${setId}`);
   await page.click(`[aria-label="Editar carta ${n}"]`);
   const editor = page.locator('[data-testid="layers-editor"]');
   await expect(editor).toBeVisible();
@@ -23,6 +18,8 @@ async function openEditor(page: Page, setId: string, n: string) {
 }
 
 async function uploadOne(page: Page, image: string, total: number) {
+  // Si el archivo se elige antes de que la página se hidrate, nadie escucha el cambio y la subida no empieza.
+  await page.waitForLoadState("networkidle");
   await page.setInputFiles('[data-testid="file-input"]', path.join(LAB, image));
   await expect(page.locator("text=/Subida terminada · 1 correcta/")).toBeVisible({ timeout: 90_000 });
   await expect(page.locator("[data-card-tile]")).toHaveCount(total);
@@ -74,7 +71,7 @@ test("valores por defecto, ajustes del panel y cartas de portada", async ({ brow
     await setSlider(form.locator('input[data-testid="default-border"]'), 4.5);
     await form.locator('[data-testid="card-defaults-save"]').click();
     await expect(form.getByText("Valores de las cartas guardados.")).toBeVisible();
-    await admin.goto(`/admin/sets/${draftId}`);
+    await go(admin, `/admin/sets/${draftId}`);
     await uploadOne(admin, "06.webp", 2);
     let editor = await openEditor(admin, draftId, "002");
     await expect(editor.locator('input[data-testid="layers-border"]')).toHaveValue("4.5");
@@ -104,7 +101,8 @@ test("valores por defecto, ajustes del panel y cartas de portada", async ({ brow
     await form.locator('[data-testid="pity-defaults-save"]').click();
     await expect(form.getByText("Garantías guardadas.")).toBeVisible();
     const fresh = `VN${tag.slice(0, 4).toUpperCase()}`;
-    await admin.goto("/admin/sets");
+    // Tras guardar, los ajustes se refrescan solos.
+    await go(admin, "/admin/sets");
     await admin.fill('input[name="code"]', fresh);
     await admin.fill('form input[name="name"]', `Nueva ${fresh}`);
     await admin.fill('input[name="packSize"]', "3");

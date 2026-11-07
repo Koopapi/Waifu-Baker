@@ -5,6 +5,21 @@ import path from "node:path";
 
 export const LAB = path.resolve(__dirname, "../public/lab");
 
+/**
+ * `page.goto` que tolera la recarga sola de la página anterior: tras guardar un formulario o al entrar en «Mis sobres»
+ * (que marca los sobres como vistos) la página se refresca, y en WebKit ese refresco interrumpe el goto siguiente. Si
+ * pasa, se vuelve a ir a la dirección pedida cuando la recarga termina.
+ */
+export async function go(page: Page, url: string) {
+  try {
+    await page.goto(url);
+  } catch (e) {
+    if (!/interrupted by another navigation/.test((e as Error).message)) throw e;
+    await page.waitForLoadState("networkidle");
+    await page.goto(url);
+  }
+}
+
 /** El administrador entra siempre en escritorio; el resto, con el dispositivo del proyecto. */
 export async function login(browser: Browser, name: string, admin: boolean, next = "/admin", opts: { keepCelebration?: boolean } = {}): Promise<Page> {
   const page = await (await browser.newContext(admin ? DESKTOP : {})).newPage();
