@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { OpenAllCard } from "@/app/packs/actions";
-import { confettiCount, revealSound, vibrationPattern } from "@/domain/opening/feedback";
-import { isSpecial } from "@/domain/opening/sobre";
+import { isSpecial, revealFx } from "@/domain/opening/sobre";
 import { RARITY_SEAL } from "@/domain/catalog/rarity-tier";
 import { bell } from "@/features/opening/sobre-sounds";
 import { sound } from "@/features/sound/engine";
@@ -25,12 +24,13 @@ export function OpenAllFocus({ items, reduced, onDone }: { items: OpenAllCard[];
   const c = items[i];
 
   useEffect(() => {
-    const extra = revealSound(c.rarity);
-    if (extra) sound.play(extra);
-    sound.vibrate(vibrationPattern(c.rarity));
-    // Spec 030, RF-25: las Legendarias y EX destacadas salen con el efecto especial (rayos, estrella y campanita).
-    if (isSpecial(c.rarity)) bell();
-    if (!reduced && confettiCount(c.rarity) > 0) setBurst({ key: Date.now(), count: confettiCount(c.rarity), x: window.innerWidth / 2, y: window.innerHeight / 2 });
+    // Spec 030, RF-25 y RF-26: las Legendarias y EX destacadas salen solo con el efecto especial de Bruno (rayos,
+    // estrella, campanita y su vibración); las demás, con su sonido, su vibración y su confeti.
+    const fx = revealFx(c.rarity);
+    if (fx.sound) sound.play(fx.sound);
+    sound.vibrate(fx.vibration ? [...fx.vibration] : null);
+    if (fx.special) bell();
+    if (!reduced && fx.confetti > 0) setBurst({ key: Date.now(), count: fx.confetti, x: window.innerWidth / 2, y: window.innerHeight / 2 });
   }, [c, reduced]);
 
   const last = i + 1 >= items.length;

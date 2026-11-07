@@ -9,9 +9,8 @@ import { bell, whoosh } from "./sobre-sounds";
 import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
 import { useTiltSource } from "./useTiltSource";
-import { celebrates, confettiCount, revealSound, teaseLevel, vibrationPattern } from "@/domain/opening/feedback";
 import { SWIPE_MIN, revealOrder, swipeSide } from "@/domain/opening/deck";
-import { isSpecial, omen, progressDots, sobreTimeline } from "@/domain/opening/sobre";
+import { isSpecial, omen, progressDots, revealFx, sobreTimeline } from "@/domain/opening/sobre";
 import { RARITY_SEAL } from "@/domain/catalog/rarity-tier";
 import { basicRegistro } from "@/domain/packs/design";
 import type { PackViewData } from "@/domain/packs/view";
@@ -37,7 +36,6 @@ const SPARKLES: [number, number, number, string, number][] = [
   [51, 11, 8, "#7cc8ff", 1.6], [90, 83, 12, "#b79cff", 0.9], [7, 45, 8, "#ffffff", 1.9], [91, 39, 9, "#ffe27a", 0.4],
   [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
 ];
-const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "ex"];
 /** El sobre del laboratorio (sin colección real): el básico, sin arte. */
 const LAB_VIEW: PackViewData = {
   setId: "lab",
@@ -191,24 +189,25 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
     busy.current = true;
     sound.play("flip");
     const effects = () => {
-      // Spec 013, RF-4 y RF-9: las raras o mejores suenan y vibran según su nivel.
-      const extra = revealSound(card.rarity);
-      if (extra) sound.play(extra);
-      sound.vibrate(vibrationPattern(card.rarity));
+      // Spec 013, RF-4 y RF-9: las raras o mejores suenan y vibran según su nivel. Spec 030, RF-26: la Legendaria y la
+      // EX, solo con el efecto de Bruno (sin sonido de rareza, confeti, partículas, celebración ni destello).
+      const fx = revealFx(card.rarity);
+      if (fx.sound) sound.play(fx.sound);
+      sound.vibrate(fx.vibration ? [...fx.vibration] : null);
       const r = el.getBoundingClientRect();
-      particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
-      if (!reduced && confettiCount(card.rarity) > 0) setBurst({ key: Date.now(), count: confettiCount(card.rarity), x: r.left + r.width / 2, y: r.top + r.height / 2 });
-      if (!reduced && celebrates(card.rarity)) {
+      if (fx.particles) particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
+      if (!reduced && fx.confetti > 0) setBurst({ key: Date.now(), count: fx.confetti, x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      if (!reduced && fx.celebrate) {
         setParty(card.rarity);
         window.setTimeout(() => setParty(null), 1600);
       }
-      if (FLASH_RARITIES.includes(card.rarity) && !reduced) {
+      if (fx.flash && !reduced) {
         setFlash(card.rarity);
         window.setTimeout(() => setFlash(null), 400);
       }
       // Spec 030, RF-22: la Legendaria y la EX salen con el efecto especial de Bruno (rayos dorados, estrella con su
-      // rareza y campanita; la vibración es la de su rareza). Con movimiento reducido, la estrella sin animar y sin rayos.
-      if (isSpecial(card.rarity)) {
+      // rareza, campanita y su vibración). Con movimiento reducido, la estrella sin animar y sin rayos.
+      if (fx.special) {
         setSpecial(card.rarity);
         bell();
       }
@@ -398,7 +397,7 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
               }}
               card={c}
               active={isTop}
-              tease={isTop && !shown ? teaseLevel(c.rarity) : 0}
+              tease={isTop && !shown ? revealFx(c.rarity).tease : 0}
               mode={tilt.mode}
               tiltTarget={tilt.target}
               style={{ zIndex: cards.length - i + 1, visibility: showDeck && i === top ? "visible" : "hidden" }}
@@ -406,6 +405,9 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
               gesture={isTop ? cardGesture : undefined}
               actionLabel={shown ? t.packs.stage.dismissCard : t.packs.stage.flipCard}
               showLive={liveIndex === i}
+              // Spec 030, RF-27: la carta de arriba monta su versión viva antes de voltearse, para que al revelarla ya
+              // esté cargada.
+              preloadLive={isTop && !reduced}
             />
           );
         })}

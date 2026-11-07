@@ -1060,6 +1060,8 @@
   mask: radial-gradient(circle, #000 15%, transparent 62%);
 }
 .deck-fx__rays--on {
+  /* Spec 030, RF-27: capa propia en la GPU; el degradado y la máscara se pintan una vez y solo se mueven. */
+  will-change: transform, opacity;
   animation: deck-rays 2.6s ease-out forwards;
 }
 @keyframes deck-rays {

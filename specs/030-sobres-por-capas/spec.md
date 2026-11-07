@@ -19,6 +19,9 @@ Decisiones del dueño en la entrevista:
 8. Las cartas siguen saliendo boca abajo y se voltean una a una para revelarse, como hoy (no boca arriba como en la de
    Bruno).
 9. Las fuentes del sobre (Dela Gothic One y Archivo) se cargan solo en las pantallas donde aparecen sobres.
+10. Tras probarla (6 nov 2026), la Legendaria y la EX salen solo con el efecto de Bruno: se quitan el confeti, las
+    partículas, la celebración, el destello, el brillo previo y el sonido de su rareza, que se sumaban y daban un pequeño
+    lag. La carta viva se carga antes de voltearse.
 
 ## Contexto y objetivo
 Hoy cada colección muestra un sobre plano hecho con su carta de portada o con una imagen a mano, y la apertura es la de
@@ -104,6 +107,11 @@ que el creador de Bruno.
 - RF-24: EL SISTEMA conservará el resto del flujo de la spec 023: la tirada la decide el servidor al confirmar la
   apertura, el orden de menor a mayor rareza, el error con el sobre cerrado, la reanudación tras recargar, el teclado,
   el botón «Abrir sin deslizar», el sonido con silencio recordado y el movimiento reducido.
+- RF-26: CUANDO se revele una Legendaria o una EX, EL SISTEMA mostrará solo el efecto especial, con la vibración de
+  Bruno, sin el confeti, las partículas, la celebración, el destello, el brillo previo de los bordes ni el sonido de su
+  rareza.
+- RF-27: MIENTRAS una carta con versión viva esté arriba del mazo sin revelar, EL SISTEMA la irá cargando oculta, para
+  que al voltearla se vea sin esperar.
 - RF-25: CUANDO empiece «Abrir todos», EL SISTEMA mantendrá su ráfaga y su ritmo actuales con el sobre nuevo, y
   presentará las Legendarias y EX destacadas con el efecto especial.
 
