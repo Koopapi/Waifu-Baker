@@ -59,6 +59,10 @@ export const site = {
     pity: (n: number) =>
       `Bad-luck protection (silver packs only): if you open ${n} silver packs in a row from this set without any Epic or better card, the next one brings at least one (it replaces the card in the last slot). The counter is yours and for this set only.`,
     noPity: "This set has no bad-luck protection.",
+    // Spec 028, RF-11 and RF-14.
+    exPity: (n: number) =>
+      `EX guarantee (gold packs only): if you open ${n} gold packs in a row from this set without any EX, the next one brings one (it replaces the card in the last slot). The counter is yours and for this set only.`,
+    atLeastOne: "Chance that one pack brings at least one card of each rarity",
     // Spec 022, RF-14, RF-15 and RF-20.
     guarantee: { silver: "Every silver pack brings at least one Rare or better.", gold: "Every gold pack brings at least one Epic or better." },
     slot: "Slot",

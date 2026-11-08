@@ -18,6 +18,7 @@ import { characterLayer, imageKeys, layerKey } from "@/domain/cards/layers";
 import { prepareCharacterImage } from "@/server/cards/character-images";
 import { sheetOf } from "@/domain/cards/versions";
 import { insertVersion, saveCard } from "./card-save";
+import { getCardDefaults } from "./settings";
 import {
   applyPatch,
   assertEditable,
@@ -88,9 +89,11 @@ export async function uploadCardImage(db: DbLike, store: CardStore, actorUserId:
         .limit(1);
       if (dup) throw new AdminError("duplicate_image", `Esta imagen ya está en la colección (carta ${String(dup.number).padStart(3, "0")}).`, { number: dup.number });
       const [last] = await tx.select({ n: cards.number }).from(cards).where(eq(cards.setId, setId)).orderBy(desc(cards.number)).limit(1);
+      // Spec 028, RF-1: con el sello y el borde por defecto vigentes.
+      const defaults = await getCardDefaults(tx);
       const [row] = await tx
         .insert(cards)
-        .values({ id, setId, number: (last?.n ?? 0) + 1, originalSha256: hash, originalKey, width: meta.width, height: meta.height, layers: configFromCharacter(characterKey, "n", seedFrom(hash)) })
+        .values({ id, setId, number: (last?.n ?? 0) + 1, originalSha256: hash, originalKey, width: meta.width, height: meta.height, layers: configFromCharacter(characterKey, "n", seedFrom(hash), defaults) })
         .returning();
       await recordAudit(tx, {
         actorUserId,
@@ -153,9 +156,10 @@ export async function bulkUpdateCards(
     if (rows.some((r) => r.version !== versions[r.id])) {
       throw new AdminError("stale_version", "Alguna carta cambió desde que cargaste la página. Recarga y vuelve a intentarlo.", { entity: "selected_cards" });
     }
+    const defaults = await getCardDefaults(tx);
     const plans = rows.map((cur) => {
       const next = applyPatch(cur, patch, set.status);
-      return { cur, next, retier: retierIfLayered(cur, next.rarity) };
+      return { cur, next, retier: retierIfLayered(cur, next.rarity, defaults) };
     });
     const recomposed = await mapLimit(plans, COMPOSE_PARALLEL, async ({ cur, next, retier }) =>
       needsRecompose(cur, next) ? composeAndStore(store, { ...cur, ...next, ...retier.patch }, set.code) : null,
@@ -374,7 +378,7 @@ export async function replaceCardArt(db: DbLike, store: CardStore, actorUserId: 
       const old = cur.layers ? characterLayer(cur.layers)?.key : undefined;
       if (old && old !== characterKey) layersToRelease.push(old);
       setId = cur.setId;
-      const layers = cur.layers ? replaceCharacter(cur.layers, characterKey) : configFromCharacter(characterKey, rarityTier(cur.rarity), seedFrom(hash));
+      const layers = cur.layers ? replaceCharacter(cur.layers, characterKey) : configFromCharacter(characterKey, rarityTier(cur.rarity), seedFrom(hash), await getCardDefaults(db));
       const keys = await composeAndStore(store, { ...cur, originalKey: key, layers }, set.code);
       toDelete.push(cur.originalKey, ...composedKeys(cur));
       patch = {

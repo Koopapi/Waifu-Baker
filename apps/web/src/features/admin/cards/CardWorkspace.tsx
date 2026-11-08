@@ -21,6 +21,8 @@ import { SaveStatus } from "@/ui/feedback/SaveStatus";
 import { Modal } from "@/ui/overlay/Modal";
 import { CardPreview } from "./CardPreview";
 import { LayersEditor } from "./LayersEditor";
+import { CardDefaultsContext } from "./card-defaults-context";
+import { FACTORY_CARD_DEFAULTS, type CardDefaults } from "@/domain/cards/card-defaults";
 import { VersionsPanel } from "./VersionsPanel";
 import { emptyLayers, useCardDraft, type SaveTexts } from "./useCardDraft";
 import type { LibraryEntry } from "@/features/admin/library/LibraryPicker";
@@ -457,6 +459,7 @@ export function CardWorkspace({
   characters,
   library = [],
   perms,
+  cardDefaults = FACTORY_CARD_DEFAULTS,
 }: {
   setId: string;
   cards: CardDTO[];
@@ -464,6 +467,8 @@ export function CardWorkspace({
   /** Spec 017, RF-8: la biblioteca general de elementos, para armar las cartas en el editor de capas. */
   library?: LibraryEntry[];
   perms: Permissions;
+  /** Spec 028, RF-15: sello y borde por defecto vigentes (ajustes del panel). */
+  cardDefaults?: CardDefaults;
 }) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [anchor, setAnchor] = useState<number | null>(null);
@@ -536,6 +541,7 @@ export function CardWorkspace({
   const shown = sorting ? order.map((id) => byId.get(id)!).filter(Boolean) : cards;
 
   return (
+    <CardDefaultsContext.Provider value={cardDefaults}>
     <div className="space-y-4">
       <div className="sticky top-[calc(var(--banner-h,0px)+52px)] z-10 -mx-2 flex flex-wrap items-end gap-3 rounded-l border border-ui-line bg-ui-bg/95 px-4 py-3 backdrop-blur">
         {sorting ? (
@@ -636,5 +642,6 @@ export function CardWorkspace({
         />
       )}
     </div>
+    </CardDefaultsContext.Provider>
   );
 }

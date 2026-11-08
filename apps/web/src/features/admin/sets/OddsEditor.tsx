@@ -11,12 +11,14 @@ import { Alert } from "@/ui/feedback/Alert";
 import { TextField } from "@/ui/form/TextField";
 import { formatNumber, formatPercent } from "@/i18n/format";
 import type { PackKind } from "@/domain/catalog/default-odds";
+import { useAdminDefaultsT } from "@/i18n/admin-defaults";
 
 type Slot = Record<Rarity, number>;
 
 /**
  * RF-20: pesos por ranura y rareza, con suma por ranura y probabilidad de holo. Spec 022, RF-21: una tabla por tipo de
- * sobre; la protección de mala suerte solo en la plata.
+ * sobre; la protección de mala suerte de épica solo en la plata. Spec 028, RF-12: en el gold, la garantía de EX
+ * (`pityThreshold` es la garantía del tipo de sobre).
  */
 export function OddsEditor({
   setId,
@@ -45,6 +47,7 @@ export function OddsEditor({
   const router = useRouter();
   const tt = useT();
   const t = tt.admin.odds;
+  const tex = useAdminDefaultsT().oddsEditor;
   const locale = useLocale();
   // Tras guardar, el servidor devuelve otra versión: se sincronizan los datos sin remontar el
   // editor, para que el mensaje de confirmación siga visible.
@@ -123,12 +126,11 @@ export function OddsEditor({
       </div>
       <div className="flex flex-wrap items-end gap-4">
         <TextField label={`${t.holo} (%)`} type="number" min={0} max={100} step={0.5} value={holo} disabled={locked} onChange={(e) => setHolo(Number(e.target.value))} fieldClassName="w-40" className="text-right tabular-nums" />
-        {kind === "silver" && (
         <TextField
-          label={t.pity}
-          aria-label={t.pityAria}
-          title={t.pityTitle}
-          hint={pity === 0 ? t.disabled : t.packs}
+          label={kind === "silver" ? t.pity : tex.exPity}
+          aria-label={kind === "silver" ? t.pityAria : tex.exPityAria}
+          title={kind === "silver" ? t.pityTitle : tex.exPityTitle}
+          hint={kind === "silver" ? (pity === 0 ? t.disabled : t.packs) : pity === 0 ? tex.disabled : tex.packs}
           type="number"
           min={0}
           max={100}
@@ -138,8 +140,8 @@ export function OddsEditor({
           onChange={(e) => setPity(Number(e.target.value))}
           fieldClassName="w-40"
           className="text-right tabular-nums"
+          data-testid={`odds-pity-${kind}`}
         />
-        )}
         {!locked && (
           <Button
             loading={pending}

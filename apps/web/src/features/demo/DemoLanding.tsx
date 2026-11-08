@@ -7,16 +7,9 @@ import { LocaleToggle } from "@/i18n/LocaleToggle";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
 import { Alert } from "@/ui/feedback/Alert";
+import { CardFan } from "@/ui/game/CardFan";
 import { getDict } from "@/i18n/server";
-
-// Abanico de la portada: cartas de la colección de bienvenida, con su giro y desplazamiento.
-const FAN = [
-  { rot: -14, x: -190, y: 34 },
-  { rot: -7, x: -95, y: 10 },
-  { rot: 0, x: 0, y: 0 },
-  { rot: 7, x: 95, y: 10 },
-  { rot: 14, x: 190, y: 34 },
-];
+import { publicCoverCards } from "@/server/services/settings";
 
 /** Spec 010, RF-13: portada de la demo con los dos papeles. */
 export async function DemoLanding() {
@@ -27,27 +20,18 @@ export async function DemoLanding() {
   const order = ["ex", "legendary", "epic", "rare", "common"];
   const picks = [...list].sort((a, b) => order.indexOf(a.rarity ?? "common") - order.indexOf(b.rarity ?? "common") || a.number - b.number).slice(0, 5);
   const fan = [picks[3], picks[1], picks[0], picks[2], picks[4]].filter(Boolean);
+  // Spec 028, RF-21: si el administrador eligió cartas de portada, la demo enseña las mismas que la portada pública.
+  const covers = await publicCoverCards(db);
 
   return (
     <main className="relative grid min-h-dvh place-items-center overflow-hidden bg-ui-rail bg-[radial-gradient(90%_70%_at_50%_30%,rgb(214_51_108/0.22),transparent_70%)] px-4 py-12 text-ui-text">
       <LocaleToggle className="fixed right-4 top-4 z-50" />
       <div className="flex w-full max-w-3xl flex-col items-center gap-10 text-center">
-        {fan.length > 0 && (
-          <div aria-hidden className="relative h-[250px] w-full max-w-[560px] scale-[0.62] sm:scale-100">
-            {fan.map((c, i) => (
-              // La posición va en el contenedor: la animación de entrada solo mueve la carta de dentro.
-              <span
-                key={c!.number}
-                className="absolute left-1/2 top-0 h-[210px] w-[150px]"
-                style={{ transform: `translateX(calc(-50% + ${FAN[i].x}px)) translateY(${FAN[i].y}px) rotate(${FAN[i].rot}deg)`, zIndex: i === 2 ? 3 : i === 1 || i === 3 ? 2 : 1 }}
-              >
-                <span className="card-in block size-full overflow-hidden rounded-l border-2 border-ui-text/20 shadow-3" style={{ "--i": i } as React.CSSProperties}>
-                  {/* eslint-disable-next-line @next/next/no-img-element -- imagen servida por la ruta de la demo */}
-                  <img src={`/api/demo/card/${c!.number}`} alt="" className="size-full object-cover object-top" />
-                </span>
-              </span>
-            ))}
-          </div>
+        {/* Spec 028: el abanico es un componente del sistema (CardFan), el mismo de la portada pública. */}
+        {covers.length > 0 ? (
+          <CardFan cards={covers.map((c) => ({ key: c.id, src: `/api/cover/${c.id}` }))} data-testid="cover-fan" />
+        ) : (
+          <CardFan cards={fan.map((c) => ({ key: String(c!.number), src: `/api/demo/card/${c!.number}` }))} data-testid="demo-fan" />
         )}
         <div className="space-y-3">
           <Badge tone="accent" className="uppercase tracking-wider">

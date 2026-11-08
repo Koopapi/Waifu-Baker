@@ -8,6 +8,7 @@ import type { Rarity } from "@/domain/catalog/card-rules";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import { checkLayersConfig, imageKeys, isImageLayer, isImageSeal, isSetLayerKey, isTempKey, layerKey, type LayersConfig } from "@/domain/cards/layers";
 import { retierLayers } from "@/domain/cards/layers-rarity";
+import type { CardDefaults } from "@/domain/cards/card-defaults";
 import { composeCard, type CardSize } from "@/server/cards/compose";
 import { renderCardFlat, storeFlat } from "@/server/cards/flat-store";
 import type { CardStore } from "@/server/ports/card-store";
@@ -128,9 +129,10 @@ export const needsRecompose = (cur: CardRow, next: { rarity: Rarity | null; numb
  * Spec 016, RF-25: si cambia la rareza de una carta con capas, su marco y su sello de texto siguen al escalón nuevo.
  * Devuelve las columnas a cambiar y si queda un sello de imagen que hay que revisar a mano.
  */
-export function retierIfLayered(cur: CardRow, rarity: Rarity | null): { patch: { layers?: LayersConfig }; sealToReview: boolean } {
+export function retierIfLayered(cur: CardRow, rarity: Rarity | null, defaults?: CardDefaults): { patch: { layers?: LayersConfig }; sealToReview: boolean } {
   if (!cur.layers || !rarity || cur.rarity === rarity) return { patch: {}, sealToReview: false };
-  const r = retierLayers(cur.layers as LayersConfig, rarityTier(rarity));
+  // Spec 028, RF-3: con el estilo automático, sello y borde vuelven a los valores por defecto vigentes.
+  const r = retierLayers(cur.layers as LayersConfig, rarityTier(rarity), defaults);
   return { patch: { layers: r.config }, sealToReview: r.imageSealToReview };
 }
 

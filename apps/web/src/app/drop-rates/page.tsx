@@ -1,5 +1,6 @@
 import { db } from "@/db/client";
 import { RARITIES } from "@/domain/catalog/card-rules";
+import { atLeastOneChance } from "@/domain/catalog/pack-chances";
 import { listPublicOdds } from "@/server/services/collections";
 import { publicZoneOdds } from "@/server/services/expedition-zones";
 import { gamesDictionaries } from "@/i18n/games";
@@ -65,6 +66,12 @@ export default async function DropRatesPage() {
             <p className="text-sm text-ui-text-2" data-testid={`pity-${set.code}`}>
               {odds.pityThreshold > 0 ? t.site.dropRates.pity(odds.pityThreshold - 1) : t.site.dropRates.noPity}
             </p>
+            {/* Spec 028, RF-14: la garantía de EX de los sobres gold. */}
+            {gold && gold.exPityThreshold > 0 && (
+              <p className="text-sm text-ui-text-2" data-testid={`ex-pity-${set.code}`}>
+                {t.site.dropRates.exPity(gold.exPityThreshold - 1)}
+              </p>
+            )}
             <div className="overflow-x-auto rounded-l border border-ui-line">
               <table className="w-full text-sm">
                 <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
@@ -98,6 +105,38 @@ export default async function DropRatesPage() {
                     </tbody>
                   ) : null,
                 )}
+              </table>
+            </div>
+            {/* Spec 028, RF-11: probabilidad de que un sobre traiga al menos una de cada rareza. */}
+            <div className="overflow-x-auto rounded-l border border-ui-line" data-testid={`at-least-one-${set.code}`}>
+              <table className="w-full text-sm">
+                <caption className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-ui-text-3">{t.site.dropRates.atLeastOne}</caption>
+                <thead className="bg-ui-raised text-xs uppercase tracking-wider text-ui-text-3">
+                  <tr>
+                    <th className="px-3 py-2 text-left">{t.site.dropRates.pack}</th>
+                    {RARITIES.map((r) => (
+                      <th key={r} className="px-3 py-2 text-right">
+                        {t.common.rarity[r]}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {([["silver", odds], ["gold", gold]] as const).map(([kind, table]) => {
+                    if (!table) return null;
+                    const chance = atLeastOneChance(table.slots);
+                    return (
+                      <tr key={kind} className="border-t border-ui-line" data-testid={`at-least-one-${set.code}-${kind}`}>
+                        <td className={`px-3 py-2 font-semibold ${kind === "gold" ? "text-k-limon-oscuro" : "text-ui-text-2"}`}>{t.common.packKind[kind]}</td>
+                        {RARITIES.map((r) => (
+                          <td key={r} className="px-3 py-2 text-right tabular-nums" data-rarity={r}>
+                            {chance[r] > 0 ? pct(Math.round(chance[r] * 100) / 100) : "—"}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
               </table>
             </div>
           </section>

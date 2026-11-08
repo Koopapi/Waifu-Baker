@@ -1,6 +1,7 @@
 // Spec 017, RF-17 a RF-19: exportar e importar la configuración en el formato del creador de cartas de Bruno
 // (`creador-cartas.html`): las imágenes van por nombre de archivo (`src`) en vez de por clave del almacén. Puro, sin E/S.
 import { z } from "zod";
+import { FACTORY_CARD_DEFAULTS, type CardDefaults } from "./card-defaults";
 import {
   BLEND_MODES,
   CANVAS_RATIO,
@@ -132,9 +133,10 @@ function guessRole(name: string, taken: Set<LayerRole>): LayerRole {
 /**
  * RF-18 y RF-19: lee una configuración del creador. Si no es válida, dice qué parte falla; los modos de mezcla que el
  * editor no ofrece pasan a `normal` y se indican las capas que cambiaron (número de capa, desde 1). Devuelve también
- * los archivos que hay que subir y de qué tipo (la chica, el sello o una capa del lienzo).
+ * los archivos que hay que subir y de qué tipo (la chica, el sello o una capa del lienzo). Spec 028, RF-5: sin grosor de
+ * borde o sin tamaño del sello de texto, se usan los valores por defecto.
  */
-export function parseCreatorConfig(input: unknown): ImportResult {
+export function parseCreatorConfig(input: unknown, defaults: CardDefaults = FACTORY_CARD_DEFAULTS): ImportResult {
   if (!isRecord(input)) return { ok: false, path: "" };
   const frame = importFrame(input.marco);
   if (!frame) return { ok: false, path: "marco" };
@@ -170,16 +172,16 @@ export function parseCreatorConfig(input: unknown): ImportResult {
   if (isRecord(input.sello)) {
     const s = "src" in input.sello ? importedImageSeal.safeParse({ ...input.sello, src: typeof input.sello.src === "string" ? fileName(input.sello.src) : input.sello.src }) : textSealSchema.safeParse(input.sello);
     if (!s.success) return fail("sello", s.error.issues[0]);
-    sello = s.data;
+    sello = "texto" in s.data && s.data.tamano === undefined ? { ...s.data, tamano: defaults.sealSize } : s.data;
   } else if (input.sello != null) return { ok: false, path: "sello" };
 
-  const borde = typeof input.borde === "number" && input.borde >= 0 && input.borde <= 8 ? input.borde : undefined;
+  const borde = typeof input.borde === "number" && input.borde >= 0 && input.borde <= 8 ? input.borde : defaults.border;
   const holoIntensidad = typeof input.holoIntensidad === "number" && input.holoIntensidad >= 0 && input.holoIntensidad <= 1 ? input.holoIntensidad : undefined;
   const config: ImportedConfig = {
     capas,
     ...frame,
     sello,
-    ...(borde !== undefined ? { borde } : {}),
+    borde,
     ...(input.holo === true ? { holo: true } : {}),
     ...(input.holo === true && holoIntensidad !== undefined ? { holoIntensidad } : {}),
   };

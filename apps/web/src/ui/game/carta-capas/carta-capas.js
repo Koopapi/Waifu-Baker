@@ -8,7 +8,7 @@
  *     etiqueta: 'Yuki, SSR',
  *     marco: 'ssr',                       // 'ur' ('ex') | 'ssr' | 'sr' | 'r' | 'n' | 'ninguno' | 'personalizado'
  *     marcoColores: { color: '#6d5cff', brillo: '#d7ff3a' },   // solo con 'personalizado' (Waifu Baker, spec 025)
- *     borde: 2.2,                         // grosor del marco en % del ancho (sin él, el de su escalón)
+ *     borde: 3,                           // grosor del marco en % del ancho (sin él, 3; spec 028)
  *     capas: [                            // de atrás hacia adelante
  *       { src: 'yuki_1_fondo.webp',       profundidad: 0.2,  margen: 5 },
  *       { particulas: 'destellos-dorados', profundidad: 0.55, margen: 4 },
@@ -61,6 +61,8 @@
     r:   ['linear-gradient(135deg,#9fd3ff 0%,#3b82f6 100%)', 'rgba(59,130,246,.22)', 2.9],
     n:   ['linear-gradient(180deg,#c9ced6 0%,#8e949e 100%)', 'rgba(220,225,235,.12)', 1.9]
   };
+  // Spec 028, RF-4: grosor del marco de una carta sin grosor guardado (DEFAULT_BORDER de domain/cards/card-defaults.ts).
+  var BORDE = 3;
   MARCOS.ex = MARCOS.ur; MARCOS.epica = MARCOS.sr; MARCOS.rara = MARCOS.r; MARCOS.comun = MARCOS.n;
 
   var SELLOS = {
@@ -95,7 +97,7 @@
 
   var CSS = [
     '.cc{position:relative;container-type:inline-size;perspective:1100px;aspect-ratio:var(--cc-ratio,.7064)}',
-    '.cc-card{--px:.5;--py:.5;--hyp:0;--cc-borde:2.2cqw;position:absolute;inset:0;border-radius:5.4cqw;transform-style:preserve-3d;will-change:transform;touch-action:none;outline:none;cursor:grab;transition:opacity .45s ease}',
+    '.cc-card{--px:.5;--py:.5;--hyp:0;--cc-borde:3cqw;position:absolute;inset:0;border-radius:5.4cqw;transform-style:preserve-3d;will-change:transform;touch-action:none;outline:none;cursor:grab;transition:opacity .45s ease}',
     '.cc-card:active{cursor:grabbing}',
     '.cc-card.cc-cargando{opacity:0}',
     '.cc-card:focus-visible .cc-in{outline:2px solid #ff8ab0;outline-offset:4px}',
@@ -291,8 +293,9 @@
       card.classList.toggle('cc-sin-marco', sin);
       card.style.setProperty('--cc-marco', sin ? 'none' : m[0]);
       card.style.setProperty('--cc-aura', op.aura || m[1] || 'rgba(255,255,255,.12)');
-      // Sin grosor guardado, el de su escalón (`num(null)` daría 0: el marco desaparecía).
-      card.style.setProperty('--cc-borde', (op.borde == null ? m[2] || 2.2 : num(op.borde, m[2] || 2.2)) + 'cqw');
+      // Spec 028, RF-4: sin grosor guardado, 3 (`num(null)` daría 0: el marco desaparecía). El tercer valor de MARCOS
+      // es el grosor de antes, que la migración 0021 escribió en las cartas ya guardadas.
+      card.style.setProperty('--cc-borde', (op.borde == null ? BORDE : num(op.borde, BORDE)) + 'cqw');
       card.classList.toggle('cc-con-holo', !!op.holo);
       card.style.setProperty('--cc-holo-i', intensidad(op.holoIntensidad, .4));
 
@@ -435,6 +438,8 @@
 
   /* ---------- presets por rareza ---------- */
   var PRESETS = {
+    // Spec 028, RF-6: las cartas sin capas (imagen compuesta) siguen con el sello de antes; las cartas por capas
+    // guardan el suyo (15 desde la spec 028, ver domain/cards/layers-rarity.ts).
     n:   { marco: 'n',   particulas: null, sello: { texto: 'C', estilo: 'plata', tamano: 10 }, holo: false },
     r:   { marco: 'r',   particulas: { particulas: 'destellos-arcoiris', cantidad: 16, tamano: 0.8, opacidad: 0.75 }, sello: { texto: 'R', estilo: 'azul', tamano: 10 }, holo: false },
     sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'E', estilo: 'morado', tamano: 12 }, holo: false },

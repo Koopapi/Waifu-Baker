@@ -220,6 +220,8 @@ export const dropTables = pgTable(
     holoChance: doublePrecision("holo_chance").notNull().default(0.2),
     /** Protección de mala suerte: N sobres; 0 la desactiva (spec 004, RF-12). */
     pityThreshold: integer("pity_threshold").notNull().default(10),
+    /** Spec 028, RF-12: garantía de EX de la tabla gold, en sobres gold; 0 la desactiva (las publicadas antes, 0). */
+    exPityThreshold: integer("ex_pity_threshold").notNull().default(0),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     isPublic: boolean("is_public").notNull().default(false),
     ...timestamps,
@@ -339,6 +341,8 @@ export const pityCounters = pgTable(
       .notNull()
       .references(() => sets.id, { onDelete: "cascade" }),
     packsSinceEpic: integer("packs_since_epic").notNull().default(0),
+    /** Spec 028, RF-12 y RF-13: sobres gold seguidos sin EX. */
+    packsSinceEx: integer("packs_since_ex").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.setId] })],

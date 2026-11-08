@@ -13,6 +13,7 @@ import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
 import { AdminError } from "@/server/errors";
 import { auditChange, recordAudit } from "./audit";
+import { getCardDefaults } from "./settings";
 import {
   applyPatch,
   characterRequired,
@@ -87,13 +88,15 @@ export async function saveCard(db: DbLike, store: CardStore, actorUserId: string
     const next = applyPatch(cur, input.ficha ?? {}, set.status);
     // Spec 018, RF-18: en una colección 18+ publicada el cambio de capas queda pendiente; se edita sobre lo pendiente.
     const pendingMode = set.isAdult && set.status !== "draft";
+    // Spec 028, RF-2 y RF-3: el estilo de la rareza lleva el sello y el borde por defecto vigentes.
+    const defaults = await getCardDefaults(tx);
     let change: Partial<CardRow> = { ...next };
     let before: LayersConfig | null = cur.layers;
     let after: LayersConfig | null = cur.layers;
 
     if (!touchesLayers) {
       // Solo la ficha: como siempre, el estilo sigue a la rareza nueva y la imagen fija se regenera si cambia el marco.
-      const retier = retierIfLayered(cur, next.rarity);
+      const retier = retierIfLayered(cur, next.rarity, defaults);
       sealToReview = retier.sealToReview;
       if (needsRecompose(cur, next)) {
         const keys = await composeAndStore(store, { ...cur, ...next, ...retier.patch }, set.code);
@@ -117,7 +120,7 @@ export async function saveCard(db: DbLike, store: CardStore, actorUserId: string
       const base = pendingMode ? (cur.layersPending ?? cur.layers) : cur.layers;
       validConfig(requested, base);
       // Spec 017, RF-13 y RF-14: el estilo automático se asienta con la rareza nueva (la de la ficha que se guarda).
-      const config = settleAutoStyle(base, requested!, rarityTier(next.rarity));
+      const config = settleAutoStyle(base, requested!, rarityTier(next.rarity), defaults);
       const flat = await renderCardFlat(store, config);
       const settled = await settleKeys(tx, store, cur.setId, config);
       const flatKeys = await storeFlat(store, cur, flat);
