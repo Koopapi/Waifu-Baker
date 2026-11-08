@@ -42,6 +42,8 @@ export interface CartaCapasProps {
 
 export interface CartaCapasHandle {
   entrar(): void;
+  /** Spec 030, RF-27: hace la entrada cuando sus capas terminen de cargar (aunque aún no se haya montado). */
+  entrarAlCargar(): void;
   ocultarSello(): void;
   /** Spec 018, RF-12: sigue la inclinación del teléfono (pide permiso si el dispositivo lo exige). */
   habilitarGiroscopio(): Promise<boolean>;
@@ -64,6 +66,7 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
   hidden.current = sealHidden;
   const viewRef = useRef(view);
   viewRef.current = view;
+  const pendingEnter = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -83,8 +86,9 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
         ...viewRef.current,
       };
       card.current = config ? lib.montar(box.current, { ...config, ...extra }) : lib.montarRareza(box.current, tier, image, extra);
-      if (hidden.current || entrance) card.current.ocultarSello();
-      if (entrance) {
+      if (hidden.current || entrance || pendingEnter.current) card.current.ocultarSello();
+      if (entrance || pendingEnter.current) {
+        pendingEnter.current = false;
         const inst = card.current;
         void inst.listo.then(() => alive && inst.entrar());
       }
@@ -108,6 +112,14 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
 
   useImperativeHandle(ref, () => ({
     entrar: () => card.current?.entrar(),
+    entrarAlCargar: () => {
+      const inst = card.current;
+      if (!inst) {
+        pendingEnter.current = true;
+        return;
+      }
+      void inst.listo.then(() => card.current === inst && inst.entrar());
+    },
     ocultarSello: () => card.current?.ocultarSello(),
     habilitarGiroscopio: () => card.current?.habilitarGiroscopio() ?? Promise.resolve(false),
     deshabilitarGiroscopio: () => card.current?.deshabilitarGiroscopio(),

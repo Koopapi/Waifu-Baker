@@ -33,6 +33,10 @@ export async function POST() {
   const sample = sampleConfig
     ? { name: "Yuki", character: "Yuki", rarity: "legendary" as const, config: JSON.parse(sampleConfig), readFile: (f: string) => readFile(path.join(sampleDir, "yuki", path.basename(f))) }
     : undefined;
-  const r = await seedDemo(db, getCardStore(), { manifest, readImage, now: new Date(), sample });
+  // Spec 030: el sobre FA01 del paquete de Bruno en el sobre plata de la colección.
+  const packDir = path.resolve(process.cwd(), "assets/sobres/ejemplo");
+  const plasticDir = path.resolve(process.cwd(), "public/sobres");
+  const packDesign = { readFile: (f: string) => readFile(path.join(packDir, path.basename(f))), readPlastic: (f: string) => readFile(path.join(plasticDir, path.basename(f))) };
+  const r = await seedDemo(db, getCardStore(), { manifest, readImage, now: new Date(), sample, packDesign });
   return Response.json({ seeded: true, cards: manifest.cards.length + (sample ? 1 : 0), ...r });
 }

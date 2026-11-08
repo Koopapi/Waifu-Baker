@@ -133,6 +133,13 @@
     '@keyframes cc-destello{0%{background-position:100% 0}65%,100%{background-position:0% 0}}',
     '.cc-brillo-oro{mix-blend-mode:overlay;background:linear-gradient(115deg,#5a3a0a 0%,#ffe9a8 18%,#b8862c 34%,#fff7d6 48%,#a87420 62%,#ffe08a 80%,#5a3a0a 100%);background-size:260% 260%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:var(--cc-bi,.7)}',
     '.cc-brillo-plata{mix-blend-mode:overlay;background:linear-gradient(115deg,#4a505c 0%,#f2f5fa 18%,#9aa1b0 34%,#ffffff 48%,#8a91a0 62%,#e4e8ef 80%,#4a505c 100%);background-size:260% 260%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:var(--cc-bi,.7)}',
+    // Spec 030: «ondas que brillan» (v7 del paquete de Bruno).
+    '.cc-brillo-ondas{mix-blend-mode:screen;opacity:calc(var(--cc-bi,.7) * (.85 + var(--hyp)*.5))}',
+    '.cc-ondas-base,.cc-ondas-color,.cc-ondas-luz{position:absolute;inset:0;-webkit-mask-size:var(--cc-ot,100%) auto;mask-size:var(--cc-ot,100%) auto;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:repeat;mask-repeat:repeat}',
+    '.cc-ondas-css .cc-ondas-base,.cc-ondas-css .cc-ondas-color,.cc-ondas-css .cc-ondas-luz{-webkit-mask-image:repeating-radial-gradient(ellipse 150% 120% at 110% 115%,transparent 0 2.6%,#000 3% 3.25%,transparent 3.7% 5.2%,rgba(0,0,0,.6) 5.45% 5.6%,transparent 5.9% 7.4%);mask-image:repeating-radial-gradient(ellipse 150% 120% at 110% 115%,transparent 0 2.6%,#000 3% 3.25%,transparent 3.7% 5.2%,rgba(0,0,0,.6) 5.45% 5.6%,transparent 5.9% 7.4%);-webkit-mask-size:100% 100%;mask-size:100% 100%}',
+    '.cc-ondas-base{background:rgba(170,190,255,.13)}',
+    '.cc-ondas-color{background:repeating-linear-gradient(65deg,transparent 0%,#ff2e97 2.5%,#b04dff 5%,transparent 8%,transparent 11%,#1fc8ff 13.5%,#3dffb0 16%,transparent 19%,transparent 22%,#ffd500 24.5%,#ff5a2e 27%,transparent 30%,transparent 33%,#6a4dff 35.5%,#ff3dd0 38%,transparent 41%,transparent 44%);background-size:260% 260%;background-position:calc(15% + var(--px)*70%) calc(15% + var(--py)*70%);filter:saturate(1.5) brightness(1.1)}',
+    '.cc-ondas-luz{background:linear-gradient(120deg,transparent 36%,rgba(255,255,255,.95) 50%,transparent 64%);background-size:300% 300%;background-position:calc(85% - var(--px)*70%) calc(85% - var(--py)*70%);opacity:calc(.22 + var(--hyp)*.5)}',
     '.cc-glare{position:absolute;inset:0;pointer-events:none;z-index:7;mix-blend-mode:overlay;background:radial-gradient(farthest-corner circle at calc(var(--px)*100%) calc(var(--py)*100%),rgba(255,255,255,.45) 0%,rgba(255,255,255,.08) 34%,transparent 62%);opacity:calc(.2 + var(--hyp)*.55)}',
     '.cc-sweep{position:absolute;inset:0;pointer-events:none;z-index:7;mix-blend-mode:overlay;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.75) 50%,transparent 65%);transform:translateX(-130%)}',
     '.cc-card.cc-entra .cc-sweep{animation:cc-sweep 1.1s .2s ease-out both}',
@@ -162,11 +169,11 @@
 
   function inyectarCSS() {
     var prev = document.getElementById('carta-capas-css');
-    if (prev && prev.getAttribute('data-v') === '4') return;
+    if (prev && prev.getAttribute('data-v') === '4m') return;
     if (prev) prev.remove();
     var s = document.createElement('style');
     s.id = 'carta-capas-css';
-    s.setAttribute('data-v', '4');
+    s.setAttribute('data-v', '4m');
     s.textContent = CSS;
     document.head.appendChild(s);
   }
@@ -194,7 +201,7 @@
   // barras invertidas ni espacios (los enlaces firmados del sitio y las `data:` en base64 las cumplen).
   function urlSegura(u) { return typeof u === 'string' && /^[^"'()\\\s<>]+$/.test(u) ? u : null; }
   function intensidad(v, d) { return Math.max(0, Math.min(1, num(v, d))); }
-  var BRILLOS = { holo: 'Holográfico', destello: 'Destello que pasa', oro: 'Metálico dorado', plata: 'Metálico plateado' };
+  var BRILLOS = { holo: 'Holográfico', destello: 'Destello que pasa', oro: 'Metálico dorado', plata: 'Metálico plateado', ondas: 'Ondas que brillan (fondo)' };
   // Waifu Baker, spec 025: marco personalizado con dos colores, con la fórmula del configurador de Bruno (oscuro =
   // el color al 45 %, brillo, color, blanco, color, brillo, oscuro) y aura del color al 25 %.
   function hexRgb(h) { h = h.slice(1); if (h.length === 3) h = h.replace(/./g, '$&$&'); var n = parseInt(h.slice(0, 6), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
@@ -224,6 +231,38 @@
     return h;
   }
 
+  // Waifu Baker, spec 030: la capa (imagen con su brillo, o partículas) sale de `montar` para que sobre-capas.js la
+  // comparta (`CartaCapas.motor`). Todo lo que va en `style` sigue pasando por las listas cerradas.
+  function capaHTMLBase(c, i, semilla, estatica) {
+    var estilo = 'inset:-' + num(c.margen, 0) + '%;' +
+      (mezclaSegura(c.mezcla) !== 'normal' ? 'mix-blend-mode:' + mezclaSegura(c.mezcla) + ';' : '') +
+      (c.opacidad != null && c.opacidad !== 1 ? 'opacity:' + num(c.opacidad, 1) + ';' : '');
+    var prof = c.profundidad == null ? 1 : num(c.profundidad, 1);
+    var tipo = c.particulas || (c.destellos ? 'destellos-dorados' : null);
+    if (tipo) {
+      var cfg = Object.assign({}, c, { particulas: tipo, _factor: estatica ? 0.4 : 1 });
+      return '<div class="cc-capa cc-part" data-p="' + prof + '" style="' + estilo + '">' + particulasHTML(cfg, semilla) + '</div>';
+    }
+    if (!c.src) return '';
+    var br = '', b = c.brillo, u = urlSegura(c.src);
+    if (b && BRILLOS.hasOwnProperty(b.tipo) && u) {
+      // La máscara sigue el encuadre de la imagen: va dentro del mismo recuadro transformado.
+      var m = 'url(&quot;' + esc(u) + '&quot;)', aj = c.encuadre && c.encuadre.ajuste === 'contener' ? 'contain' : 'cover';
+      var dentro = '', extra = '', cls = '';
+      // Spec 030 (v7 del paquete de Bruno): «ondas que brillan», estelas que se encienden por grupos al inclinar. El
+      // patrón es una imagen con transparencia (por defecto `texturas.ondas`); `patron: null` usa arcos hechos con CSS.
+      if (b.tipo === 'ondas') {
+        var pt = b.patron === null ? null : urlSegura(b.patron || api.texturas.ondas || '');
+        var mi = '';
+        if (pt) { var pu = 'url(&quot;' + esc(pt) + '&quot;)'; mi = ' style="-webkit-mask-image:' + pu + ';mask-image:' + pu + '"'; extra = ';--cc-ot:' + Math.max(5, Math.min(300, num(b.patronTamano, 100))) + '%'; }
+        else cls = ' cc-ondas-css';
+        dentro = '<i class="cc-ondas-base"' + mi + '></i><i class="cc-ondas-color"' + mi + '></i><i class="cc-ondas-luz"' + mi + '></i>';
+      }
+      br = '<div class="cc-brillo cc-brillo-' + b.tipo + cls + '" style="--cc-bi:' + intensidad(b.intensidad, .7) + extra + ';-webkit-mask-image:' + m + ';mask-image:' + m + ';-webkit-mask-size:' + aj + ';mask-size:' + aj + ';' + encuadreEstilo(c.encuadre).replace(/object-fit:contain;/, '') + '">' + dentro + '</div>';
+    }
+    return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false" style="' + encuadreEstilo(c.encuadre) + '">' + br + '</div>';
+  }
+
   var contador = 0;
 
   function montar(el, opciones) {
@@ -241,25 +280,7 @@
     var capas = [], sello = null, selloOculto = false, primera = true, listo = Promise.resolve();
     var zona = op.zona || el.parentElement || el;
 
-    function capaHTML(c, i) {
-      var estilo = 'inset:-' + num(c.margen, 0) + '%;' +
-        (mezclaSegura(c.mezcla) !== 'normal' ? 'mix-blend-mode:' + mezclaSegura(c.mezcla) + ';' : '') +
-        (c.opacidad != null && c.opacidad !== 1 ? 'opacity:' + num(c.opacidad, 1) + ';' : '');
-      var prof = c.profundidad == null ? 1 : num(c.profundidad, 1);
-      var tipo = c.particulas || (c.destellos ? 'destellos-dorados' : null);
-      if (tipo) {
-        var cfg = Object.assign({}, c, { particulas: tipo, _factor: op.estatica ? 0.4 : 1 });
-        return '<div class="cc-capa cc-part" data-p="' + prof + '" style="' + estilo + '">' + particulasHTML(cfg, 7 + id + i) + '</div>';
-      }
-      if (!c.src) return '';
-      var br = '', b = c.brillo, u = urlSegura(c.src);
-      if (b && BRILLOS.hasOwnProperty(b.tipo) && u) {
-        // La máscara sigue el encuadre de la imagen: va dentro del mismo recuadro transformado.
-        var m = 'url(&quot;' + esc(u) + '&quot;)', aj = c.encuadre && c.encuadre.ajuste === 'contener' ? 'contain' : 'cover';
-        br = '<div class="cc-brillo cc-brillo-' + b.tipo + '" style="--cc-bi:' + intensidad(b.intensidad, .7) + ';-webkit-mask-image:' + m + ';mask-image:' + m + ';-webkit-mask-size:' + aj + ';mask-size:' + aj + ';' + encuadreEstilo(c.encuadre).replace(/object-fit:contain;/, '') + '"></div>';
-      }
-      return '<div class="cc-capa" data-p="' + prof + '" style="' + estilo + '"><img src="' + esc(c.src) + '" alt="" decoding="async" draggable="false" style="' + encuadreEstilo(c.encuadre) + '">' + br + '</div>';
-    }
+    function capaHTML(c, i) { return capaHTMLBase(c, i, 7 + id + i, op.estatica); }
 
     function selloHTML() {
       var s = op.sello;
@@ -474,7 +495,9 @@
     return montar(el, desdeRareza(rareza, imagen, extra));
   }
 
-  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro, encuadre: encuadreEstilo, url: urlSegura }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, brillos: BRILLOS, marcoPersonalizado: marcoPersonalizado, version: 4 };
+  var api = { seguro: { mezcla: mezclaSegura, esquina: esquinaSegura, color: colorSeguro, encuadre: encuadreEstilo, url: urlSegura }, montar: montar, montarRareza: montarRareza, desdeRareza: desdeRareza, presets: PRESETS, marcos: MARCOS, sellos: SELLOS, particulas: PARTICULAS, brillos: BRILLOS, marcoPersonalizado: marcoPersonalizado, texturas: {}, version: 4,
+    // Spec 030: motor compartido; sobre-capas.js arma sus capas con estas mismas piezas (y sus valores seguros).
+    motor: { inyectarCSS: inyectarCSS, capaHTML: function (c, i, o) { o = o || {}; return capaHTMLBase(c || {}, i || 0, o.semilla || 7 + (i || 0), o.estatica); }, particulasHTML: particulasHTML } };
   global.CartaCapas = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : {});

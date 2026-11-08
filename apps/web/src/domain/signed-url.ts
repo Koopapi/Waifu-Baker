@@ -40,3 +40,23 @@ export function verifyLayer(g: LayerGrant & { sig: string }, secret: string, now
   const given = Buffer.from(g.sig, "hex");
   return given.length === expected.length && timingSafeEqual(given, expected);
 }
+
+/** Spec 030 (RNF seguridad): enlace a una imagen del diseño del sobre de una colección (o a su miniatura). */
+export interface PackAssetGrant {
+  setId: string;
+  kind: "silver" | "gold";
+  key: string;
+  userId: string;
+  expires: number;
+}
+
+export function signPackAsset(g: PackAssetGrant, secret: string): string {
+  return createHmac("sha256", secret).update(`pack.${g.setId}.${g.kind}.${g.key}.${g.expires}.${g.userId}`).digest("hex");
+}
+
+export function verifyPackAsset(g: PackAssetGrant & { sig: string }, secret: string, now: number): boolean {
+  if (!(g.expires > now) || !/^[0-9a-f]{64}$/.test(g.sig)) return false;
+  const expected = Buffer.from(signPackAsset(g, secret), "hex");
+  const given = Buffer.from(g.sig, "hex");
+  return given.length === expected.length && timingSafeEqual(given, expected);
+}

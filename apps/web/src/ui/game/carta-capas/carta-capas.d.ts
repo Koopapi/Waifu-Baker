@@ -3,11 +3,16 @@
 
 export type CartaTier = "n" | "r" | "sr" | "ssr" | "ur" | "ex";
 /** v4: brillo que se pinta solo sobre el dibujo de una capa de imagen. */
-export type TipoBrillo = "holo" | "destello" | "oro" | "plata";
+/** Spec 030: `ondas` («ondas que brillan») solo lo usan los sobres. */
+export type TipoBrillo = "holo" | "destello" | "oro" | "plata" | "ondas";
 export interface Brillo {
   tipo: TipoBrillo;
   /** 0 a 1 (0,7 por defecto). */
   intensidad?: number;
+  /** Spec 030, solo `ondas`: imagen con transparencia; `null` = arcos CSS; sin campo = `texturas.ondas`. */
+  patron?: string | null;
+  /** Spec 030, solo `ondas`: % del ancho de la capa (100 por defecto). */
+  patronTamano?: number;
 }
 export type Esquina = "sup-izq" | "sup-der" | "inf-izq" | "inf-der";
 
@@ -93,6 +98,14 @@ export interface CartaCapasApi {
   brillos: Record<TipoBrillo, string>;
   /** Spec 025: degradado y aura del marco personalizado, o null si los colores no son válidos. */
   marcoPersonalizado(c: { color?: string; brillo?: string } | null | undefined): [string, string] | null;
+  /** Spec 030: patrones de fábrica (`ondas` = el del brillo «ondas que brillan»). */
+  texturas: { ondas?: string };
+  /** Spec 030: piezas compartidas con sobre-capas.js. */
+  motor: {
+    inyectarCSS(): void;
+    capaHTML(capa: CapaImagen | CapaParticulas | Record<string, unknown>, indice?: number, opciones?: { semilla?: number; estatica?: boolean }): string;
+    particulasHTML(capa: CapaParticulas | Record<string, unknown>, semilla: number): string;
+  };
   version: number;
 }
 

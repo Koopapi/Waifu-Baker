@@ -3,7 +3,7 @@
 // vínculo sube de nivel → la carta se ve con el destello → fabrica con polvo la carta que le falta.
 import path from "node:path";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, giftPacks, go, login, openAllAndSkip } from "./helpers";
 
 test("vínculo de personaje, reciclaje y fabricar", async ({ browser }) => {
   test.setTimeout(300_000);
@@ -33,7 +33,8 @@ test("vínculo de personaje, reciclaje y fabricar", async ({ browser }) => {
 
   await fan.goto("/packs");
   await dismissCelebration(fan);
-  await fan.goto(`/packs/${setId}/all`);
+  // «Mis sobres» marca los sobres como vistos y se refresca sola.
+  await go(fan, `/packs/${setId}/all`);
   expect(await openAllAndSkip(fan)).toBe(14);
 
   await test.step("RF-15 y RF-17: desde la ficha se llega a la línea del personaje con su vínculo y su polvo", async () => {

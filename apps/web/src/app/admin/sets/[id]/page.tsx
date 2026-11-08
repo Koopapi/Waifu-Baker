@@ -11,6 +11,10 @@ import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
 import { FreeToggle } from "@/features/admin/sets/FreeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
+import { PackDesignLinks } from "@/features/admin/sets/PackDesignLinks";
+import { packViewsFor } from "@/server/services/pack-designs";
+import { requireAdmin } from "@/server/auth/require-admin";
+import { packViewKey } from "@/domain/packs/view";
 import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
@@ -60,6 +64,12 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   // Spec 017, RF-15: cartas sin chica o sin fondo, enlazadas, antes de intentar publicar.
   const notAssembled = cards.filter((c) => missingParts(c.layers).length > 0);
   const tl = adminLayersDictionaries[await getLocale()];
+  // Spec 030, RF-1: el sobre plata y el gold de la colección (con el enlace firmado para quien mira el panel).
+  const admin = await requireAdmin(`/admin/sets/${id}`);
+  const packViews = await packViewsFor(db, admin.user.id, [
+    { setId: set.id, kind: "silver" },
+    { setId: set.id, kind: "gold" },
+  ]);
 
   return (
     <div className="space-y-8">
@@ -124,6 +134,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
             .filter((c) => c.rarity)
             .map((c) => ({ id: c.id, label: `${String(c.number).padStart(3, "0")} · ${c.name || "—"} · ${tt.common.rarity[c.rarity!]}` }))}
         />
+        <PackDesignLinks setId={set.id} views={(["silver", "gold"] as const).map((k) => packViews.get(packViewKey(set.id, k))!).filter(Boolean)} />
       </Card>
 
       {/* Spec 021, RF-1 a RF-3: gratuita o de Patreon. */}

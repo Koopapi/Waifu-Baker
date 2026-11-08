@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { and, eq } from "drizzle-orm";
-import { albums, cards, characters, packs, sets, userRewards, users } from "@/db/schema";
+import { albums, cards, characters, packDesigns, packs, sets, userRewards, users } from "@/db/schema";
 import { parseDemoManifest } from "@/domain/demo/manifest";
 import { isAssembled, type ImageLayer } from "@/domain/cards/layers";
 import { DEMO_BANNED_NAMES, demoCollectorCards, seedDemo } from "@/server/services/demo-seed";
@@ -76,6 +76,22 @@ describe("demo", () => {
       expect(capas.map((l) => ("key" in l ? l.rol : "particulas"))).toEqual(["fondo", "particulas", "personaje", "extra", "extra"]);
       expect((capas[2] as ImageLayer).key).toMatch(new RegExp(`^sets/${r.setId}/layers/`));
       expect(yuki.layers).toMatchObject({ marco: "ssr", sello: { esquina: "sup-izq" } });
+    });
+  }, SLOW);
+
+  it("test_s030_la_demo_lleva_el_sobre_fa01_en_el_plata_y_el_basico_en_el_gold", async () => {
+    const web = path.resolve(__dirname, "../..");
+    const packDesign = {
+      readFile: (f: string) => readFile(path.join(web, "assets/sobres/ejemplo", f)),
+      readPlastic: (f: string) => readFile(path.join(web, "public/sobres", f)),
+    };
+    await inRollback(async (tx) => {
+      const r = await seedDemo(tx, tempStore(), { manifest, readImage, now: NOW, packDesign });
+      const rows = await tx.select().from(packDesigns).where(eq(packDesigns.setId, r.setId));
+      expect(rows.map((x) => x.kind)).toEqual(["silver"]);
+      expect(rows[0].design.capas.map((l) => ("key" in l ? l.nombre : l.particulas))).toEqual(["sobre_fa01_fondo.webp", "destellos-arcoiris", "sobre_fa01_personaje.webp", "sobre_fa01_efecto.webp"]);
+      const gold = await tx.select().from(packs).where(and(eq(packs.userId, r.collectorId), eq(packs.kind, "gold"), eq(packs.status, "sealed")));
+      expect(gold).toHaveLength(1);
     });
   }, SLOW);
 });

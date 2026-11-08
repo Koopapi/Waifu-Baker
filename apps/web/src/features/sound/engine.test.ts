@@ -122,4 +122,15 @@ describe("spec 013 — motor de sonido", () => {
     expect(() => engine.setMuted(true)).not.toThrow();
     expect(engine.isMuted()).toBe(true);
   });
+
+  it("test_s030_rf18_el_rasgado_del_sobre_se_anota_sin_sonar_dos_veces_y_respeta_el_silencio", async () => {
+    const { engine, h, events } = setup();
+    await engine.preload();
+    engine.note("tear");
+    expect(h.played).toEqual([]);
+    expect(events).toEqual(["wb:sound:tear"]);
+    engine.setMuted(true);
+    engine.note("tear");
+    expect(events).toEqual(["wb:sound:tear"]);
+  });
 });

@@ -1,0 +1,20 @@
+{
+  "id": "fa01-especial",
+  "nombre": "FAN ART · VOL. 1",
+  "codigo": "FA01-E",
+  "cartas": 5,
+  "vista": "3d",
+  "apertura": "rasgar",
+  "capas": [
+    { "src": "sobres/fa01/sobre_fa01_fondo.webp", "brillo": { "tipo": "ondas", "intensidad": 0.8 }, "profundidad": 0.25, "margen": 3 },
+    { "particulas": "destellos-dorados", "cantidad": 30, "semilla": 7, "profundidad": 0.6, "margen": 4 },
+    { "src": "sobres/fa01/sobre_fa01_personaje.webp", "brillo": { "tipo": "destello", "intensidad": 0.6 }, "profundidad": 1, "margen": 2 },
+    { "src": "sobres/fa01/sobre_fa01_efecto.webp", "profundidad": 1.3, "margen": 3, "mezcla": "overlay" }
+  ],
+  "sellos": { "arriba": "#3FE0D0", "abajo": "#C6F432", "patron": "marcos/patrones/liquido.webp", "patronTamano": 40 },
+  "insignia": { "texto": "Edición especial", "color": "#C6F432" },
+  "holo": true,
+  "holoIntensidad": 0.35,
+  "foilIntensidad": 0.8,
+  "plastico": 1.2
+}

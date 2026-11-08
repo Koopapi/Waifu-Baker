@@ -1,17 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { useT } from "@/i18n/client";
 import { drawFakePack, type LabCard, type Rarity } from "./fakePack";
-import { TearPack } from "./TearPack";
+import { TearPack, type TearPackHandle } from "./TearPack";
+import { bell, whoosh } from "./sobre-sounds";
 import { Card3D } from "./Card3D";
 import { Particles, type ParticlesHandle } from "./Particles";
 import { useTiltSource } from "./useTiltSource";
-import { celebrates, confettiCount, revealSound, teaseLevel, vibrationPattern } from "@/domain/opening/feedback";
 import { SWIPE_MIN, revealOrder, swipeSide } from "@/domain/opening/deck";
+import { isSpecial, omen, progressDots, revealFx, sobreTimeline } from "@/domain/opening/sobre";
 import { RARITY_SEAL } from "@/domain/catalog/rarity-tier";
-import type { PackShellProps } from "@/features/packs/PackShell";
+import { basicRegistro } from "@/domain/packs/design";
+import type { PackViewData } from "@/domain/packs/view";
 import { Confetti, type ConfettiBurst } from "@/ui/game/Confetti";
 import { Sticker } from "@/ui/icons/Sticker";
 import { SoundToggle } from "@/ui/game/SoundToggle";
@@ -19,8 +21,14 @@ import { sound, useSoundMuted } from "@/features/sound/engine";
 import { useReducedMotion } from "@/ui/hooks/useReducedMotion";
 import "./opening.css";
 
-/** idle: sobre cerrado · opening: la tira salió y se espera al servidor · deck: el mazo · summary: el resumen. */
+/**
+ * idle: sobre cerrado · opening: el sobre se abrió, se espera al servidor y las cartas suben (spec 030, RF-19) ·
+ * deck: el mazo · summary: el resumen.
+ */
 type Phase = "idle" | "opening" | "deck" | "summary";
+/** Spec 030, RF-19: dónde está el mazo mientras se abre (dentro del sobre, subiendo o ya en el centro). */
+type Step = "inside" | "rise" | "center";
+const wait = (ms: number) => new Promise<void>((r) => window.setTimeout(r, Math.max(0, ms)));
 
 /** Spec 014, RF-9: destellos del fondo (posición en %, tamaño, color y retardo). */
 const SPARKLES: [number, number, number, string, number][] = [
@@ -28,22 +36,22 @@ const SPARKLES: [number, number, number, string, number][] = [
   [51, 11, 8, "#7cc8ff", 1.6], [90, 83, 12, "#b79cff", 0.9], [7, 45, 8, "#ffffff", 1.9], [91, 39, 9, "#ffe27a", 0.4],
   [30, 88, 9, "#ff9ecb", 1.3], [64, 92, 8, "#7ef0c9", 0.2], [25, 28, 6, "#ffffff", 2.1], [72, 30, 6, "#ffffff", 1.4],
 ];
-const FLASH_RARITIES: Rarity[] = ["epic", "legendary", "ex"];
-/** El sobre del laboratorio (sin colección real). */
-const LAB_SHELL: Omit<PackShellProps, "state" | "className"> = {
+/** El sobre del laboratorio (sin colección real): el básico, sin arte. */
+const LAB_VIEW: PackViewData = {
   setId: "lab",
+  kind: "silver",
   code: "LAB",
   name: "Laboratorio",
-  art: { coverVersion: null, packImage: null },
-  kind: "silver",
-  kindLabel: "Plata",
+  registro: basicRegistro("silver", { nombre: "Laboratorio", codigo: "LAB", cartas: 5 }, null),
+  thumb: null,
+  designed: false,
 };
 
 interface StageProps {
   /** Fuente de cartas del sobre. Por defecto, datos falsos del laboratorio. */
   draw?: () => Promise<LabCard[]>;
-  /** Spec 023: el sobre de la colección (imagen, nombre, código y tipo). */
-  shell?: Omit<PackShellProps, "state" | "className">;
+  /** Spec 030: el sobre de la colección y tipo (su diseño o el básico). */
+  view?: PackViewData;
   /** Línea bajo el nombre al revelar (p. ej. «FA01 · Fan Art Vol. 1»). */
   setLine?: string;
   /** RF-22: la apertura ya estaba rasgada; se retoma en el mazo sin pedir rasgar. */
@@ -63,9 +71,12 @@ interface StageProps {
  * arriba se revela con un toque o deslizando (RF-15) y se presenta como en la referencia de Bruno («¡Nueva!», insignia de
  * rareza, nombre y colección); otro gesto la aparta hacia ese lado (RF-16) y, tras la última, el resumen (RF-18).
  */
-export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = false, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
+export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
   const t = useT();
   const [phase, setPhase] = useState<Phase>(autoOpen ? "opening" : "idle");
+  const [step, setStep] = useState<Step>("inside");
+  // Spec 030, RF-22: la carta especial presentada (rayos y estrella con su rareza).
+  const [special, setSpecial] = useState<Rarity | null>(null);
   const [cards, setCards] = useState<LabCard[]>([]);
   /** La carta de arriba del mazo. */
   const [top, setTop] = useState(0);
@@ -85,67 +96,87 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
   const stage = useRef<HTMLDivElement>(null);
   const cardEls = useRef<(HTMLDivElement | null)[]>([]);
   const particles = useRef<ParticlesHandle>(null);
+  const tear = useRef<TearPackHandle>(null);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   const muted = useSoundMuted();
   // Spec 013, RF-6: los sonidos se descargan al entrar en la apertura, sin retrasar la animación.
   useEffect(() => {
     void sound.preload();
   }, []);
+  // El rasgado lo suena el sobre de Bruno (sintetizado); aquí se desbloquea el audio de los volteos (spec 013, RF-2).
   const onCommit = useCallback(() => {
     sound.unlock();
-    sound.play("tear");
   }, []);
 
-  // RF-10 y RF-11: el contenido se pide al confirmar el rasgado; si falla, el sobre vuelve cerrado y se puede reintentar.
-  const open = useCallback(() => {
-    setPhase("opening");
-    void (async () => {
-      try {
-        const next = draw ? await draw() : drawFakePack();
-        cardEls.current = [];
-        setCards(revealOrder(next));
-        setTop(0);
-        setShown(false);
-        setPhase("deck");
-      } catch (e) {
-        // Cadena vacía = error sin mensaje: se muestra el texto genérico en el idioma activo.
-        setError(e instanceof Error ? e.message : "");
-        setPhase("idle");
-        setPackKey((k) => k + 1);
-      }
-    })();
-  }, [draw]);
+  // RF-10 y RF-11: el contenido se pide al abrir el sobre; si falla, el sobre vuelve cerrado y se puede reintentar.
+  // Spec 030, RF-19: mientras, la coreografía de Bruno: las cartas suben boca abajo desde dentro a los 0,38 s, el sobre
+  // se va a los 1,25 s y el mazo queda en el centro a los 1,9 s (si el servidor tarda más, cada paso espera a las cartas).
+  const open = useCallback(
+    (resume = false) => {
+      setPhase("opening");
+      setStep("inside");
+      const tl = sobreTimeline(reduced || resume);
+      const t0 = performance.now();
+      void (async () => {
+        try {
+          const next = draw ? await draw() : drawFakePack();
+          if (!alive.current) return;
+          cardEls.current = [];
+          setCards(revealOrder(next));
+          setTop(0);
+          setShown(false);
+          await wait(tl.rise - (performance.now() - t0));
+          if (!alive.current) return;
+          if (!resume) {
+            setStep("rise");
+            whoosh();
+          }
+          await wait(tl.hide - tl.rise);
+          if (!alive.current) return;
+          void tear.current?.ocultar();
+          setStep("center");
+          await wait(tl.ready - tl.hide);
+          if (alive.current) setPhase("deck");
+        } catch (e) {
+          if (!alive.current) return;
+          // Cadena vacía = error sin mensaje: se muestra el texto genérico en el idioma activo.
+          setError(e instanceof Error ? e.message : "");
+          setPhase("idle");
+          setPackKey((k) => k + 1);
+        }
+      })();
+    },
+    [draw, reduced],
+  );
 
   // RF-22: retomar sin rasgar.
   const resumed = useRef(false);
   useEffect(() => {
     if (!autoOpen || resumed.current) return;
     resumed.current = true;
-    open();
+    open(true);
   }, [autoOpen, open]);
 
-  /** Sitio de cada carta en el mazo: la de arriba en el centro y las demás asomando debajo. */
-  const deckPose = useCallback((depth: number) => ({ x: depth === 0 ? 0 : depth % 2 ? 7 : -6, y: depth * 7, rotation: depth === 0 ? 0 : depth % 2 ? 3 : -3, scale: 1 - depth * 0.025 }), []);
+  /** Spec 030, RF-20: las cartas del mazo van derechas, una encima de otra (solo se ve la de arriba). */
+  const deckPose = useCallback(() => ({ x: 0, y: 0, rotation: 0, scale: 1 }), []);
 
-  // RF-12: las cartas salen del sobre y se apilan boca abajo.
-  useEffect(() => {
-    if (phase !== "deck" || top !== 0 || shown) return;
+  // RF-12 (spec 030, RF-19): las cartas nacen boca abajo, apiladas dentro del sobre, antes de pintarse.
+  useLayoutEffect(() => {
     const els = cardEls.current.slice(0, cards.length).filter((e): e is HTMLDivElement => Boolean(e));
-    if (els.length === 0 || els.length !== cards.length) return;
+    if (els.length === 0) return;
     gsap.set(
       els.map((el) => el.querySelector(".card3d__inner")),
       { rotationY: 180 },
     );
-    gsap.set(els, { y: "38vh", scale: 0.55, opacity: 0, rotation: 0, x: 0 });
-    const tl = gsap.timeline();
-    els.forEach((el, i) => {
-      const depth = i;
-      tl.to(el, { ...deckPose(depth), opacity: 1, duration: reduced ? 0.2 : 0.6, ease: "back.out(1.3)" }, reduced ? 0 : 0.1 + (els.length - 1 - i) * 0.07);
-    });
-    return () => {
-      tl.kill();
-    };
-  }, [phase, cards.length, reduced, deckPose, top, shown]);
+    gsap.set(els, { ...deckPose(), opacity: 1 });
+  }, [cards, deckPose]);
 
   /** RF-14 y RF-15: voltea la de arriba con los efectos de su rareza y la presenta. */
   const reveal = useCallback(() => {
@@ -158,20 +189,27 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
     busy.current = true;
     sound.play("flip");
     const effects = () => {
-      // Spec 013, RF-4 y RF-9: las raras o mejores suenan y vibran según su nivel.
-      const extra = revealSound(card.rarity);
-      if (extra) sound.play(extra);
-      sound.vibrate(vibrationPattern(card.rarity));
+      // Spec 013, RF-4 y RF-9: las raras o mejores suenan y vibran según su nivel. Spec 030, RF-26: la Legendaria y la
+      // EX, solo con el efecto de Bruno (sin sonido de rareza, confeti, partículas, celebración ni destello).
+      const fx = revealFx(card.rarity);
+      if (fx.sound) sound.play(fx.sound);
+      sound.vibrate(fx.vibration ? [...fx.vibration] : null);
       const r = el.getBoundingClientRect();
-      particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
-      if (!reduced && confettiCount(card.rarity) > 0) setBurst({ key: Date.now(), count: confettiCount(card.rarity), x: r.left + r.width / 2, y: r.top + r.height / 2 });
-      if (!reduced && celebrates(card.rarity)) {
+      if (fx.particles) particles.current?.burst(r.left + r.width / 2, r.top + r.height / 2, card.rarity);
+      if (!reduced && fx.confetti > 0) setBurst({ key: Date.now(), count: fx.confetti, x: r.left + r.width / 2, y: r.top + r.height / 2 });
+      if (!reduced && fx.celebrate) {
         setParty(card.rarity);
         window.setTimeout(() => setParty(null), 1600);
       }
-      if (FLASH_RARITIES.includes(card.rarity) && !reduced) {
+      if (fx.flash && !reduced) {
         setFlash(card.rarity);
         window.setTimeout(() => setFlash(null), 400);
+      }
+      // Spec 030, RF-22: la Legendaria y la EX salen con el efecto especial de Bruno (rayos dorados, estrella con su
+      // rareza, campanita y su vibración). Con movimiento reducido, la estrella sin animar y sin rayos.
+      if (fx.special) {
+        setSpecial(card.rarity);
+        bell();
       }
       el.classList.add("card3d--revealed");
       // RF-17 (spec 018, RF-6): viva si la tiene (las comunes no: spec 022), salvo con movimiento reducido.
@@ -199,6 +237,8 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
       const el = cardEls.current[i];
       if (!el) return;
       busy.current = true;
+      setSpecial(null);
+      whoosh();
       const next = () => {
         el.classList.remove("card3d--revealed");
         setLiveIndex(null);
@@ -217,11 +257,11 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
     [top, cards.length, reduced],
   );
 
-  // Las de debajo suben un puesto cuando se aparta la de arriba.
+  // Las de debajo ya están en su sitio (derechas, una encima de otra): la siguiente solo se hace visible (RF-20).
   useEffect(() => {
     if (phase !== "deck" || top === 0) return;
-    cardEls.current.slice(top, cards.length).forEach((el, k) => el && gsap.to(el, { ...deckPose(k), duration: reduced ? 0.15 : 0.35, ease: "power2.out" }));
-  }, [top, phase, cards.length, reduced, deckPose]);
+    cardEls.current.slice(top, cards.length).forEach((el) => el && gsap.set(el, deckPose()));
+  }, [top, phase, cards.length, deckPose]);
 
   const act = useCallback((side: "left" | "right") => (shown ? dismiss(side) : reveal()), [shown, dismiss, reveal]);
   // RF-15 y RF-16: toque o deslizamiento sobre la de arriba con eventos de puntero (dedo, ratón y lápiz por igual); la
@@ -266,6 +306,8 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
 
   const reset = () => {
     setError(null);
+    setSpecial(null);
+    setStep("inside");
     setLiveIndex(null);
     setCards([]);
     setTop(0);
@@ -276,18 +318,25 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
   };
 
   const current = phase === "deck" ? cards[top] : undefined;
+  const sobreHint = view.registro.apertura === "sticker" ? t.packs.sobre.sticker.hint : t.packs.sobre.tear.hint;
   const hint =
     phase === "idle"
       ? reduced
         ? t.packs.stage.hintButton
-        : t.packs.stage.hintSwipe
-      : phase === "deck"
+        : sobreHint
+      : phase === "deck" && current
         ? shown
-          ? t.packs.stage.hintNext(top + 1, cards.length)
+          ? isSpecial(current.rarity)
+            ? t.packs.sobre.special(current.name, t.common.rarity[current.rarity], top + 1, cards.length)
+            : t.packs.stage.hintNext(top + 1, cards.length)
           : t.packs.stage.hintDeck(top + 1, cards.length)
         : phase === "opening"
-          ? "..."
+          ? t.packs.sobre.opened
           : "";
+  // Spec 030, RF-21 y RF-23: el mazo late antes de una especial; un punto por carta.
+  const omenOn = phase === "deck" && omen(cards, top, shown);
+  const dots = useMemo(() => (phase === "deck" ? progressDots(cards.length, top) : []), [phase, cards.length, top]);
+  const showDeck = phase === "deck" || (phase === "opening" && cards.length > 0);
 
   return (
     <div
@@ -297,7 +346,8 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
       className="stage"
       data-phase={phase}
       data-revealed={phase === "deck" ? top + (shown ? 1 : 0) : 0}
-      data-kind={shell.kind}
+      data-kind={view.kind}
+      data-step={phase === "opening" ? step : undefined}
       data-shown={shown || undefined}
       onPointerMove={tilt.onPointerMove}
       onPointerLeave={tilt.onPointerLeave}
@@ -312,25 +362,31 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
         {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>
 
-      {phase !== "summary" && (
+      {/* Spec 030: el sobre de Bruno, hasta que se va (RF-19); al retomar una apertura no se pinta (spec 023, RF-22). */}
+      {(phase === "idle" || phase === "opening") && !(autoOpen && packKey === 0) && (
         <div className="stage__center">
           <TearPack
             key={packKey}
-            shell={shell}
+            ref={tear}
+            view={view}
             reducedMotion={reduced}
+            muted={muted}
+            zone={stage}
             onCommit={onCommit}
             onOpen={() => {
               setError(null);
               open();
             }}
-            mode={tilt.mode}
-            tiltTarget={tilt.target}
-            startOpen={autoOpen && packKey === 0}
           />
         </div>
       )}
 
-      <div className="cards">
+      <div className="cards" data-step={phase === "opening" ? step : "center"} data-omen={omenOn || undefined}>
+        {/* Spec 030, RF-21 y RF-22: el halo que late antes de una especial y los rayos dorados al revelarla. */}
+        <div aria-hidden className="deck-fx">
+          <span className="deck-fx__omen" />
+          <span className={`deck-fx__rays${special && !reduced ? " deck-fx__rays--on" : ""}`} />
+        </div>
         {cards.map((c, i) => {
           const isTop = phase === "deck" && i === top;
           return (
@@ -341,18 +397,35 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
               }}
               card={c}
               active={isTop}
-              tease={isTop && !shown ? teaseLevel(c.rarity) : 0}
+              tease={isTop && !shown ? revealFx(c.rarity).tease : 0}
               mode={tilt.mode}
               tiltTarget={tilt.target}
-              style={{ zIndex: cards.length - i, visibility: phase === "deck" && i >= top ? "visible" : "hidden" }}
+              style={{ zIndex: cards.length - i + 1, visibility: showDeck && i === top ? "visible" : "hidden" }}
               onClick={isTop ? () => act("right") : undefined}
               gesture={isTop ? cardGesture : undefined}
               actionLabel={shown ? t.packs.stage.dismissCard : t.packs.stage.flipCard}
               showLive={liveIndex === i}
+              // Spec 030, RF-27: la carta de arriba monta su versión viva antes de voltearse, para que al revelarla ya
+              // esté cargada.
+              preloadLive={isTop && !reduced}
             />
           );
         })}
+        {special && (
+          <span aria-hidden className={`deck-fx__star rarity-${special}`} data-testid="special-star">
+            {RARITY_SEAL[special]}
+          </span>
+        )}
       </div>
+
+      {/* Spec 030, RF-23: los puntos de avance del mazo (con una sola carta no hay). */}
+      {dots.length > 0 && (
+        <div className="deck-dots" aria-hidden data-testid="deck-dots">
+          {dots.map((d, i) => (
+            <i key={i} className={`deck-dots__dot deck-dots__dot--${d}`} />
+          ))}
+        </div>
+      )}
 
       {/* RF-15: la carta presentada, como en la referencia de Bruno. */}
       {current && shown && (
@@ -365,7 +438,7 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
             <p className="reveal-info__name">{current.name}</p>
             <p className="reveal-info__set">
               <span className="reveal-info__mini">{RARITY_SEAL[current.rarity]}</span>
-              {setLine ?? shell.code}
+              {setLine ?? view.code}
               {current.holo ? t.packs.stage.holoSuffix.toUpperCase() : ""}
             </p>
           </div>
@@ -384,9 +457,10 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
       {phase === "summary" && (
         <div className="summary">
           <div className="summary__card">
+            {/* Spec 030, RF-23: el resumen con el diseño de Bruno («Tu sobre»), con miniaturas, rareza y «¡Nueva!». */}
             <h2 className="summary__title">
               <Sticker name="card" className="size-9" />
-              {t.packs.stage.summaryTitle}
+              {t.packs.sobre.summaryTitle}
             </h2>
             {/* Spec 014, RF-14: las cartas en miniatura con su rareza y la etiqueta «¡Nueva!». */}
             <div className="summary__grid">
@@ -417,6 +491,12 @@ export function OpeningStage({ draw, shell = LAB_SHELL, setLine, autoOpen = fals
       )}
 
       <div className="hud">
+        {/* Spec 030, RF-20: el botón voltea la de arriba y, ya revelada, la aparta y pasa a la siguiente. */}
+        {phase === "deck" && current && (
+          <button type="button" className="hud__btn hud__btn--primary" onClick={() => act("right")} data-testid="deck-next">
+            {shown ? t.packs.sobre.nextCard : t.packs.sobre.flipCard}
+          </button>
+        )}
         {extraHud}
         <SoundToggle muted={muted} onToggle={(m) => sound.setMuted(m)} variant="ghost" className="hud__sound" data-testid="sound-toggle" />
         {tilt.gyroAvailable && tilt.mode !== "gyro" && (

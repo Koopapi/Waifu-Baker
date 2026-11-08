@@ -26,6 +26,10 @@ import { upsertUserFromLogin } from "./users";
 import { giftPacks } from "./users-admin";
 import { getCardDefaults } from "./settings";
 import { grantWelcomePack, setWelcomeSet } from "./welcome";
+import sharp from "sharp";
+import { exampleDesign, PACK_EXAMPLE_FILES } from "@/domain/packs/example";
+import { PACK_THUMB } from "@/domain/packs/design";
+import { savePackDesign } from "./pack-designs";
 
 /** Nombres reales que nunca pueden aparecer en las cartas de la demo (RF-12). */
 export const DEMO_BANNED_NAMES = ["makima", "yor", "forger", "rias", "gremory", "mitsuri", "kanroji", "albedo", "tifa", "lockhart"];
@@ -55,11 +59,30 @@ export interface DemoSample {
 }
 
 /**
+ * Spec 030: el sobre FA01 de Bruno para la demo. `readFile` lee sus capas (assets/sobres/ejemplo) y `readPlastic` las
+ * imágenes del plástico (public/sobres), para una miniatura aproximada (la de verdad la dibuja el navegador al guardar).
+ */
+export interface DemoPackDesign {
+  readFile: (name: string) => Promise<Buffer>;
+  readPlastic: (name: "plastico-sombra.webp" | "plastico-brillo.webp" | "plastico-silueta.webp") => Promise<Buffer>;
+}
+
+/** Miniatura de 500 × 875 de la demo: fondo y personaje, el plástico y la silueta (sin logo ni banda). */
+async function demoPackThumb(layers: Buffer[], p: DemoPackDesign) {
+  const fit = (b: Buffer) => sharp(b).resize(PACK_THUMB.width, PACK_THUMB.height, { fit: "cover" }).png().toBuffer();
+  const [sombra, brillo, silueta, ...art] = await Promise.all([fit(await p.readPlastic("plastico-sombra.webp")), fit(await p.readPlastic("plastico-brillo.webp")), fit(await p.readPlastic("plastico-silueta.webp")), ...layers.map(fit)]);
+  return sharp({ create: { width: PACK_THUMB.width, height: PACK_THUMB.height, channels: 4, background: "#3B2FC9" } })
+    .composite([...art.map((input) => ({ input })), { input: sombra }, { input: brillo }, { input: silueta, blend: "dest-in" as const }])
+    .png()
+    .toBuffer();
+}
+
+/**
  * Spec 010, RF-12: la base de datos de la demo. Colección publicada (y de bienvenida) con las cartas
  * del manifiesto; un administrador; un coleccionista con 4 sobres ya abiertos (semillas fijas: cada
  * ejecución da las mismas cartas), 3 sin abrir, 240 galletas, racha en el día 4 y álbum público.
  */
-export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: DemoManifest; readImage: (file: string) => Promise<Buffer>; now: Date; sample?: DemoSample }) {
+export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: DemoManifest; readImage: (file: string) => Promise<Buffer>; now: Date; sample?: DemoSample; packDesign?: DemoPackDesign }) {
   const { manifest, now } = opts;
   const admin = await upsertUserFromLogin(db, { patreonUserId: `dev:${DEMO_USERS.admin.name}`, displayName: DEMO_USERS.admin.displayName, role: "admin" });
   const fan = await upsertUserFromLogin(db, { patreonUserId: `dev:${DEMO_USERS.collector.name}`, displayName: DEMO_USERS.collector.displayName, role: "user" });
@@ -96,6 +119,16 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
   });
   await setWelcomeSet(db, admin.id, setId);
 
+  // Spec 030: el sobre plata de la colección lleva el FA01 de Bruno; el gold se queda con el sobre básico (la portada).
+  if (opts.packDesign) {
+    const ref = (f: string) => `upload:${f.replace(/[^a-z0-9]+/g, "-")}`;
+    const layers = PACK_EXAMPLE_FILES.filter((f) => f.startsWith("sobre_"));
+    const bodies = await Promise.all(layers.map((f) => opts.packDesign!.readFile(f)));
+    const uploads = new Map(layers.map((f, i) => [ref(f), { body: bodies[i], mime: "image/webp", filename: f }]));
+    const thumb = await demoPackThumb(bodies.slice(0, 2), opts.packDesign);
+    await savePackDesign(db, store, admin.id, setId, "silver", { design: exampleDesign(ref), uploads, thumb: { body: thumb, mime: "image/png", filename: "miniatura.png" } });
+  }
+
   // La carta de muestra recibe el resto de sus capas (fondo, partículas, sello…) como al importarla en el panel.
   if (opts.sample && sample?.ok && sampleGirl) {
     const [card] = await db.select().from(cards).where(and(eq(cards.setId, setId), eq(cards.name, opts.sample.name)));
@@ -117,6 +150,8 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
   // 2 regalados + el de bienvenida = 3 sin abrir.
   await giftPacks(db, admin.id, { userId: fan.id, setId, count: 2, reason: "Demo: ready to open" });
   await grantWelcomePack(db, fan);
+  // Spec 030: un sobre gold, que se ve con el sobre básico (el plata lleva el diseño FA01).
+  if (opts.packDesign) await giftPacks(db, admin.id, { userId: fan.id, setId, count: 1, reason: "Demo: gold pack", kind: "gold" });
 
   // Galletas y racha: hoy toca el día 4 y hay una carga de sobre gratis lista.
   await adjustCookies(db, admin.id, { userId: fan.id, amount: 240, reason: "Demo", now });

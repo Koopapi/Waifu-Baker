@@ -3,24 +3,12 @@
 // salir a mitad y volver retoma en el mazo sin rasgar → «Abrir todos» usa el sobre nuevo. Con movimiento reducido
 // (RF-23) el ayudante `tear` abre con el botón.
 import path from "node:path";
-import type { Page } from "@playwright/test";
 import { RARITIES } from "../src/domain/catalog/card-rules";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, dismissCelebration, dismissTop, giftPacks, login, openAllAndSkip, revealTop, tear } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, dismissTop, dragLine, giftPacks, login, openAllAndSkip, revealTop, tear } from "./helpers";
 
 const es = dictionaries.es;
-
-/** Arrastra por los dientes `dx` píxeles con el ratón y suelta (escritorio). */
-async function dragStrip(page: Page, dx: number) {
-  const box = (await page.locator(".tear__hit").boundingBox())!;
-  const x = box.x + (dx > 0 ? 16 : box.width - 16);
-  const y = box.y + box.height / 2;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  for (let i = 1; i <= 12; i++) await page.mouse.move(x + (dx * i) / 12, y);
-  await page.mouse.up();
-}
 
 test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", async ({ browser }) => {
   // Recorre el rasgado, el mazo, la reanudación y «Abrir todos»: pasa de los 3 minutos por defecto.
@@ -38,26 +26,25 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
   await fan.goto("/packs");
   await dismissCelebration(fan);
 
-  await test.step("RF-1 a RF-3 y RF-5: «Mis sobres» muestra el sobre nuevo con su etiqueta", async () => {
-    const shell = fan.locator(`[data-testid="group-${code}"] .pack-shell[data-kind="silver"]`);
-    await expect(shell).toBeVisible();
-    await expect(shell.locator(".pack-shell__tag")).toHaveText(es.common.packKind.silver);
-    await expect(shell.locator(".pack-shell__teeth")).toHaveCount(1);
+  await test.step("RF-1 a RF-3 y RF-5: «Mis sobres» muestra el sobre de su colección con su etiqueta", async () => {
+    // Spec 030, RF-16: el sobre de Bruno en miniatura (aquí el básico, que dibuja el navegador).
+    const thumb = fan.locator(`[data-testid="group-${code}"] [data-testid="pack-thumb"][data-kind="silver"]`);
+    await expect(thumb.locator("img")).toBeVisible();
+    await expect(fan.locator(`[data-testid="group-${code}"]`).getByText(es.common.packKind.silver, { exact: true }).first()).toBeVisible();
   });
 
   await test.step("RF-7 y RF-8: rasgar a medias devuelve la tira; del todo, abre el sobre", async () => {
     await fan.click(`[data-testid="group-${code}"] >> text=${es.packs.mine.openOne}`);
-    await fan.waitForSelector(".tear__hit");
+    await fan.waitForSelector('[data-testid="tear-pack"] .sc-sobre');
     await fan.waitForLoadState("networkidle");
     await expect(fan.locator('[data-testid="open-without-swipe"]')).toBeVisible();
     if (desktop) {
-      const w = (await fan.locator(".tear").boundingBox())!.width;
-      // RF-7: menos del 60 % (y de derecha a izquierda): la tira vuelve y el sobre sigue cerrado.
-      await dragStrip(fan, -w * 0.4);
+      // RF-7 (spec 030: el sobre de Bruno): rasgar a medias (y de derecha a izquierda) suelta la tira y sigue cerrado.
+      await dragLine(fan, 0.6, 0.25);
       await expect(fan.locator(".tear--whole")).toBeVisible();
       await expect(fan.locator('.stage[data-phase="idle"]')).toBeVisible();
-      // RF-8: más del 60 %: se arranca y salen las cartas.
-      await dragStrip(fan, w * 0.75);
+      // RF-8: por toda la línea se abre y salen las cartas.
+      await dragLine(fan, 0.08, 0.94);
     } else {
       await tear(fan);
     }
@@ -96,7 +83,7 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
     await fan.click('[data-testid="pending-opening"]');
     await fan.waitForURL(/\?pack=/);
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
-    await expect(fan.locator(".tear__hit")).toBeHidden();
+    await expect(fan.locator('[data-testid="tear-pack"]')).toHaveCount(0);
   });
 
   await test.step("RF-20: «Abrir todos» usa el sobre nuevo", async () => {
@@ -105,7 +92,7 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
     await fan.goto("/packs");
     await dismissCelebration(fan);
     await fan.click(`[data-testid="group-${code}"] >> text=${es.packs.mine.openAll(3)}`, { timeout: 30_000 });
-    await expect(fan.locator(".pack-shell").first()).toBeVisible();
+    await expect(fan.locator('[data-testid="pack-thumb"] img').first()).toBeVisible();
     expect(await openAllAndSkip(fan)).toBe(6);
   });
 

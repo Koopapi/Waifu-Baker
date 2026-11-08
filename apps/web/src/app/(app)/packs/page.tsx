@@ -6,7 +6,9 @@ import { now } from "@/server/clock";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
 import { packArtForSets } from "@/server/services/pack-art";
 import { newArrivalsBySet } from "@/server/services/arrivals";
-import { PackShell } from "@/features/packs/PackShell";
+import { PackThumb } from "@/ui/game/sobre-capas/PackThumb";
+import { packViewsFor } from "@/server/services/pack-designs";
+import { packViewKey } from "@/domain/packs/view";
 import { MarkPacksSeen } from "@/features/packs/MarkPacksSeen";
 import { claimableSets, rewardsSummary } from "@/server/services/rewards";
 import { RewardsPanel } from "@/features/rewards/RewardsPanel";
@@ -35,7 +37,11 @@ export default async function MisSobresPage() {
     // Spec 015, RF-8: llegadas que el coleccionista aún no había visto.
     newArrivalsBySet(db, user.id),
   ]);
-  const art = await packArtForSets(db, [...new Set([...groups.map((g) => g.setId), ...plainSets.map((s) => s.id)])]);
+  const [art, views] = await Promise.all([
+    packArtForSets(db, [...new Set([...groups.map((g) => g.setId), ...plainSets.map((s) => s.id)])]),
+    // Spec 030, RF-14 a RF-16: el sobre de cada grupo (su diseño o el básico) con su miniatura.
+    packViewsFor(db, user.id, groups.map((g) => ({ setId: g.setId, kind: g.kind }))),
+  ]);
   // Spec 015, RF-5: el sobre de la colección elegida sale en la celebración del día 7.
   const sets = plainSets.map((s) => ({ ...s, art: art.get(s.id) ?? { coverVersion: null, packImage: null } }));
   const total = groups.reduce((a, g) => a + g.sealed, 0);
@@ -78,6 +84,7 @@ export default async function MisSobresPage() {
             {groups.map((g, i) => {
               // Spec 022, RF-19: el sobre gold va en su propio grupo y sus enlaces lo piden con `?k=gold`.
               const k = g.kind === "gold" ? "?k=gold" : "";
+              const view = views.get(packViewKey(g.setId, g.kind));
               return (
                 <li
                   key={`${g.setId}-${g.kind}`}
@@ -88,9 +95,18 @@ export default async function MisSobresPage() {
                 >
                   <div className="flex flex-col items-center gap-5 @sm:flex-row">
                     <div className="relative shrink-0">
-                      {/* Spec 023, RF-5: el sobre nuevo de su tipo; detrás, la pila si hay más de uno. */}
-                      {g.sealed > 1 && <span aria-hidden className="absolute inset-x-3 inset-y-6 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
-                      <PackShell setId={g.setId} code={g.code} name={g.name} art={art.get(g.setId) ?? { coverVersion: null, packImage: null }} kind={g.kind} kindLabel={t.common.packKind[g.kind]} className="relative w-[200px] @sm:w-[170px]" />
+                      {/* Spec 030, RF-16: el sobre de su colección y tipo en miniatura; detrás, la pila si hay más de uno. */}
+                      {g.sealed > 1 && <span aria-hidden className="absolute inset-x-4 inset-y-8 translate-x-3 rotate-6 rounded-xl bg-k-lavanda/30" />}
+                      {view && (
+                        <PackThumb
+                          registro={view.registro}
+                          thumb={view.thumb}
+                          label={`${g.name} (${g.code}) · ${t.common.packKind[g.kind]}`}
+                          textos={{ carta: t.packs.sobre.card, cartas: t.packs.sobre.cards }}
+                          className="relative w-[150px] @sm:w-[128px]"
+                          data={{ "data-kind": g.kind, "data-designed": view.designed ? "true" : undefined, "data-art": view.designed ? undefined : String(view.registro.capas[0]?.src ?? ""), "data-testid": "pack-thumb" }}
+                        />
+                      )}
                     </div>
                     <div className="flex w-full max-w-xs min-w-0 flex-1 flex-col gap-4 @sm:max-w-none">
                       <div className="flex items-start justify-center gap-3 @sm:justify-between">

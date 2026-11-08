@@ -5,7 +5,8 @@ import { getSet } from "@/server/services/collections";
 import { SimulateStage } from "@/features/admin/sets/SimulateStage";
 import { getDict } from "@/i18n/server";
 import { parsePackKind } from "@/domain/catalog/default-odds";
-import { packArtForSets } from "@/server/services/pack-art";
+import { packViewFor } from "@/server/services/pack-designs";
+import { requireAdmin } from "@/server/auth/require-admin";
 
 export async function generateMetadata() {
   const t = await getDict();
@@ -20,6 +21,8 @@ export default async function SimulatePage({ params, searchParams }: { params: P
   const set = await getSet(db, id);
   if (!set) notFound();
   const t = await getDict();
-  const art = (await packArtForSets(db, [set.id])).get(set.id) ?? { coverVersion: null, packImage: null };
-  return <SimulateStage setId={set.id} kind={kind} code={set.code} name={set.name} art={art} label={t.admin.simulate.packLabel(set.code, t.common.packKind[kind])} />;
+  // Spec 030, RF-16: el mismo sobre que verá el coleccionista (con enlaces firmados para el administrador).
+  const admin = await requireAdmin(`/admin/sets/${id}/simulate`);
+  const view = (await packViewFor(db, admin.user.id, set.id, kind))!;
+  return <SimulateStage setId={set.id} kind={kind} view={view} label={t.admin.simulate.packLabel(set.code, t.common.packKind[kind])} />;
 }

@@ -13,10 +13,11 @@ import { useReducedMotion } from "@/ui/hooks/useReducedMotion";
 import { OpenAllBurst } from "./open-all/OpenAllBurst";
 import { OpenAllFocus } from "./open-all/OpenAllFocus";
 import { OpenAllSummary } from "./open-all/OpenAllSummary";
-import type { PackArtData } from "./PackArt";
-import { PackShell } from "./PackShell";
 import { PackKindTag } from "./PackKindTag";
+import { TornPack } from "./TornPack";
 import type { PackKind } from "@/domain/catalog/default-odds";
+import type { PackViewData } from "@/domain/packs/view";
+import { PackThumb } from "@/ui/game/sobre-capas/PackThumb";
 import "./open-all.css";
 
 type Phase = "idle" | "burst" | "focus" | "summary";
@@ -25,7 +26,7 @@ type Phase = "idle" | "burst" | "focus" | "summary";
  * Spec 004, RF-18: abre todos los sobres de la colección. Spec 019: los sobres se abren en el servidor y después se
  * anima el lote: ráfaga de sobres, foco en las destacadas y resumen agrupado por rareza («Saltar» lleva al resumen).
  */
-export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { setId: string; setCode: string; setName: string; art: PackArtData; kind: PackKind; sealed: number }) {
+export function OpenAllView({ setId, setName, view, kind, sealed }: { setId: string; setName: string; view: PackViewData; kind: PackKind; sealed: number }) {
   const [cards, setCards] = useState<OpenAllCard[] | null>(null);
   const [opened, setOpened] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -55,17 +56,23 @@ export function OpenAllView({ setId, setCode, setName, art, kind, sealed }: { se
     });
   };
 
-  // Spec 023, RF-5 y RF-20: el sobre nuevo de su tipo; en la ráfaga, el rasgado arranca su tira.
-  const shell = { setId, code: setCode, name: setName, art, kind, kindLabel: t.common.packKind[kind] };
-  const pack = <PackShell {...shell} className="w-full" />;
-  const tornPack = <PackShell {...shell} state="torn" className="w-full" />;
+  // Spec 030, RF-16 y RF-25: el mismo sobre de la colección (su miniatura); en la ráfaga, su tira sale volando por la
+  // línea de rasgado, con el mismo ritmo de siempre.
+  const thumb = {
+    registro: view.registro,
+    thumb: view.thumb,
+    label: `${view.name} (${view.code}) · ${t.common.packKind[kind]}`,
+    textos: { carta: t.packs.sobre.card, cartas: t.packs.sobre.cards },
+  };
+  const pack = <PackThumb {...thumb} className="w-full" />;
+  const tornPack = <TornPack {...thumb} />;
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-10 sm:px-6" data-phase={phase}>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex items-end gap-4">
           {/* Spec 014, RF-8: el mismo sobre de la colección. */}
-          {phase === "idle" && <PackShell {...shell} className="w-[96px] sm:w-[120px]" />}
+          {phase === "idle" && <PackThumb {...thumb} className="w-[84px] sm:w-[104px]" data={{ "data-kind": kind, "data-testid": "pack-thumb" }} />}
           <div className="min-w-0">
             <Link href="/packs" className="text-sm text-ui-text-3 hover:text-ui-text">
               {t.packs.openAll.backToMine}

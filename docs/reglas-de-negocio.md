@@ -303,6 +303,20 @@ barra (RN-209 y RN-214 siguen); sustituye el nivel por carta de la economía v2.
 | RN-236 | **Polvo**: solo se gana reciclando, se ve junto a las galletas y sirve para fabricar una copia normal de una carta publicada que se pueda ver: Común 100, Rara 300, Épica 800, Legendaria 2500. No se fabrican la EX, la carta del mes, versiones holo ni cartas de colecciones sin publicar o archivadas; sin polvo suficiente, se dice el motivo. Vínculo y polvo se borran con la cuenta. | Vigente | 029 RF-17 a RF-20 |
 | RN-237 | El administrador cambia puntos, polvo, factor holo, costes de fabricar y títulos (con auditoría; cada reciclaje usa los valores del momento) y simula los días hasta el nivel 10 de un coleccionista gratuito y de un patron. | Vigente | 029 RF-22, RF-23 |
 
+## 23. Sobres por capas (spec 030)
+
+Decisiones del dueño del 6 nov 2026. Se mantiene el flujo de apertura de la spec 023; el sobre y sus animaciones son los
+del paquete de Bruno (`docs/waifu-baker/sobres/`).
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-241 | Cada colección tiene dos diseños de sobre, plata y gold, que solo editan los administradores en el panel. El nombre, el código y las cartas por sobre salen de la colección. Mientras un tipo no tenga diseño, se ve el sobre básico de Bruno con la portada (o el sobre a mano) de la colección y sellos plateados o dorados. | Vigente | 030 RF-1, RF-8, RF-13, RF-15 |
+| RN-242 | El diseño se valida en el servidor (modos de mezcla, colores en hexadecimal, rangos y solo imágenes del almacén propio de la colección); uno inválido no se guarda y se dice qué campo falla. Sus imágenes y su miniatura (500 × 875) se guardan al guardar, con auditoría, y se sirven con enlaces firmados de la misma sesión y el doble filtro 18+. | Vigente | 030 RF-10 a RF-12, RNF |
+| RN-243 | La revisión del editor avisa sin impedir guardar: imagen que no mide 1000 × 1750, fondo con transparencia, arte que cruza la línea de rasgado (y = 230), nombre de más de 17 letras y archivos que faltan. | Vigente | 030 RF-9 |
+| RN-244 | El mismo sobre se ve en «Mis sobres» (en miniatura), la apertura, «Abrir todos» y el simulador. Al guardar un diseño, los sobres ya entregados sin abrir se ven con él; los de una colección archivada se siguen abriendo con su diseño. Cerrado, no deja ver ninguna carta. | Vigente | 030 RF-14, RF-16, RF-17 |
+| RN-245 | Al abrirse (rasgar o despegar el sticker, Intro o «Abrir sin deslizar») la tira sale volando con destello, sonido y vibración corta; las cartas suben boca abajo a los 0,38 s, el sobre se va a los 1,25 s y el mazo queda listo a los 1,9 s. Las cartas salen derechas, solo se ve la de arriba y se voltean una a una; un punto por carta. La Legendaria y la EX hacen latir el mazo antes y salen con rayos dorados, estrella con su rareza y campanita, también como destacadas de «Abrir todos». | Vigente | 030 RF-18 a RF-25 |
+| RN-246 | Las fuentes del sobre (Dela Gothic One y Archivo) solo se descargan en las pantallas con sobres. Con movimiento reducido el sobre no se inclina, no lleva partículas, se abre con el botón y el efecto especial no se anima. | Vigente | 030 RNF |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -319,6 +333,7 @@ barra (RN-209 y RN-214 siguen); sustituye el nivel por carta de la economía v2.
 | JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
 | Sonidos | 9 (6 de la apertura y 3 de los premios), hasta 200 kB en total |
 | Sobre hecho a mano | se recorta a 600 × 900 (2:3) en WebP |
+| Sobre por capas (spec 030) | lienzo 1000 × 1750, línea de rasgado en y = 230; hasta 10 capas de imagen (24 en total); miniatura 500 × 875; insignia hasta 22 letras; enlaces firmados de 10 a 15 min |
 | Aperturas por minuto | 10 por usuario |
 | Caducidad de los sobres | ninguna |
 | Enlaces de imagen privados | 10 minutos |

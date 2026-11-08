@@ -6,7 +6,7 @@ import { packs, sets } from "@/db/schema";
 import { requireUser } from "@/server/auth/require-user";
 import { getDict } from "@/i18n/server";
 import { PackOpener } from "@/features/packs/PackOpener";
-import { packArtForSets } from "@/server/services/pack-art";
+import { packViewFor } from "@/server/services/pack-designs";
 import { parsePackKind } from "@/domain/catalog/default-odds";
 
 export async function generateMetadata() {
@@ -29,6 +29,7 @@ export default async function OpenPackPage({ params, searchParams }: { params: P
     .from(packs)
     .where(and(eq(packs.userId, user.id), eq(packs.setId, setId), eq(packs.kind, kind), eq(packs.status, "sealed")));
   const resume = pack && z.string().uuid().safeParse(pack).success ? pack : null;
-  const art = (await packArtForSets(db, [set.id])).get(set.id) ?? { coverVersion: null, packImage: null };
-  return <PackOpener setId={set.id} setCode={set.code} setName={set.name} art={art} kind={kind} sealed={n} resumePackId={resume} />;
+  // Spec 030, RF-14 y RF-15: el diseño de la colección para ese tipo o el sobre básico.
+  const view = (await packViewFor(db, user.id, set.id, kind))!;
+  return <PackOpener setId={set.id} setCode={set.code} setName={set.name} view={view} kind={kind} sealed={n} resumePackId={resume} />;
 }

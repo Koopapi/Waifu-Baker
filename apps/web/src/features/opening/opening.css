@@ -803,193 +803,7 @@
   }
 }
 
-/* RF-1 a RF-9: el sobre que se rasga. */
-.tear-wrap {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 22px;
-  transition: transform 0.6s, opacity 0.4s;
-  transition-timing-function: cubic-bezier(0.3, 0.7, 0.3, 1);
-}
-.tear {
-  position: relative;
-  width: min(60vw, 250px, calc((100dvh - 380px) * 0.638));
-  container-type: inline-size;
-  perspective: 900px;
-  --rx: 0deg;
-  --ry: 0deg;
-}
-.tear__tilt {
-  position: relative;
-  /* Al tirar, el sobre se inclina hacia ese lado, como sujetándolo con la otra mano (--tug: -1 a 1). */
-  transform: rotateX(var(--rx)) rotateY(var(--ry)) rotate(calc(var(--tug, 0) * 3.5deg)) translateX(calc(var(--tug, 0) * 2.4cqw));
-  transform-style: preserve-3d;
-}
-.tear .tear__shell {
-  width: 100%;
-}
-.tear__strips {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 17.6cqw;
-  transform-style: preserve-3d;
-}
-/* El blanco del papel que asoma en el corte (una tira blanca un poco más ancha, debajo de la de foil). */
-.tear__fiber {
-  background: #fffaf2 !important;
-  border-color: #fffaf2 !important;
-}
-.tear__fiber > *,
-.tear__fiber::after {
-  visibility: hidden;
-}
-.tear__fiber--rest {
-  clip-path: var(--rest-fiber, none);
-}
-.tear__rest {
-  clip-path: var(--rest-clip, none);
-}
-.tear__fly {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-/* La tira arrancada se levanta y se curva hacia quien mira; por debajo se oscurece. */
-.tear__peel {
-  position: absolute;
-  inset: 0;
-  transform-origin: var(--cut, 50%) 100%;
-  transform: translateY(calc(var(--tear, 0) * -5cqw)) rotate(calc(var(--tug, 0) * 15deg)) rotateX(calc(var(--tear, 0) * -32deg));
-  transform-style: preserve-3d;
-  filter: drop-shadow(0 calc(var(--tear, 0) * 4cqw) 3cqw rgb(0 0 0 / 0.45));
-}
-.tear__fiber--flap {
-  clip-path: var(--flap-fiber, none);
-}
-.tear__flap {
-  clip-path: var(--flap-clip, none);
-  filter: brightness(calc(1 - var(--tear, 0) * 0.28));
-}
-/* Trocitos de papel y foil que saltan en el punto de rotura y caen. */
-.tear__flake {
-  position: absolute;
-  width: var(--s);
-  height: calc(var(--s) * 0.7);
-  margin: calc(var(--s) * -0.35) 0 0 calc(var(--s) * -0.5);
-  border-radius: 1px;
-  background: #fffaf2;
-  pointer-events: none;
-  animation: tear-flake 0.75s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
-}
-.tear__flake--foil {
-  background: linear-gradient(135deg, var(--strip-a), var(--strip-c));
-}
-@keyframes tear-flake {
-  40% {
-    transform: translate(calc(var(--dx) * 0.6), var(--dy)) rotate(calc(var(--rot) * 0.4));
-    opacity: 1;
-  }
-  to {
-    transform: translate(var(--dx), calc(var(--dy) + 90px)) rotate(var(--rot));
-    opacity: 0;
-  }
-}
-/* Al abrirse: un destello sale de la boca del sobre y el sobre rebota un poco. */
-.tear__burst {
-  position: absolute;
-  left: 50%;
-  top: 17.6cqw;
-  width: 130cqw;
-  height: 70cqw;
-  margin: -35cqw 0 0 -65cqw;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(223 230 245 / 0.55) 40%, transparent 72%);
-  pointer-events: none;
-  animation: tear-burst 0.9s ease-out forwards;
-}
-.tear__burst.pack-shell--gold {
-  background: radial-gradient(closest-side, rgb(255 255 255 / 0.95), rgb(255 226 122 / 0.65) 38%, transparent 72%);
-}
-@keyframes tear-burst {
-  from {
-    opacity: 0;
-    transform: scale(0.2, 0.1);
-  }
-  25% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    transform: scale(1.25, 1);
-  }
-}
-.tear--off .tear__shell {
-  transform-origin: 50% 100%;
-  animation: tear-pop 0.5s ease-out;
-}
-@keyframes tear-pop {
-  30% {
-    transform: scale(1.03, 0.95);
-  }
-  65% {
-    transform: scale(0.99, 1.02);
-  }
-}
-/* La zona de agarre: un poco más grande que la tira, para el dedo. */
-.tear .tear__hit.pack__strip {
-  position: absolute;
-  left: -8%;
-  right: -8%;
-  top: -6cqw;
-  height: 30cqw;
-  border: 0;
-  border-radius: 12px;
-  background: none;
-  cursor: grab;
-  z-index: 3;
-}
-.tear--tearing .tear__hit.pack__strip {
-  cursor: grabbing;
-}
-.tear--off .tear__hit,
-.tear--reduced .tear__hit {
-  cursor: default;
-}
-.tear--off .tear__hit {
-  display: none;
-}
-.tear-wrap .tear__cta {
-  position: static;
-  transform: none;
-  background: rgb(255 255 255 / 0.08);
-  color: #fff;
-  border: 1.5px solid rgb(255 255 255 / 0.35);
-  font-weight: 800;
-  padding: 11px 22px;
-}
-.tear-wrap .tear__cta:disabled {
-  opacity: 0;
-  pointer-events: none;
-}
-.tear-wrap .tear__cta:focus-visible {
-  outline: 3px solid #ffe27a;
-  outline-offset: 3px;
-}
-.tear--shake {
-  animation: packShake 0.45s ease-in-out;
-}
-
-/* RF-12: con el sobre abierto, baja y las cartas salen de su boca. */
-.stage[data-phase="opening"] .tear-wrap,
-.stage[data-phase="deck"] .tear-wrap {
-  transform: translateY(calc(var(--card-h) * 0.62)) scale(0.84);
-}
-.stage[data-phase="deck"] .tear-wrap {
-  opacity: 0.9;
-}
+/* Spec 030: el sobre que se rasga es el de Bruno (sobre-stage.css). */
 
 /* RF-15: la carta presentada (referencia de Bruno). */
 .reveal-info {
@@ -1129,14 +943,6 @@
   .reveal-info__foot {
     animation: none;
   }
-  .tear-wrap {
-    transition: none;
-  }
-  .tear--off .tear__shell,
-  .tear__burst,
-  .tear__flake {
-    animation: none;
-  }
 }
 
 /* Spec 023: la indicación va arriba, lejos de la barra de abajo y del nombre de la carta presentada. */
@@ -1153,7 +959,229 @@
   flex-wrap: nowrap;
 }
 
-/* Con una carta presentada, el sobre abierto queda en segundo plano para que se lea el nombre. */
-.stage[data-shown] .tear-wrap {
-  opacity: 0.18;
+
+/* ---------- Spec 030: el sobre por capas de Bruno en la mesa ---------- */
+
+/* El sobre mide lo justo para que el mazo (84 % de su ancho) crezca un 8 % hasta el tamaño de la carta presentada. */
+.stage {
+  --pack-w: calc(var(--card-w) * 1.1);
+}
+.stage__center {
+  z-index: 2;
+}
+.stage .cards {
+  z-index: 1;
+}
+.tear-wrap {
+  position: relative;
+  width: var(--pack-w);
+}
+.tear,
+.tear__sobre {
+  position: relative;
+  width: 100%;
+}
+.tear--shake {
+  animation: packShake 0.45s ease-in-out;
+}
+/* «Abrir sin deslizar» debajo del sobre, sin moverlo del centro (el mazo sale de su boca). */
+.tear-wrap .tear__cta {
+  position: absolute;
+  top: calc(100% + 18px);
+  left: 50%;
+  bottom: auto;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  border: 1.5px solid rgb(255 255 255 / 0.35);
+  font-weight: 800;
+  padding: 11px 22px;
+  z-index: 3;
+}
+.tear-wrap .tear__cta:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+.tear-wrap .tear__cta:focus-visible {
+  outline: 3px solid #ffe27a;
+  outline-offset: 3px;
+}
+
+/* RF-19: las cartas esperan dentro del sobre (detrás de él), suben medio cuerpo y vuelven al centro un 8 % más grandes. */
+.stage .cards[data-step="inside"] {
+  transform: scale(0.925);
+}
+.stage .cards[data-step="rise"] {
+  transform: translateY(calc(var(--card-h) * -0.481)) scale(0.925);
+  transition: transform 0.75s;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.stage .cards[data-step="center"] {
+  transform: none;
+  transition: transform 0.6s;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* RF-21 y RF-22: halo que late antes de una Legendaria o EX y rayos dorados al revelarla. */
+.deck-fx {
+  grid-area: 1 / 1;
+  position: relative;
+  width: var(--card-w);
+  aspect-ratio: 700 / 991;
+  pointer-events: none;
+  z-index: 0;
+}
+.deck-fx__omen,
+.deck-fx__rays {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.deck-fx__omen {
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(247 220 138 / 0.9), rgb(255 62 165 / 0.35) 45%, transparent 70%);
+  transition: opacity 0.6s;
+}
+.stage .cards[data-omen] .deck-fx__omen {
+  opacity: 1;
+  animation: deck-omen 1.1s ease-in-out infinite;
+}
+@keyframes deck-omen {
+  50% {
+    transform: scale(1.12);
+  }
+}
+.deck-fx__rays {
+  inset: -60%;
+  background: repeating-conic-gradient(rgb(247 220 138 / 0.85) 0 5deg, transparent 5deg 14deg);
+  -webkit-mask: radial-gradient(circle, #000 15%, transparent 62%);
+  mask: radial-gradient(circle, #000 15%, transparent 62%);
+}
+.deck-fx__rays--on {
+  /* Spec 030, RF-27: capa propia en la GPU; el degradado y la máscara se pintan una vez y solo se mueven. */
+  will-change: transform, opacity;
+  animation: deck-rays 2.6s ease-out forwards;
+}
+@keyframes deck-rays {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+    transform: scale(1) rotate(40deg);
+  }
+}
+/* La estrella lima de 16 puntas con la rareza, en la esquina de arriba a la derecha de la carta. */
+.deck-fx__star {
+  grid-area: 1 / 1;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  translate: calc(var(--card-w) / 2 - 28px) calc(var(--card-h) / -2 + 24px);
+  background: #c6f432;
+  color: #17132b;
+  font-family: var(--font-dela), "Dela Gothic One", var(--ui-font-display), sans-serif;
+  font-size: 20px;
+  pointer-events: none;
+  clip-path: polygon(99% 59.9%, 68.2% 62.3%, 77.6% 91.7%, 54.2% 71.6%, 40.1% 99%, 37.7% 68.2%, 8.3% 77.6%, 28.4% 54.2%, 1% 40.1%, 31.8% 37.7%, 22.4% 8.3%, 45.8% 28.4%, 59.9% 1%, 62.3% 31.8%, 91.7% 22.4%, 71.6% 45.8%);
+  transform: rotate(-12deg);
+  animation: deck-star 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+@keyframes deck-star {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+}
+
+/* RF-23: un punto por carta: lima las vistas, rosa la de ahora. */
+.deck-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 62px);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 5;
+  pointer-events: none;
+}
+.deck-dots__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  transform: skewX(-10deg);
+}
+.deck-dots__dot--done {
+  background: #c6f432;
+  border-color: #c6f432;
+}
+.deck-dots__dot--current {
+  background: #ff3ea5;
+}
+
+/* RF-23: el resumen con el diseño de Bruno: «Tu sobre» y las cartas en rejilla, cada una con su insignia de rareza. */
+.stage .summary {
+  background: rgb(23 19 43 / 0.78);
+}
+.stage .summary__card {
+  width: min(92vw, 640px);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.stage .summary__title {
+  justify-content: center;
+  margin-bottom: 22px;
+  font-family: var(--font-dela), "Dela Gothic One", var(--ui-font-display), sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 4vw, 36px);
+  text-shadow: 3px 3px 0 #ff3ea5, 6px 6px 0 #3b2fc9;
+}
+.stage .summary__grid {
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 26px 18px;
+}
+.stage .summary__row .badge {
+  border: 2px solid #17132b;
+  border-radius: 0;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  color: #17132b;
+  transform: skewX(-10deg);
+  background: #d7d2e3;
+}
+.stage .summary__row.rarity-rare .badge {
+  background: #3fe0d0;
+}
+.stage .summary__row.rarity-epic .badge {
+  background: #8f86ff;
+}
+.stage .summary__row.rarity-legendary .badge {
+  background: #c6f432;
+  box-shadow: 3px 3px 0 #ff3ea5;
+}
+.stage .summary__row.rarity-ex .badge {
+  background: #ff3ea5;
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage .cards[data-step] {
+    transition: none;
+  }
+  .stage .cards[data-omen] .deck-fx__omen,
+  .deck-fx__star {
+    animation: none;
+  }
 }

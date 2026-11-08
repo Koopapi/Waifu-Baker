@@ -29,6 +29,8 @@ export const ROUTES = [
   "/admin/sets",
   `/admin/sets/${ID}`,
   `/admin/sets/${ID}/simulate`,
+  // Spec 030: el editor de sobres.
+  `/admin/sets/${ID}/pack/gold`,
   "/admin/characters",
   "/admin/library",
   "/admin/expeditions",
@@ -66,4 +68,8 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   // Spec 020: imagen de las zonas y su subida desde el panel.
   { method: "GET", path: `/api/zones/${ID}/img` },
   { method: "POST", path: "/api/admin/zone-image", body: "{}" },
+  // Spec 030: guardar el diseño del sobre, sus imágenes firmadas y el ejemplo FA01 del panel.
+  { method: "POST", path: "/api/admin/pack-designs", body: "{}" },
+  { method: "GET", path: `/api/sets/${ID}/pack-asset` },
+  { method: "GET", path: "/api/admin/pack-example/carta-muestra.webp" },
 ];

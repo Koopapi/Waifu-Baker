@@ -151,6 +151,8 @@ sobre sus clases `ui-*` (`ui-btn`, `ui-card`, `ui-field`…) dentro de un `@scop
 | BondBar | Barra de vínculo de un personaje: nivel, título, puntos del tramo y lo que desbloquea el siguiente (spec 029, sin maqueta por decisión del dueño; pendiente de pasar a Pencil) |
 | CardLine | Línea de personaje: sus cartas en fila con las que tiene, el hueco de las que faltan y sus acciones (spec 029; pendiente de pasar a Pencil) |
 | GainSummary | Resumen de lo que se gana o cuesta antes de confirmar (copias, puntos, polvo, nivel), dentro del diálogo de reciclar (spec 029; pendiente de pasar a Pencil) |
+| SobreCapas | Sobre por capas de Bruno (`sobre-capas.js`): plástico 3D o plano, sellos, logo, insignia y banda; rasgar o despegar (spec 030, paquete en `docs/waifu-baker/sobres/`; pendiente de pasar a Pencil) |
+| PackThumb | Miniatura del sobre cerrado (500 × 875) en las listas: la guardada del diseño o la que dibuja el navegador para el sobre básico (spec 030; pendiente de pasar a Pencil) |
 | «Abrir todos» dinámico | Ráfaga de sobres con «Saltar», foco en las destacadas con la carta viva y resumen agrupado por rareza con totales (lámina «"Abrir todos" dinámico (spec 019)») |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
