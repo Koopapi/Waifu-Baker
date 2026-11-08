@@ -79,6 +79,8 @@ export const collection: typeof en = {
     featuredSaved: "Destacadas guardadas.",
   },
   publicAlbum: {
+    // Spec 029, RF-12.
+    mastery: "Maestría",
     unavailable: "Este álbum no está disponible",
     unavailableBody: "Puede que sea privado o que su enlace haya cambiado. Pide el enlace actual a su dueño.",
     notFoundTitle: "Álbum no encontrado",

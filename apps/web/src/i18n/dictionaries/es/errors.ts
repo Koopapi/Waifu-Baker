@@ -174,4 +174,16 @@ export const errors: Record<string, Msg> = {
       .join(", ")}.`,
   card_pending_art: (p) => `Carta ${pad(p.number)}: tiene arte nuevo pendiente de revisión.`,
   card_unreviewed: (p) => `Carta ${pad(p.number)}: falta la revisión «personaje claramente adulto».`,
+  // Spec 029: reciclar y fabricar.
+  nothing_to_recycle: "No hay repetidas que reciclar: cada versión conserva una copia.",
+  no_character: "Esta carta no tiene personaje: no se puede reciclar.",
+  cannot_craft: (p) =>
+    ({
+      no_rarity: "Esta carta aún no tiene rareza.",
+      ex: "Las cartas EX no se fabrican.",
+      monthly: "La carta del mes no se fabrica.",
+      unpublished: "Solo se fabrican cartas de colecciones publicadas.",
+      adult: "Desbloquea el contenido 18+ para fabricar esta carta.",
+      dust: `No te alcanza el polvo: necesitas ${p.cost} y tienes ${p.dust}.`,
+    })[String(p.reason)] ?? "Esta carta no se puede fabricar.",
 };

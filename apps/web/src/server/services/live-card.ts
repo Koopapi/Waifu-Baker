@@ -9,6 +9,8 @@ import { verifyLayer } from "@/domain/signed-url";
 import { cardLayerUrl, imageSecret } from "@/server/cards/image-urls";
 import type { CardStore } from "@/server/ports/card-store";
 import type { DbLike } from "@/server/db-types";
+import { applyBondEffects } from "@/domain/bonds/effects";
+import { bondLevelsOf } from "./bonds";
 
 
 /** La carta, si el usuario la tiene y puede verla (18+: declaración y tier adulto verificados). */
@@ -44,7 +46,10 @@ export async function liveCardConfig(db: DbLike, userId: string, cardId: string,
     const { key, ...rest } = card.layers.sello;
     sello = { ...rest, src: url(key) };
   }
-  return { tier: rarityTier(card.rarity), config: { ...card.layers, capas, sello } };
+  const config = { ...card.layers, capas, sello };
+  // Spec 029, RF-9 a RF-11 y RF-13: los efectos del vínculo del dueño con el personaje de la carta (solo los ve él).
+  const level = card.characterId ? ((await bondLevelsOf(db, userId, [card.characterId])).get(card.characterId) ?? 1) : 1;
+  return { tier: rarityTier(card.rarity), config: applyBondEffects(config, level) };
 }
 
 /** RF-16: la imagen de una capa con su enlace firmado; `null` si el enlace no vale o la capa no es de la carta. */

@@ -73,10 +73,17 @@ relojes para expediciones. Los cosméticos solo cambian el aspecto.
 
 ## Cartas repetidas
 
-- **Subir de nivel:** cada copia repetida de la misma carta sube su nivel; cada nivel da +5 % de poder en
-  expediciones, hasta nivel 5. La holo lleva su propio nivel.
-- **Convertir en polvo:** las repetidas se convierten en polvo según su rareza; con polvo se fabrica una carta concreta
-  que falte (más cara cuanto más rara). No se fabrican cartas EX ni la carta del mes.
+Cambiado por la spec 029 (5 nov 2026, `docs/vinculo-y-reciclaje.md`): el nivel ya no es de la carta sino del
+**personaje** (el vínculo de la spec 020, niveles 1 a 10, +2 % de poder por nivel).
+
+- **Reciclar:** cada repetida (todas menos una copia por versión, normal y holo) da puntos de vínculo a su personaje
+  (Común 10, Rara 25, Épica 60, Legendaria 150, EX 400; holo × 1,5) y la mitad de su polvo (5, 15, 40, 120, 300; holo
+  × 1,5). Con el vínculo al nivel 10, el polvo completo y ningún punto.
+- **Lo que da el vínculo:** nivel 3, destello sobre la chica en todas sus cartas; 5, holo visual (sin el poder de la
+  holo); 7, marco de vínculo y partículas; 10, insignia de maestría. Títulos Conocida, Amiga, Cómplice, Inseparable y
+  Alma gemela.
+- **Fabricar:** con polvo, una copia normal de cualquier carta publicada que se pueda ver (Común 100, Rara 300, Épica
+  800, Legendaria 2500). No se fabrican la EX, la carta del mes ni versiones holo.
 
 ## Tiers de Patreon
 

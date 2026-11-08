@@ -63,6 +63,8 @@ export async function shellSummary(db: DbLike, userId: string, opts: { now: Date
     collections,
     sealed: sealedRows.reduce((a, r) => a + r.n, 0),
     cookies: rw?.cookies ?? 0,
+    // Spec 029, RF-17: el polvo, junto a las galletas.
+    dust: rw?.dust ?? 0,
     rewardsReady: (free > 0 ? 1 : 0) + (daily.claimedToday ? 0 : 1),
   };
 }

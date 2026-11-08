@@ -5,7 +5,10 @@ import type { LiveCard } from "@/domain/cards/live";
 import { useLocale, useT } from "@/i18n/client";
 import { formatDate } from "@/i18n/format";
 import { useGamesT } from "@/i18n/games";
+import Link from "next/link";
+import { bondEffects } from "@/domain/bonds/effects";
 import { Button } from "@/ui/action/Button";
+import { Badge } from "@/ui/content/Badge";
 import { Switch } from "@/ui/form/Choice";
 import { CartaCapas, type CartaCapasHandle } from "@/ui/game/CartaCapas";
 import { useReducedMotion } from "@/ui/hooks/useReducedMotion";
@@ -31,6 +34,8 @@ export function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { 
   const locale = useLocale();
   const o = slot.owned;
   const [holo, setHolo] = useState(o.qty === 0 && o.holoQty > 0);
+  // Spec 029, RF-10: desde el nivel 5 de vínculo, la carta se ve holo (solo visual; también la común plana).
+  const bondHolo = bondEffects(o.bondLevel).holo;
   const reduced = useReducedMotion();
   const gyroAvailable = useGyroAvailable();
   const art = useRef<HTMLDivElement>(null);
@@ -83,7 +88,7 @@ export function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { 
             {showLive && live ? (
               <CartaCapas ref={card} tier={live.tier} image="" config={live.config} holo={holo} label={name} zone={art} className="w-full max-w-[280px]" />
             ) : (
-              <span className={`block w-full max-w-[280px] overflow-hidden rounded-l ${holo ? "holo-finish" : ""}`} data-testid="card-sheet-flat">
+              <span className={`block w-full max-w-[280px] overflow-hidden rounded-l ${holo || bondHolo ? "holo-finish" : ""}`} data-testid="card-sheet-flat">
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
                 <img src={o.mid} alt="" className="block aspect-[700/991] w-full object-cover" draggable={false} />
               </span>
@@ -115,8 +120,21 @@ export function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { 
           <p className="text-sm text-ui-text-3">{t.collection.binder.firstObtained(formatDate(locale, o.firstObtainedAt, "long"))}</p>
           {/* Spec 020, RF-25: vínculo de la personaje y, si está de expedición, cuándo vuelve. */}
           <div className="space-y-1 rounded-m border border-ui-line p-3" data-testid="card-bond">
-            <p className="text-sm font-semibold">{tg.sheet.bond(o.bondLevel)}</p>
+            <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
+              {tg.sheet.bond(o.bondLevel)}
+              {/* Spec 029, RF-12: insignia de maestría en el nivel 10. */}
+              {bondEffects(o.bondLevel).mastery && (
+                <span data-testid="bond-mastery" title={tg.bond.masteryHint(name)}>
+                  <Badge tone="accent">{tg.bond.mastery}</Badge>
+                </span>
+              )}
+            </p>
             <p className="text-xs text-ui-text-3">{tg.sheet.bondHint}</p>
+            {o.characterId && (
+              <Link href={`/collection/character/${o.characterId}`} className="inline-block text-sm font-semibold text-ui-accent-text underline underline-offset-4" data-testid="card-character-link">
+                {tg.bond.seeLine}
+              </Link>
+            )}
           </div>
           {(holo ? o.away.holo : o.away.normal) && (
             <p className="text-sm font-semibold text-k-limon" data-testid="card-away">

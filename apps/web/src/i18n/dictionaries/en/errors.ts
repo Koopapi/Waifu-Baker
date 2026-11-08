@@ -174,4 +174,16 @@ export const errors: Record<string, Msg> = {
       .join(", ")}.`,
   card_pending_art: (p) => `Card ${pad(p.number)}: has new art pending review.`,
   card_unreviewed: (p) => `Card ${pad(p.number)}: missing the "clearly adult character" review.`,
+  // Spec 029: recycling and crafting.
+  nothing_to_recycle: "There are no duplicates to recycle: each version keeps one copy.",
+  no_character: "This card has no character, so it can't be recycled.",
+  cannot_craft: (p) =>
+    ({
+      no_rarity: "This card has no rarity yet.",
+      ex: "EX cards can't be crafted.",
+      monthly: "The card of the month can't be crafted.",
+      unpublished: "Only cards from published sets can be crafted.",
+      adult: "Unlock 18+ content to craft this card.",
+      dust: `Not enough dust: you need ${p.cost} and you have ${p.dust}.`,
+    })[String(p.reason)] ?? "This card can't be crafted.",
 };

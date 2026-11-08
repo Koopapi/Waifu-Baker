@@ -1,0 +1,2 @@
+ALTER TABLE "user_rewards" ADD COLUMN "dust" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
+ALTER TABLE "user_rewards" ADD CONSTRAINT "user_rewards_dust_non_negative" CHECK ("user_rewards"."dust" >= 0);

@@ -413,9 +413,11 @@ export const userRewards = pgTable(
     lastDailyAt: timestamp("last_daily_at", { withTimezone: true }),
     lastTimeZone: text("last_time_zone"),
     cookies: integer("cookies").notNull().default(0),
+    /** Spec 029, RF-17: polvo, que solo se gana reciclando repetidas y sirve para fabricar. */
+    dust: integer("dust").notNull().default(0),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [check("user_rewards_cookies_non_negative", sql`${t.cookies} >= 0`)],
+  (t) => [check("user_rewards_cookies_non_negative", sql`${t.cookies} >= 0`), check("user_rewards_dust_non_negative", sql`${t.dust} >= 0`)],
 );
 
 /** Spec 009, RF-18: cada movimiento de galletas; solo se insertan filas. */

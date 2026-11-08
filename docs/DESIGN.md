@@ -148,6 +148,9 @@ sobre sus clases `ui-*` (`ui-btn`, `ui-card`, `ui-field`…) dentro de un `@scop
 | PreviewStage | Escena oscura de la vista previa (maqueta HTML de la spec 025; pendiente de pasar a Pencil) |
 | SaveStatus | Estado de guardado de la ventana de la carta: sin cambios, cambios sin guardar, guardando, guardado a las HH:MM, sin borrador (spec 027, sin maqueta por decisión del dueño; pendiente de pasar a Pencil). La pregunta al cerrar con tres opciones y la ventana que no se cierra con clic fuera son variantes de ConfirmDialogView y Modal |
 | CardFan | Abanico de 1 a 5 cartas con la del centro delante: portada pública con las cartas de portada y portada de la demo (spec 028, sale del abanico de la demo de la spec 010; sin maqueta por decisión del dueño; pendiente de pasar a Pencil) |
+| BondBar | Barra de vínculo de un personaje: nivel, título, puntos del tramo y lo que desbloquea el siguiente (spec 029, sin maqueta por decisión del dueño; pendiente de pasar a Pencil) |
+| CardLine | Línea de personaje: sus cartas en fila con las que tiene, el hueco de las que faltan y sus acciones (spec 029; pendiente de pasar a Pencil) |
+| GainSummary | Resumen de lo que se gana o cuesta antes de confirmar (copias, puntos, polvo, nivel), dentro del diálogo de reciclar (spec 029; pendiente de pasar a Pencil) |
 | «Abrir todos» dinámico | Ráfaga de sobres con «Saltar», foco en las destacadas con la carta viva y resumen agrupado por rareza con totales (lámina «"Abrir todos" dinámico (spec 019)») |
 
 Pantallas: tableros «Pantallas · Escritorio» y «Pantallas · Móvil» del mismo archivo, con las capturas reales
