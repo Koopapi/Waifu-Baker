@@ -31,8 +31,9 @@ export interface CardDTO {
  * Spec 031, RF-2: lo que la cuadrícula de la colección necesita de cada carta. Sin las capas ni las imágenes grandes:
  * eso lo pide la ventana de edición al abrir la carta (`GET /api/admin/cards/[id]`).
  */
-export const TILE_FIELDS = ["id", "number", "name", "rarity", "characterName", "status", "version", "thumbUrl", "chance", "adultReviewedAt", "pendingArtUrl", "pendingLayersUrl"] as const;
-export type CardTileDTO = Pick<CardDTO, (typeof TILE_FIELDS)[number]>;
+export const TILE_FIELDS = ["id", "number", "name", "rarity", "characterId", "characterName", "status", "version", "thumbUrl", "chance", "adultReviewedAt", "pendingArtUrl", "pendingLayersUrl"] as const;
+/** Spec 033, RF-3: `assembled` se calcula en el servidor, para filtrar «sin armar» sin mandar las capas. */
+export type CardTileDTO = Pick<CardDTO, (typeof TILE_FIELDS)[number]> & { assembled: boolean };
 
 export interface CharacterOption {
   id: string;

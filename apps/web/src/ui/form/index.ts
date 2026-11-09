@@ -4,6 +4,7 @@ export { Checkbox, RadioGroup, Switch } from "./Choice";
 export { Select, type SelectOption } from "./Select";
 export { Slider, type SliderProps } from "./Slider";
 export { ChipGroup, type ChipOption } from "./ChipGroup";
+export { ToggleChips, type ToggleChipOption } from "./ToggleChips";
 export { Segmented } from "./Segmented";
 export { ColorField } from "./ColorField";
 export { OptionCards, type OptionCard } from "./OptionCards";

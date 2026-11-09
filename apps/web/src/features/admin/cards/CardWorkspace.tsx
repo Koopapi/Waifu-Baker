@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, rectSortingStrategy, sortableKeyboardCoordinates, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -18,6 +18,8 @@ import { FACTORY_CARD_DEFAULTS, type CardDefaults } from "@/domain/cards/card-de
 import { CardEditorLoader } from "./CardEditorLoader";
 import { Notice, pad, pct, RARITY_DOT, ReviewBadge } from "./card-bits";
 import type { CardTileDTO, CharacterOption, Permissions } from "./types";
+import { NO_FILTERS, filtersToParams, isFiltered, optionCounts, parseFilters, visibleCards, type CardFilters as Filters } from "@/domain/cards/card-filters";
+import { CardFilters } from "./CardFilters";
 import { useLocale, useT } from "@/i18n/client";
 
 function Tile({
@@ -121,21 +123,45 @@ export function CardWorkspace({
   const router = useRouter();
   const tt = useT();
   const t = tt.admin.cards;
+  const isAdultSet = perms.isAdultSet;
+  // Spec 033: los personajes de la colección (no todos los del panel), para el filtro.
+  const setCharacters = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of cards) if (c.characterId) m.set(c.characterId, c.characterName ?? "");
+    return [...m].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
+  }, [cards]);
+  // RF-17 y RF-18: los filtros iniciales salen de la dirección; lo que no existe se ignora.
+  const params = useSearchParams();
+  const pathname = usePathname();
+  const [filters, setFiltersState] = useState<Filters>(() => parseFilters(params, { characterIds: setCharacters.map((c) => c.id), isAdultSet }));
+  const setFilters = (f: Filters) => {
+    setFiltersState(f);
+    // RF-16: la dirección se reescribe sin añadir una entrada al historial ni volver a pedir la página.
+    const q = filtersToParams(f).toString();
+    window.history.replaceState(window.history.state, "", `${pathname}${q ? `?${q}` : ""}`);
+  };
+  const filtered = isFiltered(filters);
+  const visible = useMemo(() => visibleCards(cards, filters, isAdultSet), [cards, filters, isAdultSet]);
+  const counts = useMemo(() => optionCounts(cards, isAdultSet), [cards, isAdultSet]);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }));
 
   const byId = useMemo(() => new Map(cards.map((c) => [c.id, c])), [cards]);
   useEffect(() => {
     setOrder(cards.map((c) => c.id));
-    setSelected((s) => new Set([...s].filter((id) => cards.some((c) => c.id === id))));
   }, [cards]);
+  // RF-13: lo que deja de verse (o de existir) sale de la selección.
+  useEffect(() => {
+    const ids = new Set(visible.map((c) => c.id));
+    setSelected((s) => ([...s].every((id) => ids.has(id)) ? s : new Set([...s].filter((id) => ids.has(id)))));
+  }, [visible]);
 
   const toggle = (index: number) => (e: React.MouseEvent) => {
-    const id = cards[index].id;
+    const id = shown[index].id;
     setSelected((prev) => {
       const next = new Set(prev);
       if (e.shiftKey && anchor !== null) {
         const [a, b] = [Math.min(anchor, index), Math.max(anchor, index)];
-        for (let i = a; i <= b; i++) next.add(cards[i].id);
+        for (let i = a; i <= b; i++) next.add(shown[i].id);
       } else if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
@@ -175,11 +201,16 @@ export function CardWorkspace({
 
   if (cards.length === 0) return <EmptyState title={t.empty} />;
 
-  const shown = sorting ? order.map((id) => byId.get(id)!).filter(Boolean) : cards;
+  const shown = sorting ? order.map((id) => byId.get(id)!).filter(Boolean) : visible;
+  // RF-12: con filtros, «Seleccionar todas» selecciona las que se ven.
+  const allShownSelected = visible.length > 0 && visible.every((c) => selected.has(c.id));
 
   return (
     <CardDefaultsContext.Provider value={cardDefaults}>
     <div className="space-y-4">
+      {!sorting && (
+        <CardFilters filters={filters} onChange={setFilters} characters={setCharacters} counts={counts} isAdultSet={isAdultSet} shown={visible.length} total={cards.length} />
+      )}
       <div className="sticky top-[calc(var(--banner-h,0px)+52px)] z-10 -mx-2 flex flex-wrap items-end gap-3 rounded-l border border-ui-line bg-ui-bg/95 px-4 py-3 backdrop-blur">
         {sorting ? (
           <>
@@ -193,8 +224,8 @@ export function CardWorkspace({
             <span className="text-sm tabular-nums">
               {t.selectedCount(selected.size, cards.length)}
             </span>
-            <Button size="sm" variant="ghost" onClick={() => setSelected(selected.size === cards.length ? new Set() : new Set(cards.map((c) => c.id)))}>
-              {selected.size === cards.length ? t.clearSelection : t.selectAll}
+            <Button size="sm" variant="ghost" disabled={visible.length === 0} onClick={() => setSelected(allShownSelected ? new Set() : new Set(visible.map((c) => c.id)))}>
+              {allShownSelected ? t.clearSelection : filtered ? t.filters.selectVisible(visible.length) : t.selectAll}
             </Button>
             {selected.size > 0 && (
               <>
@@ -238,7 +269,16 @@ export function CardWorkspace({
               </>
             )}
             {perms.canReorder && selected.size === 0 && (
-              <Button size="sm" variant="secondary" onClick={() => setSorting(true)} className="ml-auto">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  // RF-14: se reordena la colección entera, por número.
+                  setFilters(NO_FILTERS);
+                  setSorting(true);
+                }}
+                className="ml-auto"
+              >
                 {t.reorder}
               </Button>
             )}
@@ -252,20 +292,31 @@ export function CardWorkspace({
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
         <SortableContext items={order} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6" data-testid="card-grid">
-            {shown.map((c) => (
+            {shown.map((c, i) => (
               <Tile
                 key={c.id}
                 card={c}
                 sortable={sorting}
                 isAdult={perms.isAdultSet}
                 selected={selected.has(c.id)}
-                onToggle={toggle(cards.indexOf(c))}
+                onToggle={toggle(i)}
                 onOpen={() => setEditing(latest(c))}
               />
             ))}
           </div>
         </SortableContext>
       </DndContext>
+      {/* RF-9: ninguna carta cumple los filtros. */}
+      {!sorting && visible.length === 0 && (
+        <EmptyState
+          title={t.filters.none}
+          action={
+            <Button size="sm" variant="secondary" onClick={() => setFilters({ ...NO_FILTERS, sort: filters.sort })} data-testid="filters-empty-clear">
+              {t.filters.clear}
+            </Button>
+          }
+        />
+      )}
 
       {editing && (
         // Spec 031, RF-8 a RF-12: la ventana abre al instante y el editor llega después.
