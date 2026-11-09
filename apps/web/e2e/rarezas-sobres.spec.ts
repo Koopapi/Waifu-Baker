@@ -88,14 +88,15 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
     await expect(fan.locator(`[data-testid="published-${code}-silver"]`)).toContainText(es.site.dropRates.guarantee.silver);
   });
 
-  await test.step("RF-4 a RF-9: la común se ve plana y la legendaria viva con su sello", async () => {
+  // Spec 034, RF-9: la común ya no se ve plana (sustituye a la spec 022, RF-4); con movimiento reducido, la imagen fija.
+  await test.step("RF-5 a RF-9: la común y la legendaria se ven vivas, la legendaria con su sello", async () => {
     await fan.goto(`/collection/${setId}`);
     const art = fan.locator('[data-testid="card-sheet-art"]');
     // La común que haya salido (la 001 o la 002).
     const common = fan.locator('[aria-label="Ver carta 001"], [aria-label="Ver carta 002"]').first();
     await common.click();
-    await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
-    await expect(art.locator(".cc-card")).toHaveCount(0);
+    if (reduced) await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
+    else await expect(art.locator(".cc-card")).toBeVisible();
     await fan.keyboard.press("Escape");
     await fan.click('[aria-label="Ver carta 004"]');
     if (reduced) {

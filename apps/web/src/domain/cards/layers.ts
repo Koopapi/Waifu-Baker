@@ -112,6 +112,10 @@ export const layersConfigSchema = z.object({
   holoIntensidad: num(0, 1).optional(),
   /** Spec 017, RF-13: el sistema pone marco, partículas y sello del escalón mientras nadie los toque. */
   estiloAuto: z.boolean().optional(),
+  /** Spec 034, RF-12: el movimiento de la carta guardado desde el armador (px de parallax, grados, movimiento solo). */
+  profundidad: num(0, 30).optional(),
+  inclinacion: num(0, 26).optional(),
+  reposo: z.boolean().optional(),
 });
 
 export type ImageLayer = z.infer<typeof imageLayerSchema>;

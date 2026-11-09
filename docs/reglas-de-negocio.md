@@ -347,6 +347,22 @@ Decisiones del dueño del 9 nov 2026.
 | RN-253 | La cuadrícula de cartas de una colección del panel se filtra por personaje (con «Sin personaje»), rareza y pendientes (sin armar, procesando, capas por revisar y, en 18+, sin revisar), se busca por nombre o número y se ordena por número, rareza o nombre sin cambiar el número de las cartas. Cada opción dice cuántas cartas tiene; varias opciones de un filtro suman y filtros distintos se combinan. | Vigente | 033 RF-1 a RF-11 |
 | RN-254 | Con filtros, «Seleccionar todas» selecciona solo las que se ven y lo que deja de verse sale de la selección. «Reordenar» quita los filtros. Los filtros van en la dirección de la página (se mantienen al recargar y se pueden compartir); al entrar desde «Sets» no hay filtros. | Vigente | 033 RF-12 a RF-19 |
 
+## 27. La carta final es la del armador (spec 034)
+
+Decisiones del dueño del 9 nov 2026.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-255 | Lo que se ve en el armador al guardar una carta es la carta final: capas con su encuadre, marco, sello, partículas, brillo, holo y su intensidad, profundidad del parallax, inclinación y movimiento solo. La apertura de un sobre, «Abrir todos», la ficha de «Mi colección» y la imagen fija la preparan igual, sin brillos, inclinaciones ni marcos extra; la apertura conserva el volteo y la entrada. | Vigente | 034 RF-1 a RF-6, RF-10 |
+| RN-256 | Todas las rarezas se ven vivas, también la Común (deja la decisión de la spec 022, RF-4, de mostrarla plana); quien arma la carta decide cuánto se mueve. Con movimiento reducido se ve la imagen fija, como siempre. | Vigente | 034 RF-9 |
+| RN-257 | La profundidad, la inclinación, el movimiento solo y el holo se guardan con la carta y en su historial de versiones; las cartas guardadas antes se ven con 14, 14, movimiento solo y sin holo. Guardada con holo, todas sus copias se ven holo; una copia holo de un sobre se ve siempre holo. Los efectos del vínculo se suman encima. | Vigente | 034 RF-7, RF-8, RF-12 a RF-16 |
+
+## 28. Aviso de despliegue (spec 035)
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-258 | Cuando una versión nueva de pruebas o de producción responde bien en su comprobación de salud, el grupo de Telegram del equipo recibe un mensaje: entorno con fecha y hora de Ciudad de México, un renglón por PR entrado desde el aviso anterior (hasta 15, títulos de menos de 90 caracteres) y la dirección. Uno solo por versión; sin cambios, ninguno. Si un despliegue falla, avisa Coolify. Un fallo de Telegram o de GitHub nunca impide que la web arranque. | Vigente | 035 RF-1 a RF-11 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |

@@ -8,7 +8,8 @@ export type LiveSeal = (Omit<ImageSeal, "key"> & { src: string }) | TextSeal;
 
 export interface LiveCard {
   tier: RarityTier;
-  config: Omit<LayersConfig, "capas" | "sello"> & { capas: (LiveImageLayer | ParticleLayer)[]; sello: LiveSeal | null };
+  /** Spec 034: la carta final (`finalCardConfig`), con enlaces firmados. */
+  config: Omit<LayersConfig, "capas" | "sello"> & { capas: (LiveImageLayer | ParticleLayer)[]; sello: LiveSeal | null; holo: boolean; holoIntensidad: number; profundidad: number; inclinacion: number; reposo: boolean };
 }
 
 /** Los enlaces de imagen de una carta viva (para descargarlos antes de mostrarla). */

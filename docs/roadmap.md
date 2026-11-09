@@ -187,3 +187,11 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   rareza, pendientes, búsqueda y orden, en la dirección de la página. Para quedar en el presupuesto, reordenar
   (`@dnd-kit`) y el aviso de eliminar se descargan al usarlos: la colección pesa 247,9 kB de 260. Rama
   `spec/033-filtros-de-cartas`, sobre la 032.
+- 9 nov 2026: **spec 034 «la carta se ve igual que en el armador»**, pedida por el dueño y el colaborador de diseño:
+  lo que se ve en el armador al guardar es la carta final. Una sola preparación de la carta (`finalCardConfig`) para el
+  armador, la apertura, «Abrir todos», la ficha y la imagen fija (antes el encuadre por defecto solo lo calculaba el
+  armador); el movimiento y el holo se guardan con la carta; las comunes se ven vivas. Rama
+  `spec/034-carta-igual-al-armador`, sobre la 033.
+- 9 nov 2026: **spec 035 «aviso en Telegram al terminar un despliegue»**, pedida por el dueño. La web avisa al grupo del
+  equipo al arrancar una versión nueva (pruebas o producción) con la lista de PR; los fallos los avisa Coolify. Hace
+  falta activarlo en Coolify (ver `docs/despliegue.md`). Rama `spec/035-aviso-de-despliegue`, sobre la 034.

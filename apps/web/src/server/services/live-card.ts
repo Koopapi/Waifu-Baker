@@ -2,9 +2,10 @@
 // enlaces firmados que caducan y, en las colecciones 18+, con el doble control de edad. Nunca lo pendiente de revisión.
 import { and, eq } from "drizzle-orm";
 import { cards, sets, userCards, users } from "@/db/schema";
-import { imageKeys, isImageLayer, isImageSeal, type LayersConfig, type ParticleLayer } from "@/domain/cards/layers";
-import { isFlat, rarityTier } from "@/domain/catalog/rarity-tier";
-import type { LiveCard, LiveImageLayer, LiveSeal } from "@/domain/cards/live";
+import { imageKeys, type LayersConfig } from "@/domain/cards/layers";
+import { finalCardConfig } from "@/domain/cards/final-card";
+import { rarityTier } from "@/domain/catalog/rarity-tier";
+import type { LiveCard } from "@/domain/cards/live";
 import { verifyLayer } from "@/domain/signed-url";
 import { cardLayerUrl, imageSecret } from "@/server/cards/image-urls";
 import type { CardStore } from "@/server/ports/card-store";
@@ -33,20 +34,10 @@ async function visibleCard(db: DbLike, userId: string, cardId: string) {
 /** RF-16 y RF-17: la configuración vigente de la carta con enlaces firmados; `null` si no la tiene o no puede verla. */
 export async function liveCardConfig(db: DbLike, userId: string, cardId: string, now = Date.now()): Promise<LiveCard | null> {
   const card = await visibleCard(db, userId, cardId);
-  // Spec 022, RF-4: la común se ve plana (su imagen fija, con el brillo holo si toca), también al revelarla y en su ficha.
-  if (!card?.layers || isFlat(card.rarity)) return null;
-  const url = (key: string) => cardLayerUrl(cardId, key, userId, now);
-  const capas = card.layers.capas.map((l): LiveImageLayer | ParticleLayer => {
-    if (!isImageLayer(l)) return { ...l };
-    const { key, ...rest } = l;
-    return { ...rest, src: url(key) };
-  });
-  let sello: LiveSeal | null = card.layers.sello && !isImageSeal(card.layers.sello) ? { ...card.layers.sello } : null;
-  if (isImageSeal(card.layers.sello)) {
-    const { key, ...rest } = card.layers.sello;
-    sello = { ...rest, src: url(key) };
-  }
-  const config = { ...card.layers, capas, sello };
+  // Spec 034, RF-9: también las comunes se ven vivas (antes, spec 022, RF-4, planas); quien las arma decide cuánto se
+  // mueven. RF-1 a RF-5: la misma preparación que la vista previa del armador.
+  if (!card?.layers) return null;
+  const config = finalCardConfig(card.layers, (key) => cardLayerUrl(cardId, key, userId, now));
   // Spec 029, RF-9 a RF-11 y RF-13: los efectos del vínculo del dueño con el personaje de la carta (solo los ve él).
   const level = card.characterId ? ((await bondLevelsOf(db, userId, [card.characterId])).get(card.characterId) ?? 1) : 1;
   return { tier: rarityTier(card.rarity), config: applyBondEffects(config, level) };

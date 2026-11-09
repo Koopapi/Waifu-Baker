@@ -138,4 +138,15 @@ describe("spec 018 — imagen fija", () => {
     const [r2, g2] = await pixel(bare, 40, 991);
     expect(r2).toBeGreaterThan(g2);
   }, SLOW);
+
+  // Spec 034, RF-10: la imagen fija usa el encuadre del armador. Una chica sin encuadre guardado sale igual que con el
+  // que le calcula el armador («contener»), y distinta de otro encuadre.
+  it("test_s034_rf10_la_imagen_fija_usa_el_encuadre_del_armador", async () => {
+    const imgs = await images();
+    const sinEncuadre: LayersConfig = { ...config, capas: config.capas.map((l) => ("key" in l && l.rol === "personaje" ? { key: l.key, rol: l.rol } : l)) };
+    const cubrir: LayersConfig = { ...config, capas: config.capas.map((l) => ("key" in l && l.rol === "personaje" ? { ...l, encuadre: { x: 0, y: 0, escala: 1.5, giro: 0, ajuste: "cubrir" as const } } : l)) };
+    const [a, b, c] = [await flattenCard(sinEncuadre, imgs), await flattenCard(config, imgs), await flattenCard(cubrir, imgs)];
+    expect(await meanDiff(a, b)).toBeLessThan(1);
+    expect(await meanDiff(a, c)).toBeGreaterThan(2);
+  });
 });
