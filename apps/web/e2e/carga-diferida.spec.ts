@@ -4,34 +4,37 @@
 // miniatura nueva. El administrador entra siempre en escritorio (helpers `login`).
 import path from "node:path";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, login } from "./helpers";
+import { LAB, createPublishedSet, login, setSlider } from "./helpers";
 
 test("carga diferida en la página de una colección", async ({ browser }) => {
   test.setTimeout(240_000);
   const tag = test.info().project.name.replace(/[^a-z0-9]/g, "");
-  const code = `CD${tag.slice(0, 4).toUpperCase()}`;
+  // Código único por corrida (la base de E2E guarda las colecciones de corridas anteriores).
+  const code = `CD${tag.slice(0, 2).toUpperCase()}${Date.now().toString(36).slice(-4).toUpperCase()}`;
   const admin = await login(browser, `admin-cd-${tag}`, true);
   const setId = await createPublishedSet(admin, code, ["01.webp", "02.webp", "03.webp"].map((f) => path.join(LAB, f)), 3);
-  const layerKeys = new RegExp(`sets/${setId}/layers/[0-9a-f]{64}`);
-  const libraryKeys = /library\/[0-9a-f]{64}\.webp/;
+  // Peticiones de la ventana de una carta (la carta completa y la biblioteca).
+  const lazy: string[] = [];
+  admin.on("request", (r) => {
+    const u = new URL(r.url());
+    if (r.method() === "GET" && (u.pathname === "/api/admin/library" || /^\/api\/admin\/cards\/[0-9a-f-]{36}$/.test(u.pathname))) lazy.push(u.pathname);
+  });
 
   await test.step("RF-1, RF-2 y RF-3: la colección llega sin el editor, sin las capas y sin la biblioteca", async () => {
-    // La página completa (HTML con los datos del router) y la respuesta de navegación (RSC).
-    const html = await (await admin.request.get(`/admin/sets/${setId}`)).text();
-    const rsc = await (await admin.request.get(`/admin/sets/${setId}?_rsc=cd`, { headers: { RSC: "1" } })).text();
-    for (const body of [html, rsc]) {
-      expect(body).not.toMatch(layerKeys);
-      expect(body).not.toMatch(libraryKeys);
-    }
     await admin.goto(`/admin/sets/${setId}`);
-    await expect(admin.locator("[data-card-tile]")).toHaveCount(3);
-    // Sin abrir ninguna carta, la ventana del editor no existe.
+    // 3 cartas de las imágenes y la legendaria del sobre gold (helpers `createPublishedSet`).
+    await expect(admin.locator("[data-card-tile]")).toHaveCount(4);
+    await admin.waitForLoadState("networkidle");
+    // Sin abrir ninguna carta, ni el editor ni sus datos: la página no pidió la carta completa ni la biblioteca (en el
+    // servidor de E2E, en modo desarrollo, React añade a la respuesta los datos de depuración de las consultas, así que
+    // la ausencia de las claves en la respuesta se comprueba con el build de producción; ver validation.md).
     await expect(admin.locator('[data-testid="layers-editor"]')).toHaveCount(0);
+    expect(lazy).toEqual([]);
   });
 
   await test.step("RF-6 y RF-7: todas las cartas en la cuadrícula, con las miniaturas diferidas", async () => {
     const imgs = admin.locator('[data-testid="card-grid"] [data-card-tile] img');
-    await expect(imgs).toHaveCount(3);
+    await expect(imgs).toHaveCount(4);
     for (const img of await imgs.all()) await expect(img).toHaveAttribute("loading", "lazy");
   });
 
@@ -58,6 +61,9 @@ test("carga diferida en la página de una colección", async ({ browser }) => {
     await expect(editor.locator('[data-testid="layers-preview"] .cc-card')).toBeVisible();
     // La biblioteca llegó: el fondo de las colecciones de prueba se puede elegir.
     await expect(editor.getByRole("button", { name: "Usar el fondo Fondo de prueba" })).toBeVisible();
+    expect(lazy.filter((p) => p === "/api/admin/library")).toHaveLength(1);
+    // Solo la carta abierta (en desarrollo, el modo estricto de React monta dos veces y cancela la primera petición).
+    expect(new Set(lazy.filter((p) => p.startsWith("/api/admin/cards/"))).size).toBe(1);
     await admin.unroute(`**/api/admin/cards/*`);
     await admin.click('[data-testid="card-cancel"]');
     await expect(editor).toHaveCount(0);
@@ -79,15 +85,14 @@ test("carga diferida en la página de una colección", async ({ browser }) => {
   await test.step("RF-11: si la carta no carga, avisa y «Reintentar» la vuelve a pedir", async () => {
     let fail = true;
     await admin.route(`**/api/admin/cards/*`, async (route) => {
-      if (route.request().method() === "GET" && fail) {
-        fail = false;
-        return route.fulfill({ status: 500, body: "error" });
-      }
+      // Falla hasta pulsar «Reintentar» (en desarrollo React monta dos veces y la primera petición se cancela).
+      if (route.request().method() === "GET" && fail) return route.fulfill({ status: 500, body: "error" });
       await route.fallback();
     });
     await admin.click('[aria-label="Editar carta 003"]');
     const error = admin.locator('[data-testid="card-editor-error"]');
     await expect(error).toContainText("No se pudo cargar la carta");
+    fail = false;
     await error.locator('[data-testid="card-editor-retry"]').click();
     await expect(admin.locator('[data-testid="layers-editor"]')).toBeVisible();
     await admin.unroute(`**/api/admin/cards/*`);
@@ -119,7 +124,9 @@ test("carga diferida en la página de una colección", async ({ browser }) => {
     await admin.click('[aria-label="Editar carta 001"]');
     const editor = admin.locator('[data-testid="layers-editor"]');
     await expect(editor).toBeVisible();
-    await admin.fill('input[name="name"]', "Carta diferida");
+    await admin.locator('[data-testid="card-editor"] input[name="name"]').fill("Carta diferida");
+    // Un cambio que se ve en la imagen (el grosor del borde), para que la miniatura cambie.
+    await setSlider(editor.locator('input[data-testid="layers-border"]'), 5.5);
     await admin.click('[data-testid="layers-save"]');
     await expect(admin.locator('[data-testid="card-save-bar"]')).toContainText(/Guardado a las/);
     await admin.click('[data-testid="card-cancel"]');
@@ -127,7 +134,7 @@ test("carga diferida en la página de una colección", async ({ browser }) => {
     await expect.poll(() => thumb.getAttribute("src"), { timeout: 30_000 }).not.toBe(before);
     // La selección de varias sigue funcionando.
     await admin.getByRole("button", { name: "Seleccionar todas" }).click();
-    await expect(admin.locator('[data-card-tile] input[type="checkbox"]:checked')).toHaveCount(3);
+    await expect(admin.locator('[data-card-tile] input[type="checkbox"]:checked')).toHaveCount(4);
   });
 
   await test.step("Seguridad: la biblioteca del editor solo para administradores", async () => {
