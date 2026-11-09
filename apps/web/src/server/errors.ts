@@ -25,5 +25,17 @@ export function isUniqueViolation(e: unknown): boolean {
   return false;
 }
 
+/** Spec 032: detecta violaciones de clave foránea de Postgres (23503), también envueltas por Drizzle. */
+export function isForeignKeyViolation(e: unknown): boolean {
+  const seen = new Set<unknown>();
+  let cur: unknown = e;
+  while (cur && typeof cur === "object" && !seen.has(cur)) {
+    seen.add(cur);
+    if ((cur as { code?: string }).code === "23503") return true;
+    cur = (cur as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
 /** Mismo error para el lado del usuario: el mensaje se muestra tal cual. */
 export { AdminError as AppError };

@@ -58,6 +58,9 @@ export const errors: Record<string, Msg> = {
   invalid_username: "Invalid username: 3 to 32 lowercase letters, numbers, dots or dashes.",
   username_taken: "There is already an administrator with that username.",
   last_admin: "The only administrator account cannot be deleted.",
+  // Spec 032: deleting a set.
+  confirm_mismatch: (p) => `Type ${p.code ?? "the code"} to confirm.`,
+  set_not_deletable: "The set can no longer be deleted: check the notice.",
   not_found: (p) =>
     ({
       user: "This user doesn't exist.",
