@@ -96,6 +96,27 @@ eliminada, y resultado de la copia nocturna. Los avisos de despliegues y del ser
 (Notifications → Telegram, con el mismo grupo). Para sacar el ID de un grupo: escribir en él mencionando al bot y
 leer `getUpdates`.
 
+### Aviso al terminar un despliegue (spec 035)
+
+Cuando una versión nueva de pruebas o de producción ya responde en `/api/health`, la propia web manda al grupo un
+mensaje corto:
+- primera línea, el entorno con la fecha y la hora de Ciudad de México;
+- un renglón por cada PR que entró desde el aviso anterior (hasta 15);
+- al final, la dirección.
+
+Si se reinicia o se redespliega la misma versión, no se repite. Si un despliegue **falla**, la versión nueva no llega a
+arrancar y avisa Coolify (su mensaje viene en inglés).
+
+Para activarlo, una vez en **las dos** aplicaciones (pruebas y producción):
+1. **General → Build**: activar «Include Source Commit in Build» (la web necesita saber de qué commit sale).
+2. **Environment Variables**: añadir `DEPLOY_NOTICE=1`.
+3. **Notifications → Telegram** (de Coolify): el mismo bot y el mismo ID de grupo que `TELEGRAM_*`, con solo
+   «Deployment failed» activado.
+4. Redesplegar. El primer aviso dice «Primer aviso de este entorno.»; a partir del siguiente llega la lista.
+
+Sin `SOURCE_COMMIT` o sin el bot no se avisa, y queda en el registro de la aplicación («[aviso de despliegue]»). La
+lista se lee de la API pública de GitHub (el repositorio es público; sin token).
+
 ## Copias y restauración
 
 - Cada noche a las 09:00 UTC la web hace una copia cifrada (base de datos + imágenes) en `/data/backups`, guarda 30
