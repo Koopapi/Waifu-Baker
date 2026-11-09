@@ -8,7 +8,7 @@
 | T4 | `CardWorkspace` y la página con teselas, sin biblioteca, miniaturas diferidas | RF-1 a RF-7, RF-13, RF-14 | T1–T3 | tipos, lint y Vitest en verde |
 | T5 | Presupuesto por página con 260 kB para la colección; medir tras el build | RF-16, RF-17 | T4 | `pnpm build && pnpm budget` en verde |
 | T6 | E2E `carga-diferida.spec.ts` | RF-1 a RF-14 | T4 | en verde en `chromium-desktop` |
-| T7 | Comprobar en producción (demo compilada) el clic desde «Sets» y abrir cartas | RF-5, RNF | T4 | medición anotada en `validation.md` |
+| T7 ✓ | Comprobar en producción (demo compilada) el clic desde «Sets» y abrir cartas | RF-5, RNF | T4 | medición anotada en `validation.md` |
 | T8 | Documentación (reglas, roadmap) y `validation.md`; suite completa en los cuatro proyectos | todos | T1–T7 | suite en verde |
 
 ## Cobertura

@@ -317,6 +317,17 @@ del paquete de Bruno (`docs/waifu-baker/sobres/`).
 | RN-245 | Al abrirse (rasgar o despegar el sticker, Intro o «Abrir sin deslizar») la tira sale volando con destello, sonido y vibración corta; las cartas suben boca abajo a los 0,38 s, el sobre se va a los 1,25 s y el mazo queda listo a los 1,9 s. Las cartas salen derechas, solo se ve la de arriba y se voltean una a una; un punto por carta. La Legendaria y la EX hacen latir el mazo antes y salen con rayos dorados, estrella con su rareza y campanita, también como destacadas de «Abrir todos». | Vigente | 030 RF-18 a RF-25 |
 | RN-246 | Las fuentes del sobre (Dela Gothic One y Archivo) solo se descargan en las pantallas con sobres. Con movimiento reducido el sobre no se inclina, no lleva partículas, se abre con el botón y el efecto especial no se anima. | Vigente | 030 RNF |
 
+## 24. Carga diferida en la página de una colección (spec 031)
+
+Decisiones del dueño del 8 nov 2026: en la página de una colección del panel, las cosas se cargan cuando se van a usar,
+y siempre se ve un indicador mientras tanto.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-247 | Al entrar a una colección del panel llegan solo los datos de la cuadrícula: ni la configuración de capas, ni la biblioteca, ni el código del editor. Las miniaturas se descargan al acercarse a la pantalla; las cartas se siguen viendo todas, sin páginas. | Vigente | 031 RF-1 a RF-7 |
+| RN-248 | Al abrir una carta, la ventana sale al instante con su miniatura y «Cargando el editor de la carta…»; el editor y la biblioteca se descargan una sola vez por visita y la carta completa cada vez. Si falla, avisa con «Reintentar» sin cerrar la ventana; si se cierra antes, no avisa de nada. | Vigente | 031 RF-8 a RF-12 |
+| RN-249 | La biblioteca de elementos del editor solo la pueden pedir los administradores. | Vigente | 031 RF-3 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
@@ -331,6 +342,7 @@ del paquete de Bruno (`docs/waifu-baker/sobres/`).
 | Nota de moderación | hasta 300 caracteres |
 | Espera entre revisiones de un álbum oculto | 7 días |
 | JavaScript de la primera carga por página (coleccionista y pública) | hasta 250 kB comprimidos |
+| JavaScript de la primera carga de la página de una colección del panel (spec 031) | hasta 260 kB comprimidos |
 | Sonidos | 9 (6 de la apertura y 3 de los premios), hasta 200 kB en total |
 | Sobre hecho a mano | se recorta a 600 × 900 (2:3) en WebP |
 | Sobre por capas (spec 030) | lienzo 1000 × 1750, línea de rasgado en y = 230; hasta 10 capas de imagen (24 en total); miniatura 500 × 875; insignia hasta 22 letras; enlaces firmados de 10 a 15 min |

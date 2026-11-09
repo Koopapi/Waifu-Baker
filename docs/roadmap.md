@@ -173,3 +173,10 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   la apertura, «Abrir todos» y el simulador, coreografía de Bruno y efecto especial de Legendaria y EX; sobre básico sin
   diseño. Rama `spec/030-sobres-por-capas`, sin push. Pendiente: la E2E completa en los cuatro proyectos, `pnpm build`
   y `pnpm budget`, la comparación lado a lado y la prueba en un teléfono real.
+- 8 nov 2026: **fix «entrar al set»** (PR #43). En el servidor de pruebas el clic desde «Sets» a una colección se
+  quedaba sin respuesta (3 de 5 clics en el build de producción); una pantalla de carga propia de la colección lo
+  arregla (8 de 8).
+- 8–9 nov 2026: **spec 031 «carga diferida en la página de una colección»**, idea del dueño: cargar las cosas cuando
+  se van a usar, con indicador de carga. La página llega con teselas (sin capas ni biblioteca) y miniaturas diferidas;
+  la ventana de una carta abre al instante y descarga el editor (una vez por visita), la carta y la biblioteca, con
+  «Reintentar» si falla. Límite propio de 260 kB para esa página (antes 393 kB). Rama `spec/031-carga-diferida-del-set`.
