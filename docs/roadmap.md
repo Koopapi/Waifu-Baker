@@ -183,3 +183,7 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
 - 9 nov 2026: **spec 032 «eliminar una colección»**, pedida por el dueño. Botón en una zona de peligro al final de la
   colección (con «Archivar»), aviso con lo que se borra y el código para confirmar. Solo colecciones que nadie recibió
   y que no se usan en la bienvenida, la portada ni los tiers. Rama `spec/032-eliminar-coleccion`.
+- 9 nov 2026: **spec 033 «filtros, búsqueda y orden de las cartas de una colección»**, pedida por el dueño: personaje,
+  rareza, pendientes, búsqueda y orden, en la dirección de la página. Para quedar en el presupuesto, reordenar
+  (`@dnd-kit`) y el aviso de eliminar se descargan al usarlos: la colección pesa 247,9 kB de 260. Rama
+  `spec/033-filtros-de-cartas`, sobre la 032.
