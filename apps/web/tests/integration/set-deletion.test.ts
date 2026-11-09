@@ -78,7 +78,7 @@ describe("spec 032: eliminar una colección", () => {
       const admin = await makeAdmin(tx);
       const store = tempStore();
       const pub = await createPublishedSet(tx, admin.id, { code: "OWN1", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], store });
-      const fan = await upsertUserFromLogin(tx, { patreonUserId: "fan-del", displayName: "Fan" });
+      const fan = await upsertUserFromLogin(tx, { patreonUserId: "fan-del", displayName: "Fan", role: "user" });
       await giftPacks(tx, admin.id, { userId: fan.id, setId: pub.set.id, count: 1, reason: "Pruebas" });
       const info = await getSetDeletionInfo(tx, store, pub.set.id);
       expect(info.blockers).toEqual([{ kind: "owners", count: 1 }]);
@@ -112,7 +112,7 @@ describe("spec 032: eliminar una colección", () => {
       const store = tempStore();
       const pub = await createPublishedSet(tx, admin.id, { code: "RACE", rarities: ["common", "rare"], slots: [{ common: 100 }, { rare: 100 }], store });
       expect((await getSetDeletionInfo(tx, store, pub.set.id)).blockers).toEqual([]);
-      const fan = await upsertUserFromLogin(tx, { patreonUserId: "fan-race", displayName: "Fan" });
+      const fan = await upsertUserFromLogin(tx, { patreonUserId: "fan-race", displayName: "Fan", role: "user" });
       await giftPacks(tx, admin.id, { userId: fan.id, setId: pub.set.id, count: 1, reason: "Llega tarde" });
       await expect(deleteSet(tx, store, admin.id, pub.set.id, "RACE")).rejects.toMatchObject({ code: "set_not_deletable" });
     });

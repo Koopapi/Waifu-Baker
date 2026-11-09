@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { archiveSetAction, publishSetAction } from "@/app/admin/sets/actions";
+import { publishSetAction } from "@/app/admin/sets/actions";
 import type { Problem } from "@/domain/catalog/odds";
 import { useT } from "@/i18n/client";
 import { translateError } from "@/i18n/errors";
@@ -25,7 +25,7 @@ const anchor = (p: Problem) => {
           : null;
 };
 
-/** RF-6/RF-7: publicar con lista de problemas enlazados. RF-9: archivar una publicada. */
+/** RF-6/RF-7: publicar con lista de problemas enlazados. Archivar (RF-9) vive en la zona de peligro (spec 032). */
 export function PublishPanel({ setId, version, status }: { setId: string; version: number; status: "draft" | "published" | "archived" }) {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -68,25 +68,8 @@ export function PublishPanel({ setId, version, status }: { setId: string; versio
           {pending ? t.checking : t.checkAndPublish}
         </Button>
       ) : (
-        <Button
-          variant="secondary"
-          loading={pending}
-          onClick={async () => {
-            if (!(await confirm({ title: t.archive, body: t.confirmArchive, confirmLabel: t.archive, tone: "danger" }))) return;
-            start(async () => {
-              const r = await archiveSetAction(setId, version);
-              if (r.code === "stale_version") {
-                setMsg({ ok: false, text: t.staleArchive });
-                router.refresh();
-                return;
-              }
-              setMsg({ ok: r.ok, text: r.error ?? r.message ?? "" });
-              if (r.ok) router.refresh();
-            });
-          }}
-        >
-          {t.archive}
-        </Button>
+        // Spec 032, RF-1: «Archivar» se mueve a la zona de peligro, al final de la página.
+        <p className="text-sm text-ui-text-3">{t.publishedNote}</p>
       )}
       {msg && <Alert tone={msg.ok ? "success" : "danger"}>{msg.text}</Alert>}
       {problems.length > 0 && (

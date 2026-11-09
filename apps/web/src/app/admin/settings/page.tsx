@@ -63,7 +63,7 @@ export default async function AjustesPage({ searchParams }: { searchParams: Prom
         <p className="text-sm text-ui-text-2">{d.pity.help}</p>
         <PityDefaultsForm current={pity} />
       </Card>
-      <Card className="max-w-2xl space-y-3" title={d.cover.heading} data-testid="settings-cover-cards">
+      <Card className="max-w-2xl space-y-3" title={d.cover.heading} data-testid="settings-cover-cards" id="cover-cards">
         <p className="text-sm text-ui-text-2">{d.cover.help}</p>
         <CoverCardsForm current={cover} candidates={candidates.map(({ keyThumb, ...c }) => ({ ...c, thumbUrl: assetUrl(keyThumb) }))} />
       </Card>
