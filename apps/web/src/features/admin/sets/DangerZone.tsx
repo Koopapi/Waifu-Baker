@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
 import { Card } from "@/ui/content/Card";
 import { ArchiveButton } from "./ArchiveButton";
-import { DeleteSetDialog } from "./DeleteSetDialog";
+// El aviso (con el formulario y los motivos) solo se descarga al pulsar «Eliminar colección» (presupuesto de la spec 031).
+const DeleteSetDialog = lazy(() => import("./DeleteSetDialog").then((m) => ({ default: m.DeleteSetDialog })));
 
 /** Spec 032, RF-1: al final de la página de una colección, archivar (si está publicada) y eliminar. */
 export function DangerZone({ setId, code, version, status }: { setId: string; code: string; version: number; status: "draft" | "published" | "archived" }) {
@@ -20,7 +21,11 @@ export function DangerZone({ setId, code, version, status }: { setId: string; co
           {t.open}
         </Button>
       </div>
-      {open && <DeleteSetDialog setId={setId} code={code} version={version} onClose={() => setOpen(false)} />}
+      {open && (
+        <Suspense fallback={null}>
+          <DeleteSetDialog setId={setId} code={code} version={version} onClose={() => setOpen(false)} />
+        </Suspense>
+      )}
     </Card>
   );
 }
