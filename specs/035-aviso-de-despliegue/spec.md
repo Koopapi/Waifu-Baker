@@ -1,6 +1,6 @@
 # Spec 035 — Aviso en Telegram al terminar un despliegue
 
-Estado: **borrador**, pendiente de aprobación del dueño (entrevista del 9 nov 2026).
+Estado: **aprobada por el dueño el 9 nov 2026**, tras la entrevista del mismo día.
 
 Decisiones del dueño en la entrevista:
 1. Se avisa de los despliegues de pruebas y de producción, diciendo cuál fue.
