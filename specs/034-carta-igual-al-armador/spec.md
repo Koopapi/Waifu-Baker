@@ -81,9 +81,9 @@ Todo lo que cambia la vista previa se guarda con la carta.
   guardados de la carta.
 - RF-14: SI una carta se guardó antes de esta spec, ENTONCES EL SISTEMA usará los valores de fábrica (profundidad 14,
   inclinación 14, movimiento solo activado y sin holo).
-- RF-16: MIENTRAS una carta esté guardada con el holo activado, EL SISTEMA mostrará holo todas sus copias, las normales
+- RF-15: MIENTRAS una carta esté guardada con el holo activado, EL SISTEMA mostrará holo todas sus copias, las normales
   y las holo.
-- RF-15: EL SISTEMA guardará esos valores en el historial de versiones de la carta (spec 027), como el resto de lo que
+- RF-16: EL SISTEMA guardará esos valores en el historial de versiones de la carta (spec 027), como el resto de lo que
   se guarda.
 
 ## Requisitos no funcionales
