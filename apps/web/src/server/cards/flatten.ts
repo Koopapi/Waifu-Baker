@@ -1,11 +1,12 @@
 // Spec 018, RF-1 a RF-4: la imagen fija de una carta armada. Se saca del mismo carta-capas.js en un Chromium sin
 // ventana (decisión del dueño, 23 oct 2026): así queda igual que la carta viva en reposo y sigue sus cambios solo.
+import { finalCardConfig } from "@/domain/cards/final-card";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { encode } from "blurhash";
 import sharp from "sharp";
 import { chromium, type Browser } from "playwright-core";
-import { imageKeys, isImageLayer, isImageSeal, type LayersConfig } from "@/domain/cards/layers";
+import { imageKeys, type LayersConfig } from "@/domain/cards/layers";
 import { AdminError } from "@/server/errors";
 import { watermarkSvg } from "./compose";
 
@@ -77,9 +78,9 @@ export async function flattenCard(config: LayersConfig, images: Map<string, Buff
       .catch(() => false);
     if (!ok) throw new AdminError("flatten_failed", "No se pudo generar la imagen de la carta: una de sus capas no es una imagen válida.");
   }
-  const capas = config.capas.map((l) => (isImageLayer(l) ? { ...l, src: dataUrl(images.get(l.key)!) } : l));
-  const sello = isImageSeal(config.sello) ? { ...config.sello, src: dataUrl(images.get(config.sello.key)!) } : config.sello;
-  const cfg = { ...config, capas, sello, holo: Boolean(opts.holo || config.holo), aparecer: false, reposo: false, etiqueta: "carta" };
+  // Spec 034, RF-10: la misma preparación que la vista previa del armador (con el encuadre completo de cada capa).
+  const final = finalCardConfig(config, (key) => dataUrl(images.get(key)!));
+  const cfg = { ...final, holo: Boolean(opts.holo || config.holo), aparecer: false, reposo: false, etiqueta: "carta" };
 
   let page;
   try {
