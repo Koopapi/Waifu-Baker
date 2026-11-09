@@ -28,6 +28,10 @@ RUN cd /app/apps/web && node_modules/.bin/playwright-core install --with-deps ch
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /data/cards /data/backups && chown -R node:node /data /ms-playwright
 USER node
+# Spec 035: el commit de la versión (Coolify lo pasa con «Include Source Commit in Build»), para el aviso de despliegue.
+# Va al final para no invalidar la caché de las capas de arriba.
+ARG SOURCE_COMMIT=""
+ENV SOURCE_COMMIT=$SOURCE_COMMIT
 WORKDIR /app/apps/web
 EXPOSE 3000
 HEALTHCHECK --interval=15s --timeout=5s --start-period=60s --retries=4 \
