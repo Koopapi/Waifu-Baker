@@ -1,6 +1,6 @@
 # Spec 032 — Eliminar una colección desde el panel
 
-Estado: **borrador**, pendiente de aprobación del dueño (entrevista del 9 nov 2026).
+Estado: **aprobada por el dueño el 9 nov 2026**, tras la entrevista del mismo día.
 
 Decisiones del dueño en la entrevista:
 1. Se puede eliminar un borrador siempre, y una colección publicada o archivada solo si ningún usuario recibió nunca
