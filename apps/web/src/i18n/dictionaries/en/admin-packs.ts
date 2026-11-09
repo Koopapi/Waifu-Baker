@@ -1,4 +1,4 @@
-// Spec 030: texts of the pack editor (those of Bruno's pack creator). Kept apart from the general dictionary so only
+// Spec 030: texts of the pack editor (those of the pack creator). Kept apart from the general dictionary so only
 // the panel downloads them.
 
 export const adminPacks = {

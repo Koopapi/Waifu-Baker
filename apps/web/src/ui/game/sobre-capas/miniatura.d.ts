@@ -1,4 +1,4 @@
-// Tipos de miniatura.js (spec 030: la receta de la miniatura del creador de sobres de Bruno).
+// Tipos de miniatura.js (spec 030: la receta de la miniatura del creador de sobres del paquete de diseño).
 import type { SobreRegistro } from "./sobre-capas";
 
 export const MINIATURA: { width: 500; height: 875 };

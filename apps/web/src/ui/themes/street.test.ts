@@ -31,7 +31,7 @@ const sp = block(street, '[data-theme="street"]');
 const ink = block(street, '[data-theme="street"] .ui-ink,\n[data-theme="street"] .ui-toast,\n[data-theme="street"] .ui-tooltip');
 
 describe("tema Street pop", () => {
-  it("test_s026_rf17_usa_la_paleta_de_bruno", () => {
+  it("test_s026_rf17_usa_la_paleta_del_paquete_de_diseno", () => {
     expect(sp["ui-bg"]).toBe("#ece4fa");
     expect(sp["ui-raised"]).toBe("#ffffff");
     expect(sp["ui-text"]).toBe("#17132b");

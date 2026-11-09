@@ -8,4 +8,4 @@
 - [x] T6 Editor con la distribución del configurador y textos en/es. RF: 8 a 16, 21 a 28.
 - [x] T7 Pruebas unitarias, de integración y E2E (escritorio) en local.
 - [x] T8a Demo del dueño en local (aprobada el 29 oct 2026); `validation.md`.
-- [ ] T8b Checklist en teléfono (iPhone y Android) en el servidor de pruebas y revisión de Bruno.
+- [ ] T8b Checklist en teléfono (iPhone y Android) en el servidor de pruebas y revisión de diseño.

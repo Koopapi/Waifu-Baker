@@ -779,7 +779,7 @@
   width: var(--card-w);
 }
 
-/* Rayos que giran detrás del sobre y del mazo (laboratorio de Bruno). */
+/* Rayos que giran detrás del sobre y del mazo (laboratorio de diseño). */
 .stage__rays {
   position: absolute;
   left: 50%;
@@ -803,9 +803,9 @@
   }
 }
 
-/* Spec 030: el sobre que se rasga es el de Bruno (sobre-stage.css). */
+/* Spec 030: el sobre que se rasga es el del paquete de diseño (sobre-stage.css). */
 
-/* RF-15: la carta presentada (referencia de Bruno). */
+/* RF-15: la carta presentada (referencia del paquete de diseño). */
 .reveal-info {
   position: absolute;
   inset: 0;
@@ -960,7 +960,7 @@
 }
 
 
-/* ---------- Spec 030: el sobre por capas de Bruno en la mesa ---------- */
+/* ---------- Spec 030: el sobre por capas del paquete de diseño en la mesa ---------- */
 
 /* El sobre mide lo justo para que el mazo (84 % de su ancho) crezca un 8 % hasta el tamaño de la carta presentada. */
 .stage {
@@ -1128,7 +1128,7 @@
   background: #ff3ea5;
 }
 
-/* RF-23: el resumen con el diseño de Bruno: «Tu sobre» y las cartas en rejilla, cada una con su insignia de rareza. */
+/* RF-23: el resumen con el diseño del paquete: «Tu sobre» y las cartas en rejilla, cada una con su insignia de rareza. */
 .stage .summary {
   background: rgb(23 19 43 / 0.78);
 }

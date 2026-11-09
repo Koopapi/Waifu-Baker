@@ -1,39 +1,39 @@
-# Spec 030 — Sobres por capas: editor de sobres y apertura con el diseño de Bruno
+# Spec 030 — Sobres por capas: editor de sobres y apertura con el diseño del paquete
 
 Estado: **aprobada por el dueño el 6 nov 2026**, tras la entrevista del mismo día.
 
-Referencia: el paquete de Bruno «creador de sobres y apertura de sobres» del 6 nov 2026 (`sobre-capas.js` v1,
+Referencia: el paquete de diseño «creador de sobres y apertura de sobres» del 6 nov 2026 (`sobre-capas.js` v1,
 `creador-sobres.html`, `apertura-sobre.html`), que se copiará a `docs/waifu-baker/sobres/` como referencia. El paquete
 es material de consulta: lo que manda es esta spec.
 
 Decisiones del dueño en la entrevista:
-1. Se mantiene el flujo de apertura actual (spec 023) y se toman de Bruno el diseño del sobre y las animaciones de la
+1. Se mantiene el flujo de apertura actual (spec 023) y se toman del paquete de diseño el diseño del sobre y las animaciones de la
    apertura.
-2. Hay un editor de sobres en el panel, como el creador de Bruno.
+2. Hay un editor de sobres en el panel, como el creador del paquete de diseño.
 3. Cada colección tiene dos diseños: uno para el sobre plata y otro para el gold.
-4. El efecto especial de la SSR de Bruno lo llevan la Legendaria y la EX.
-5. Mientras una colección no tenga su diseño, se ve el sobre de Bruno básico, armado con la portada que ya tiene.
+4. El efecto especial de la SSR del paquete de diseño lo llevan la Legendaria y la EX.
+5. Mientras una colección no tenga su diseño, se ve el sobre del paquete de diseño básico, armado con la portada que ya tiene.
 6. «Abrir todos» sigue igual de rápido, con el sobre nuevo y el efecto de Legendaria y EX en las destacadas.
 7. Los recursos del paquete (plástico 3D, textura «líquido» y arte de ejemplo) se usan desde ya; la confirmación de su
-   licencia con Bruno se hace por separado.
-8. Las cartas siguen saliendo boca abajo y se voltean una a una para revelarse, como hoy (no boca arriba como en la de
-   Bruno).
+   licencia con el colaborador de diseño se hace por separado.
+8. Las cartas siguen saliendo boca abajo y se voltean una a una para revelarse, como hoy (no boca arriba como en la del
+   paquete de diseño).
 9. Las fuentes del sobre (Dela Gothic One y Archivo) se cargan solo en las pantallas donde aparecen sobres.
-10. Tras probarla (6 nov 2026), la Legendaria y la EX salen solo con el efecto de Bruno: se quitan el confeti, las
+10. Tras probarla (6 nov 2026), la Legendaria y la EX salen solo con el efecto del paquete de diseño: se quitan el confeti, las
     partículas, la celebración, el destello, el brillo previo y el sonido de su rareza, que se sumaban y daban un pequeño
     lag. La carta viva se carga antes de voltearse.
 
 ## Contexto y objetivo
 Hoy cada colección muestra un sobre plano hecho con su carta de portada o con una imagen a mano, y la apertura es la de
-la spec 023. Bruno diseñó un sobre mucho más vistoso: plástico 3D con brillos y arrugas, capas con parallax y
+la spec 023. El paquete de diseño trae un sobre mucho más vistoso: plástico 3D con brillos y arrugas, capas con parallax y
 partículas, sellos de aluminio, logo, banda del set e insignia, que se rasga por la línea o se despega como sticker. Las
 cartas suben desde dentro del sobre y la SSR sale con rayos dorados. Esta spec trae ese sobre y esas animaciones al
 juego sin cambiar el flujo que ya funciona: el servidor decide la tirada, se reanuda tras recargar, hay movimiento
 reducido, teclado, sonido y «Abrir todos». Además deja diseñar cada sobre desde el panel con las mismas herramientas
-que el creador de Bruno.
+que el creador del paquete de diseño.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): diseña los sobres de cada colección en el panel.
+- **Administrador** (el dueño y quien colabora en el diseño): diseña los sobres de cada colección en el panel.
 - **Coleccionista**: ve los sobres y los abre.
 
 ## Historias de usuario
@@ -47,24 +47,24 @@ que el creador de Bruno.
 
 ## Vocabulario
 - **Diseño del sobre**: la configuración de un sobre (capas, partículas, sellos, logo, insignia, holo, foil, versión y
-  forma de abrir), en el formato del creador de Bruno.
+  forma de abrir), en el formato del creador del paquete de diseño.
 - **Versión del sobre**: 3D (con plástico y silueta de almohada) o plano (con dientes y sin plástico).
 - **Forma de abrir**: rasgar por la línea o despegar un sticker.
-- **Sobre básico**: el sobre de Bruno armado solo, sin diseño propio, con la portada de la colección como arte.
+- **Sobre básico**: el sobre del paquete de diseño armado solo, sin diseño propio, con la portada de la colección como arte.
 - **Línea de rasgado**: la franja de arriba del sobre por donde se abre; en el lienzo de 1000 × 1750 px está a 230 px.
-- **Efecto especial**: el de la SSR de Bruno (el mazo late antes, rayos dorados, estrella con la rareza, campanita y
+- **Efecto especial**: el de la SSR del paquete de diseño (el mazo late antes, rayos dorados, estrella con la rareza, campanita y
   vibración).
 
 ## Requisitos funcionales (criterios de aceptación en EARS)
 
 ### Editor de sobres (panel)
 - RF-1: EL SISTEMA ofrecerá en cada colección un editor de sobres con un diseño para el sobre plata y otro para el gold.
-- RF-2: EL SISTEMA mostrará el editor con la misma distribución, controles y textos que el creador de Bruno, con el
+- RF-2: EL SISTEMA mostrará el editor con la misma distribución, controles y textos que el creador del paquete de diseño, con el
   sistema de diseño del editor de cartas.
 - RF-3: EL SISTEMA mostrará en el editor una vista previa en vivo del sobre que se inclina con el puntero y permite
   probar la apertura con cartas de muestra, pasar a la siguiente carta y volver a cerrarlo.
 - RF-4: EL SISTEMA permitirá subir capas de 1000 × 1750 px en PNG, WebP o JPG, y les dará valores iniciales según el
-  nombre del archivo, como el creador de Bruno.
+  nombre del archivo, como el creador del paquete de diseño.
 - RF-5: EL SISTEMA permitirá en cada capa elegir modo de mezcla, opacidad, profundidad, margen extra y brillo solo en el
   dibujo, y ordenarla, ocultarla o quitarla.
 - RF-6: EL SISTEMA permitirá agregar capas de partículas con tipo, cantidad, tamaño, velocidad, color y variación.
@@ -93,7 +93,7 @@ que el creador de Bruno.
 
 ### Apertura
 - RF-18: CUANDO el coleccionista rasgue el sobre o despegue el sticker según su diseño, EL SISTEMA lo abrirá con la
-  animación de Bruno: la tira sale volando, hay un destello, el sonido de rasgado y una vibración corta.
+  animación del paquete de diseño: la tira sale volando, hay un destello, el sonido de rasgado y una vibración corta.
 - RF-19: CUANDO el sobre se abra, EL SISTEMA hará subir las cartas boca abajo desde dentro a los 0,38 s, ocultará el
   sobre a los 1,25 s y dejará el mazo en el centro, listo para revelar, a los 1,9 s.
 - RF-20: EL SISTEMA mostrará las cartas derechas, con solo la de arriba visible; al tocarla, arrastrarla o pulsar el
@@ -102,13 +102,13 @@ que el creador de Bruno.
 - RF-21: CUANDO la carta de arriba sea Legendaria o EX, EL SISTEMA hará latir el mazo antes de voltearla.
 - RF-22: CUANDO se revele una Legendaria o una EX, EL SISTEMA la presentará con el efecto especial: rayos dorados,
   estrella con su rareza, campanita y vibración.
-- RF-23: EL SISTEMA mostrará los puntos de avance del mazo y, al final, el resumen con el diseño de Bruno, conservando
+- RF-23: EL SISTEMA mostrará los puntos de avance del mazo y, al final, el resumen con el diseño del paquete, conservando
   las miniaturas, la rareza y «¡Nueva!».
 - RF-24: EL SISTEMA conservará el resto del flujo de la spec 023: la tirada la decide el servidor al confirmar la
   apertura, el orden de menor a mayor rareza, el error con el sobre cerrado, la reanudación tras recargar, el teclado,
   el botón «Abrir sin deslizar», el sonido con silencio recordado y el movimiento reducido.
-- RF-26: CUANDO se revele una Legendaria o una EX, EL SISTEMA mostrará solo el efecto especial, con la vibración de
-  Bruno, sin el confeti, las partículas, la celebración, el destello, el brillo previo de los bordes ni el sonido de su
+- RF-26: CUANDO se revele una Legendaria o una EX, EL SISTEMA mostrará solo el efecto especial, con la vibración del
+  paquete de diseño, sin el confeti, las partículas, la celebración, el destello, el brillo previo de los bordes ni el sonido de su
   rareza.
 - RF-27: MIENTRAS una carta con versión viva esté arriba del mazo sin revelar, EL SISTEMA la irá cargando oculta, para
   que al voltearla se vea sin esperar.
@@ -116,7 +116,7 @@ que el creador de Bruno.
   presentará las Legendarias y EX destacadas con el efecto especial.
 
 ## Requisitos no funcionales
-- Mismo aspecto que la referencia: el sobre y sus efectos salen del componente de Bruno y de sus imágenes de plástico, sin
+- Mismo aspecto que la referencia: el sobre y sus efectos salen del componente del paquete de diseño y de sus imágenes de plástico, sin
   reescribir los efectos.
 - Seguridad: las imágenes del diseño se sirven con URL firmadas; el diseño se valida en el servidor (modos de mezcla,
   colores, rutas solo del almacenamiento propio) igual que la configuración de las cartas. Pasar a la versión de la

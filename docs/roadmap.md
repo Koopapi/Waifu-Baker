@@ -35,7 +35,7 @@ el CI en verde.
 | 1. Cerrar lo pendiente | 002 y 005 documentadas como absorbidas; **spec 012 ✓**: moderación de álbumes públicos (los términos ya la prometen); **spec 013 ✓**: rendimiento y sonido de la apertura (lo que faltó de la 005: presupuesto de peso de `/sobres/[id]`, 60 fps medidos, sonidos). **Etapa cerrada el 16 oct 2026.** | entrevistas cortas |
 | 1b. Demo pulida (**spec 014**) | Estilo kawaii sobre oscuro: iconos tipo pegatina, sobres compuestos con el arte de la colección (o subidos a mano), apertura con suspense, recompensas y colección con más vida, sin cartas repetidas por sobre, demo optimizada. **Spec 014 ✓, cerrada el 18 oct 2026** tras la prueba del usuario en su teléfono. | maquetas aprobadas |
 | 1c. Premios con vida (**spec 015 ✓**, cerrada el 20 oct 2026) | Galletas y sobres que vuelan hasta su contador, celebración central para los sobres que llegan sin pedirlos y el día 7, racha que se estampa y avisa en el día de gracia, sonidos y vibración por el motor de la apertura, fuera los avisos del sistema para el coleccionista | maquetas aprobadas |
-| 1d. Cartas por capas (**specs 016 ✓, 017 ✓ y 018 ✓**, del paquete de Bruno; 016 y 017 cerradas el 23 oct 2026, 018 el 25 oct 2026) | 016 editor en el panel; 017 armado de cartas por capas (la chica recortada crea la carta, biblioteca general de fondos, sellos, adornos y partículas, mover/escalar/girar capas, estilo automático, no publicar sin armar, importar/exportar); 018 las cartas por capas se ven en toda la web (imagen plana que sustituye al marco de Pencil, apertura, colección, ficha, giroscopio, zonas públicas con marca de agua, revisión 18+). Marcos y sello de Bruno (N a UR) sin cambiar las rarezas del juego | aprobar cada spec |
+| 1d. Cartas por capas (**specs 016 ✓, 017 ✓ y 018 ✓**, del paquete de diseño; 016 y 017 cerradas el 23 oct 2026, 018 el 25 oct 2026) | 016 editor en el panel; 017 armado de cartas por capas (la chica recortada crea la carta, biblioteca general de fondos, sellos, adornos y partículas, mover/escalar/girar capas, estilo automático, no publicar sin armar, importar/exportar); 018 las cartas por capas se ven en toda la web (imagen plana que sustituye al marco de Pencil, apertura, colección, ficha, giroscopio, zonas públicas con marca de agua, revisión 18+). Marcos y sello del paquete de diseño (N a UR) sin cambiar las rarezas del juego | aprobar cada spec |
 | 1e. Más juego (**specs 019 ✓, 020 ✓, 021, 022 y 023**; 019 y 020 cerradas el 25 oct 2026) | 019 «Abrir todos» dinámico; 020 espacio de juegos con Expediciones (botín fijo y, de vez en cuando, un sobre gratis con probabilidad publicada); **021 economía** (colecciones gratuitas y de Patreon, probadita, insignia y tercer espacio de patron; `docs/economia.md`); 022 tienda y cosméticos con galletas; 023 tema Street pop como segundo estilo con interruptor | entrevistas cortas |
 | 2. Contenido de pago | Pista de arte: elegir las 5 OCs, prueba A0 de consistencia, set SFW de ~30 cartas y set 18+; cargarlos con el panel | aprobar OCs y créditos |
 | 3. Salir a internet (**spec 024**, parte 2 de la 007) | Servidor y dominio, Docker/Coolify, HTTPS, CSP y HSTS, imágenes en R2, Redis (límites y tareas), webhook real de Patreon, Cloudflare (bloqueo de Bélgica), Sentry, copias fuera del Mac; comprobar en la web publicada lo que quedó de la 013 (holo con giroscopio, vibración en Android, carga en 4G) | proveedor, dominio y presupuesto |
@@ -100,12 +100,12 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   para después: botón de cerrar en «Probabilidades» (arreglo) y «Abrir todos» mucho más dinámico (spec 016).
 - 20 oct 2026: spec 015 cerrada; el usuario la probó a mano. El repo pasa a público con dos ramas fijas, `main` y
   `pruebas` (la beta para el equipo).
-- 23 oct 2026: Bruno entrega un paquete de diseño y una propuesta de spec de cartas por capas (PR #14 y #17) que no
-  puede seguir; se integra aquí, partida en las specs 016 a 018. Decisiones del dueño: marcos y sello de Bruno,
+- 23 oct 2026: El colaborador de diseño entrega un paquete de diseño y una propuesta de spec de cartas por capas (PR #14 y #17) que no
+  puede seguir; se integra aquí, partida en las specs 016 a 018. Decisiones del dueño: marcos y sello del paquete de diseño,
   kawaii por defecto con Street pop como segundo tema (spec 022), Expediciones dentro del espacio de juegos (020).
   Renumeración: publicar pasa a la 023 y el piloto a la 024.
 - 23 oct 2026: spec 016 cerrada (editor de capas aprobado). **Decisión del dueño: todas las cartas serán cartas por
-  capas** con el sistema de Bruno; el montaje con el marco de Pencil deja de ser la forma de hacer cartas. Las specs
+  capas** con el sistema del paquete de diseño; el montaje con el marco de Pencil deja de ser la forma de hacer cartas. Las specs
   017 y 018 se replantean con esa premisa.
 - 25 oct 2026: spec 020 «Juegos: Expediciones» aprobada e implementada (30 RF): mapa con zonas y niebla, equipos de 1 a
   3 cartas con terreno, rol, holo y vínculo, calificación y botín fijo a la vista, 2 espacios, reporte con frases, sobre
@@ -134,12 +134,12 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   sustituida. Nuevo orden: 022 rarezas y sobres plata/gold, 023 monedas y recompensas, 024 tiendas, 025 repetidas,
   026 tiers de Patreon; después Street pop (027), publicar (028) y piloto (029).
 - 28 oct 2026: maquetas de la spec 022 aprobadas (5 marcos nuevos y tabla doble). El dueño quiere la apertura de
-  sobres de Bruno: su «Laboratorio de sobres» (sobre por capas de 1000 × 1750, sticker que se despega con el dedo,
+  sobres del paquete de diseño: su «Laboratorio de sobres» (sobre por capas de 1000 × 1750, sticker que se despega con el dedo,
   dientes, foil y volumen, sonidos sintetizados, mazo de cartas que se pasan deslizando) estaba en su paquete original y
   ahora se copia a `docs/waifu-baker/waifu-baker/abridor-sobres/` como referencia. Entra como **spec 023**, justo después
   de la 022; el aspecto de los sobres plata y gold se define ahí. Renumeración: 024 monedas y recompensas, 025 tiendas,
   026 repetidas, 027 tiers de Patreon, 028 Street pop, 029 publicar, 030 piloto.
-- 29 oct 2026: **spec 025 «configurador de cartas v4»**, pedida por el dueño con el paquete de Bruno
+- 29 oct 2026: **spec 025 «configurador de cartas v4»**, pedida por el dueño con el paquete de diseño
   (`docs/waifu-baker/configurador-cartas/`). Decisiones: lo visual del configurador (distribución, deslizadores, lista
   de capas, fichas, selector) como componentes del sistema de diseño con la paleta actual (las fuentes y colores del
   configurador llegan con Street pop); se quedan los marcos de rareza y los sellos de la 022; marco personalizado y «Sin
@@ -149,7 +149,7 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
 - 29 oct 2026: **spec 026 «tema Street pop seleccionable»** (en local hasta que el dueño pida subirla). Decisiones:
   cualquier usuario lo elige en «Mi cuenta» y se guarda en su cuenta (sin sesión, kawaii); cambia toda la web y el
   panel, salvo la mesa de apertura y el escenario de la carta, que siguen oscuros; las cartas y los colores de rareza no
-  cambian; estilo completo de Bruno (bordes de tinta, sombras duras, inclinados, franja y trama); las pegatinas se
+  cambian; estilo completo del paquete de diseño (bordes de tinta, sombras duras, inclinados, franja y trama); las pegatinas se
   redibujan. Maquetas en HTML.
 - 3 nov 2026: **spec 027 «guardado claro del armador»** aprobada e implementada sin maqueta (decisión del dueño: quiere
   desplegarla a pruebas al despertar). Origen: la ventana de la carta tenía dos «Guardar» (el de la ficha cerraba la
@@ -169,8 +169,8 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   fabricar con polvo (no EX ni holo); ajustes y simulador en `/admin/settings`. Rama `spec/029-vinculo-y-reciclaje`,
   sin push; la verificación larga (build, budget, E2E de las dos specs) queda en `/Volumes/KoopaDev/wb-029/e2e-resultado.log`.
 - 6 nov 2026: **spec 030 «sobres por capas»** implementada en local sobre la 029. Editor de sobres en el panel (plata y
-  gold por colección, con la distribución del creador de Bruno), el sobre de Bruno (`sobre-capas.js`) en «Mis sobres»,
-  la apertura, «Abrir todos» y el simulador, coreografía de Bruno y efecto especial de Legendaria y EX; sobre básico sin
+  gold por colección, con la distribución del creador del paquete de diseño), el sobre del paquete de diseño (`sobre-capas.js`) en «Mis sobres»,
+  la apertura, «Abrir todos» y el simulador, coreografía del paquete de diseño y efecto especial de Legendaria y EX; sobre básico sin
   diseño. Rama `spec/030-sobres-por-capas`, sin push. Pendiente: la E2E completa en los cuatro proyectos, `pnpm build`
   y `pnpm budget`, la comparación lado a lado y la prueba en un teléfono real.
 - 8 nov 2026: **fix «entrar al set»** (PR #43). En el servidor de pruebas el clic desde «Sets» a una colección se
@@ -195,3 +195,7 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
 - 9 nov 2026: **spec 035 «aviso en Telegram al terminar un despliegue»**, pedida por el dueño. La web avisa al grupo del
   equipo al arrancar una versión nueva (pruebas o producción) con la lista de PR; los fallos los avisa Coolify. Hace
   falta activarlo en Coolify (ver `docs/despliegue.md`). Rama `spec/035-aviso-de-despliegue`, sobre la 034.
+- 9 nov 2026: **spec 036 «textos generales, sin nombres de personas»**, pedida por el dueño: la web y el repositorio
+  describen las piezas por su función («el armador», «el paquete de diseño»), sin nombrar a nadie. El único texto
+  visible era la descripción del tema Street pop. Una prueba impide que vuelva a aparecer un nombre en los textos de la
+  web. Rama `spec/036-sin-nombres`, sobre la 035.

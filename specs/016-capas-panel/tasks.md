@@ -1,6 +1,6 @@
 # Tareas 016 — Cartas por capas: editor en el panel
 
-## Entrega 1 — Código de Bruno (PR #17), traído y renumerado
+## Entrega 1 — Código del paquete de diseño (PR #17), traído y renumerado
 - [x] **T1 — Migración `0011_card_layers`** · RF-12 · Hecho: columnas en `cards`; migra sin romper nada.
 - [x] **T2 — Dominio de la configuración** (`domain/cards/layers.ts`, `layers-rarity.ts`) · RF-7, RF-9, RF-10, RF-13,
   RF-20, RF-22 a RF-24 · Hecho: tests de unidad en verde.
@@ -31,7 +31,7 @@
 
 ## Entrega 3 — Cierre
 - [x] **T13 — Reglas de negocio, presupuesto y validación** · Todos · Hecho cuando: reglas nuevas en
-  `docs/reglas-de-negocio.md` (adaptadas de las RN-190 a RN-198 de Bruno que tocan el editor), `pnpm budget` sin
+  `docs/reglas-de-negocio.md` (adaptadas de las RN-190 a RN-198 del paquete de diseño que tocan el editor), `pnpm budget` sin
   cambios en el coleccionista, `validation.md` 25 de 25 y demo manual del dueño (aprobada el 23 oct 2026: «sí funciona»).
 
 ## Cobertura

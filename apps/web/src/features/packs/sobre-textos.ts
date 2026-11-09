@@ -1,4 +1,4 @@
-// Spec 030: los textos del sobre de Bruno (sobre-capas.js) desde el diccionario del juego.
+// Spec 030: los textos del sobre del paquete de diseño (sobre-capas.js) desde el diccionario del juego.
 import type { Dict } from "@/i18n";
 
 export function sobreTextos(t: Dict["packs"]["sobre"]) {

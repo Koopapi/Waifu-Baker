@@ -76,8 +76,8 @@ export interface PackDesignerProps {
 }
 
 /**
- * Spec 030, RF-1 a RF-13: el editor de sobres del panel, con la misma distribución, controles y textos que el creador de
- * Bruno (`docs/waifu-baker/sobres/src/creador-sobres.html`) y los componentes del editor de cartas: a la izquierda la
+ * Spec 030, RF-1 a RF-13: el editor de sobres del panel, con la misma distribución, controles y textos que el creador del
+ * paquete de diseño (`docs/waifu-baker/sobres/src/creador-sobres.html`) y los componentes del editor de cartas: a la izquierda la
  * vista previa y sus controles rápidos; a la derecha capas, revisión, sobre, sellos y el registro. Guardar sube las
  * imágenes nuevas, la miniatura y el diseño en una sola petición (RF-10); al volver se cargan las guardadas (RF-11).
  */
@@ -264,7 +264,7 @@ export function PackDesigner({ set, kind, kindLabel, initial, savedAt: savedAtPr
     a.remove();
   };
 
-  /** «Cargar ejemplo FA01»: las capas del paquete de Bruno como imágenes nuevas, con los ajustes de su registro. */
+  /** «Cargar ejemplo FA01»: las capas del paquete de diseño como imágenes nuevas, con los ajustes de su registro. */
   const loadExample = async () => {
     try {
       const refs: Record<string, string> = {};

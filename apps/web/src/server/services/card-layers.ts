@@ -77,7 +77,7 @@ export async function getCardLayers(db: DbLike, cardId: string) {
 }
 
 /**
- * Spec 017, RF-17: la carta en el formato del creador de Bruno: `carta.json` con los nombres de archivo de sus capas y su
+ * Spec 017, RF-17: la carta en el formato del creador del paquete de diseño: `carta.json` con los nombres de archivo de sus capas y su
  * encuadre, y cada imagen con ese nombre (para el ZIP de la descarga).
  */
 export async function exportCardLayers(db: DbLike, store: CardStore, cardId: string) {

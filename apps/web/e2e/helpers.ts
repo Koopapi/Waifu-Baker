@@ -140,7 +140,7 @@ export async function giftPacks(page: Page, userName: string, code: string, coun
 }
 
 /**
- * Spec 030: arrastra por la línea de rasgado del sobre de Bruno (y = 230 de 1750) de `from` a `to` (fracciones del
+ * Spec 030: arrastra por la línea de rasgado del sobre del paquete de diseño (y = 230 de 1750) de `from` a `to` (fracciones del
  * ancho). En los dispositivos táctiles se mandan eventos de puntero con el dedo (el sobre escucha eventos de puntero,
  * también en el teléfono); en escritorio, el ratón. Con apertura de sticker, se tira de la esquina de arriba.
  */

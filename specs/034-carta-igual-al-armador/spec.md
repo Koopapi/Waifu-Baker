@@ -3,7 +3,7 @@
 Estado: **aprobada por el dueño el 9 nov 2026**, tras la entrevista del mismo día.
 
 Decisiones del dueño en la entrevista:
-1. Bruno y el dueño ven cuatro diferencias entre el armador y la apertura:
+1. El colaborador de diseño y el dueño ven cuatro diferencias entre el armador y la apertura:
    - el brillo y el holo;
    - el movimiento;
    - el encuadre y el tamaño;
@@ -18,7 +18,7 @@ Decisiones del dueño en la entrevista:
    holo.
 
 ## Contexto y objetivo
-Bruno arma cada carta en el armador hasta que se ve como quiere, pero el coleccionista la ve distinta al abrir el sobre.
+El colaborador de diseño arma cada carta en el armador hasta que se ve como quiere, pero el coleccionista la ve distinta al abrir el sobre.
 Las pantallas usan la misma carta por capas, pero cada una la monta a su manera:
 - La apertura la pone encima de la imagen fija, le añade su propio brillo y su propia inclinación, y la estira a otra
   proporción.
@@ -29,7 +29,7 @@ El objetivo es que el coleccionista vea la carta tal como quedó en el armador, 
 su ficha, con una sola forma de mostrarla.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): arma la carta y ajusta cómo se mueve.
+- **Administrador** (el dueño y quien colabora en el diseño): arma la carta y ajusta cómo se mueve.
 - **Coleccionista**: abre sobres y mira sus cartas.
 
 ## Historias de usuario
@@ -123,7 +123,7 @@ Cada RF con su test en verde:
   - una Común viva igual que en el armador;
   - una carta guardada con el holo activado se ve holo en una copia normal.
 
-Además: comparación lado a lado (capturas del armador y de la apertura) revisada por el dueño y Bruno, y suite completa
+Además: comparación lado a lado (capturas del armador y de la apertura) revisada por el dueño y quien colabora en el diseño, y suite completa
 en verde en los cuatro proyectos.
 
 ## Dudas abiertas

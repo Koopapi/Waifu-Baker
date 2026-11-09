@@ -1,11 +1,11 @@
-// Spec 030: el sobre de ejemplo FA01 del paquete de Bruno (decisión 7: sus recursos se usan desde ya), adaptado al
+// Spec 030: el sobre de ejemplo FA01 del paquete de diseño (decisión 7: sus recursos se usan desde ya), adaptado al
 // formato guardado: las capas son sus archivos (en `apps/web/assets/sobres/ejemplo/`) con los ajustes de su registro.
 import type { PackDesign } from "./design";
 
 export const PACK_EXAMPLE_FILES = ["sobre_fa01_fondo.webp", "sobre_fa01_personaje.webp", "sobre_fa01_efecto.webp", "carta-muestra.webp"] as const;
 export const PACK_SAMPLE_CARD = "carta-muestra.webp";
 
-/** El registro `fa01.json` de Bruno, con un nombre de archivo en lugar de cada imagen (`ref` lo convierte). */
+/** El registro `fa01.json` del paquete de diseño, con un nombre de archivo en lugar de cada imagen (`ref` lo convierte). */
 export function exampleDesign(ref: (file: string) => string): PackDesign {
   return {
     vista: "3d",

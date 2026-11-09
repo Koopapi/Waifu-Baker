@@ -11,7 +11,7 @@ export async function generateMetadata() {
   return { title: t.site.adminLogin.title, robots: { index: false } };
 }
 
-/** Spec 024, RF-14: acceso del equipo (tú y Bruno) con usuario, contraseña y código por Telegram. */
+/** Spec 024, RF-14: acceso del equipo (tú y quien colabora en el diseño) con usuario, contraseña y código por Telegram. */
 export default async function StaffLoginPage() {
   const session = await auth();
   if (session?.user?.role === "admin") redirect("/admin");

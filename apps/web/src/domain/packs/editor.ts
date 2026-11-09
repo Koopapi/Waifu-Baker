@@ -1,4 +1,4 @@
-// Spec 030: reglas del editor de sobres (las del creador de Bruno): valores iniciales por nombre de archivo, partículas
+// Spec 030: reglas del editor de sobres (las del creador del paquete de diseño): valores iniciales por nombre de archivo, partículas
 // nuevas, la revisión automática y el registro que se enseña. Puro, sin navegador.
 import { LONG_NAME, MAX_PACK_IMAGE_LAYERS, PACK_CANVAS, TEAR_LINE_Y, isPackImageLayer, type PackDesign, type PackImageLayer, type PackInfo, type PackLayer, type PackRegistro } from "./design";
 
@@ -6,7 +6,7 @@ const r3 = (v: number) => Math.round(v * 1000) / 1000;
 
 export type UploadRole = "logo" | "fondo" | "personaje" | "efecto" | "otra";
 
-/** RF-4: el papel de un archivo por su nombre (como el creador de Bruno). */
+/** RF-4: el papel de un archivo por su nombre (como el creador del paquete de diseño). */
 export function uploadRole(name: string): UploadRole {
   if (/(^|[_\-\s])logo([_\-\s.]|$)/i.test(name)) return "logo";
   if (/fondo|background|(^|[_\-\s])bg([_\-\s.]|$)/i.test(name)) return "fondo";
@@ -84,7 +84,7 @@ export type ReviewIssue =
   | { level: "bad"; kind: "pattern_missing" };
 
 /**
- * RF-9: la revisión automática del creador de Bruno. Avisa, sin impedir guardar, de imágenes que no miden
+ * RF-9: la revisión automática del creador del paquete de diseño. Avisa, sin impedir guardar, de imágenes que no miden
  * 1000 × 1750, de un fondo con transparencia, de arte que cruza la línea de rasgado, de un nombre largo y de archivos
  * que faltan. `facts` da lo que se sabe de cada imagen por su clave o marca (sin entrada = falta el archivo).
  */

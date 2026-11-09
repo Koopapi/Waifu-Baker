@@ -133,7 +133,7 @@
     '@keyframes cc-destello{0%{background-position:100% 0}65%,100%{background-position:0% 0}}',
     '.cc-brillo-oro{mix-blend-mode:overlay;background:linear-gradient(115deg,#5a3a0a 0%,#ffe9a8 18%,#b8862c 34%,#fff7d6 48%,#a87420 62%,#ffe08a 80%,#5a3a0a 100%);background-size:260% 260%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:var(--cc-bi,.7)}',
     '.cc-brillo-plata{mix-blend-mode:overlay;background:linear-gradient(115deg,#4a505c 0%,#f2f5fa 18%,#9aa1b0 34%,#ffffff 48%,#8a91a0 62%,#e4e8ef 80%,#4a505c 100%);background-size:260% 260%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);opacity:var(--cc-bi,.7)}',
-    // Spec 030: «ondas que brillan» (v7 del paquete de Bruno).
+    // Spec 030: «ondas que brillan» (v7 del paquete de diseño).
     '.cc-brillo-ondas{mix-blend-mode:screen;opacity:calc(var(--cc-bi,.7) * (.85 + var(--hyp)*.5))}',
     '.cc-ondas-base,.cc-ondas-color,.cc-ondas-luz{position:absolute;inset:0;-webkit-mask-size:var(--cc-ot,100%) auto;mask-size:var(--cc-ot,100%) auto;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:repeat;mask-repeat:repeat}',
     '.cc-ondas-css .cc-ondas-base,.cc-ondas-css .cc-ondas-color,.cc-ondas-css .cc-ondas-luz{-webkit-mask-image:repeating-radial-gradient(ellipse 150% 120% at 110% 115%,transparent 0 2.6%,#000 3% 3.25%,transparent 3.7% 5.2%,rgba(0,0,0,.6) 5.45% 5.6%,transparent 5.9% 7.4%);mask-image:repeating-radial-gradient(ellipse 150% 120% at 110% 115%,transparent 0 2.6%,#000 3% 3.25%,transparent 3.7% 5.2%,rgba(0,0,0,.6) 5.45% 5.6%,transparent 5.9% 7.4%);-webkit-mask-size:100% 100%;mask-size:100% 100%}',
@@ -202,7 +202,7 @@
   function urlSegura(u) { return typeof u === 'string' && /^[^"'()\\\s<>]+$/.test(u) ? u : null; }
   function intensidad(v, d) { return Math.max(0, Math.min(1, num(v, d))); }
   var BRILLOS = { holo: 'Holográfico', destello: 'Destello que pasa', oro: 'Metálico dorado', plata: 'Metálico plateado', ondas: 'Ondas que brillan (fondo)' };
-  // Waifu Baker, spec 025: marco personalizado con dos colores, con la fórmula del configurador de Bruno (oscuro =
+  // Waifu Baker, spec 025: marco personalizado con dos colores, con la fórmula del configurador del paquete de diseño (oscuro =
   // el color al 45 %, brillo, color, blanco, color, brillo, oscuro) y aura del color al 25 %.
   function hexRgb(h) { h = h.slice(1); if (h.length === 3) h = h.replace(/./g, '$&$&'); var n = parseInt(h.slice(0, 6), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
   function marcoPersonalizado(mc) {
@@ -249,7 +249,7 @@
       // La máscara sigue el encuadre de la imagen: va dentro del mismo recuadro transformado.
       var m = 'url(&quot;' + esc(u) + '&quot;)', aj = c.encuadre && c.encuadre.ajuste === 'contener' ? 'contain' : 'cover';
       var dentro = '', extra = '', cls = '';
-      // Spec 030 (v7 del paquete de Bruno): «ondas que brillan», estelas que se encienden por grupos al inclinar. El
+      // Spec 030 (v7 del paquete de diseño): «ondas que brillan», estelas que se encienden por grupos al inclinar. El
       // patrón es una imagen con transparencia (por defecto `texturas.ondas`); `patron: null` usa arcos hechos con CSS.
       if (b.tipo === 'ondas') {
         var pt = b.patron === null ? null : urlSegura(b.patron || api.texturas.ondas || '');

@@ -36,7 +36,7 @@ export const account: typeof en = {
     names: { kawaii: "Kawaii", street: "Street pop" },
     descriptions: {
       kawaii: "Oscuro y suave, con pegatinas pastel. El de siempre.",
-      street: "Claro, con bordes de tinta y sombras duras. Diseño de Bruno.",
+      street: "Claro, con bordes de tinta y sombras duras.",
     },
     active: "Activo",
     cardsNote: "Tus cartas se ven igual en los dos temas. La mesa donde abres sobres se queda oscura para que luzcan el holo y los brillos.",

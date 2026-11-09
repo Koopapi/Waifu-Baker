@@ -1,17 +1,17 @@
-# Spec 025 — Configurador de cartas v4 (el de Bruno) en el panel
+# Spec 025 — Configurador de cartas v4 (el del paquete de diseño) en el panel
 
 Estado: aprobada por el dueño el 29 oct 2026, con sus decisiones (D1 a D4 y marco personalizado). Siguiente paso:
 maquetas en Pencil.
 
-Origen: paquete «waifu-baker-configurador-cartas» que Bruno entregó el 29 oct 2026 (`carta-capas.js` v4 y
+Origen: paquete «waifu-baker-configurador-cartas» que el colaborador de diseño entregó el 29 oct 2026 (`carta-capas.js` v4 y
 `creador-cartas.html` v4), copiado como referencia en `docs/waifu-baker/configurador-cartas/`. Su
 `PROMPT-INTEGRACION.md` es material de referencia: lo que pide entra solo a través de esta spec y de las decisiones del
 dueño.
 
 ## Contexto y objetivo
-Las specs 016 a 018 llevaron al panel el editor de cartas por capas con la versión 3 de la carta de Bruno, y la 022 cambió
-los marcos y los sellos de las cinco rarezas. Desde entonces Bruno siguió puliendo su configurador. Al dueño le gusta
-cómo quedó y quiere armar las cartas **con lo que Bruno tiene**. La v4 trae efectos nuevos en la carta (brillo solo
+Las specs 016 a 018 llevaron al panel el editor de cartas por capas con la versión 3 de la carta del paquete de diseño, y la 022 cambió
+los marcos y los sellos de las cinco rarezas. Desde entonces el configurador del paquete de diseño siguió mejorando. Al dueño le gusta
+cómo quedó y quiere armar las cartas **con lo que tiene el paquete de diseño**. La v4 trae efectos nuevos en la carta (brillo solo
 sobre el dibujo de una capa e intensidad del holo) y controles que el editor del panel no tiene (ajustes de la vista
 previa, «Probar revelado», marco personalizado, sin marco, grosor del borde, «Usar como sello», partículas de un solo
 color y «Otra variación», recorte automático del sello). Esta spec trae todo eso al panel **sin perder** lo que el panel
@@ -20,7 +20,7 @@ estilo automático por rareza, la revisión 18+, importar y exportar, el aviso d
 auditoría.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): arma las cartas en el panel.
+- **Administrador** (el dueño y quien colabora en el diseño): arma las cartas en el panel.
 - **Coleccionista**: ve los efectos nuevos en sus cartas (apertura, ficha y colección).
 
 ## Historias de usuario
@@ -29,7 +29,7 @@ auditoría.
 - H2: Como administrador quiero ajustar qué tan fuerte se ve el holo de la carta.
 - H3: Como administrador quiero probar en la vista previa cómo se ve la carta al revelarse y con más o menos
   inclinación, sin tener que abrir un sobre.
-- H4: Como administrador quiero tener todos los controles del configurador de Bruno en el editor del panel, para no
+- H4: Como administrador quiero tener todos los controles del configurador del paquete de diseño en el editor del panel, para no
   tener que armar la carta fuera y luego importarla.
 - H5: Como coleccionista quiero ver la carta con los mismos efectos que vio quien la armó.
 
@@ -77,10 +77,10 @@ auditoría.
 - RF-19: EL SISTEMA aceptará en el marco personalizado solo colores en formato hexadecimal (#rrggbb).
 - RF-20: CUANDO el administrador suba varias capas a la vez en el editor de una carta, EL SISTEMA las ordenará por nombre de archivo y usará el
   nombre (`fondo`, `personaje`, `overlay`, `sello`…) para proponer su papel, profundidad, margen y mezcla, como el
-  configurador de Bruno.
+  configurador del paquete de diseño.
 
 ### Aspecto del editor (D1)
-- RF-21: EL SISTEMA mostrará el editor con la distribución del configurador de Bruno: vista previa grande sobre una
+- RF-21: EL SISTEMA mostrará el editor con la distribución del configurador del paquete de diseño: vista previa grande sobre una
   escena oscura a la izquierda, ajustes de la vista previa debajo de ella, y capas, rareza y sello a la derecha; en
   pantallas de 390 px, la vista previa arriba y los controles debajo, sin scroll horizontal.
 - RF-22: EL SISTEMA mostrará cada ajuste numérico como un deslizador con su nombre a la izquierda y su valor con unidad a
@@ -100,7 +100,7 @@ auditoría.
   (specs 016 a 018).
 - RF-28: SI se cambian el brillo de capa o la intensidad del holo de una carta de una colección 18+ publicada, ENTONCES
   EL SISTEMA dejará el cambio pendiente de revisión, como cualquier otro cambio de capas (spec 018, RF-18).
-- RF-29: CUANDO se importe una configuración del configurador v4 de Bruno, EL SISTEMA conservará su brillo de capa y su
+- RF-29: CUANDO se importe una configuración del configurador v4 del paquete de diseño, EL SISTEMA conservará su brillo de capa y su
   intensidad del holo.
 - RF-30: CUANDO se exporte una carta, EL SISTEMA incluirá su brillo de capa y su intensidad del holo en el formato del
   configurador v4.
@@ -109,7 +109,7 @@ auditoría.
 - Seguridad: el brillo de capa y la intensidad del holo se validan en el servidor con listas cerradas y límites, y la
   carta los vuelve a filtrar al pintar, como el resto de la configuración (#18). La imagen que usa el brillo como máscara
   es siempre la de la propia capa, servida desde el mismo dominio.
-- La carta del sitio conserva lo propio del proyecto que la v4 de Bruno no tiene: el encuadre por capa (spec 017), los
+- La carta del sitio conserva lo propio del proyecto que la v4 del paquete de diseño no tiene: el encuadre por capa (spec 017), los
   marcos y sellos de la spec 022 (salvo que D2 diga otra cosa) y los filtros de seguridad.
 - Rendimiento: 60 fps en Pixel 6a e iPhone 12 con una carta EX con holo, 65 partículas y brillo de capa en la chica
   (constitución). Las páginas del coleccionista no crecen más de 2 KB comprimidos (`pnpm budget`).
@@ -136,19 +136,19 @@ auditoría.
 - La proporción libre de la carta del configurador (automática, 5:7, 2:3, 3:4…): en el sitio todas las cartas usan el
   lienzo de 700 × 991 de la spec 016.
 - Guardar el trabajo a medias en el navegador (`localStorage`): el editor del panel ya guarda en la carta.
-- La carta de ejemplo de Yuki como carta del sitio (es arte de prueba; Bruno debe confirmar su origen antes de usarla).
+- La carta de ejemplo de Yuki como carta del sitio (es arte de prueba; quien colabora en el diseño debe confirmar su origen antes de usarla).
 - La página `ejemplo.html` del paquete.
 - Los colores y las fuentes del configurador (tema Street pop).
-- Volver a los marcos de rareza y los sellos de Bruno: se quedan los de la spec 022 (el marco personalizado sí entra).
+- Volver a los marcos de rareza y los sellos del paquete de diseño: se quedan los de la spec 022 (el marco personalizado sí entra).
 
 ## Criterios de finalización
 Cada RF con su test en verde y la suite completa en verde; maquetas en Pencil aprobadas antes del plan; abrir el
-configurador de Bruno y el editor del panel lado a lado con la carta de Yuki (subida como prueba, sin publicar) y
+configurador del paquete de diseño y el editor del panel lado a lado con la carta de Yuki (subida como prueba, sin publicar) y
 comprobar que la carta se ve igual (brillo holográfico en la chica, EX con holo al 60 %); checklist en teléfono (iPhone y
-Android); demo del dueño y de Bruno.
+Android); demo del dueño y del paquete de diseño.
 
 ## Decisiones del dueño (29 oct 2026)
-- **D1. Aspecto del editor:** se trae lo visual del configurador de Bruno (distribución, deslizadores, lista de capas
+- **D1. Aspecto del editor:** se trae lo visual del configurador del paquete de diseño (distribución, deslizadores, lista de capas
   con sus botones, fichas de rareza, selector de sello y escena oscura de la vista previa) como componentes reutilizables
   (RF-21 a RF-26). Los colores y las fuentes se quedan como están hasta el tema Street pop.
 - **D2. Marcos y sellos:** se quedan los de la spec 022 (sellos C, R, E, LEG y EX).
@@ -156,7 +156,7 @@ Android); demo del dueño y de Bruno.
   que conserva el encuadre de la spec 017, los marcos de la 022 y los filtros de seguridad.
 - **D3. Modos de mezcla:** se quedan los 12 del panel; `hue`, `saturation`, `color` y `luminosity` no entran porque no
   salen igual en la imagen fija (spec 016, RF-7). Al importar una configuración que los use, pasan a normal con aviso.
-- **Marco personalizado:** entra como en el configurador de Bruno: dos colores (color y brillo) y la opción «Sin
+- **Marco personalizado:** entra como en el configurador del paquete de diseño: dos colores (color y brillo) y la opción «Sin
   marco» (RF-16 a RF-19). Los sellos siguen siendo los de la spec 022.
 
 ## Dudas abiertas

@@ -134,7 +134,7 @@ function frameSwatch(f: Frame, custom: LayersConfig["marcoColores"]) {
 
 /**
  * Spec 016, 017 y 025: editor de la carta por capas dentro del editor de carta del panel, con la distribución y los
- * controles del configurador de Bruno (spec 025, RF-21 a RF-26): vista previa grande en escena oscura con sus ajustes
+ * controles del configurador del paquete de diseño (spec 025, RF-21 a RF-26): vista previa grande en escena oscura con sus ajustes
  * debajo; a la derecha la chica, el fondo, el encuadre, la lista de capas (la de adelante arriba), la rareza y el
  * sello. Las imágenes se suben al área temporal y nada cambia en la carta hasta «Guardar capas».
  */

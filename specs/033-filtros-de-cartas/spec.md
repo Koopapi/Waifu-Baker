@@ -16,7 +16,7 @@ de revisión, pero solo lo dice en un aviso arriba. El objetivo es encontrar en 
 revisar o cambiar juntas, y poder pasarle a otro administrador el enlace con la vista ya filtrada.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): revisa y edita las cartas de una colección.
+- **Administrador** (el dueño y quien colabora en el diseño): revisa y edita las cartas de una colección.
 
 ## Historias de usuario
 - H1: Como administrador quiero ver solo las cartas de un personaje o una rareza, para revisarlas o cambiarlas juntas.

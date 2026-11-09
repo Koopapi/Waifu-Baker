@@ -24,7 +24,7 @@ export function OpenAllFocus({ items, reduced, onDone }: { items: OpenAllCard[];
   const c = items[i];
 
   useEffect(() => {
-    // Spec 030, RF-25 y RF-26: las Legendarias y EX destacadas salen solo con el efecto especial de Bruno (rayos,
+    // Spec 030, RF-25 y RF-26: las Legendarias y EX destacadas salen solo con el efecto especial del paquete de diseño (rayos,
     // estrella, campanita y su vibración); las demás, con su sonido, su vibración y su confeti.
     const fx = revealFx(c.rarity);
     if (fx.sound) sound.play(fx.sound);

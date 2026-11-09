@@ -4,7 +4,7 @@ Estado: aprobada por el dueño el 28 oct 2026, con las decisiones derivadas.
 
 ## Contexto y objetivo
 La apertura es el momento central del juego y hoy se siente plana: el sobre es una imagen que se corta y las cartas
-salen en abanico. El laboratorio de sobres de Bruno demostró una apertura más física: el sobre tiene volumen, foil y
+salen en abanico. El laboratorio de sobres demostró una apertura más física: el sobre tiene volumen, foil y
 dientes de rasgado, la tira se arranca siguiendo el dedo y las cartas salen del sobre como un mazo que se va pasando.
 Esta spec lleva esa sensación a la apertura real, a «Abrir todos», al simulador del panel y a «Mis sobres», con el
 sobre plata y el gold diferenciados (spec 022).
@@ -104,7 +104,7 @@ checklist en teléfono (`dispositivo.md`); demo del dueño.
 ## Decisiones (28 oct 2026)
 - Imagen única por colección, la de hoy; el código pone los dientes, el foil y el volumen.
 - Plata y gold con el mismo arte por ahora; se distinguen por el foil y la etiqueta.
-- Mazo de Bruno con los efectos de revelado de hoy (propuesta, al pedir el dueño «la que se vea más sorprendente»).
+- Mazo del paquete de diseño con los efectos de revelado de hoy (propuesta, al pedir el dueño «la que se vea más sorprendente»).
 - Alcance: abrir un sobre, «Abrir todos», simulador y «Mis sobres».
 - Derivadas, confirmadas por el dueño al aprobar: la más rara al final (RF-13); umbral del 60 % y botón «Abrir sin deslizar».
 

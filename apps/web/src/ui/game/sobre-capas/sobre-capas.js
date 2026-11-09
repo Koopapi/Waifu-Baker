@@ -17,7 +17,7 @@
  * logo y 260–480, banda del set y 1450–1650 y 80 px libres a cada lado.
  * Las imágenes del plástico se configuran una vez: SobreCapas.recursos = { brillo, sombra, silueta }.
  *
- * Waifu Baker, spec 030: copia del paquete de Bruno con estos cambios (cada uno marcado con «spec 030»):
+ * Waifu Baker, spec 030: copia del paquete de diseño con estos cambios (cada uno marcado con «spec 030»):
  *   - fuentes por variables de next/font (--font-dela, --font-archivo), con el nombre de Google de respaldo;
  *   - opción `textos` (indicación, etiqueta accesible, «carta/cartas» y guías) para los diccionarios;
  *   - colores de sellos e insignia y URL del patrón y del logo por las listas cerradas de CartaCapas.seguro;

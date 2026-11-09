@@ -27,13 +27,13 @@ export async function POST() {
     if (!full.startsWith(artDir + path.sep)) throw new Error(`Ruta fuera del taller: ${file}`);
     return readFile(full);
   };
-  // Spec 017, RF-20: la carta de Yuki del paquete de Bruno, armada con su chica recortada (si el repositorio la trae).
+  // Spec 017, RF-20: la carta de Yuki del paquete de diseño, armada con su chica recortada (si el repositorio la trae).
   const sampleDir = path.resolve(process.cwd(), "../../docs/waifu-baker/waifu-baker/codigo/carta-capas/cartas");
   const sampleConfig = await readFile(path.join(sampleDir, "yuki.json"), "utf8").catch(() => null);
   const sample = sampleConfig
     ? { name: "Yuki", character: "Yuki", rarity: "legendary" as const, config: JSON.parse(sampleConfig), readFile: (f: string) => readFile(path.join(sampleDir, "yuki", path.basename(f))) }
     : undefined;
-  // Spec 030: el sobre FA01 del paquete de Bruno en el sobre plata de la colección.
+  // Spec 030: el sobre FA01 del paquete de diseño en el sobre plata de la colección.
   const packDir = path.resolve(process.cwd(), "assets/sobres/ejemplo");
   const plasticDir = path.resolve(process.cwd(), "public/sobres");
   const packDesign = { readFile: (f: string) => readFile(path.join(packDir, path.basename(f))), readPlastic: (f: string) => readFile(path.join(plasticDir, path.basename(f))) };

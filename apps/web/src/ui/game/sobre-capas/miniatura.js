@@ -1,7 +1,7 @@
 // Spec 030, RF-10 y RF-16: la miniatura plana del sobre cerrado (500 × 875, PNG con transparencia fuera de la silueta),
-// con la receta de `creador-sobres.html` de Bruno (docs/FORMATO-DE-DATOS.md, «De registro a imagen»). Solo navegador.
+// con la receta de `creador-sobres.html` del paquete de diseño (docs/FORMATO-DE-DATOS.md, «De registro a imagen»). Solo navegador.
 // No lleva partículas, brillo por capa, holo, foil, patrón de los sellos ni el lustre que se mueve.
-// Es parte del diseño del sobre de Bruno (sus colores y medidas), por eso va en JavaScript junto a sobre-capas.js.
+// Es parte del diseño del sobre del paquete de diseño (sus colores y medidas), por eso va en JavaScript junto a sobre-capas.js.
 import { SOBRE_RECURSOS } from "./recursos";
 
 export const MINIATURA = { width: 500, height: 875 };

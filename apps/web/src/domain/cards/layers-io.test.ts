@@ -17,7 +17,7 @@ const config: LayersConfig = {
   estiloAuto: false,
 };
 
-/** Configuración del creador de Bruno, como la de su carta de ejemplo. */
+/** Configuración del creador del paquete de diseño, como la de su carta de ejemplo. */
 const yuki = {
   id: "yuki",
   etiqueta: "Yuki, rareza SSR",

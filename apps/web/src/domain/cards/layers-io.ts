@@ -1,4 +1,4 @@
-// Spec 017, RF-17 a RF-19: exportar e importar la configuración en el formato del creador de cartas de Bruno
+// Spec 017, RF-17 a RF-19: exportar e importar la configuración en el formato del creador de cartas del paquete de diseño
 // (`creador-cartas.html`): las imágenes van por nombre de archivo (`src`) en vez de por clave del almacén. Puro, sin E/S.
 import { z } from "zod";
 import { FACTORY_CARD_DEFAULTS, type CardDefaults } from "./card-defaults";
@@ -80,7 +80,7 @@ export function customFrameGradient(color: string, brillo: string) {
 
 /**
  * Spec 025, RF-30: el marco en el formato del configurador v4: `ex` en vez de `ur`, y el personalizado como su
- * degradado con su aura (así lo escribe el configurador de Bruno).
+ * degradado con su aura (así lo escribe el configurador del paquete de diseño).
  */
 function exportFrame(c: LayersConfig): Record<string, unknown> {
   if (c.marco === "ur") return { marco: "ex" };

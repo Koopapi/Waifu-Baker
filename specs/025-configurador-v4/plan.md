@@ -1,9 +1,9 @@
 # Plan — Spec 025, configurador de cartas v4 en el panel
 
 ## Resumen técnico
-Lo nuevo de `carta-capas.js` v4 de Bruno (brillo por capa, intensidad del holo y `ex`) se pasa a **nuestra** copia de
+Lo nuevo de `carta-capas.js` v4 del paquete de diseño (brillo por capa, intensidad del holo y `ex`) se pasa a **nuestra** copia de
 la carta, que conserva el encuadre (spec 017), los marcos y sellos de la 022 y los filtros de seguridad (decisión D4).
-El editor del panel se reorganiza con la distribución y los controles del configurador de Bruno usando componentes
+El editor del panel se reorganiza con la distribución y los controles del configurador del paquete de diseño usando componentes
 nuevos del sistema de diseño con la paleta actual (D1). Maquetas: `maqueta.html` (Pencil sin cupo; se pasan a
 `waifubaker.pen` cuando vuelva).
 

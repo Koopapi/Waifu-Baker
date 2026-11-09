@@ -51,14 +51,14 @@ async function ready(tx: Parameters<Parameters<typeof inRollback>[0]>[0], bot: F
 describe("spec 024 — acceso del equipo", () => {
   it("test_s024_rf15_la_cuenta_se_crea_por_comando_con_su_usuario_administrador", async () => {
     await inRollback(async (tx) => {
-      const { password } = await createAdminAccount(tx, "Bruno");
+      const { password } = await createAdminAccount(tx, "Diseno");
       expect(password).toHaveLength(20);
-      const [acc] = await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "bruno"));
+      const [acc] = await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "diseno"));
       expect(acc.passwordHash).not.toContain(password);
       expect(acc.mustChangePassword).toBe(true);
       const [u] = await tx.select().from(users).where(eq(users.id, acc.userId));
-      expect([u.role, u.patreonUserId]).toEqual(["admin", "admin:bruno"]);
-      await expect(createAdminAccount(tx, "bruno")).rejects.toMatchObject({ code: "username_taken" });
+      expect([u.role, u.patreonUserId]).toEqual(["admin", "admin:diseno"]);
+      await expect(createAdminAccount(tx, "diseno")).rejects.toMatchObject({ code: "username_taken" });
     });
   });
 
@@ -155,7 +155,7 @@ describe("spec 024 — acceso del equipo", () => {
       const bot = new FakeBot();
       bot.teamChatId = "-100";
       await createAdminAccount(tx, "koopa");
-      await createAdminAccount(tx, "bruno");
+      await createAdminAccount(tx, "diseno");
       await notifyAdmins(tx, bot, "hola");
       expect(bot.sent).toEqual([{ chatId: "-100", text: "hola" }]);
     });
@@ -165,15 +165,15 @@ describe("spec 024 — acceso del equipo", () => {
     await inRollback(async (tx) => {
       await createAdminAccount(tx, "koopa");
       await expect(deleteAdminAccount(tx, "koopa")).rejects.toMatchObject({ code: "last_admin" });
-      await createAdminAccount(tx, "bruno");
-      const [acc] = await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "bruno"));
-      await deleteAdminAccount(tx, "bruno");
-      expect(await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "bruno"))).toHaveLength(0);
+      await createAdminAccount(tx, "diseno");
+      const [acc] = await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "diseno"));
+      await deleteAdminAccount(tx, "diseno");
+      expect(await tx.select().from(adminAccounts).where(eq(adminAccounts.username, "diseno"))).toHaveLength(0);
       const [u] = await tx.select().from(users).where(eq(users.id, acc.userId));
       expect(u.role).toBe("user");
       const log = await tx.select().from(auditLog).where(eq(auditLog.entityId, acc.id));
       expect(log.map((l) => l.action)).toEqual(expect.arrayContaining(["admin_account_create", "admin_account_delete"]));
-      await expect(deleteAdminAccount(tx, "bruno")).rejects.toMatchObject({ code: "not_found" });
+      await expect(deleteAdminAccount(tx, "diseno")).rejects.toMatchObject({ code: "not_found" });
     });
   });
 });

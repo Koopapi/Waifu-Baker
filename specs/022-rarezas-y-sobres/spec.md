@@ -77,7 +77,7 @@ rareza, holo en todas, publicar con las dos tablas y sus comprobaciones, garant�
 mala suerte solo en plata, plata y gold visibles en la web, Probabilidades y panel; checklist en teléfono; demo del dueño.
 
 ## Decisiones (28 oct 2026)
-- Marcos nuevos para las cinco rarezas (no los de Bruno).
+- Marcos nuevos para las cinco rarezas (no los del paquete de diseño).
 - Plata garantiza rara o mejor; gold, épica o mejor.
 - Los dos sobres tienen el mismo número de cartas (5 por defecto).
 - Protección de mala suerte solo en plata, sin cambios.

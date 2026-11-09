@@ -6,7 +6,7 @@ import { cx } from "../variants";
 
 /**
  * Spec 025, RF-23: lista de capas con la de adelante arriba, entre las marcas «Adelante» y «Atrás» (como el
- * configurador de Bruno). Los hijos son `LayerRow`.
+ * configurador del paquete de diseño). Los hijos son `LayerRow`.
  */
 export function LayerList({ frontLabel, backLabel, action, children, className, ...rest }: { frontLabel: React.ReactNode; backLabel: React.ReactNode; action?: React.ReactNode; children: React.ReactNode; className?: string; "data-testid"?: string }) {
   const mark = "text-[11px] font-extrabold uppercase italic tracking-[.14em] text-ui-accent-text";

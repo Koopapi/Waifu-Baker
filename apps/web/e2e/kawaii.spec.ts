@@ -37,7 +37,7 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   await test.step("RF-5, RF-8 y RF-19: «Mis sobres» muestra el sobre compuesto con la portada y el plural correcto", async () => {
     await fan.goto("/packs");
     await expect(fan.getByText("Tienes 3 sobres sin abrir.")).toBeVisible();
-    // Spec 030, RF-15 y RF-16: el sobre básico de Bruno con la portada, en miniatura (la dibuja el navegador).
+    // Spec 030, RF-15 y RF-16: el sobre básico del paquete de diseño con la portada, en miniatura (la dibuja el navegador).
     const art = fan.locator('[data-testid="group-KAW1"] [data-testid="pack-thumb"]');
     await expect(art).toHaveAttribute("data-art", /k=cover/);
     await expect(art.locator("img")).toBeVisible();
@@ -79,7 +79,7 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
 
   await test.step("RF-8, RF-9, RF-11 y RF-15: la apertura con el sobre de la colección, destellos y agitado", async () => {
     await fan.locator('[data-testid="group-KAW1"]').getByRole("link", { name: es.packs.mine.openOne }).click();
-    // Spec 030: el sobre de Bruno (con la imagen de la colección) sacude la indicación al tocarlo sin deslizar.
+    // Spec 030: el sobre del paquete de diseño (con la imagen de la colección) sacude la indicación al tocarlo sin deslizar.
     await expect(fan.locator('[data-testid="tear-pack"] .sc-sobre')).toBeVisible();
     await expect(fan.locator(".sparkle").first()).toBeAttached();
     await fan.waitForLoadState("networkidle");

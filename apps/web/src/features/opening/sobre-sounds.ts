@@ -1,4 +1,4 @@
-// Spec 030: los sonidos sintetizados de la revelación de Bruno (apertura-sobre.html), sin archivos: el zumbido de las
+// Spec 030: los sonidos sintetizados de la revelación del paquete de diseño (apertura-sobre.html), sin archivos: el zumbido de las
 // cartas al subir o apartarse y la campanita de la carta especial (RF-22). Callan si el sonido está silenciado (spec 013).
 import { sound } from "@/features/sound/engine";
 

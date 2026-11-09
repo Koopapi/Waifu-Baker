@@ -4,7 +4,7 @@ import { PackThumb, type PackThumbProps } from "@/ui/game/sobre-capas/PackThumb"
 
 /**
  * Spec 030, RF-25: el sobre de la ráfaga de «Abrir todos» rasgándose: la misma miniatura partida por la línea de
- * rasgado, con la tira que sale volando como en el sobre de Bruno (solo transform y opacity: mismo ritmo de siempre).
+ * rasgado, con la tira que sale volando como en el sobre del paquete de diseño (solo transform y opacity: mismo ritmo de siempre).
  */
 export function TornPack(props: Omit<PackThumbProps, "className" | "data">) {
   return (

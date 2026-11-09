@@ -17,7 +17,7 @@ const ODDS = [{ common: 100 }, { legendary: 100 }];
 const thumb = async () => ({ body: await testImage({ width: 500, height: 875, hue: 10 }), mime: MIME.png, filename: "miniatura.png" });
 const upload = async (hue: number, w = 1000, h = 1750) => ({ body: await testImage({ width: w, height: h, hue }), mime: MIME.png, filename: `capa-${hue}.png` });
 
-/** El FA01 de Bruno con sus tres capas nuevas (marcas `upload:`), partículas, insignia y patrón incluido. */
+/** El FA01 del paquete de diseño con sus tres capas nuevas (marcas `upload:`), partículas, insignia y patrón incluido. */
 function fa01(): PackDesign {
   return {
     ...emptyDesign("silver"),

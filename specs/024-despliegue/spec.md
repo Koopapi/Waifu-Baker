@@ -4,17 +4,17 @@ Estado: aprobada por el dueño el 28 oct 2026, con las decisiones derivadas.
 
 ## Contexto y objetivo
 La web solo corre en el Mac del dueño. Ya hay un VPS en Contabo y un dominio. El objetivo es tenerla publicada en el
-dominio con HTTPS, que cada cambio fusionado en `main` se publique solo (como en Vercel), que el dueño y Bruno puedan
+dominio con HTTPS, que cada cambio fusionado en `main` se publique solo (como en Vercel), que el dueño y quien colabora en el diseño puedan
 subir las cartas desde cero en producción con su propia cuenta de administrador, y que nada de lo subido se pierda.
 
 ## Usuarios / actores
 - **Dueño**, que fusiona cambios, sube cartas y vigila los despliegues.
-- **Bruno**, administrador que sube y arma el arte.
+- **Colaborador de diseño**, administrador que sube y arma el arte.
 - **Coleccionista**, que entra con Patreon como hasta ahora.
 
 ## Historias de usuario
 - H1: Como dueño quiero que al fusionar un cambio se publique solo, y poder volver atrás si algo sale mal.
-- H2: Como dueño y como Bruno queremos subir las cartas en la web publicada con nuestra propia cuenta.
+- H2: Como dueño y como colaborador de diseño queremos subir las cartas en la web publicada con nuestra propia cuenta.
 - H3: Como dueño quiero que las cartas y los datos tengan copia fuera del servidor.
 
 ## Requisitos funcionales (criterios de aceptación en EARS)
@@ -104,7 +104,7 @@ subir las cartas desde cero en producción con su propia cuenta de administrador
 Cada RF comprobado: fusión de prueba en `pruebas` que se publica sola en el servidor de pruebas con su contraseña, PR de
 `pruebas` a `main` que llega a producción, despliegue que falla y deja la anterior, vuelta atrás desde el panel, HTTPS
 en el dominio, entrada de administrador con contraseña y código de Telegram, bloqueo tras 5 fallos, copia nocturna en
-R2 y restauración probada en una base aparte, SSH solo con llave y puertos cerrados; el dueño y Bruno suben una carta
+R2 y restauración probada en una base aparte, SSH solo con llave y puertos cerrados; el dueño y quien colabora en el diseño suben una carta
 en producción.
 
 ## Decisiones (28 oct 2026)

@@ -8,7 +8,7 @@ un sobre gratis y el siguiente no hay nada que hacer. Esta spec abre un apartado
 Expediciones: el coleccionista manda equipos de 1 a 3 cartas a explorar zonas de un mapa y, al volver, recibe galletas,
 fragmentos de mapa y, muy de vez en cuando, un sobre. El terreno de la personaje pesa más que la rareza, así que todas
 las cartas tienen uso. El servidor decide todo con su reloj y su RNG; no hay forma de pagar para avanzar. Parte de la
-propuesta de Bruno (versión 1), con el botín rediseñado por el dueño.
+propuesta de diseño (versión 1), con el botín rediseñado por el dueño.
 
 ## Usuarios / actores
 - **Coleccionista** con al menos una carta en su colección.
@@ -141,7 +141,7 @@ reclamo, carta ocupada, filtro 18+ y simulador del panel; test de concurrencia; 
 reporte); `pnpm budget` dentro del límite; demo manual del dueño.
 
 ## Decisiones (25 oct 2026)
-- Versión 1 de Bruno: «Juegos» con Expediciones, 4 zonas (2 abiertas, 2 con niebla), terreno y rol, calificación previa,
+- Versión 1 del paquete de diseño: «Juegos» con Expediciones, 4 zonas (2 abiertas, 2 con niebla), terreno y rol, calificación previa,
   3 duraciones, reporte con frases y vínculo; en el panel zonas, botín y simulador.
 - Botín fijo y conocido antes de enviar, más un sobre al azar difícil de conseguir con probabilidad publicada.
 - Sin cartas exclusivas por zona en esta versión.
@@ -152,7 +152,7 @@ reporte); `pnpm budget` dentro del límite; demo manual del dueño.
 - Derivadas, confirmadas por el dueño al aprobar: el sobre ganado es de una colección SFW publicada que elige el
   coleccionista, como el del día 7 (spec 009); solo los roles que cambian el botín (Recolectora, Cartógrafa,
   Buscatesoros), porque Guardiana y Carismática dependen de eventos que quedan fuera; los valores iniciales de poder,
-  dificultad y botín salen de la propuesta de Bruno y se fijan en el plan.
+  dificultad y botín salen de la propuesta de diseño y se fijan en el plan.
 
 ## Dudas abiertas
 - Ninguna.
