@@ -92,8 +92,14 @@
   - «Reordenar» quita los filtros.
 - `pnpm budget` tras el build.
 
+## Presupuesto (medido el 9 nov 2026)
+Con los filtros y la zona de peligro de la 032, la página llegó a 263,2 kB (de 260). Se resolvió cargando al usarlo:
+- el aviso de eliminar (032) al pulsar «Eliminar colección» (262,4 kB);
+- el modo «Reordenar» con `@dnd-kit` (`SortableGrid.tsx`) al pulsar «Reordenar». La tarjeta pasa a `CardTile.tsx`,
+  sin código de arrastre: **247,9 kB**, con 12 kB de margen.
+
 ## Riesgos
-- **Presupuesto:** quedan 1,4 kB. Si se pasa, `CardFilters` se carga con `import()` tras la primera pintura de la
+- **Presupuesto (previsto antes de medir):** quedan 1,4 kB. Si se pasa, `CardFilters` se carga con `import()` tras la primera pintura de la
   cuadrícula (las fichas no se necesitan para ver las cartas) y se avisa al dueño.
 - **`replaceState`:** el refresco del servidor (`router.refresh()`) mantiene la dirección actual, así que los filtros
   no se pierden.
