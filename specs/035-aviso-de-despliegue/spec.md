@@ -6,6 +6,7 @@ Decisiones del dueño en la entrevista:
 1. Se avisa de los despliegues de pruebas y de producción, diciendo cuál fue.
 2. El mensaje lista, en un renglón cada uno, los PR que entraron desde el despliegue anterior, con su título y su número.
 3. También se avisa cuando un despliegue falla.
+4. La fecha y la hora del mensaje van en hora de Ciudad de México.
 
 ## Contexto y objetivo
 Hoy, al mergear un PR, Coolify publica la versión nueva en pruebas o en producción sin avisar a nadie. Para saber si
@@ -27,7 +28,8 @@ Telegram un mensaje corto cuando una versión nueva ya está funcionando, o cuan
   mensaje al grupo de Telegram del equipo.
 - RF-2: CUANDO una versión nueva de producción empiece a responder bien en su comprobación de salud, EL SISTEMA enviará
   un mensaje al grupo de Telegram del equipo.
-- RF-3: EL SISTEMA dirá en la primera línea del mensaje el entorno («Pruebas» o «Producción»), la fecha y la hora.
+- RF-3: EL SISTEMA dirá en la primera línea del mensaje el entorno («Pruebas» o «Producción»), la fecha y la hora de
+  Ciudad de México.
 - RF-4: EL SISTEMA listará en el mensaje, en un renglón cada uno, los PR que entraron desde el último despliegue
   avisado de ese entorno, con su título y su número.
 - RF-5: EL SISTEMA terminará el mensaje con la dirección del entorno.
@@ -81,4 +83,4 @@ Además, prueba real en pruebas con el merge de un PR (llega el mensaje con su t
 a propósito (llega el aviso de fallo). Suite completa en verde.
 
 ## Dudas abiertas
-- [NECESITA ACLARACIÓN] Zona horaria de la fecha y la hora del mensaje. Propuesta: la hora de Ciudad de México.
+- Ninguna.
