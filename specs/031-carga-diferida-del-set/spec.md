@@ -1,6 +1,6 @@
 # Spec 031 — Carga diferida en la página de una colección del panel
 
-Estado: **borrador**, pendiente de aprobación del dueño (entrevista del 8 nov 2026).
+Estado: **aprobada por el dueño el 8 nov 2026**, tras la entrevista del mismo día.
 
 Decisiones del dueño en la entrevista:
 1. Solo la página de una colección del panel; el resto del panel y las páginas del coleccionista quedan como están.
