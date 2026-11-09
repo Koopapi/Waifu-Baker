@@ -75,11 +75,23 @@ describe("spec 018 — capas para la carta viva", () => {
     });
   });
 
-  it("test_s022_rf4_la_comun_no_se_monta_viva_aunque_tenga_capas", async () => {
+  // Spec 034, RF-9 (sustituye a la spec 022, RF-4): la común también se ve viva, como en el armador.
+  it("test_s034_rf9_la_comun_se_monta_viva_con_la_vista_del_armador", async () => {
     await inRollback(async (tx) => {
       const { common, fan } = await world(tx);
-      expect(common.layers).not.toBeNull();
-      expect(await liveCardConfig(tx, fan.id, common.id, NOW)).toBeNull();
+      const live = await liveCardConfig(tx, fan.id, common.id, NOW);
+      expect(live).not.toBeNull();
+      expect(live!.config).toMatchObject({ profundidad: 14, inclinacion: 14, reposo: true, holo: false });
+    });
+  });
+
+  it("test_s034_rf12_el_coleccionista_recibe_el_movimiento_y_el_encuadre_guardados", async () => {
+    await inRollback(async (tx) => {
+      const { card, fan } = await world(tx);
+      await tx.update(cards).set({ layers: { ...card.layers!, profundidad: 3, inclinacion: 20, reposo: false, holo: true } }).where(eq(cards.id, card.id));
+      const live = await liveCardConfig(tx, fan.id, card.id, NOW);
+      expect(live!.config).toMatchObject({ profundidad: 3, inclinacion: 20, reposo: false, holo: true });
+      for (const l of live!.config.capas) if ("src" in l) expect(l).toHaveProperty("encuadre.ajuste");
     });
   });
 
