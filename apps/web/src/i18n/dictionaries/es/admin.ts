@@ -158,6 +158,9 @@ export const admin: typeof en = {
     editAria: (n) => `Editar carta ${n}`,
     selectAria: (n) => `Seleccionar carta ${n}`,
     processing: "Procesando…",
+    // Spec 031, RF-8 y RF-11: la ventana de una carta mientras carga el editor, y si no carga.
+    editorLoading: "Cargando el editor de la carta…",
+    editorLoadError: "No se pudo cargar la carta. Revisa la conexión y vuelve a intentarlo.",
     pendingArt: "Arte pendiente",
     reviewed: "Revisada",
     notReviewed: "Sin revisar",

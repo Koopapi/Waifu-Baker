@@ -5,11 +5,23 @@ import { getCardStore } from "@/server/cards/store-instance";
 import { translateError } from "@/i18n/errors";
 import { getDict } from "@/i18n/server";
 import { isAdminError } from "@/server/errors";
-import { uploadLibraryImage } from "@/server/services/library";
+import { listLibraryEntries, uploadLibraryImage } from "@/server/services/library";
+import { assetUrl } from "@/features/admin/cards/types";
 
 export const runtime = "nodejs";
 
 const IMAGE_KINDS = ["fondo", "sello", "adorno"] as const;
+
+/**
+ * Spec 031, RF-3 y RF-9: la biblioteca para el editor de una carta, que la pide al abrirse (la página de la colección
+ * ya no la manda). Solo para administradores; sin el uso de cada imagen (RF-4).
+ */
+export async function GET() {
+  const session = await adminFromRequest("/api/admin/library");
+  if (!session) return notFoundResponse();
+  const items = await listLibraryEntries(db);
+  return Response.json({ ok: true, items: items.map((i) => ({ id: i.id, kind: i.kind, name: i.name, key: i.key, url: assetUrl(i.key), particles: i.particles })) });
+}
 
 /** Spec 017, RF-6 y RF-7: sube un fondo, un sello o un adorno a la biblioteca general. Un archivo por petición. */
 export async function POST(req: Request) {

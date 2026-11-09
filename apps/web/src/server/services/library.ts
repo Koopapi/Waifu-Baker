@@ -103,6 +103,13 @@ export async function listLibrary(db: DbLike): Promise<LibraryItemView[]> {
   });
 }
 
+/** Spec 031, RF-4: lo que necesita el editor de una carta (sin el uso: no lee las cartas de ninguna colección). */
+export type LibraryEntryView = Omit<LibraryItemView, "uses" | "sets">;
+export async function listLibraryEntries(db: DbLike): Promise<LibraryEntryView[]> {
+  const rows = await db.select().from(libraryItems).orderBy(asc(libraryItems.kind), asc(libraryItems.createdAt), asc(libraryItems.name));
+  return rows.map((r) => ({ id: r.id, kind: r.kind, name: r.name, key: r.key, particles: r.particles }));
+}
+
 async function libraryUses(db: DbLike) {
   const rows = await db.select({ setCode: sets.code, layers: cards.layers, pending: cards.layersPending }).from(cards).innerJoin(sets, eq(sets.id, cards.setId));
   return usesByKey(rows);

@@ -63,6 +63,8 @@ export const API_CALLS: { method: "GET" | "POST" | "DELETE"; path: string; body?
   { method: "GET", path: `/api/admin/cards/${ID}/layers/export` },
   { method: "POST", path: "/api/admin/layer-uploads", body: "{}" },
   { method: "POST", path: "/api/admin/library", body: "{}" },
+  // Spec 031: la biblioteca que pide la ventana de una carta al abrirse.
+  { method: "GET", path: "/api/admin/library" },
   { method: "GET", path: `/api/cards/${ID}/live` },
   { method: "GET", path: "/api/cards/layer" },
   // Spec 020: imagen de las zonas y su subida desde el panel.

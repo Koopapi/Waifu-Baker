@@ -1,6 +1,7 @@
 // Spec 028, RF-1 a RF-5: valores con los que nace o se re-estila una carta (sello de texto 15 y borde 3,0). Puro.
 import { describe, expect, it } from "vitest";
-import { FACTORY_CARD_DEFAULTS, parseCardDefaults } from "./card-defaults";
+import { FACTORY_CARD_DEFAULTS } from "./card-defaults";
+import { parseCardDefaults } from "./card-defaults-schema";
 import type { LayersConfig, TextSeal } from "./layers";
 import { parseCreatorConfig } from "./layers-io";
 import { applyTierStyle, configFromCharacter, retierLayers, settleAutoStyle, tierTextSeal } from "./layers-rarity";

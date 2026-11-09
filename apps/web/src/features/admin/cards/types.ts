@@ -27,6 +27,13 @@ export interface CardDTO {
   hasOriginal: boolean;
 }
 
+/**
+ * Spec 031, RF-2: lo que la cuadrícula de la colección necesita de cada carta. Sin las capas ni las imágenes grandes:
+ * eso lo pide la ventana de edición al abrir la carta (`GET /api/admin/cards/[id]`).
+ */
+export const TILE_FIELDS = ["id", "number", "name", "rarity", "characterName", "status", "version", "thumbUrl", "chance", "adultReviewedAt", "pendingArtUrl", "pendingLayersUrl"] as const;
+export type CardTileDTO = Pick<CardDTO, (typeof TILE_FIELDS)[number]>;
+
 export interface CharacterOption {
   id: string;
   name: string;

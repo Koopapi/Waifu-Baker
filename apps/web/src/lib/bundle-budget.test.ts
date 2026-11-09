@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BUDGET_KB, BUDGET_PAGES, formatReport, measurePages, overBudget } from "./bundle-budget";
+import { ADMIN_BUDGET_PAGES, BUDGET_KB, BUDGET_PAGES, formatReport, measurePages, measureWithLimits, overBudget } from "./bundle-budget";
 
 const manifest = {
   rootMainFiles: ["static/chunks/react.js", "static/chunks/main.js"],
@@ -7,6 +7,7 @@ const manifest = {
     "/page": ["static/chunks/react.js", "static/chunks/home.js", "static/css/app.css"],
     "/packs/[setId]/page": ["static/chunks/opening.js", "static/chunks/home.js"],
     "/admin/page": ["static/chunks/admin.js"],
+    "/admin/sets/[id]/page": ["static/chunks/admin.js"],
   },
 };
 const sizes: Record<string, number> = {
@@ -14,6 +15,7 @@ const sizes: Record<string, number> = {
   "static/chunks/main.js": 50 * 1024,
   "static/chunks/home.js": 20 * 1024,
   "static/chunks/opening.js": 90 * 1024,
+  "static/chunks/admin.js": 115 * 1024,
 };
 const sizeOf = (f: string) => sizes[f] ?? 0;
 
@@ -43,5 +45,23 @@ describe("spec 013 — peso de las páginas", () => {
 
   it("test_s013_rf12_una_pagina_que_falta_en_el_manifiesto_es_un_error", () => {
     expect(() => measurePages(manifest, sizeOf, ["/no-existe/page"])).toThrow(/no-existe/);
+  });
+
+  it("test_s031_rf16_la_pagina_de_una_coleccion_se_vigila_con_260_kB", () => {
+    expect(ADMIN_BUDGET_PAGES).toEqual([{ page: "/admin/sets/[id]/page", limitKb: 260 }]);
+    // 150 kB de la base + 115 kB propios = 265 kB.
+    const r = measureWithLimits(manifest, sizeOf, ADMIN_BUDGET_PAGES);
+    expect(r).toEqual([{ page: "/admin/sets/[id]/page", bytes: 265 * 1024, limitKb: 260 }]);
+  });
+
+  it("test_s031_rf17_si_la_coleccion_pasa_de_260_kB_falla_y_dice_cuanto_pesa", () => {
+    const r = measureWithLimits(manifest, sizeOf, ADMIN_BUDGET_PAGES);
+    expect(overBudget(r).map((w) => w.page)).toEqual(["/admin/sets/[id]/page"]);
+    expect(formatReport(r)).toContain("265.0 kB");
+    expect(formatReport(r)).toContain("+5.0 kB sobre 260 kB");
+    // Con 260 justos no falla, y su límite propio se ve en el informe.
+    const ok = [{ page: "/admin/sets/[id]/page", bytes: 260 * 1024, limitKb: 260 }];
+    expect(overBudget(ok)).toEqual([]);
+    expect(formatReport(ok)).toContain("(límite 260 kB)");
   });
 });

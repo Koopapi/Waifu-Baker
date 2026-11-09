@@ -158,6 +158,9 @@ export const admin = {
     editAria: (n: string) => `Edit card ${n}`,
     selectAria: (n: string) => `Select card ${n}`,
     processing: "Processing…",
+    // Spec 031, RF-8 y RF-11: la ventana de una carta mientras carga el editor, y si no carga.
+    editorLoading: "Loading the card editor…",
+    editorLoadError: "The card could not be loaded. Check your connection and try again.",
     pendingArt: "Art pending",
     reviewed: "Reviewed",
     notReviewed: "Not reviewed",
