@@ -1,6 +1,6 @@
 # Spec 034 — La carta se ve igual que en el armador
 
-Estado: **borrador**, pendiente de aprobación del dueño (entrevista del 9 nov 2026).
+Estado: **aprobada por el dueño el 9 nov 2026**, tras la entrevista del mismo día.
 
 Decisiones del dueño en la entrevista:
 1. Bruno y el dueño ven cuatro diferencias entre el armador y la apertura:
