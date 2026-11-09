@@ -25,6 +25,12 @@ export const BUDGET_PAGES = [
   "/legal/[doc]/page",
 ] as const;
 
+/**
+ * Spec 031, RF-16 y RF-17: páginas del panel con su propio límite. La de una colección carga el editor de cartas solo
+ * al abrir una carta, así que su primera carga se vigila para que no vuelva a crecer.
+ */
+export const ADMIN_BUDGET_PAGES = [{ page: "/admin/sets/[id]/page", limitKb: 260 }] as const;
+
 export interface BuildManifests {
   rootMainFiles: string[];
   pages: Record<string, string[]>;
@@ -33,6 +39,8 @@ export interface BuildManifests {
 export interface PageWeight {
   page: string;
   bytes: number;
+  /** Límite propio de la página (spec 031); sin él vale el general. */
+  limitKb?: number;
 }
 
 /** `sizeOf` devuelve el tamaño comprimido de un fichero del build. */
@@ -45,8 +53,13 @@ export function measurePages(m: BuildManifests, sizeOf: (file: string) => number
   });
 }
 
+/** Mide páginas con límite propio (spec 031). */
+export function measureWithLimits(m: BuildManifests, sizeOf: (file: string) => number, pages: readonly { page: string; limitKb: number }[]): PageWeight[] {
+  return measurePages(m, sizeOf, pages.map((p) => p.page)).map((w, i) => ({ ...w, limitKb: pages[i].limitKb }));
+}
+
 export function overBudget(weights: PageWeight[], limitKb = BUDGET_KB): PageWeight[] {
-  return weights.filter((w) => w.bytes > limitKb * 1024);
+  return weights.filter((w) => w.bytes > (w.limitKb ?? limitKb) * 1024);
 }
 
 const kb = (bytes: number) => `${(bytes / 1024).toFixed(1)} kB`;
@@ -56,8 +69,10 @@ export function formatReport(weights: PageWeight[], limitKb = BUDGET_KB): string
   const rows = [...weights]
     .sort((a, b) => b.bytes - a.bytes)
     .map((w) => {
-      const over = w.bytes - limitKb * 1024;
-      return `${over > 0 ? "✗" : "✓"} ${w.page.padEnd(width)} ${kb(w.bytes).padStart(9)}${over > 0 ? `  (+${kb(over)} sobre ${limitKb} kB)` : ""}`;
+      const limit = w.limitKb ?? limitKb;
+      const over = w.bytes - limit * 1024;
+      const own = w.limitKb !== undefined && over <= 0 ? `  (límite ${limit} kB)` : "";
+      return `${over > 0 ? "✗" : "✓"} ${w.page.padEnd(width)} ${kb(w.bytes).padStart(9)}${over > 0 ? `  (+${kb(over)} sobre ${limit} kB)` : own}`;
     });
   return rows.join("\n");
 }

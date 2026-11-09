@@ -2,13 +2,13 @@
 // renombrar y quitar) y su uso desde las cartas.
 import { describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { auditLog } from "@/db/schema";
+import { auditLog, cards } from "@/db/schema";
 import type { ImageLayer } from "@/domain/cards/layers";
 import { createSet } from "@/server/services/collections";
 import { uploadCardImage } from "@/server/services/cards";
 import { saveCardLayers } from "@/server/services/card-layers";
 import { stageLayerImage } from "@/server/cards/layer-images";
-import { listLibrary, removeLibraryItem, renameLibraryItem, saveLibraryFromCard, saveLibraryParticles, uploadLibraryImage } from "@/server/services/library";
+import { listLibrary, listLibraryEntries, removeLibraryItem, renameLibraryItem, saveLibraryFromCard, saveLibraryParticles, uploadLibraryImage } from "@/server/services/library";
 import { inRollback } from "./db";
 import { makeAdmin } from "./factories";
 import { MIME, testImage } from "./images";
@@ -141,6 +141,36 @@ describe("spec 017 — biblioteca general de elementos", () => {
       expect(await saveLibraryFromCard(tx, store, admin.id, { kind: "sello", key: seal, name: "Mi sello" })).toMatchObject({ kind: "sello" });
       // Un archivo que no es de una carta ni del área temporal no se acepta.
       await expect(saveLibraryFromCard(tx, store, admin.id, { kind: "adorno", key: "sets/x/original/y.png", name: "x" })).rejects.toMatchObject({ code: "invalid_layers" });
+    });
+  });
+
+  it("test_s031_rf4_las_entradas_para_el_editor_no_leen_las_cartas_de_ninguna_coleccion", async () => {
+    await inRollback(async (tx) => {
+      const { image, set, card } = await setup(tx);
+      const f = await image("fondo", 12, "Atardecer.png");
+      await image("sello", 52, "Sello.png");
+      // Dos colecciones con cartas: el resultado no depende de ellas.
+      for (const code of ["LA01", "LA02"]) await card((await set(code)).id, code === "LA01" ? 20 : 30);
+      const tables: unknown[] = [];
+      const spy = new Proxy(tx, {
+        get(target, prop, receiver) {
+          if (prop !== "select") return Reflect.get(target, prop, receiver);
+          return (...args: unknown[]) => {
+            const q = (target.select as (...a: unknown[]) => { from: (t: unknown) => unknown })(...args);
+            const from = q.from.bind(q);
+            q.from = (t: unknown) => {
+              tables.push(t);
+              return from(t);
+            };
+            return q;
+          };
+        },
+      }) as Tx;
+      const entries = await listLibraryEntries(spy);
+      expect(tables).not.toContain(cards);
+      expect(entries.map((e) => [e.kind, e.name])).toEqual([["fondo", "Atardecer"], ["sello", "Sello"]]);
+      expect(entries[0]).toEqual({ id: f.id, kind: "fondo", name: "Atardecer", key: f.key, particles: null });
+      expect(entries[0]).not.toHaveProperty("uses");
     });
   });
 });

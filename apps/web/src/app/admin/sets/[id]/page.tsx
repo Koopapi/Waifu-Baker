@@ -15,7 +15,6 @@ import { PackDesignLinks } from "@/features/admin/sets/PackDesignLinks";
 import { packViewsFor } from "@/server/services/pack-designs";
 import { requireAdmin } from "@/server/auth/require-admin";
 import { packViewKey } from "@/domain/packs/view";
-import { listLibrary } from "@/server/services/library";
 import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
@@ -24,8 +23,8 @@ import { AdultBadge, StatusBadge } from "@/features/admin/ui";
 import { Dropzone } from "@/features/admin/cards/Dropzone";
 import { CardWorkspace } from "@/features/admin/cards/CardWorkspace";
 import { RegenerateButton } from "@/features/admin/cards/RegenerateButton";
-import { assetUrl, type CardDTO } from "@/features/admin/cards/types";
-import { toCardDTO } from "@/features/admin/cards/dto";
+import type { CardDTO } from "@/features/admin/cards/types";
+import { toCardDTO, toCardTile } from "@/features/admin/cards/dto";
 import { getDict, getLocale } from "@/i18n/server";
 import { adminLayersDictionaries } from "@/i18n/admin-layers";
 import { missingParts } from "@/domain/cards/layers";
@@ -40,7 +39,9 @@ const EMPTY_SLOT: Record<Rarity, number> = { common: 0, rare: 0, epic: 0, legend
 export default async function SetDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
-  const [overview, characters, packArts, library, cardDefaults] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), listLibrary(db), getCardDefaults(db)]);
+  // Spec 031, RF-3 y RF-4: sin la biblioteca (la pide la ventana de una carta al abrirse), así no se leen las cartas
+  // de las demás colecciones.
+  const [overview, characters, packArts, cardDefaults] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), getCardDefaults(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -234,9 +235,9 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         <Dropzone setId={set.id} disabled={!perms.canAdd} />
         <CardWorkspace
           setId={set.id}
-          cards={cards}
+          // Spec 031, RF-2: los avisos de arriba se calculan con la carta completa; la cuadrícula solo recibe la tesela.
+          cards={cards.map(toCardTile)}
           characters={characters.map((c) => ({ id: c.id, name: c.name }))}
-          library={library.map((i) => ({ id: i.id, kind: i.kind, name: i.name, key: i.key, url: assetUrl(i.key), particles: i.particles }))}
           perms={perms}
           cardDefaults={cardDefaults}
         />

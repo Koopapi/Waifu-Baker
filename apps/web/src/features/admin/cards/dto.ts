@@ -1,6 +1,6 @@
 // Spec 027: la carta tal como la ve la ventana del panel, construida igual desde la página y desde el guardado único.
 import type { cards } from "@/db/schema";
-import { assetUrl, type CardDTO } from "./types";
+import { assetUrl, TILE_FIELDS, type CardDTO, type CardTileDTO } from "./types";
 
 type Row = typeof cards.$inferSelect;
 
@@ -27,4 +27,9 @@ export function toCardDTO(c: Row, extra: { characterName: string | null; chance:
     layers: c.layersPending ?? c.layers,
     hasOriginal: Boolean(c.originalKey),
   };
+}
+
+/** Spec 031, RF-2: la carta tal como la ve la cuadrícula (solo los campos de `TILE_FIELDS`). */
+export function toCardTile(c: CardDTO): CardTileDTO {
+  return Object.fromEntries(TILE_FIELDS.map((k) => [k, c[k]])) as CardTileDTO;
 }

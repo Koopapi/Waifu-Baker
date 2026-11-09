@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { cx } from "../../variants";
 import type { PackRegistro } from "@/domain/packs/design";
 import type { SobreRegistro } from "./sobre-capas";
-import { dibujarMiniatura, type MiniaturaTextos } from "./miniatura";
+import type { MiniaturaTextos } from "./miniatura";
 
 /** Miniaturas ya dibujadas en esta pestaña (el mismo sobre básico sale varias veces en «Abrir todos»). */
 const drawn = new Map<string, Promise<string | null>>();
@@ -13,7 +13,14 @@ function drawOnce(registro: PackRegistro | SobreRegistro, textos: MiniaturaTexto
   const k = JSON.stringify([registro, textos]);
   let p = drawn.get(k);
   if (!p) {
-    p = dibujarMiniatura(registro as SobreRegistro, textos).then((b) => (b ? URL.createObjectURL(b) : null));
+    // Spec 031: la receta se descarga solo cuando hay que dibujar un sobre básico (los diseñados traen su miniatura).
+    p = import("./miniatura")
+      .then((m) => m.dibujarMiniatura(registro as SobreRegistro, textos))
+      .then((b) => (b ? URL.createObjectURL(b) : null))
+      .catch(() => {
+        drawn.delete(k);
+        return null;
+      });
     drawn.set(k, p);
   }
   return p;

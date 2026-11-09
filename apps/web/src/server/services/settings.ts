@@ -1,7 +1,8 @@
 import { and, asc, eq, inArray, isNotNull } from "drizzle-orm";
 import { appSettings, cards, sets } from "@/db/schema";
 import { MIN_AGE, isMinAge, type MinAge } from "@/domain/legal/documents";
-import { cardDefaultsSchema, parseCardDefaults, type CardDefaults } from "@/domain/cards/card-defaults";
+import type { CardDefaults } from "@/domain/cards/card-defaults";
+import { cardDefaultsSchema, parseCardDefaults } from "@/domain/cards/card-defaults-schema";
 import type { OddsTables, PityDefaults } from "@/domain/catalog/default-odds";
 import { oddsTablesProblems, oddsTablesSchema, parseOddsTables, parsePityDefaults, pityDefaultsSchema } from "@/domain/catalog/odds-defaults";
 import { coverIdsSchema, coverSelectionProblem, isValidCover, parseCoverIds } from "@/domain/catalog/cover-cards";
