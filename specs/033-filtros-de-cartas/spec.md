@@ -1,6 +1,6 @@
 # Spec 033 — Filtros, búsqueda y orden de las cartas de una colección
 
-Estado: **borrador**, pendiente de aprobación del dueño (entrevista del 9 nov 2026).
+Estado: **aprobada por el dueño el 9 nov 2026**, tras la entrevista del mismo día.
 
 Decisiones del dueño en la entrevista:
 1. Los filtros van en la cuadrícula de cartas dentro de una colección del panel; la lista «Sets» queda como está.
