@@ -9,6 +9,7 @@ import { OddsEditor } from "@/features/admin/sets/OddsEditor";
 import { OddsTabs } from "@/features/admin/sets/OddsTabs";
 import { PublishPanel } from "@/features/admin/sets/PublishPanel";
 import { WelcomeToggle } from "@/features/admin/sets/WelcomeToggle";
+import { DangerZone } from "@/features/admin/sets/DangerZone";
 import { FreeToggle } from "@/features/admin/sets/FreeToggle";
 import { PackSettings } from "@/features/admin/sets/PackSettings";
 import { PackDesignLinks } from "@/features/admin/sets/PackDesignLinks";
@@ -143,7 +144,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
         <FreeToggle setId={set.id} isFree={set.isFree} isAdult={set.isAdult} />
       </Card>
 
-      <Card className="space-y-3" title={t.welcome.title}>
+      <Card className="space-y-3" title={t.welcome.title} id="welcome">
         <WelcomeToggle setId={set.id} isWelcome={set.isWelcome} eligible={set.status === "published" && !set.isAdult} />
       </Card>
 
@@ -242,6 +243,9 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
           cardDefaults={cardDefaults}
         />
       </section>
+
+      {/* Spec 032, RF-1: archivar y eliminar, al final de la página. */}
+      <DangerZone setId={set.id} code={set.code} version={set.version} status={set.status} />
     </div>
   );
 }

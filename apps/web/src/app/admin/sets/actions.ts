@@ -9,6 +9,7 @@ import { getDict } from "@/i18n/server";
 import { setWelcomeSet } from "@/server/services/welcome";
 import { removePackImage, setCoverCard } from "@/server/services/pack-art";
 import { getCardStore } from "@/server/cards/store-instance";
+import { deleteSet, getSetDeletionInfo, type SetDeletionInfo } from "@/server/services/set-deletion";
 
 export async function createSetAction(_: ActionState | null, fd: FormData): Promise<ActionState> {
   return adminAction("createSet", ["/admin/sets", "/admin"], async ({ db, actorId }) => {
@@ -97,4 +98,23 @@ export async function removePackImageAction(setId: string): Promise<ActionState>
     await removePackImage(db, getCardStore(), actorId, setId);
     return (await getDict()).admin.set.pack.removed;
   });
+}
+
+/** Spec 032, RF-2, RF-9 y RF-12: lo que se borraría al eliminar la colección y, si no se puede, por qué. */
+export async function setDeletionInfoAction(setId: string): Promise<ActionState & { info?: SetDeletionInfo }> {
+  let info: SetDeletionInfo | undefined;
+  const r = await adminAction("setDeletionInfo", [], async ({ db }) => {
+    info = await getSetDeletionInfo(db, getCardStore(), setId);
+  });
+  return { ...r, info };
+}
+
+/** Spec 032, RF-5, RF-6, RF-14 y RF-15: elimina la colección; si ya no se puede, devuelve el aviso actualizado. */
+export async function deleteSetAction(setId: string, typedCode: string): Promise<ActionState & { info?: SetDeletionInfo }> {
+  const r = await adminAction("deleteSet", ["/admin/sets", "/admin", "/drop-rates", "/"], async ({ db, actorId }) => {
+    const { code } = await deleteSet(db, getCardStore(), actorId, setId, typedCode);
+    return (await getDict()).admin.deleteSet.deleted(code);
+  });
+  if (r.code === "set_not_deletable") return { ...r, info: (await setDeletionInfoAction(setId)).info };
+  return r;
 }

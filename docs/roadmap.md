@@ -180,3 +180,6 @@ La **pista de arte** corre en paralelo y se documenta en `art/README.md`.
   se van a usar, con indicador de carga. La página llega con teselas (sin capas ni biblioteca) y miniaturas diferidas;
   la ventana de una carta abre al instante y descarga el editor (una vez por visita), la carta y la biblioteca, con
   «Reintentar» si falla. Límite propio de 260 kB para esa página (antes 393 kB). Rama `spec/031-carga-diferida-del-set`.
+- 9 nov 2026: **spec 032 «eliminar una colección»**, pedida por el dueño. Botón en una zona de peligro al final de la
+  colección (con «Archivar»), aviso con lo que se borra y el código para confirmar. Solo colecciones que nadie recibió
+  y que no se usan en la bienvenida, la portada ni los tiers. Rama `spec/032-eliminar-coleccion`.

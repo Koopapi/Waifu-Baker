@@ -328,6 +328,16 @@ y siempre se ve un indicador mientras tanto.
 | RN-248 | Al abrir una carta, la ventana sale al instante con su miniatura y «Cargando el editor de la carta…»; el editor y la biblioteca se descargan una sola vez por visita y la carta completa cada vez. Si falla, avisa con «Reintentar» sin cerrar la ventana; si se cierra antes, no avisa de nada. | Vigente | 031 RF-8 a RF-12 |
 | RN-249 | La biblioteca de elementos del editor solo la pueden pedir los administradores. | Vigente | 031 RF-3 |
 
+## 25. Eliminar una colección (spec 032)
+
+Decisiones del dueño del 9 nov 2026. RN-40 y RN-64 no cambian: lo que recibió un coleccionista nunca se borra.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-250 | Una colección se puede eliminar desde la zona de peligro de su página si ningún usuario recibió nunca un sobre o una carta de ella (aunque los haya abierto o reciclado) y no es la de bienvenida, no tiene cartas de portada y no la da ninguna regla de tier. Si tiene dueños, el aviso dice cuántos usuarios son (sin decir quiénes) y, si está publicada, ofrece archivarla; si se usa en otro lugar, lista cada uno con su enlace. | Vigente | 032 RF-8 a RF-13 |
+| RN-251 | El aviso dice cuántas cartas, imágenes y diseños de sobre se borran y que no se puede deshacer; «Eliminar» solo se activa al escribir el código de la colección (sin distinguir mayúsculas). Se borra todo o nada (cartas, versiones, capas, imágenes, probabilidades y diseños), se comprueba otra vez al confirmar y queda en la auditoría con quién, cuándo, código, nombre y cartas. | Vigente | 032 RF-2 a RF-7, RF-14 |
+| RN-252 | «Archivar» se hace desde la zona de peligro, al final de la página de la colección. | Vigente | 032 RF-1 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
