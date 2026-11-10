@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { VIEW_DEFAULTS, configSignature, finalCardConfig } from "./final-card";
+import { effectiveHolo } from "./config-signature";
 import { layersConfigSchema, type LayersConfig } from "./layers";
 
 const base: LayersConfig = {
@@ -48,5 +51,17 @@ describe("spec 034 — la carta final", () => {
     expect(ok.success).toBe(true);
     expect(layersConfigSchema.safeParse({ ...base, profundidad: 31 }).success).toBe(false);
     expect(layersConfigSchema.safeParse({ ...base, inclinacion: -1 }).success).toBe(false);
+  });
+
+  it("test_s034_rf7_una_copia_holo_se_ve_holo_y_una_carta_guardada_con_holo_tambien", () => {
+    expect(effectiveHolo(true, finalCardConfig(base, panel))).toBe(true);
+    expect(effectiveHolo(false, finalCardConfig({ ...base, holo: true }, panel))).toBe(true);
+    expect(effectiveHolo(false, finalCardConfig(base, panel))).toBe(false);
+    expect(effectiveHolo(false, null)).toBe(false);
+  });
+
+  it("test_s034_rf4_rf11_la_carta_de_la_apertura_y_su_imagen_fija_tienen_la_proporcion_del_armador", () => {
+    const css = readFileSync(path.resolve(__dirname, "../../features/opening/opening.css"), "utf8");
+    expect(css).toMatch(/\.card3d \{[^}]*aspect-ratio: 700 \/ 991;/);
   });
 });
