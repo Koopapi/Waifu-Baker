@@ -1,8 +1,9 @@
 // Spec 018, RF-16 y RF-17: las capas de una carta (para verla viva) solo para quien la tiene y, en 18+, con el doble control.
 import { describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
-import { cards, userCards, users } from "@/db/schema";
+import { cards, characterBonds, userCards, users } from "@/db/schema";
 import { liveCardConfig, serveLiveLayer } from "@/server/services/live-card";
+import { BOND_THRESHOLDS } from "@/domain/expeditions/rules";
 import { upsertUserFromLogin } from "@/server/services/users";
 import { inRollback } from "./db";
 import { createPublishedSet, makeAdmin } from "./factories";
@@ -105,6 +106,17 @@ describe("spec 018 — capas para la carta viva", () => {
       const live = (await liveCardConfig(tx, fan.id, card.id, NOW))!;
       expect(live.config).toMatchObject({ holo: true, holoIntensidad: 0.7, marco: "personalizado", marcoColores: { color: "#6d5cff", brillo: "#d7ff3a" } });
       expect(live.config.capas.find((l) => "src" in l && l.rol === "personaje")).toMatchObject({ brillo: { tipo: "oro", intensidad: 0.5 } });
+    });
+  });
+
+  it("test_s034_rf8_los_efectos_del_vinculo_se_suman_a_la_carta_del_armador", async () => {
+    await inRollback(async (tx) => {
+      const { card, fan } = await world(tx);
+      await tx.update(cards).set({ layers: { ...card.layers!, profundidad: 3 } }).where(eq(cards.id, card.id));
+      await tx.insert(characterBonds).values({ userId: fan.id, characterId: card.characterId!, xp: BOND_THRESHOLDS.at(-1)! });
+      const live = await liveCardConfig(tx, fan.id, card.id, NOW);
+      // Lo guardado se conserva y el vínculo máximo suma el holo y el marco de vínculo.
+      expect(live!.config).toMatchObject({ profundidad: 3, holo: true, marco: "personalizado" });
     });
   });
 });
