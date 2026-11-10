@@ -10,6 +10,9 @@ export async function register() {
     if (dsn) Sentry.init({ dsn, tracesSampleRate: 0, beforeSend: (e) => scrubEvent(e) });
     const { startSchedulerIfEnabled } = await import("./server/scheduler");
     startSchedulerIfEnabled();
+    // Spec 035: aviso en Telegram cuando la versión nueva ya responde (DEPLOY_NOTICE=1, solo en el servidor).
+    const { startDeployNotice } = await import("./server/deploy-notice-start");
+    startDeployNotice();
   }
 }
 
