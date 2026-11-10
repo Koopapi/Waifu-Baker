@@ -30,7 +30,7 @@ test("eliminar una colección desde el panel", async ({ browser }) => {
     await expect(admin.locator('[data-testid="publish-panel"] [data-testid="archive-set"]')).toHaveCount(0);
   });
 
-  await test.step("RF-2 a RF-4: el aviso dice qué se borra y pide el código", async () => {
+  await test.step("RF-2, RF-3 y RF-4: el aviso dice qué se borra, que no se puede deshacer, y pide el código", async () => {
     await admin.click('[data-testid="delete-set-open"]');
     const dialog = admin.locator('[data-testid="delete-set-dialog"]');
     await expect(dialog).toContainText(`Eliminar la colección ${code}`);
