@@ -28,4 +28,25 @@ describe("spec 036 — textos sin nombres de personas", () => {
     expect(es).toContain('street: "Claro, con bordes de tinta y sombras duras.",');
     expect(en).toContain('street: "Light, with ink outlines and hard shadows.",');
   });
+
+  // RF-3 y RF-4: tampoco en el código, las pruebas, las specs ni los documentos (sin los paquetes de diseño originales).
+  it("test_s036_rf3_rf4_el_codigo_y_los_documentos_no_nombran_personas", () => {
+    const repo = path.resolve(__dirname, "../../../..");
+    const roots = ["apps/web/src", "apps/web/e2e", "apps/web/tests", "apps/web/scripts", "docs", "specs"].map((r) => path.join(repo, r));
+    const skip = new Set(["node_modules", "waifu-baker", ".next", "test-results"]);
+    const found: string[] = [];
+    const walk = (dir: string) => {
+      for (const e of readdirSync(dir, { withFileTypes: true })) {
+        if (skip.has(e.name)) continue;
+        const full = path.join(dir, e.name);
+        if (e.isDirectory()) walk(full);
+        else if (/\.(ts|tsx|mts|mjs|js|md|css|json|html)$/.test(e.name) && full !== __filename) {
+          const text = readFileSync(full, "utf8");
+          for (const name of PEOPLE) if (new RegExp(`\\b${name}\\b`, "i").test(text)) found.push(`${path.relative(repo, full)} ${name}`);
+        }
+      }
+    };
+    roots.forEach(walk);
+    expect(found).toEqual([]);
+  });
 });
