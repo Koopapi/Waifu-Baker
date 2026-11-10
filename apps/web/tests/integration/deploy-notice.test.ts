@@ -38,6 +38,15 @@ describe("spec 035 — aviso de despliegue", () => {
     });
   });
 
+  it("test_s035_rf2_produccion_tambien_avisa_y_dice_que_es_produccion", async () => {
+    await inRollback(async (tx) => {
+      const { tg, sent } = fakeTelegram();
+      expect(await notifyDeploy({ db: tx, telegram: tg, compare, commit: "p1", siteUrl: "https://waifubaker.com" })).toBe("sent");
+      expect(sent[0].split("\n")[0]).toMatch(/^✅ Producción actualizada · /);
+      expect(sent[0].trim().split("\n").at(-1)).toBe("waifubaker.com");
+    });
+  });
+
   it("test_s035_rf6_sin_cambios_no_avisa", async () => {
     await inRollback(async (tx) => {
       const { tg, sent } = fakeTelegram();
