@@ -79,13 +79,23 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   });
 
   await test.step("Nombres de las cartas desde el editor", async () => {
+    const nameInput = page.locator('[data-testid="card-editor"] input[name="name"]');
+    const save = page.locator('[data-testid="layers-save"]');
+    const status = page.locator('[data-testid="save-status"]');
     for (let i = 1; i <= IMAGES.length; i++) {
       const n = String(i).padStart(3, "0");
+      const name = `Carta de prueba ${n}`;
       await page.click(`[aria-label="Editar carta ${n}"]`);
-      await page.fill('[data-testid="card-editor"] input[name="name"]', `Carta de prueba ${n}`);
       // Spec 027, RF-3: el único «Guardar» deja la ventana abierta; sin cambios, Escape la cierra.
-      await page.click('[data-testid="layers-save"]');
-      await expect(page.locator('[data-testid="save-status"]')).toHaveAttribute("data-state", "saved");
+      // Las E2E corren con `next dev`: si una recompilación remonta el editor entre escribir y guardar, lo escrito se
+      // pierde y «Guardar» queda desactivado (en producción no hay recarga en caliente). Se repite hasta que el nombre
+      // quede guardado; si el remontaje llega después de guardar, el editor vuelve con el nombre y sin cambios.
+      await expect(async () => {
+        if ((await nameInput.inputValue({ timeout: 10_000 })) !== name) await nameInput.fill(name);
+        if (await save.isEnabled()) await save.click({ timeout: 5_000 });
+        await expect(status).toHaveAttribute("data-state", /^(saved|clean)$/, { timeout: 15_000 });
+        await expect(nameInput).toHaveValue(name, { timeout: 1_000 });
+      }).toPass({ timeout: 120_000 });
       await page.keyboard.press("Escape");
       await expect(page.locator('[data-testid="card-editor"]')).toHaveCount(0);
     }
