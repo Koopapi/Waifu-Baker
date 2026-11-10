@@ -48,8 +48,10 @@ test("eliminar una colección desde el panel", async ({ browser }) => {
 
   await test.step("RF-5 y RF-6: eliminar vuelve a «Sets» con el aviso y la colección ya no está", async () => {
     await admin.click('[data-testid="delete-set-confirm"]');
-    await admin.waitForURL(/\/admin\/sets$/);
+    // El aviso sale al confirmar y dura unos segundos: se mira antes de que llegue la lista, que en `next dev` recién
+    // reiniciado puede tardar en compilarse más de lo que dura el aviso.
     await expect(admin.getByText(`Colección ${code} eliminada.`)).toBeVisible();
+    await admin.waitForURL(/\/admin\/sets$/);
     await expect(admin.locator(`a:text-is('${code}')`)).toHaveCount(0);
     // La página del panel ya empezó a cargar (pantalla de carga) cuando sabe que no existe: se comprueba el texto.
     await admin.goto(`/admin/sets/${setId}`);

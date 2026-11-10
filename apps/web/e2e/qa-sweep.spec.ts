@@ -2,7 +2,7 @@
 // tableta y móvil, sin errores de consola, sin respuestas fallidas, sin desbordamiento lateral,
 // sin imágenes rotas y con nombre accesible en botones y enlaces.
 import type { Page } from "@playwright/test";
-import { desktopOnly, expect, test } from "./fixtures";
+import { desktopOnly, expect, keepServerFit, test } from "./fixtures";
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
 import { LAB, acceptGate, createPublishedSet, createZone, dismissCelebration, giftPacks, login, openAllAndSkip } from "./helpers";
@@ -86,7 +86,8 @@ async function audit(page: Page, url: string, vp: (typeof VIEWPORTS)[number], pr
 for (const theme of ["kawaii", "street"] as const)
 test(`barrido de calidad de todas las páginas (${theme})`, async ({ browser }) => {
   desktopOnly();
-  test.setTimeout(600_000);
+  // Incluye los reinicios controlados del servidor entre páginas (abajo) y la recompilación que les sigue.
+  test.setTimeout(900_000);
   const problems: Problem[] = [];
 
   const admin = await login(browser, "admin-sweep", true);
@@ -128,6 +129,9 @@ test(`barrido de calidad de todas las páginas (${theme})`, async ({ browser }) 
   const cAnon = ctxFor(anon);
 
   const run = async (p: Page, c: { url: string; vp: string }, url: string, name: string) => {
+    // El barrido es un solo test largo: sin esto, `next dev` llega a su límite de memoria a mitad y se reinicia solo
+    // con una página cargando. Aquí se reinicia (si hace falta) entre dos páginas, como entre dos tests.
+    await keepServerFit(`${test.info().project.name} › barrido (${theme}) › ${name}`);
     for (const vp of VIEWPORTS) {
       c.url = url;
       c.vp = vp.name;
