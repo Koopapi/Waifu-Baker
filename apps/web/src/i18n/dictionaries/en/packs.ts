@@ -84,7 +84,7 @@ export const packs = {
     newTitle: "New!",
     dismissCard: "Move the card aside",
   },
-  // Spec 030: Bruno's layered pack and its opening.
+  // Spec 030: the layered pack and its opening.
   sobre: {
     tear: { hint: "Swipe your finger along the line", aria: "Swipe along the dotted line or press Enter to open it." },
     sticker: { hint: "Peel the sticker off the top →", aria: "Peel the top sticker off by swiping right, or press Enter to open it." },

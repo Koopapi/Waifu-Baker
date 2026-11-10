@@ -6,7 +6,7 @@ después el código.
 
 ## 1. Modelo de datos
 
-- **Configuración por capas** (jsonb `cards.layers`, formato del creador de Bruno), campos nuevos, todos opcionales
+- **Configuración por capas** (jsonb `cards.layers`, formato del creador del paquete de diseño), campos nuevos, todos opcionales
   para no romper lo que ya existe:
   - en cada capa de imagen: `rol` (`personaje` | `fondo` | `extra`) y `encuadre`
     `{ x, y, escala, giro, ajuste }` (x e y en % del lienzo entre −100 y 100; escala 0,1 a 4; giro −180 a 180;

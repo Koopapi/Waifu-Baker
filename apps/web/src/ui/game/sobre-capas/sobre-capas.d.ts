@@ -1,4 +1,4 @@
-// Tipos de sobre-capas.js v1 (paquete de Bruno, docs/waifu-baker/sobres) con las opciones que añade la spec 030.
+// Tipos de sobre-capas.js v1 (paquete de diseño, docs/waifu-baker/sobres) con las opciones que añade la spec 030.
 // El script expone `window.SobreCapas` y `module.exports`; necesita `CartaCapas.motor` (carta-capas.js) cargado antes.
 import type { CapaImagen, CapaParticulas } from "../carta-capas/carta-capas";
 
@@ -15,7 +15,7 @@ export interface SobreSellos {
   patronTamano?: number;
 }
 
-/** El registro del sobre, en el formato del creador de Bruno (las imágenes ya son URL). */
+/** El registro del sobre, en el formato del creador del paquete de diseño (las imágenes ya son URL). */
 export interface SobreRegistro {
   id?: string;
   nombre?: string;

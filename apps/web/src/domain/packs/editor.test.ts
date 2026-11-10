@@ -1,4 +1,4 @@
-// Spec 030: reglas del editor de sobres (las del creador de Bruno).
+// Spec 030: reglas del editor de sobres (las del creador del paquete de diseño).
 import { describe, expect, it } from "vitest";
 import { emptyDesign, toRegistro, type PackDesign, type PackImageLayer } from "./design";
 import { addParticles, analyzePixels, byName, exportRegistro, placeUpload, reviewDesign, uploadRole, type ImageFacts } from "./editor";

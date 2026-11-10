@@ -92,7 +92,7 @@ export function createSoundEngine(deps: Deps) {
       else void this.preload().then(fire);
     },
     /**
-     * Spec 030: un sonido que suena fuera del motor (el rasgado sintetizado del sobre de Bruno): solo se anota, con el
+     * Spec 030: un sonido que suena fuera del motor (el rasgado sintetizado del sobre del paquete de diseño): solo se anota, con el
      * mismo evento que los demás y sin sonar si está silenciado.
      */
     note(name: SoundName) {

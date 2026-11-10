@@ -20,7 +20,7 @@ las capas de todas las cartas de todas las colecciones, solo para contar usos qu
 es que la página de la colección cargue solo lo que se ve, y que el editor y sus datos se carguen al abrir una carta.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): entra a una colección, revisa la cuadrícula y edita cartas.
+- **Administrador** (el dueño y quien colabora en el diseño): entra a una colección, revisa la cuadrícula y edita cartas.
 
 ## Historias de usuario
 - H1: Como administrador quiero entrar a una colección sin esperar, para revisar sus cartas y ajustes de inmediato.

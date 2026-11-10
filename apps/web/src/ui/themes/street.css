@@ -1,5 +1,5 @@
 /*
- * Spec 026: tema Street pop (diseño de Bruno, `docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`). Solo actúa
+ * Spec 026: tema Street pop (diseño del paquete de diseño, `docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`). Solo actúa
  * bajo `[data-theme="street"]`: el kawaii no cambia. Los colores redefinen las variables de `tokens.css`; la forma
  * (bordes de tinta, sombras duras, inclinación, mayúsculas) se pone sobre las clases `ui-*` de los componentes de
  * `src/ui`. Va fuera de las capas de Tailwind a propósito: así manda sobre sus utilidades sin tocar las clases.
@@ -34,7 +34,7 @@
   --ui-danger-text: #b0102b;
   --ui-info: #8fa6ff;
   --ui-info-text: #3b2fc9;
-  /* Pegatinas y adornos (RF-23): colores planos de Bruno y contorno de tinta. */
+  /* Pegatinas y adornos (RF-23): colores planos del paquete de diseño y contorno de tinta. */
   --ui-k-chicle: #ff3ea5;
   --ui-k-lavanda: #3b2fc9;
   --ui-k-menta: #3fe0d0;

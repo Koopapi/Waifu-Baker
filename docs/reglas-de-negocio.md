@@ -217,7 +217,7 @@ Vienen de la constitución (`docs/constitution.md`) y mandan sobre cualquier otr
 
 ## 18. Cartas por capas
 
-Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto en las specs 016 a 018. Desde la spec
+Origen: propuesta de diseño (RN-190 a RN-198 de su PR #14), adaptada al reparto en las specs 016 a 018. Desde la spec
 017, todas las cartas son cartas por capas; desde la 018, se ven así en toda la web.
 
 | Regla | Enunciado | Estado | Spec |
@@ -237,11 +237,11 @@ Origen: propuesta de Bruno (RN-190 a RN-198 de su PR #14), adaptada al reparto e
 | RN-201 | Cada capa de imagen se puede mover, escalar (10 % a 400 %) y girar (−180° a 180°) sin perder el parallax ni el brillo. | Vigente | 017 RF-10 a RF-12 |
 | RN-202 | Mientras nadie cambie a mano el marco, las partículas o el sello, la carta lleva el estilo completo de su escalón y lo cambia con la rareza; aplicar el estilo de la rareza lo vuelve automático. | Vigente | 017 RF-13, RF-14 |
 | RN-203 | Una colección solo se publica con todas sus cartas armadas (chica y fondo visibles); el panel dice cuáles faltan, con enlace a cada una. | Vigente | 017 RF-15, RF-16 |
-| RN-204 | Las cartas se exportan y se importan en el formato del creador de cartas de Bruno (configuración con nombres de archivo y encuadre); una importación no válida no cambia la carta. | Vigente | 017 RF-17 a RF-19 |
+| RN-204 | Las cartas se exportan y se importan en el formato del creador de cartas del paquete de diseño (configuración con nombres de archivo y encuadre); una importación no válida no cambia la carta. | Vigente | 017 RF-17 a RF-19 |
 
 ## 19. Juegos: Expediciones
 
-Origen: propuesta de Bruno (versión 1), con el botín rediseñado por el dueño (spec 020). El servidor decide con su reloj
+Origen: propuesta de diseño (versión 1), con el botín rediseñado por el dueño (spec 020). El servidor decide con su reloj
 y su RNG; no hay forma de pagar para avanzar.
 
 | Regla | Enunciado | Estado | Spec |
@@ -306,11 +306,11 @@ barra (RN-209 y RN-214 siguen); sustituye el nivel por carta de la economía v2.
 ## 23. Sobres por capas (spec 030)
 
 Decisiones del dueño del 6 nov 2026. Se mantiene el flujo de apertura de la spec 023; el sobre y sus animaciones son los
-del paquete de Bruno (`docs/waifu-baker/sobres/`).
+del paquete de diseño (`docs/waifu-baker/sobres/`).
 
 | Regla | Enunciado | Estado | Spec |
 |---|---|---|---|
-| RN-241 | Cada colección tiene dos diseños de sobre, plata y gold, que solo editan los administradores en el panel. El nombre, el código y las cartas por sobre salen de la colección. Mientras un tipo no tenga diseño, se ve el sobre básico de Bruno con la portada (o el sobre a mano) de la colección y sellos plateados o dorados. | Vigente | 030 RF-1, RF-8, RF-13, RF-15 |
+| RN-241 | Cada colección tiene dos diseños de sobre, plata y gold, que solo editan los administradores en el panel. El nombre, el código y las cartas por sobre salen de la colección. Mientras un tipo no tenga diseño, se ve el sobre básico del paquete de diseño con la portada (o el sobre a mano) de la colección y sellos plateados o dorados. | Vigente | 030 RF-1, RF-8, RF-13, RF-15 |
 | RN-242 | El diseño se valida en el servidor (modos de mezcla, colores en hexadecimal, rangos y solo imágenes del almacén propio de la colección); uno inválido no se guarda y se dice qué campo falla. Sus imágenes y su miniatura (500 × 875) se guardan al guardar, con auditoría, y se sirven con enlaces firmados de la misma sesión y el doble filtro 18+. | Vigente | 030 RF-10 a RF-12, RNF |
 | RN-243 | La revisión del editor avisa sin impedir guardar: imagen que no mide 1000 × 1750, fondo con transparencia, arte que cruza la línea de rasgado (y = 230), nombre de más de 17 letras y archivos que faltan. | Vigente | 030 RF-9 |
 | RN-244 | El mismo sobre se ve en «Mis sobres» (en miniatura), la apertura, «Abrir todos» y el simulador. Al guardar un diseño, los sobres ya entregados sin abrir se ven con él; los de una colección archivada se siguen abriendo con su diseño. Cerrado, no deja ver ninguna carta. | Vigente | 030 RF-14, RF-16, RF-17 |

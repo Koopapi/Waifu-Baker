@@ -1,4 +1,4 @@
-// Criterios de finalización de la spec 030: el administrador diseña el sobre gold con el ejemplo FA01 de Bruno, lo
+// Criterios de finalización de la spec 030: el administrador diseña el sobre gold con el ejemplo FA01 del paquete de diseño, lo
 // guarda y recarga (las imágenes siguen) → la revisión avisa de una capa mal medida → «Mis sobres» muestra el gold con
 // su diseño y el plata con el sobre básico → el coleccionista lo abre (rasgando o con el botón) con una Legendaria:
 // las cartas suben boca abajo, el mazo late, sale el efecto especial y el resumen «Tu sobre».
@@ -115,7 +115,7 @@ test("sobres por capas: diseñar, guardar, recargar y abrir con una Legendaria",
     await shot(fan, "2-mis-sobres");
   });
 
-  await test.step("RF-17 y RF-18: el sobre diseñado, cerrado sin cartas a la vista, se abre con la animación de Bruno", async () => {
+  await test.step("RF-17 y RF-18: el sobre diseñado, cerrado sin cartas a la vista, se abre con la animación del paquete de diseño", async () => {
     await fan.click(`[data-testid="group-${code}-gold"] >> text=${es.packs.mine.openOne}`);
     const pack = fan.locator('[data-testid="tear-pack"][data-designed="true"][data-kind="gold"]');
     await expect(pack.locator(".sc-sobre")).toBeVisible();

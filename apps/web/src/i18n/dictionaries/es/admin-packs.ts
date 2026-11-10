@@ -1,4 +1,4 @@
-// Spec 030: textos del editor de sobres (los del creador de sobres de Bruno). Aparte del diccionario general para que
+// Spec 030: textos del editor de sobres (los del creador de sobres del paquete de diseño). Aparte del diccionario general para que
 // solo los descargue el panel.
 import type { adminPacks as en } from "../en/admin-packs";
 

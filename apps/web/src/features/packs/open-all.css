@@ -185,7 +185,7 @@
   background: none;
   cursor: pointer;
 }
-/* Spec 030, RF-25: el efecto especial de Bruno en las Legendarias y EX destacadas. */
+/* Spec 030, RF-25: el efecto especial del paquete de diseño en las Legendarias y EX destacadas. */
 .oa-focus__rays {
   position: absolute;
   inset: -60%;

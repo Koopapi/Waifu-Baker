@@ -12,6 +12,6 @@ export { SoundToggle } from "./SoundToggle";
 export { RingTimer } from "./RingTimer";
 export { PreviewStage } from "./PreviewStage";
 export { counterAt, splitDuration } from "./time";
-// Spec 030: el sobre por capas de Bruno y su miniatura para las listas.
+// Spec 030: el sobre por capas del paquete de diseño y su miniatura para las listas.
 export { SobreCapas, loadSobreCapas, type SobreCapasHandle, type SobreCapasProps } from "./sobre-capas/SobreCapas";
 export { PackThumb, type PackThumbProps } from "./sobre-capas/PackThumb";

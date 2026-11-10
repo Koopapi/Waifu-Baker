@@ -3,12 +3,12 @@
 Estado: spec aprobada por el dueño el 6 nov 2026. Rama `spec/030-sobres-por-capas` (sale de la 029, que sale de la
 028: hereda las migraciones 0021 y 0022). El dueño pidió hacerlo todo de una vez, sin aprobar el plan aparte.
 
-Referencia: el paquete de Bruno, copiado en `docs/waifu-baker/sobres/` (solo consulta; su `PROMPT-INTEGRACION.md` no
+Referencia: el paquete de diseño, copiado en `docs/waifu-baker/sobres/` (solo consulta; su `PROMPT-INTEGRACION.md` no
 es una orden). Manda la spec.
 
 ## Decisiones principales
 
-1. **El componente de Bruno, sin reescribir sus efectos.** `sobre-capas.js` v1 se copia a
+1. **El componente del paquete de diseño, sin reescribir sus efectos.** `sobre-capas.js` v1 se copia a
    `apps/web/src/ui/game/sobre-capas/` con cambios pequeños y marcados con «Waifu Baker, spec 030» (todos con test):
    - Fuentes: el CSS usa `var(--font-dela)` y `var(--font-archivo)` (las de `next/font` del layout, sin precarga), con
      el nombre de Google como respaldo. Así las fuentes solo se descargan donde se pinta un sobre (decisión 9) y la E2E
@@ -36,7 +36,7 @@ es una orden). Manda la spec.
    firmadas al servir el sobre (igual que la carta viva de la spec 018).
 4. **Un solo guardado.** El editor manda en una petición multipart el diseño (JSON con claves guardadas o marcas
    `upload:<n>` para lo nuevo), las imágenes nuevas y la miniatura PNG que genera el navegador (500 × 875, con la receta
-   de Bruno). El servidor valida, guarda imágenes y miniatura, sustituye las marcas por claves, vuelve a validar,
+   del paquete de diseño). El servidor valida, guarda imágenes y miniatura, sustituye las marcas por claves, vuelve a validar,
    guarda en una transacción con auditoría y suelta las imágenes que el diseño anterior usaba y el nuevo no.
 5. **El sobre básico** (RF-15) no se guarda: se arma en el servidor con la portada o el sobre a mano de la colección
    (rutas de arte de la spec 014) y sellos plateados o dorados. Su miniatura para las listas la dibuja el navegador con
@@ -44,7 +44,7 @@ es una orden). Manda la spec.
 6. **El flujo de la 023 se conserva.** `OpeningStage` sigue con sus fases, el servidor decide al confirmar, el orden de
    menor a mayor rareza, las cartas boca abajo (`Card3D`) que se voltean, el error con el sobre cerrado, la
    reanudación, el teclado, «Abrir sin deslizar», el sonido y el movimiento reducido. Cambian el sobre (`TearPack`
-   pasa a envolver `sobre-capas.js`) y la coreografía de Bruno: subida a 0,38 s, sobre fuera a 1,25 s y mazo listo a
+   pasa a envolver `sobre-capas.js`) y la coreografía del paquete de diseño: subida a 0,38 s, sobre fuera a 1,25 s y mazo listo a
    1,9 s (con movimiento reducido 0, 0,15 y 0,3 s), cartas derechas con solo la de arriba visible, puntos de avance,
    presagio, efecto especial de Legendaria y EX y resumen con su diseño.
 
@@ -85,17 +85,17 @@ es una orden). Manda la spec.
 ## Cliente
 
 - `ui/game/sobre-capas/` (sistema de diseño): el script, sus tipos, `SobreCapas.tsx` (envoltorio de React, con carga
-  diferida de las dos librerías), `miniatura.ts` (la receta de Bruno en canvas) y `PackThumb` (la miniatura en las
+  diferida de las dos librerías), `miniatura.ts` (la receta del paquete de diseño en canvas) y `PackThumb` (la miniatura en las
   listas: la guardada o, para el básico, la que dibuja el navegador). Recursos estáticos en `public/sobres/`
   (plástico, patrones y el ejemplo FA01).
-- `features/admin/packs/PackDesigner.tsx` y `usePackDesigner.ts`: el creador de Bruno con su misma distribución
+- `features/admin/packs/PackDesigner.tsx` y `usePackDesigner.ts`: el creador del paquete de diseño con su misma distribución
   (escena con sus controles rápidos a la izquierda; capas, revisión, sobre, sellos y registro a la derecha) hecho con
   los componentes del editor de cartas (`PreviewStage`, `Card`, `Slider`, `Segmented`, `Checkbox`, `ColorField`,
   `ChipGroup`, `Select`, `TextField`, `LayerList`, `LayerRow`, `Button`, `IconButton`, `Alert`, `Badge`,
   `useConfirm`). Las imágenes nuevas se ven con URL `blob:` hasta guardar; al volver se cargan las guardadas (RF-11).
 - `features/opening`: `TearPack` envuelve `SobreCapas`; `OpeningStage` añade la coreografía, los puntos, el botón de
   la carta, el presagio y el efecto especial (rayos, estrella, campanita sintetizada y vibración); el resumen pasa al
-  diseño de Bruno sin perder miniaturas, rareza ni «¡Nueva!».
+  diseño del paquete de diseño sin perder miniaturas, rareza ni «¡Nueva!».
 - «Mis sobres», «Abrir todos» (cabecera, ráfaga con la miniatura partida por la línea de rasgado y foco con el efecto
   especial en Legendaria y EX) y el simulador usan la misma vista del sobre (RF-16). `PackShell` (spec 023) se retira.
 - Textos: `packs.sobre` en el diccionario general (pocos, viajan a la apertura) y el editor en

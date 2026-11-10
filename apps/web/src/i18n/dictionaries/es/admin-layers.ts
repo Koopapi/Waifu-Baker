@@ -161,7 +161,7 @@ export const adminLayers: typeof en = {
     goTo: "Ir a la Biblioteca →",
     setNote: "Los fondos, sellos, adornos y partículas viven en la Biblioteca general, común a todas las colecciones.",
   },
-  // Spec 025: el configurador de cartas v4 (el de Bruno) en el editor.
+  // Spec 025: el configurador de cartas v4 (el del paquete de diseño) en el editor.
   v4: {
     layersTitle: "Capas",
     layersCount: (n: number) => (n === 1 ? "1 capa" : `${n} capas`),

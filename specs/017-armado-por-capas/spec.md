@@ -4,10 +4,10 @@ Estado: **cerrada** el 23 oct 2026 (validación 21 de 21 y demo manual del dueñ
 fondos de cada colección pasa a ser una biblioteca general de elementos (RF-6 a RF-9 reescritos y RF-21 nuevo).
 
 ## Contexto y objetivo
-La spec 016 llevó al panel el editor de cartas por capas de Bruno. Al aprobarlo, el dueño decidió que **todas las
-cartas serán cartas por capas**, como la carta de Yuki del paquete de Bruno: la imagen central de cada carta es **la
+La spec 016 llevó al panel el editor de cartas por capas del paquete de diseño. Al aprobarlo, el dueño decidió que **todas las
+cartas serán cartas por capas**, como la carta de Yuki del paquete de diseño: la imagen central de cada carta es **la
 chica recortada, sin fondo** (PNG con transparencia), y alrededor se arma el fondo, las partículas, el marco y el
-sello. El dueño y Bruno arman cada carta a mano antes de lanzar una colección; las ilustraciones que hay hoy en el
+sello. El dueño y el colaborador de diseño arman cada carta a mano antes de lanzar una colección; las ilustraciones que hay hoy en el
 sistema son material de prueba que se recortará fuera (Photoshop u otra herramienta).
 
 Esta spec hace que las cartas se **creen y se armen** así en el panel: subir la chica crea la carta, los fondos, sellos,
@@ -17,7 +17,7 @@ en producción: no hay conversión de cartas antiguas ni periodo de transición.
 capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo, probabilidades ni concesiones.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): crea y arma las cartas en el panel.
+- **Administrador** (el dueño y quien colabora en el diseño): crea y arma las cartas en el panel.
 - **Coleccionista**: sin cambios en esta spec.
 
 ## Historias de usuario
@@ -26,7 +26,7 @@ capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo
 - H3: Como administrador quiero encuadrar a la chica: moverla, acercarla o alejarla y girarla un poco.
 - H4: Como administrador quiero que la carta se vista sola con el estilo de su rareza mientras no lo toque.
 - H5: Como dueño quiero que no se pueda publicar una colección con cartas a medio armar.
-- H6: Como administrador quiero importar y exportar el formato del creador de Bruno.
+- H6: Como administrador quiero importar y exportar el formato del creador del paquete de diseño.
 
 ## Vocabulario
 - **Imagen de la chica (personaje)**: la ilustración recortada, con transparencia, que es el centro de la carta.
@@ -92,8 +92,8 @@ capas en toda la web) es la spec 018. No cambia ninguna regla de rarezas, sorteo
 - RF-16: EL SISTEMA mantendrá el resto de comprobaciones de publicación (personaje, nombre, rareza y revisión 18+).
 
 ### Importar y exportar
-- RF-17: CUANDO el administrador exporte una carta, EL SISTEMA entregará la configuración en el formato del creador de
-  Bruno, con los nombres de archivo de sus capas y su encuadre.
+- RF-17: CUANDO el administrador exporte una carta, EL SISTEMA entregará la configuración en el formato del creador del
+  paquete de diseño, con los nombres de archivo de sus capas y su encuadre.
 - RF-18: CUANDO el administrador importe una configuración del creador y suba sus archivos, EL SISTEMA colocará cada
   archivo en su capa; SI la configuración no es válida, ENTONCES no cambiará la carta e indicará qué parte falla.
 - RF-19: SI una configuración importada usa un modo de mezcla que el editor no ofrece, ENTONCES EL SISTEMA lo cambiará a
@@ -137,7 +137,7 @@ automático, intentar publicar con una carta sin armar, exportar e importar; la 
 `pnpm budget` sin cambios en el coleccionista; demo manual del dueño.
 
 ## Decisiones (23 oct 2026)
-- Todas las cartas son cartas por capas (sistema de Bruno); el dueño y Bruno las arman a mano antes de lanzar.
+- Todas las cartas son cartas por capas (sistema del paquete de diseño); el dueño y quien colabora en el diseño las arman a mano antes de lanzar.
 - La imagen central es la chica recortada sin fondo; el recorte se hace fuera del panel.
 - Fondos: biblioteca por colección y, si hace falta, uno propio por carta. **Ampliado el mismo día**: una biblioteca
   general de elementos (fondos, sellos de imagen, capas de adorno y partículas guardadas) común a todas las colecciones;
@@ -145,4 +145,4 @@ automático, intentar publicar con una carta sin armar, exportar e importar; la 
 - Encuadre: mover, escalar y girar cada capa.
 - No se publica una colección con cartas sin armar.
 - Sin conversión de cartas antiguas ni transición: el proyecto aún no está en producción.
-- De la propuesta de Bruno entran aquí sus RF-23, RF-24, RF-64 a RF-66 y RF-70.
+- De la propuesta de diseño entran aquí sus RF-23, RF-24, RF-64 a RF-66 y RF-70.

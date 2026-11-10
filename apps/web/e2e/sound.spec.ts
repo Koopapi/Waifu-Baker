@@ -46,7 +46,7 @@ test("sonido y vibración de la apertura, con silencio recordado", async ({ brow
     const expected = ["tear", ...rarities.flatMap((r) => ["flip", ...(revealSound(r) ? [revealSound(r)!] : [])])];
     await expect.poll(async () => (await log(fan)).sounds).toEqual(expected);
     expect(rarities.some((r) => revealSound(r))).toBe(true);
-    // Spec 030: el sobre de Bruno vibra corto al abrirse («45»); aquí solo cuentan las vibraciones de las raras.
+    // Spec 030: el sobre del paquete de diseño vibra corto al abrirse («45»); aquí solo cuentan las vibraciones de las raras.
     expect((await log(fan)).vibes.filter((v) => v !== "45")).toEqual(rarities.flatMap((r) => (vibrationPattern(r) ? [vibrationPattern(r)!.join(",")] : [])));
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}/s013-1-resumen-con-sonido.png` });
   });

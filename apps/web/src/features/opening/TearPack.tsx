@@ -28,7 +28,7 @@ export interface TearPackHandle {
 }
 
 /**
- * Spec 030, RF-18: el sobre de Bruno (`sobre-capas.js`) en la mesa de apertura. Se rasga por la línea o se despega el
+ * Spec 030, RF-18: el sobre del paquete de diseño (`sobre-capas.js`) en la mesa de apertura. Se rasga por la línea o se despega el
  * sticker según su diseño: la tira sale volando, hay un destello, el rasgado suena y vibra corto (por el motor de sonido,
  * con el silencio recordado de la spec 013). Un toque sin deslizar sacude la indicación. «Abrir sin deslizar» y la
  * tecla Intro hacen lo mismo (spec 023, RF-9); con movimiento reducido solo el botón y el teclado (RNF).

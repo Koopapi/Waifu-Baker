@@ -645,7 +645,7 @@ export const adminLoginCodes = pgTable(
 
 /**
  * Spec 030, RF-1, RF-10 y RF-14: el diseño del sobre por capas de cada colección, uno para el plata y otro para el gold
- * (formato del creador de Bruno). Las imágenes son claves del almacén propio; la miniatura de 500 × 875 la genera el
+ * (formato del creador del paquete de diseño). Las imágenes son claves del almacén propio; la miniatura de 500 × 875 la genera el
  * navegador al guardar. Sin fila, el sobre básico (RF-15).
  */
 export const packDesigns = pgTable(

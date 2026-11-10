@@ -152,7 +152,7 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   await test.step("RF-23: simular un sobre con las cartas reales", async () => {
     await page.click('[data-testid="simulate-link"]');
     await page.waitForURL(/simulate$/);
-    // Spec 030: el mismo sobre de Bruno que verá el coleccionista.
+    // Spec 030: el mismo sobre del paquete de diseño que verá el coleccionista.
     await tear(page);
     // Spec 023: el mazo (de menor a mayor rareza) se revela y se aparte carta a carta.
     await openDeck(page);

@@ -1,4 +1,4 @@
-// Spec 030: nuestra copia de sobre-capas.js (paquete de Bruno) y sus cambios marcados. Sin navegador, se revisa el
+// Spec 030: nuestra copia de sobre-capas.js (paquete de diseño) y sus cambios marcados. Sin navegador, se revisa el
 // código y la API: el registro puede venir de la base de datos (lo que va a `style` pasa por listas cerradas).
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -8,15 +8,15 @@ import type { SobreCapasApi } from "./sobre-capas";
 
 const api = lib as unknown as SobreCapasApi;
 const src = readFileSync(path.resolve(__dirname, "sobre-capas.js"), "utf8");
-const bruno = readFileSync(path.resolve(__dirname, "../../../../../../docs/waifu-baker/sobres/src/sobre-capas.js"), "utf8");
+const paquete = readFileSync(path.resolve(__dirname, "../../../../../../docs/waifu-baker/sobres/src/sobre-capas.js"), "utf8");
 
 describe("spec 030 — sobre-capas.js en el juego", () => {
-  it("test_s030_rnf_es_el_componente_de_bruno_con_sus_efectos_y_zonas", () => {
+  it("test_s030_rnf_es_el_componente_del_paquete_de_diseno_con_sus_efectos_y_zonas", () => {
     expect(api.version).toBe(1);
     expect(api.zonas).toEqual({ lienzo: [1000, 1750], selloArriba: [0, 150], selloAbajo: [1625, 1750], corte: 230, logo: [260, 480], set: [1450, 1650], margen: 80 });
     // Los efectos son los suyos: el plástico, el lustre, el rasgado y el sticker vienen tal cual.
     for (const rule of [".sc-lustre{mix-blend-mode:screen", ".sc-rasgar.sc-abierto .sc-tira{transition:transform .8s", "@keyframes sc-flash", ".sc-pl-brillo{inset:-2%"]) {
-      expect(bruno).toContain(rule);
+      expect(paquete).toContain(rule);
       expect(src).toContain(rule);
     }
     expect(src).toMatch(/necesita carta-capas\.js v7 o posterior \(con CartaCapas\.motor\)/);
@@ -35,8 +35,8 @@ describe("spec 030 — sobre-capas.js en el juego", () => {
     expect(src).toMatch(/insColor = op\.insignia \? colorSeguro\(C, op\.insignia\.color\)/);
     expect(src).toMatch(/'--sc-s1', colorSeguro\(C, op\.sellos\.arriba\)/);
     expect(src).toMatch(/'--sc-s2', colorSeguro\(C, op\.sellos\.abajo\)/);
-    // Lo de Bruno los ponía sin revisar.
-    expect(bruno).toMatch(/esc\(op\.insignia\.color\)/);
+    // Lo del paquete de diseño los ponía sin revisar.
+    expect(paquete).toMatch(/esc\(op\.insignia\.color\)/);
     expect(src).not.toMatch(/esc\(op\.insignia\.color\)/);
   });
 

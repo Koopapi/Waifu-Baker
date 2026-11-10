@@ -36,7 +36,7 @@ export const account = {
     names: { kawaii: "Kawaii", street: "Street pop" },
     descriptions: {
       kawaii: "Dark and soft, with pastel stickers. The classic one.",
-      street: "Light, with ink outlines and hard shadows. Designed by Bruno.",
+      street: "Light, with ink outlines and hard shadows.",
     },
     active: "Active",
     cardsNote: "Your cards look the same in both themes. The table where you open packs stays dark so holo and shine stand out.",

@@ -37,7 +37,7 @@ export default async function PackDesignPage({ params }: Params) {
     db.select({ name: cards.name, rarity: cards.rarity, keyMid: cards.keyMid }).from(cards).where(eq(cards.setId, set.id)).orderBy(asc(cards.number)),
     getDict(),
   ]);
-  // RF-3: las cartas de muestra de «Probar apertura» son las de la colección (o, sin cartas, la del paquete de Bruno).
+  // RF-3: las cartas de muestra de «Probar apertura» son las de la colección (o, sin cartas, la del paquete de diseño).
   const own: SampleCard[] = list.filter((c) => c.keyMid && c.rarity).map((c) => ({ image: `/api/admin/assets/${c.keyMid}`, rarity: c.rarity!, name: c.name || set.code }));
   const samples: SampleCard[] = own.length > 0 ? own.slice(0, 15) : (["common", "rare", "rare", "epic", "legendary"] as const).map((rarity) => ({ image: `/api/admin/pack-example/${PACK_SAMPLE_CARD}`, rarity, name: "Yuki", raw: true }));
   return (

@@ -68,7 +68,7 @@ interface StageProps {
 
 /**
  * Spec 023: el sobre se rasga de verdad y las cartas salen como un mazo, de menor a mayor rareza (RF-12, RF-13). La de
- * arriba se revela con un toque o deslizando (RF-15) y se presenta como en la referencia de Bruno («¡Nueva!», insignia de
+ * arriba se revela con un toque o deslizando (RF-15) y se presenta como en la referencia del paquete de diseño («¡Nueva!», insignia de
  * rareza, nombre y colección); otro gesto la aparta hacia ese lado (RF-16) y, tras la última, el resumen (RF-18).
  */
 export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false, extraHud, onFinished, renderSummaryActions, debug = false }: StageProps = {}) {
@@ -110,13 +110,13 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
   useEffect(() => {
     void sound.preload();
   }, []);
-  // El rasgado lo suena el sobre de Bruno (sintetizado); aquí se desbloquea el audio de los volteos (spec 013, RF-2).
+  // El rasgado lo suena el sobre del paquete de diseño (sintetizado); aquí se desbloquea el audio de los volteos (spec 013, RF-2).
   const onCommit = useCallback(() => {
     sound.unlock();
   }, []);
 
   // RF-10 y RF-11: el contenido se pide al abrir el sobre; si falla, el sobre vuelve cerrado y se puede reintentar.
-  // Spec 030, RF-19: mientras, la coreografía de Bruno: las cartas suben boca abajo desde dentro a los 0,38 s, el sobre
+  // Spec 030, RF-19: mientras, la coreografía del paquete de diseño: las cartas suben boca abajo desde dentro a los 0,38 s, el sobre
   // se va a los 1,25 s y el mazo queda en el centro a los 1,9 s (si el servidor tarda más, cada paso espera a las cartas).
   const open = useCallback(
     (resume = false) => {
@@ -190,7 +190,7 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
     sound.play("flip");
     const effects = () => {
       // Spec 013, RF-4 y RF-9: las raras o mejores suenan y vibran según su nivel. Spec 030, RF-26: la Legendaria y la
-      // EX, solo con el efecto de Bruno (sin sonido de rareza, confeti, partículas, celebración ni destello).
+      // EX, solo con el efecto del paquete de diseño (sin sonido de rareza, confeti, partículas, celebración ni destello).
       const fx = revealFx(card.rarity);
       if (fx.sound) sound.play(fx.sound);
       sound.vibrate(fx.vibration ? [...fx.vibration] : null);
@@ -205,7 +205,7 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
         setFlash(card.rarity);
         window.setTimeout(() => setFlash(null), 400);
       }
-      // Spec 030, RF-22: la Legendaria y la EX salen con el efecto especial de Bruno (rayos dorados, estrella con su
+      // Spec 030, RF-22: la Legendaria y la EX salen con el efecto especial del paquete de diseño (rayos dorados, estrella con su
       // rareza, campanita y su vibración). Con movimiento reducido, la estrella sin animar y sin rayos.
       if (fx.special) {
         setSpecial(card.rarity);
@@ -362,7 +362,7 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
         {error === "" ? t.packs.stage.openFailed : (error ?? hint)}
       </p>
 
-      {/* Spec 030: el sobre de Bruno, hasta que se va (RF-19); al retomar una apertura no se pinta (spec 023, RF-22). */}
+      {/* Spec 030: el sobre del paquete de diseño, hasta que se va (RF-19); al retomar una apertura no se pinta (spec 023, RF-22). */}
       {(phase === "idle" || phase === "opening") && !(autoOpen && packKey === 0) && (
         <div className="stage__center">
           <TearPack
@@ -429,7 +429,7 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
         </div>
       )}
 
-      {/* RF-15: la carta presentada, como en la referencia de Bruno. */}
+      {/* RF-15: la carta presentada, como en la referencia del paquete de diseño. */}
       {current && shown && (
         <div className={`reveal-info rarity-${current.rarity}`} data-testid="reveal-info" aria-live="polite">
           {current.isNew && <p className="reveal-info__new">{t.packs.stage.newTitle}</p>}
@@ -459,7 +459,7 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
       {phase === "summary" && (
         <div className="summary">
           <div className="summary__card">
-            {/* Spec 030, RF-23: el resumen con el diseño de Bruno («Tu sobre»), con miniaturas, rareza y «¡Nueva!». */}
+            {/* Spec 030, RF-23: el resumen con el diseño del paquete («Tu sobre»), con miniaturas, rareza y «¡Nueva!». */}
             <h2 className="summary__title">
               <Sticker name="card" className="size-9" />
               {t.packs.sobre.summaryTitle}

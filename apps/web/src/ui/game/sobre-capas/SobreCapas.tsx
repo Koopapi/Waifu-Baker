@@ -61,7 +61,7 @@ export interface SobreCapasHandle {
 }
 
 /**
- * Spec 030: el sobre por capas de Bruno (`sobre-capas.js`) en React. Se monta una vez; si cambia el registro, se le
+ * Spec 030: el sobre por capas del paquete de diseño (`sobre-capas.js`) en React. Se monta una vez; si cambia el registro, se le
  * aplica con `set` (vista previa del editor, sin volver a montarlo). Se destruye con sus escuchas al desmontarse.
  */
 export const SobreCapas = forwardRef<SobreCapasHandle, SobreCapasProps>(function SobreCapas(

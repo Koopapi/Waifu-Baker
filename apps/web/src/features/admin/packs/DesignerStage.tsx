@@ -28,7 +28,7 @@ export type Scene = "rayos" | "oscuro" | "claro";
 type TestPhase = "closed" | "opening" | "revealing" | "done";
 
 /**
- * Spec 030, RF-3: la vista previa en vivo del creador de Bruno: el sobre se inclina con el puntero, se puede rasgar o
+ * Spec 030, RF-3: la vista previa en vivo del creador del paquete de diseño: el sobre se inclina con el puntero, se puede rasgar o
  * despegar, y «Probar apertura» lo abre con cartas de muestra (suben a los 0,38 s, el sobre se va a los 1,25 s y la
  * primera sale a los 1,9 s); «Siguiente carta» las pasa y «Volver a cerrar» vuelve al sobre cerrado.
  */

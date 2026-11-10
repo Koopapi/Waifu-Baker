@@ -83,7 +83,7 @@ export const packs: typeof en = {
     newTitle: "¡Nueva!",
     dismissCard: "Apartar la carta",
   },
-  // Spec 030: el sobre por capas de Bruno y su apertura.
+  // Spec 030: el sobre por capas del paquete de diseño y su apertura.
   sobre: {
     tear: { hint: "Desliza el dedo por la línea", aria: "Desliza por la línea punteada o pulsa Intro para abrirlo." },
     sticker: { hint: "Despega el sticker de arriba →", aria: "Despega el sticker de arriba deslizando hacia la derecha, o pulsa Intro para abrirlo." },

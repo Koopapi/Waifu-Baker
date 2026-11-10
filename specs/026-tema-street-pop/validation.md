@@ -19,7 +19,7 @@ Pendiente: demo del dueño en escritorio y teléfono en el servidor de pruebas.
 | RF-13 | `PreviewStage` con `data-theme="kawaii"`; la piel de Street pop se detiene ahí (`@scope … to`) | ✅ (revisión de código y capturas) |
 | RF-14, RF-15 | El tema no toca `carta-capas.js` ni los colores de rareza; E2E (el escenario conserva las variables del kawaii) | ✅ |
 | RF-16 | E2E (el álbum de un usuario con Street pop sale en kawaii para un visitante sin sesión) | ✅ |
-| RF-17, RF-18 | `ui/themes/street.test.ts` (paleta de Bruno); E2E (fondo lila y títulos en Dela Gothic) | ✅ |
+| RF-17, RF-18 | `ui/themes/street.test.ts` (paleta del paquete de diseño); E2E (fondo lila y títulos en Dela Gothic) | ✅ |
 | RF-19 a RF-21 | `street.css` (botones y etiquetas en Archivo itálica gruesa, bordes de 3 px, sombras duras, inclinados; los botones de varias líneas rectos); E2E (botón inclinado) | ✅ |
 | RF-22 | Franja índigo y trama en el pie, en la zona sin texto | ✅ (capturas) |
 | RF-23 | Pegatinas con contorno del tema (`icons.test.tsx`) y paleta plana de Street pop | ✅ |

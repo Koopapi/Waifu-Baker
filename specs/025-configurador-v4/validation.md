@@ -1,7 +1,7 @@
 # Validación — Spec 025
 
 Fecha: 29 oct 2026, en local (rama `spec/025-configurador-v4`). El dueño probó la demo en local y la aprobó el mismo
-día. Pendiente: checklist en teléfono (iPhone y Android) en el servidor de pruebas y revisión de Bruno.
+día. Pendiente: checklist en teléfono (iPhone y Android) en el servidor de pruebas y revisión de diseño.
 
 | RF | Evidencia | Estado |
 |---|---|---|

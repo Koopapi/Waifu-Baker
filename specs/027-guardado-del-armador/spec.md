@@ -19,7 +19,7 @@ para volver a un estado anterior. Las specs 016, 017 y 025 dejaron fuera a prop�
 «guardar el trabajo a medias en el navegador»; esta spec los trae porque el dueño ya perdió trabajo por no tenerlos.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): edita cartas en el panel.
+- **Administrador** (el dueño y quien colabora en el diseño): edita cartas en el panel.
 
 ## Historias de usuario
 - H1: Como administrador quiero un solo «Guardar» que guarde la ficha y las capas juntas, para no perder capas.

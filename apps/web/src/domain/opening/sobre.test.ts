@@ -3,10 +3,10 @@ import { describe, expect, it } from "vitest";
 import { revealSound, vibrationPattern } from "./feedback";
 import { SPECIAL_VIBRATION, isSpecial, omen, progressDots, revealFx, sobreTimeline } from "./sobre";
 
-describe("spec 030 — apertura con el sobre de Bruno", () => {
+describe("spec 030 — apertura con el sobre del paquete de diseño", () => {
   it("test_s030_rf19_las_cartas_suben_a_0_38_el_sobre_se_va_a_1_25_y_el_mazo_queda_a_1_9", () => {
     expect(sobreTimeline(false)).toEqual({ rise: 380, hide: 1250, ready: 1900 });
-    // Movimiento reducido: los tiempos de Bruno bajan a 0, 0,15 y 0,3 s.
+    // Movimiento reducido: los tiempos del paquete de diseño bajan a 0, 0,15 y 0,3 s.
     expect(sobreTimeline(true)).toEqual({ rise: 0, hide: 150, ready: 300 });
   });
 
@@ -30,7 +30,7 @@ describe("spec 030 — apertura con el sobre de Bruno", () => {
   });
 });
 
-describe("spec 030, RF-26 — la Legendaria y la EX solo con el efecto de Bruno", () => {
+describe("spec 030, RF-26 — la Legendaria y la EX solo con el efecto del paquete de diseño", () => {
   it("test_s030_rf26_especial_sin_efectos_viejos", () => {
     for (const r of ["legendary", "ex"] as const) {
       expect(revealFx(r)).toEqual({ special: true, sound: null, vibration: SPECIAL_VIBRATION, confetti: 0, particles: false, celebrate: false, flash: false, tease: 0 });

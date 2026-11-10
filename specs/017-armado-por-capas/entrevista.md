@@ -1,7 +1,7 @@
 # Entrevista — Spec 017, armado de cartas por capas
 
-Contexto: al aprobar la spec 016, el dueño decidió que todas las cartas serán cartas por capas con el sistema de Bruno.
-Aclaró después que el proyecto aún no está en producción y que él y Bruno arman cada carta a mano antes de lanzar una
+Contexto: al aprobar la spec 016, el dueño decidió que todas las cartas serán cartas por capas con el sistema del paquete de diseño.
+Aclaró después que el proyecto aún no está en producción y que él y el colaborador de diseño arman cada carta a mano antes de lanzar una
 colección, con la chica recortada sin fondo como imagen central.
 
 1. **Cartas existentes** (23 oct 2026): eran material de prueba; no hay conversión automática ni transición.

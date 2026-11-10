@@ -6,7 +6,7 @@ import { PACK_EXAMPLE_FILES } from "@/domain/packs/example";
 export const runtime = "nodejs";
 
 /**
- * Spec 030: las capas del sobre de ejemplo FA01 y la carta de muestra del paquete de Bruno (arte de prueba, decisión 7),
+ * Spec 030: las capas del sobre de ejemplo FA01 y la carta de muestra del paquete de diseño (arte de prueba, decisión 7),
  * solo para el panel: «Cargar ejemplo FA01» y «Probar apertura» del editor de sobres.
  */
 export async function GET(_: Request, { params }: { params: Promise<{ name: string }> }) {

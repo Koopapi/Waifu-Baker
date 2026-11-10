@@ -1,4 +1,4 @@
-// Spec 025: acciones del configurador de Bruno sobre la configuración por capas (subir por nombre, partículas detrás de
+// Spec 025: acciones del configurador del paquete de diseño sobre la configuración por capas (subir por nombre, partículas detrás de
 // la chica, «Usar como sello» y recorte del sello). Puro, sin E/S.
 import { characterLayer, imageLayers, isImageLayer, isImageSeal, setBackground, type ImageLayer, type LayersConfig, type ParticleLayer } from "./layers";
 

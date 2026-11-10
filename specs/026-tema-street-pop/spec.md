@@ -1,15 +1,15 @@
 # Spec 026 — Tema Street pop seleccionable
 
 Estado: aprobada por el dueño el 29 oct 2026. Se trabaja **en local**; no se sube al servidor de pruebas hasta que el
-dueño lo pida. Siguiente paso: maquetas en HTML de las pantallas que Bruno no diseñó.
+dueño lo pida. Siguiente paso: maquetas en HTML de las pantallas que el paquete de diseño no diseñó.
 
-Origen: el tema B «Street pop» del paquete de diseño de Bruno (`docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`,
+Origen: el tema B «Street pop» del paquete de diseño (`docs/waifu-baker/waifu-baker/tokens/tema-b-street-pop.css`,
 `docs/estilo-visual.md` y las pantallas `disenos/b-*.html`). Es referencia: entra solo lo que dice esta spec. El 23 oct
 2026 el dueño decidió que el kawaii oscuro sigue siendo el estilo de la web y que Street pop llegaría como segundo tema
 con un interruptor, en su propia spec. Esta es esa spec.
 
 ## Contexto y objetivo
-La web tiene un solo estilo, el kawaii oscuro de la spec 014. Bruno diseñó un segundo estilo, Street pop: claro, con
+La web tiene un solo estilo, el kawaii oscuro de la spec 014. El paquete de diseño trae un segundo estilo, Street pop: claro, con
 energía de promo de juego gacha, bordes de tinta, sombras duras y etiquetas inclinadas. Al dueño le gusta y quiere que
 cualquier usuario pueda elegirlo en Configuración, sin quitarle el kawaii a quien lo prefiera. El objetivo es que cada
 usuario vea la web completa en el tema que eligió, en todos sus dispositivos, mientras las cartas siguen viéndose igual
@@ -17,7 +17,7 @@ para todos.
 
 ## Usuarios / actores
 - **Coleccionista** con sesión iniciada: elige su tema y ve la web en él.
-- **Administrador** (el dueño y Bruno): igual que el coleccionista; el panel también cambia de tema.
+- **Administrador** (el dueño y quien colabora en el diseño): igual que el coleccionista; el panel también cambia de tema.
 - **Visitante sin sesión**: ve siempre el kawaii.
 
 ## Historias de usuario
@@ -28,7 +28,7 @@ para todos.
 
 ## Vocabulario
 - **Kawaii**: el tema actual, oscuro (spec 014). Es el tema por defecto.
-- **Street pop**: el tema claro de Bruno: fondo lila, tarjetas blancas, tinta casi negra para texto, bordes y sombras,
+- **Street pop**: el tema claro del paquete de diseño: fondo lila, tarjetas blancas, tinta casi negra para texto, bordes y sombras,
   índigo, rosa neón, lima, turquesa y trama de puntos amarilla. Títulos en Dela Gothic One y texto en Archivo.
 - **Mesa de apertura**: el escenario donde se rasga el sobre y se revelan las cartas, incluido «Abrir todos».
 - **Escenario de la carta**: el fondo oscuro donde el configurador del panel muestra la vista previa (spec 025).
@@ -62,7 +62,7 @@ para todos.
   del dueño del álbum.
 
 ### Cómo se ve Street pop
-- RF-17: MIENTRAS el tema sea Street pop, EL SISTEMA usará la paleta de Bruno: fondo lila `#ECE4FA`, superficies blancas,
+- RF-17: MIENTRAS el tema sea Street pop, EL SISTEMA usará la paleta del paquete de diseño: fondo lila `#ECE4FA`, superficies blancas,
   tinta `#17132B`, índigo `#3B2FC9`, rosa neón `#FF3EA5` para la acción principal, lima `#C6F432` y turquesa `#3FE0D0`
   como acentos y trama amarilla `#FFD93D` solo como decoración.
 - RF-18: MIENTRAS el tema sea Street pop, EL SISTEMA usará Dela Gothic One en los títulos y Archivo en el resto del texto.
@@ -105,7 +105,7 @@ para todos.
 
 ## Fuera de alcance
 - Temas por colección o por juego, y más de dos temas.
-- El tema A «Pop pastel» de Bruno.
+- El tema A «Pop pastel» del paquete de diseño.
 - Seguir el modo claro u oscuro del sistema operativo.
 - Recordar el tema de quien no tiene sesión.
 - Cambiar las cartas, sus marcos, sellos, holo o colores de rareza (se quedan como en las specs 022 y 025).
@@ -116,8 +116,8 @@ para todos.
 ## Criterios de finalización
 - Todos los RF con al menos un test en verde (unitarias, integración y E2E de escritorio y teléfono).
 - Test de contraste de la paleta Street pop (RF-25) junto al del Kawaii.
-- Maquetas en HTML de las pantallas que Bruno no diseñó (Configuración con el selector, recompensas, juegos y panel),
-  aprobadas por el dueño; las de Bruno (`b-portada`, `b-coleccion`, `b-ficha`, `b-apertura`, `b-paleta`) sirven para el
+- Maquetas en HTML de las pantallas que el paquete de diseño no diseñó (Configuración con el selector, recompensas, juegos y panel),
+  aprobadas por el dueño; las del paquete de diseño (`b-portada`, `b-coleccion`, `b-ficha`, `b-apertura`, `b-paleta`) sirven para el
   resto.
 - Demo en local aprobada por el dueño, recorriendo la web completa en los dos temas en escritorio y teléfono.
 - `validation.md` con la evidencia de cada RF.

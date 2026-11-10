@@ -14,7 +14,7 @@ según la rareza, y con el grosor del borde de su marco (2,2 en la mayoría). El
 en todos los sitios donde nace una carta o se le aplica un estilo.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): arma cartas en el panel.
+- **Administrador** (el dueño y quien colabora en el diseño): arma cartas en el panel.
 
 ## Historias de usuario
 - H1: Como administrador quiero que toda carta nueva salga con el sello a 15 y el borde a 3,0, para no ajustarlos a

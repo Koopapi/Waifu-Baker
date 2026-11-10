@@ -1,4 +1,4 @@
-// Criterios de la spec 025 (configurador de cartas v4 de Bruno en el panel): distribución y componentes del
+// Criterios de la spec 025 (configurador de cartas v4 del paquete de diseño en el panel): distribución y componentes del
 // configurador, brillo solo sobre el dibujo, intensidad del holo, «Probar revelado», marco personalizado y grosor del
 // borde, subir por nombre, «Usar como sello» con recorte, partículas de un solo color y otra variación; guardar y volver.
 import type { Locator, Page } from "@playwright/test";
@@ -26,7 +26,7 @@ const openRow = async (r: Locator) => {
   if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
 };
 
-test("configurador v4: los controles de Bruno en el editor del panel", async ({ browser }) => {
+test("configurador v4: los controles del paquete de diseño en el editor del panel", async ({ browser }) => {
   desktopOnly();
   test.setTimeout(300_000);
   const admin = await login(browser, "admin-cfg4", true);

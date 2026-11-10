@@ -1,4 +1,4 @@
-// Spec 030: el diseño de un sobre por capas (formato del creador de Bruno, sobre-capas.js v1) y sus reglas. Puro, sin E/S.
+// Spec 030: el diseño de un sobre por capas (formato del creador del paquete de diseño, sobre-capas.js v1) y sus reglas. Puro, sin E/S.
 // Se guarda uno por colección y tipo de sobre; las imágenes son claves del almacén propio, nunca URL (RNF seguridad).
 import { z } from "zod";
 import type { PackKind } from "../catalog/default-odds";
@@ -233,7 +233,7 @@ export function toRegistro(d: PackDesign, info: PackInfo, url: (key: string) => 
 }
 
 /**
- * RF-15: el sobre de Bruno básico, sin diseño propio: la portada (o el sobre a mano) de la colección como arte, sellos
+ * RF-15: el sobre del paquete de diseño básico, sin diseño propio: la portada (o el sobre a mano) de la colección como arte, sellos
  * plateados en el plata y dorados en el gold, logo de Waifu Baker, 3D y rasgar.
  */
 export function basicRegistro(kind: PackKind, info: PackInfo, art: string | null): PackRegistro {

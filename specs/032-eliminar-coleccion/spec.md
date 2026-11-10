@@ -17,7 +17,7 @@ desde el panel las colecciones que nadie tiene, con un aviso que deje claro qué
 eliminar la equivocada, sin tocar nunca lo que ya recibió un coleccionista.
 
 ## Usuarios / actores
-- **Administrador** (el dueño y Bruno): elimina colecciones desde el panel.
+- **Administrador** (el dueño y quien colabora en el diseño): elimina colecciones desde el panel.
 - **Coleccionista**: no ve nada nuevo; sus cartas y sobres nunca se borran por esta función.
 
 ## Historias de usuario

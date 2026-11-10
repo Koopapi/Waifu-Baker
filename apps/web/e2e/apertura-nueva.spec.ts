@@ -27,7 +27,7 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
   await dismissCelebration(fan);
 
   await test.step("RF-1 a RF-3 y RF-5: «Mis sobres» muestra el sobre de su colección con su etiqueta", async () => {
-    // Spec 030, RF-16: el sobre de Bruno en miniatura (aquí el básico, que dibuja el navegador).
+    // Spec 030, RF-16: el sobre del paquete de diseño en miniatura (aquí el básico, que dibuja el navegador).
     const thumb = fan.locator(`[data-testid="group-${code}"] [data-testid="pack-thumb"][data-kind="silver"]`);
     await expect(thumb.locator("img")).toBeVisible();
     await expect(fan.locator(`[data-testid="group-${code}"]`).getByText(es.common.packKind.silver, { exact: true }).first()).toBeVisible();
@@ -39,7 +39,7 @@ test("apertura nueva: el sobre se rasga de verdad y las cartas salen en mazo", a
     await fan.waitForLoadState("networkidle");
     await expect(fan.locator('[data-testid="open-without-swipe"]')).toBeVisible();
     if (desktop) {
-      // RF-7 (spec 030: el sobre de Bruno): rasgar a medias (y de derecha a izquierda) suelta la tira y sigue cerrado.
+      // RF-7 (spec 030: el sobre del paquete de diseño): rasgar a medias (y de derecha a izquierda) suelta la tira y sigue cerrado.
       await dragLine(fan, 0.6, 0.25);
       await expect(fan.locator(".tear--whole")).toBeVisible();
       await expect(fan.locator('.stage[data-phase="idle"]')).toBeVisible();

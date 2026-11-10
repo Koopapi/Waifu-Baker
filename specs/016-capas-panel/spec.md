@@ -2,14 +2,14 @@
 
 Estado: aprobada por el dueño el 23 oct 2026.
 
-Origen: la propuesta de Bruno «Spec 016: cartas por capas (parallax) en el panel» (PR #14, 71 RF), partida en tres
+Origen: la propuesta de diseño «Spec 016: cartas por capas (parallax) en el panel» (PR #14, 71 RF), partida en tres
 specs por decisión del dueño (23 oct 2026): **016 editor en el panel** (esta), **017 cartas por capas para el
 coleccionista** (imagen plana, apertura, colección, ficha, giroscopio, revisión 18+ y zonas públicas) y **018 crear
 cartas desde capas e importar/exportar**. La tabla del final relaciona cada RF con el de la propuesta original.
 
 ## Contexto y objetivo
 Hoy cada carta nace de una sola ilustración que el sistema compone con el marco de su rareza (spec 003). El paquete de
-diseño de Bruno trae cartas por capas: varias ilustraciones del mismo lienzo que se mueven a distinta velocidad
+diseño del paquete de diseño trae cartas por capas: varias ilustraciones del mismo lienzo que se mueven a distinta velocidad
 (parallax), partículas, modos de mezcla, un marco metálico por escalón de rareza y un sello que flota fuera de la
 carta; la librería (`ui/game/carta-capas/`) ya está en `pruebas` (#15). Esta spec lleva el **editor** al panel: el
 administrador añade capas a una carta existente, las ajusta con una vista previa en vivo y las guarda. **El
@@ -29,7 +29,7 @@ hoy. No cambia ninguna regla de colecciones, rarezas, sorteo, probabilidades ni 
 
 ## Vocabulario
 - **Configuración por capas**: capas de atrás hacia adelante, marco, sello, holo y proporción, en el formato del
-  creador de Bruno (`CartaConfig`); cada imagen se guarda como clave del almacén, nunca como URL.
+  creador del paquete de diseño (`CartaConfig`); cada imagen se guarda como clave del almacén, nunca como URL.
 - **Capa de imagen**: una ilustración del lienzo con profundidad, margen, modo de mezcla, opacidad y visibilidad.
 - **Capa visible**: capa de imagen no oculta y con opacidad mayor que 0.
 - **Capa de partículas**: destellos, confeti, pétalos… generados por el sistema; no lleva imagen.
@@ -126,7 +126,7 @@ Cada RF con su test en verde (Vitest o Playwright) y la suite completa en verde;
 capas a una carta, ajustar y ver la vista previa, guardar, conflicto entre dos administradores, quitar las capas y
 cambio de rareza; `pnpm budget` sin cambios en las páginas del coleccionista; demo manual del dueño.
 
-## Relación con la propuesta de Bruno (PR #14)
+## Relación con la propuesta de diseño (PR #14)
 | Esta spec | Propuesta original | Esta spec | Propuesta original |
 |---|---|---|---|
 | RF-1 | RF-1 | RF-14 | RF-18, RF-68 |
@@ -146,8 +146,8 @@ cambio de rareza; `pnpm budget` sin cambios en las páginas del coleccionista; d
 Pasan a la spec 017: RF-26 a RF-29, RF-45 a RF-50, RF-52 a RF-63 y RF-71. A la 018: RF-23, RF-24, RF-64 a RF-67 y RF-70.
 
 ## Decisiones (23 oct 2026)
-- Se integra en este repo (Bruno no puede seguirla) y se parte en tres specs; esta es la primera.
-- Se usa lo de Bruno: cinco marcos metálicos con su reparto de rarezas y el sello de texto con el escalón al estilo
+- Se integra en este repo (el colaborador de diseño no puede seguirla) y se parte en tres specs; esta es la primera.
+- Se usa lo del paquete de diseño: cinco marcos metálicos con su reparto de rarezas y el sello de texto con el escalón al estilo
   gacha (SSR, UR…). Las rarezas del juego no cambian.
 - Se mantienen las decisiones de su entrevista (21 oct 2026) que caen en esta parte: lienzo 700 × 991 con tolerancia
   del 1 % y escalado, mínimo 700 px, WebP, máximo 8 capas de imagen, al menos una visible, aviso de conflicto con

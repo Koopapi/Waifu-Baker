@@ -17,7 +17,7 @@ export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputEle
 }
 
 /**
- * Spec 025, RF-22: deslizador con su nombre a la izquierda y su valor a la derecha (como el configurador de Bruno).
+ * Spec 025, RF-22: deslizador con su nombre a la izquierda y su valor a la derecha (como el configurador del paquete de diseño).
  * Es un `<input type="range">` nativo: las flechas del teclado lo mueven paso a paso y los lectores de pantalla leen el
  * valor con su unidad.
  */

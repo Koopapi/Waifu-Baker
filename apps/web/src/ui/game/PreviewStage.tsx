@@ -7,8 +7,8 @@ export interface PreviewStageProps extends React.HTMLAttributes<HTMLDivElement> 
 }
 
 /**
- * Spec 025, RF-21: escena oscura de la vista previa de una carta, con rayos y trama de puntos (la del configurador de
- * Bruno). Reenvía la referencia y los eventos: el editor escucha aquí el ratón y el teclado.
+ * Spec 025, RF-21: escena oscura de la vista previa de una carta, con rayos y trama de puntos (la del configurador del
+ * paquete de diseño). Reenvía la referencia y los eventos: el editor escucha aquí el ratón y el teclado.
  */
 export const PreviewStage = forwardRef<HTMLDivElement, PreviewStageProps>(function PreviewStage({ hint, className, children, ...rest }, ref) {
   return (

@@ -48,7 +48,7 @@ const DAY = 24 * 60 * 60 * 1000;
 
 /**
  * Spec 017, RF-20: carta de muestra armada con la chica recortada, desde una configuración del creador de cartas (la de
- * Yuki del paquete de Bruno). `readFile` lee cada archivo que nombra la configuración.
+ * Yuki del paquete de diseño). `readFile` lee cada archivo que nombra la configuración.
  */
 export interface DemoSample {
   name: string;
@@ -59,7 +59,7 @@ export interface DemoSample {
 }
 
 /**
- * Spec 030: el sobre FA01 de Bruno para la demo. `readFile` lee sus capas (assets/sobres/ejemplo) y `readPlastic` las
+ * Spec 030: el sobre FA01 del paquete de diseño para la demo. `readFile` lee sus capas (assets/sobres/ejemplo) y `readPlastic` las
  * imágenes del plástico (public/sobres), para una miniatura aproximada (la de verdad la dibuja el navegador al guardar).
  */
 export interface DemoPackDesign {
@@ -119,7 +119,7 @@ export async function seedDemo(db: DbLike, store: CardStore, opts: { manifest: D
   });
   await setWelcomeSet(db, admin.id, setId);
 
-  // Spec 030: el sobre plata de la colección lleva el FA01 de Bruno; el gold se queda con el sobre básico (la portada).
+  // Spec 030: el sobre plata de la colección lleva el FA01 del paquete de diseño; el gold se queda con el sobre básico (la portada).
   if (opts.packDesign) {
     const ref = (f: string) => `upload:${f.replace(/[^a-z0-9]+/g, "-")}`;
     const layers = PACK_EXAMPLE_FILES.filter((f) => f.startsWith("sobre_"));
@@ -181,7 +181,7 @@ export async function demoCollectorCards(db: DbLike, userId: string) {
     .orderBy(cards.number, desc(userCards.holo));
 }
 
-/** Zonas de la demo (spec 020): 2 abiertas y 2 con niebla, como la versión 1 de Bruno. */
+/** Zonas de la demo (spec 020): 2 abiertas y 2 con niebla, como la versión 1 del paquete de diseño. */
 export const DEMO_ZONES = [
   { name: "Calles de Puerto Miel", terrain: "city", difficulty: 30, fragmentsRequired: 0 },
   { name: "Bosque de los Susurros", terrain: "forest", difficulty: 30, fragmentsRequired: 0 },

@@ -23,7 +23,7 @@ aprobadas: lámina «Apertura nueva (spec 023)» en `waifubaker.pen`.
   puntero o giroscopio con `useTiltSource`. Con movimiento reducido, solo el botón.
 - `OpeningStage` (RF-10 a RF-19, RF-22, RF-23): pide el contenido al confirmar el rasgado; si falla, el sobre vuelve a
   cerrarse con el aviso y se puede reintentar. Mazo apilado que sale del sobre abierto; la carta de arriba brilla si es
-  rara o mejor; toque o deslizamiento la voltea y la presenta al estilo de Bruno («¡Nueva!», insignia de rareza
+  rara o mejor; toque o deslizamiento la voltea y la presenta al estilo del paquete de diseño («¡Nueva!», insignia de rareza
   inclinada, nombre y colección); otro gesto la aparta hacia el lado del gesto; al apartar la última, el resumen.
   `autoOpen` retoma una apertura sin rasgar. Los efectos por rareza (sonido, vibración, partículas, confeti, destello,
   celebración y carta viva) se reutilizan.

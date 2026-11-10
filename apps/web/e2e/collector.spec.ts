@@ -106,7 +106,7 @@ test("teclado: abrir un sobre y voltear las cartas sin ratón", async ({ browser
   await dismissCelebration(fan);
   await fan.click('[data-testid="group-KEY1"] >> text=Abrir un sobre');
   await fan.waitForLoadState("networkidle");
-  // Spec 030: el sobre de Bruno tiene foco y se abre con Intro.
+  // Spec 030: el sobre del paquete de diseño tiene foco y se abre con Intro.
   await fan.locator('[data-testid="tear-pack"] .sc-sobre').focus();
   await fan.keyboard.press("Enter");
   await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
