@@ -338,6 +338,15 @@ Decisiones del dueño del 9 nov 2026. RN-40 y RN-64 no cambian: lo que recibió 
 | RN-251 | El aviso dice cuántas cartas, imágenes y diseños de sobre se borran y que no se puede deshacer; «Eliminar» solo se activa al escribir el código de la colección (sin distinguir mayúsculas). Se borra todo o nada (cartas, versiones, capas, imágenes, probabilidades y diseños), se comprueba otra vez al confirmar y queda en la auditoría con quién, cuándo, código, nombre y cartas. | Vigente | 032 RF-2 a RF-7, RF-14 |
 | RN-252 | «Archivar» se hace desde la zona de peligro, al final de la página de la colección. | Vigente | 032 RF-1 |
 
+## 26. Filtros de la cuadrícula de cartas (spec 033)
+
+Decisiones del dueño del 9 nov 2026.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-253 | La cuadrícula de cartas de una colección del panel se filtra por personaje (con «Sin personaje»), rareza y pendientes (sin armar, procesando, capas por revisar y, en 18+, sin revisar), se busca por nombre o número y se ordena por número, rareza o nombre sin cambiar el número de las cartas. Cada opción dice cuántas cartas tiene; varias opciones de un filtro suman y filtros distintos se combinan. | Vigente | 033 RF-1 a RF-11 |
+| RN-254 | Con filtros, «Seleccionar todas» selecciona solo las que se ven y lo que deja de verse sale de la selección. «Reordenar» quita los filtros. Los filtros van en la dirección de la página (se mantienen al recargar y se pueden compartir); al entrar desde «Sets» no hay filtros. | Vigente | 033 RF-12 a RF-19 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |

@@ -20,6 +20,7 @@ import {
   Celebration,
   Checkbox,
   ChipGroup,
+  ToggleChips,
   Countdown,
   EmptyState,
   FlightLayer,
@@ -69,6 +70,7 @@ export function Catalog() {
   const confirm = useConfirm();
   const choose = useChoice();
   const [modal, setModal] = useState(false);
+  const [filters, setFilters] = useState<string[]>(["r"]);
   const [focus, setFocus] = useState(false);
   const [confirmed, setConfirmed] = useState("—");
   const [chosen, setChosen] = useState("—");
@@ -114,6 +116,18 @@ export function Catalog() {
                 { value: "r", label: "R", swatch: "var(--ui-k-menta)" },
                 { value: "sr", label: "E", swatch: "var(--ui-k-lavanda)" },
                 { value: "ssr", label: "LEG", swatch: "var(--ui-k-limon)" },
+              ]}
+            />
+            {/* Spec 033: fichas de varias opciones, con número (los filtros de la cuadrícula de cartas). */}
+            <ToggleChips
+              label="Filters"
+              value={filters}
+              onValueChange={setFilters}
+              data-testid="catalog-toggle-chips"
+              options={[
+                { value: "n", label: "C", count: 12 },
+                { value: "r", label: "R", count: 6 },
+                { value: "sr", label: "E", count: 3 },
               ]}
             />
           </Card>
