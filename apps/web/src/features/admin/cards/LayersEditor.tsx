@@ -50,6 +50,7 @@ import { Select } from "@/ui/form/Select";
 import { Slider } from "@/ui/form/Slider";
 import { TextField } from "@/ui/form/TextField";
 import { CartaCapas, type CartaCapasHandle } from "@/ui/game/CartaCapas";
+import { VIEW_DEFAULTS, finalCardConfig } from "@/domain/cards/final-card";
 import { PreviewStage } from "@/ui/game/PreviewStage";
 import cartaCapas from "@/ui/game/carta-capas/carta-capas.js";
 import type { CartaCapasApi } from "@/ui/game/carta-capas/carta-capas";
@@ -74,18 +75,15 @@ const DEFAULT_CUSTOM = { color: "#6d5cff", brillo: "#d7ff3a" };
 const fixed = (v: number) => v.toFixed(2);
 const percent = (v: number) => `${Math.round(v * 100)} %`;
 
-/** Cambia las claves del almacén por enlaces del panel, para la vista previa (spec 017: con el encuadre completo). */
+/**
+ * Spec 034: la carta final (la misma función que usan la apertura y la ficha) con enlaces del panel. El holo y el
+ * movimiento van aparte (`holo` y `view`): moverlos no vuelve a montar la carta.
+ */
 function previewConfig(c: LayersConfig) {
-  // La intensidad del holo va aparte (`view`): moverla no vuelve a montar la carta.
-  const { holoIntensidad: _holoIntensidad, ...rest } = c;
-  void _holoIntensidad;
-  return {
-    ...rest,
-    // Sin la animación de entrada: la vista previa se vuelve a montar con cada cambio.
-    aparecer: false,
-    capas: c.capas.map((l) => (isImageLayer(l) ? { ...l, encuadre: framingOf(l), src: asset(l.key) } : l)),
-    sello: isImageSeal(c.sello) ? { ...c.sello, src: asset(c.sello.key) } : c.sello,
-  };
+  const { holo: _h, holoIntensidad: _hi, profundidad: _p, inclinacion: _i, reposo: _r, ...rest } = finalCardConfig(c, asset);
+  void [_h, _hi, _p, _i, _r];
+  // Sin la animación de entrada: la vista previa se vuelve a montar con cada cambio.
+  return { ...rest, aparecer: false };
 }
 
 const clamp = (v: number, min: number, max: number) => Math.round(Math.min(max, Math.max(min, v)) * 100) / 100;
@@ -177,11 +175,6 @@ export function LayersEditor({
   const seq = useRef(0);
   const [selected, setSelected] = useState(() => defaultSelection(card.layers ?? emptyConfig(card)));
   const [openRow, setOpenRow] = useState(-1);
-  // Spec 025, RF-8 y RF-10: ajustes de la vista previa (no se guardan).
-  const [depth, setDepth] = useState(14);
-  const [tilt, setTilt] = useState(14);
-  const [holoPreview, setHoloPreview] = useState(false);
-  const [autoMove, setAutoMove] = useState(true);
   // Spec 017 (ampliación): biblioteca general de elementos.
   const [pickerOpen, setPickerOpen] = useState(false);
   const [saveTarget, setSaveTarget] = useState<SaveTarget | null>(null);
@@ -191,13 +184,17 @@ export function LayersEditor({
   const cardLabel = card.name || `#${String(card.number).padStart(3, "0")}`;
   const drag = useRef<{ x0: number; y0: number; width: number; start: Framing; next: Framing; img: HTMLImageElement | null } | null>(null);
 
-  // La vista previa solo se vuelve a montar si cambia algo distinto de la intensidad del holo.
-  const { holoIntensidad: _hi, ...shape } = draft;
-  void _hi;
+  // La vista previa solo se vuelve a montar si cambia algo distinto del holo y el movimiento.
+  const { holo: _h, holoIntensidad: _hi, profundidad: _p, inclinacion: _i, reposo: _r, ...shape } = draft;
+  void [_h, _hi, _p, _i, _r];
   const shapeKey = JSON.stringify(shape);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const preview = useMemo(() => (imageLayers(draft).some(isVisible) ? previewConfig(draft) : null), [shapeKey]);
   const holoIntensity = draft.holoIntensidad ?? DEFAULT_HOLO_INTENSITY;
+  // Spec 034, RF-12 y RF-13: el movimiento y el holo se guardan con la carta (antes eran solo de la vista previa).
+  const depth = draft.profundidad ?? VIEW_DEFAULTS.profundidad;
+  const tilt = draft.inclinacion ?? VIEW_DEFAULTS.inclinacion;
+  const autoMove = draft.reposo ?? VIEW_DEFAULTS.reposo;
   const view = useMemo(() => ({ profundidad: depth, inclinacion: tilt, reposo: autoMove, holoIntensidad: holoIntensity }), [depth, tilt, autoMove, holoIntensity]);
   const dirty = !sameLayers(draft, saved ?? emptyConfig(card));
   const tier = rarityTier(rarity);
@@ -207,7 +204,7 @@ export function LayersEditor({
   const backgroundLayer = imageLayers(draft).find((l) => l.rol === "fondo");
   const sel = isImageLayer(draft.capas[selected] ?? { particulas: "nieve" }) ? selected : defaultSelection(draft);
   const selLayer = sel >= 0 ? (draft.capas[sel] as ImageLayer) : null;
-  const holoShown = holoPreview || Boolean(draft.holo);
+  const holoShown = Boolean(draft.holo);
 
   const update = (fn: (c: LayersConfig) => LayersConfig) => setDraft((c) => fn(c));
   const setLayer = (i: number, patch: Partial<Layer>) => update((c) => ({ ...c, capas: c.capas.map((l, j) => (j === i ? ({ ...l, ...patch } as Layer) : l)) }));
@@ -575,21 +572,21 @@ export function LayersEditor({
             onKeyDownCapture={onKeyDown}
           >
             {preview ? (
-              <CartaCapas ref={live} tier={tier} image={card.midUrl ?? ""} config={preview} holo={holoPreview} view={view} label={card.name || t.previewLabel} zone={zone} className="w-full max-w-[300px]" />
+              <CartaCapas ref={live} tier={tier} image={card.midUrl ?? ""} config={preview} holo={holoShown} view={view} label={card.name || t.previewLabel} zone={zone} className="w-full max-w-[300px]" />
             ) : (
               <p className="px-2 text-center text-sm text-ui-text-3">{t.empty}</p>
             )}
           </PreviewStage>
 
-          {/* Spec 025, RF-8 a RF-10: ajustes de la vista previa (no se guardan) y la intensidad del holo (se guarda). */}
+          {/* Spec 025, RF-8 a RF-10, y spec 034, RF-12: el movimiento, el holo y su intensidad se guardan con la carta. */}
           <Card className="space-y-4" data-testid="layers-preview-controls">
             <div className="grid gap-4 @lg:grid-cols-2">
-              <Slider label={v4.preview.depth} value={depth} min={0} max={30} unit=" px" onValueChange={setDepth} data-testid="preview-depth" />
-              <Slider label={v4.preview.tilt} value={tilt} min={0} max={26} unit="°" onValueChange={setTilt} data-testid="preview-tilt" />
+              <Slider label={v4.preview.depth} value={depth} min={0} max={30} unit=" px" onValueChange={(v) => update((c) => ({ ...c, profundidad: v }))} data-testid="preview-depth" />
+              <Slider label={v4.preview.tilt} value={tilt} min={0} max={26} unit="°" onValueChange={(v) => update((c) => ({ ...c, inclinacion: v }))} data-testid="preview-tilt" />
             </div>
             <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <Checkbox label={v4.preview.holo} checked={holoShown} disabled={Boolean(draft.holo)} onCheckedChange={setHoloPreview} data-testid="preview-holo" />
-              <Checkbox label={v4.preview.autoMove} checked={autoMove} onCheckedChange={setAutoMove} data-testid="preview-auto-move" />
+              <Checkbox label={v4.preview.holo} checked={holoShown} onCheckedChange={(on) => update((c) => ({ ...c, holo: on === true }))} data-testid="preview-holo" />
+              <Checkbox label={v4.preview.autoMove} checked={autoMove} onCheckedChange={(on) => update((c) => ({ ...c, reposo: on === true }))} data-testid="preview-auto-move" />
               <Button size="sm" variant="secondary" onClick={testReveal} disabled={!preview} data-testid="layers-test-reveal">
                 {v4.preview.reveal}
               </Button>

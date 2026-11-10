@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import type { LayersConfig } from "@/domain/cards/layers";
-import { framingOf, isImageLayer, isImageSeal } from "@/domain/cards/layers";
 import type { ChangedPart } from "@/domain/cards/versions";
 import { useLocale } from "@/i18n/client";
 import { useAdminLayersT } from "@/i18n/admin-layers";
 import { Button } from "@/ui/action/Button";
 import { Badge } from "@/ui/content/Badge";
+import { finalCardConfig } from "@/domain/cards/final-card";
 import { CartaCapas } from "@/ui/game/CartaCapas";
 import { assetUrl } from "./types";
 
@@ -21,13 +21,9 @@ interface VersionRow {
 }
 
 /** La configuración de una versión con enlaces del panel, para la carta mini (como la vista previa del editor). */
+/** Spec 034: la versión tal como se vería (la misma preparación que la carta final). */
 function previewConfig(c: LayersConfig) {
-  return {
-    ...c,
-    aparecer: false,
-    capas: c.capas.map((l) => (isImageLayer(l) ? { ...l, encuadre: framingOf(l), src: assetUrl(l.key) ?? "" } : l)),
-    sello: isImageSeal(c.sello) ? { ...c.sello, src: assetUrl(c.sello.key) ?? "" } : c.sello,
-  };
+  return { ...finalCardConfig(c, (k) => assetUrl(k) ?? ""), aparecer: false };
 }
 
 /**

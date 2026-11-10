@@ -405,6 +405,8 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
               gesture={isTop ? cardGesture : undefined}
               actionLabel={shown ? t.packs.stage.dismissCard : t.packs.stage.flipCard}
               showLive={liveIndex === i}
+              // Spec 034, RF-1: como en el armador, la carta sigue al puntero en toda la mesa, no solo encima de ella.
+              zone={stage}
               // Spec 030, RF-27: la carta de arriba monta su versión viva antes de voltearse, para que al revelarla ya
               // esté cargada.
               preloadLive={isTop && !reduced}

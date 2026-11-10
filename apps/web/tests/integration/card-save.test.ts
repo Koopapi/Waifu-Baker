@@ -195,4 +195,16 @@ describe("spec 027 — guardado único de la carta", () => {
       expect(await tx.select().from(cardVersions).where(and(eq(cardVersions.cardId, card.id), eq(cardVersions.number, 2)))).toHaveLength(0);
     });
   });
+
+  // Spec 034, RF-12 y RF-16: el movimiento y el holo se guardan con la carta y quedan en su versión.
+  it("test_s034_rf16_el_movimiento_y_el_holo_quedan_en_la_carta_y_en_su_version", async () => {
+    await inRollback(async (tx) => {
+      const { admin, store, card, load, withBackground } = await setup(tx);
+      const layers = { ...(await withBackground(40)), profundidad: 5, inclinacion: 8, reposo: false, holo: true };
+      await saveCard(tx, store, admin.id, card.id, { layers, expectedVersion: card.version });
+      expect((await load()).layers).toMatchObject({ profundidad: 5, inclinacion: 8, reposo: false, holo: true });
+      const [last] = await tx.select().from(cardVersions).where(eq(cardVersions.cardId, card.id)).orderBy(sql`${cardVersions.number} desc`).limit(1);
+      expect(last.layers).toMatchObject({ profundidad: 5, inclinacion: 8, reposo: false, holo: true });
+    });
+  });
 });

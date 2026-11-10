@@ -1,6 +1,7 @@
 "use client";
 
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "react";
+import { configSignature, effectiveHolo } from "@/domain/cards/config-signature";
 import type { RarityTier } from "@/domain/catalog/rarity-tier";
 import type { CartaConfig, CartaInstancia } from "./carta-capas/carta-capas";
 
@@ -81,7 +82,7 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
         zona: zone?.current ?? undefined,
         // Con una imagen, el holo es la versión holo del juego (no el del preset: la UR lo trae siempre); con
         // capas, también el que elija la configuración.
-        holo: holo || Boolean(config?.holo),
+        holo: effectiveHolo(holo, config),
         ...(noSeal ? { sello: null } : {}),
         ...viewRef.current,
       };
@@ -103,7 +104,7 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
   }, [tier, image, rawArt, config, estatica, noSeal, entrance]);
 
   useEffect(() => {
-    card.current?.set({ holo: holo || Boolean(config?.holo) });
+    card.current?.set({ holo: effectiveHolo(holo, config) });
   }, [holo, config]);
 
   useEffect(() => {
@@ -125,5 +126,12 @@ export const CartaCapas = forwardRef<CartaCapasHandle, CartaCapasProps>(function
     deshabilitarGiroscopio: () => card.current?.deshabilitarGiroscopio(),
   }), []);
 
-  return <div ref={box} className={className} style={{ aspectRatio: rawArt || config ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} />;
+  // Spec 034: firma de lo que se monta (configuración, holo y movimiento), para comprobar que dos pantallas muestran la
+  // misma carta.
+  const sig = useMemo(
+    () => (config ? configSignature({ ...config, holo: effectiveHolo(holo, config), ...(noSeal ? { sello: null } : {}), ...view }) : undefined),
+    [config, holo, noSeal, view],
+  );
+
+  return <div ref={box} className={className} style={{ aspectRatio: rawArt || config ? RAW_RATIO : CARD_RATIO, ...style }} data-carta-capas={tier} data-config-sig={sig} />;
 });

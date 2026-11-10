@@ -10,7 +10,7 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
   const fan = await login(browser, `viva-${tag}`, false, "/packs");
   const admin = await login(browser, `admin-viva-${tag}`, true);
   const code = `LV${tag.slice(0, 4).toUpperCase()}`;
-  // La 001 es común (spec 022: plana, sin carta viva) y la 002 es rara y siempre holo (100 %): sirve para la carta viva,
+  // La 001 es común (spec 034: también viva) y la 002 es rara y siempre holo (100 %): sirve para la carta viva,
   // el acabado y el brillo holo.
   await createPublishedSet(admin, code, ["07.webp", "08.webp"].map((f) => path.join(LAB, f)), 2, 100);
   await giftPacks(admin, `viva-${tag}`, code, 1);
@@ -22,9 +22,10 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
     await fan.click(`[data-testid="group-${code}"] >> text=Abrir un sobre`);
     await tear(fan);
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
-    // Spec 022, RF-4: la primera, común (el mazo va de menor a mayor rareza), se revela plana.
+    // Spec 034, RF-9: la primera, común (el mazo va de menor a mayor rareza), también se revela viva.
     await revealTop(fan);
-    await expect(fan.locator(".card3d__live")).toHaveCount(0);
+    if (reduced) await expect(fan.locator(".card3d__live")).toHaveCount(0);
+    else await expect(fan.locator(".card3d__live .cc-card").first()).toBeVisible();
     await dismissTop(fan);
     // La segunda, rara, se ve viva (con movimiento reducido, la imagen fija).
     await revealTop(fan);
@@ -61,11 +62,10 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
     await fan.goto("/collection");
     await fan.click(`[data-testid="collection-${code}"] a`);
     const art = fan.locator('[data-testid="card-sheet-art"]');
-    // Spec 022, RF-4: la ficha de la común también es plana (y sin giroscopio).
+    // Spec 034, RF-9: la ficha de la común también es viva (con movimiento reducido, la imagen fija).
     await fan.click('[aria-label="Ver carta 001"]');
-    await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
-    await expect(art.locator(".cc-card")).toHaveCount(0);
-    await expect(fan.locator('[data-testid="gyro"]')).toHaveCount(0);
+    if (reduced) await expect(art.locator('[data-testid="card-sheet-flat"]')).toBeVisible();
+    else await expect(art.locator(".cc-card")).toBeVisible();
     await fan.keyboard.press("Escape");
     await fan.click('[aria-label="Ver carta 002"]');
     if (reduced) {

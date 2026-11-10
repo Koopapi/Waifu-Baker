@@ -29,6 +29,8 @@ interface Props {
   gesture?: React.HTMLAttributes<HTMLDivElement>;
   /** Nombre accesible de la acción (voltear o apartar). */
   actionLabel?: string;
+  /** Spec 034: donde la carta viva escucha el puntero (la mesa de la apertura, como la vista previa del armador). */
+  zone?: React.RefObject<HTMLElement | null>;
 }
 
 const MAX_RX = 10; // grados
@@ -41,7 +43,7 @@ const MAX_RY = 14;
  *   .card3d__inner volteo rotationY (GSAP)
  */
 export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
-  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false, preloadLive = false, gesture, actionLabel },
+  { card, active, mode, tiltTarget, style, onClick, tease = 0, showLive = false, preloadLive = false, gesture, actionLabel, zone },
   ref,
 ) {
   const t = useT();
@@ -151,6 +153,7 @@ export const Card3D = forwardRef<HTMLDivElement, Props>(function Card3D(
                 holo={card.holo}
                 label={card.name}
                 sealHidden
+                zone={zone}
                 className="card3d__live"
                 // En línea: el CSS de carta-capas.js se inyecta después y pondría `.cc` en `position: relative`.
                 style={{ position: "absolute", inset: 0, aspectRatio: "auto" }}
