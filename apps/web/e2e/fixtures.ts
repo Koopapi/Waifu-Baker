@@ -31,7 +31,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * se recoge la basura del servidor y, si hace falta, se reinicia aquí, entre tests, y se vuelven a
  * compilar las rutas. El uso de memoria queda en `test-results/server-memory.log`.
  */
-async function keepServerFit(title: string) {
+export async function keepServerFit(title: string) {
   const res = await fetch(`${BASE}/api/dev/memory`, { method: "POST" }).catch(() => null);
   if (!res?.ok) return;
   const m = (await res.json()) as { usedMb: number; limitMb: number; restarting: boolean };
