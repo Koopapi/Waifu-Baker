@@ -24,7 +24,9 @@ const env = {
   // `next dev` retiene memoria por cada página servida y se reinicia solo al pasar del 80 % del montón:
   // montón amplio y `--expose-gc` para que `/api/dev/memory` recoja la basura y, si hace falta, lo
   // reinicie entre dos tests (`e2e/fixtures.ts`) en vez de en mitad de uno.
-  NODE_OPTIONS: "--max-old-space-size=8192 --expose-gc",
+  // En CI (16 GB) el montón es de 12 GB: con todas las rutas compiladas el servidor ya ocupa ~4,4 GB (nov 2026) y con
+  // 8 GB el reinicio controlado (60 %) saltaba cada dos o tres tests, ~5 min cada vez. En la Mac se queda en 8 GB.
+  NODE_OPTIONS: `--max-old-space-size=${process.env.CI ? 12288 : 8192} --expose-gc`,
 };
 
 export default defineConfig({
