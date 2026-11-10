@@ -66,15 +66,16 @@ test("la carta se ve igual que en el armador", async ({ browser }) => {
     await expect(fan.locator('.stage[data-phase="deck"]')).toBeVisible();
     // El mazo va de menor a mayor rareza: primero la común.
     await revealTop(fan);
-    await expect(fan.locator(".card3d__live .cc-card:not(.cc-cargando)").first()).toBeVisible();
-    await expect.poll(() => sigOf(fan, ".card3d__live")).toBe(sig["001"]);
+    // La apertura monta también la carta siguiente (precarga, oculta): se mira solo la carta visible.
+    await expect(fan.locator(".card3d:visible .card3d__live .cc-card:not(.cc-cargando)")).toBeVisible();
+    await expect.poll(() => sigOf(fan, ".card3d:visible")).toBe(sig["001"]);
     // RF-5: con la carta viva cargada, los brillos propios de la apertura no se ven.
-    const shine = fan.locator(".card3d__front .holo--shine").first();
+    const shine = fan.locator(".card3d:visible .card3d__front .holo--shine");
     if (await shine.count()) await expect.poll(() => shine.evaluate((e) => getComputedStyle(e).opacity)).toBe("0");
     await shot(fan, "3-apertura-comun");
     await dismissTop(fan);
     await revealTop(fan);
-    await expect.poll(() => sigOf(fan, ".card3d__live")).toBe(sig["002"]);
+    await expect.poll(() => sigOf(fan, ".card3d:visible")).toBe(sig["002"]);
     await shot(fan, "4-apertura-rara");
   });
 
