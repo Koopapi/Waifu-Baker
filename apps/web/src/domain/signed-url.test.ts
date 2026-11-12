@@ -21,3 +21,12 @@ describe("RF-20 enlaces firmados de imágenes", () => {
     expect(verifyImage({ ...params, sig }, "otro-secreto", 0)).toBe(false);
   });
 });
+
+describe("spec 037 — enlace a la imagen holo", () => {
+  it("test_s037_rf12_el_tamano_holo_se_firma_aparte_del_normal", () => {
+    const g = { cardId: "c1", size: "thumb-holo" as const, userId: "u1", expires: 1_000_000 };
+    const sig = signImage(g, "s");
+    expect(verifyImage({ ...g, sig }, "s", 999_999)).toBe(true);
+    expect(verifyImage({ ...g, size: "thumb", sig }, "s", 999_999)).toBe(false);
+  });
+});

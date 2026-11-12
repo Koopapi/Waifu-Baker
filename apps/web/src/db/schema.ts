@@ -33,6 +33,12 @@ export interface PendingFlatKeys {
   thumb: string;
   public: string;
   blurhash: string;
+  /** Spec 037, RF-11: la imagen fija holo de lo pendiente (ausente en lo guardado antes de la spec). */
+  holoMid?: string | null;
+  holoThumb?: string | null;
+  holoPublic?: string | null;
+  /** Spec 037, RF-17: versión de la receta con que se sacó (ausente = anterior a la spec). */
+  version?: number;
 }
 
 export const userRole = pgEnum("user_role", ["user", "admin"]);
@@ -141,6 +147,15 @@ export const cards = pgTable(
     keyMid: text("key_mid"),
     keyThumb: text("key_thumb"),
     keyPublic: text("key_public"),
+    // Spec 037, RF-11: la imagen fija con la vista previa holo activada (null = sin imagen holo: carta sin capas o aún
+    // sin regenerar).
+    keyHoloMid: text("key_holo_mid"),
+    keyHoloThumb: text("key_holo_thumb"),
+    keyHoloPublic: text("key_holo_public"),
+    // Spec 037, RF-17 y RF-18: versión de la receta con que se sacó la imagen fija y motivo del último fallo al
+    // regenerarla.
+    flatVersion: integer("flat_version").notNull().default(0),
+    flatError: text("flat_error"),
     blurhash: text("blurhash"),
     adultReviewedBy: uuid("adult_reviewed_by").references(() => users.id),
     adultReviewedAt: timestamp("adult_reviewed_at", { withTimezone: true }),

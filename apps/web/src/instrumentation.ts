@@ -13,6 +13,9 @@ export async function register() {
     // Spec 035: aviso en Telegram cuando la versión nueva ya responde (DEPLOY_NOTICE=1, solo en el servidor).
     const { startDeployNotice } = await import("./server/deploy-notice-start");
     startDeployNotice();
+    // Spec 037, RF-17: regenera las imágenes fijas de receta anterior (FLAT_REGEN=0 la apaga).
+    const { startFlatRegen } = await import("./server/flat-regen-start");
+    startFlatRegen();
   }
 }
 

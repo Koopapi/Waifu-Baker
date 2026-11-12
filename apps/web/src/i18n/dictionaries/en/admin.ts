@@ -259,6 +259,7 @@ export const admin = {
     orderSaved: "Order saved.",
     deleted: "Card deleted.",
     regenerated: (n: number) => `${n} ${plural(n, "card", "cards")} regenerated with the current frame.`,
+    flatFailed: (n: number) => `${n === 1 ? "This card's image could not be regenerated" : `${n} card images could not be regenerated`}: they keep their previous image. Press “Regenerate images” to retry.`,
     reviewedShort: "Reviewed.",
     reviewedAdult: "Card reviewed: clearly adult character.",
     reviewRemoved: "Review removed.",

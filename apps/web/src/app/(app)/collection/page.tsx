@@ -10,7 +10,7 @@ import { requireUser } from "@/server/auth/require-user";
 import { getMyAlbum } from "@/server/services/album";
 import { myCollections } from "@/server/services/collection";
 import { packArtForSets } from "@/server/services/pack-art";
-import { cardImageUrl } from "@/server/cards/image-urls";
+import { cardImage, holoImageIds, ownedHoloIds } from "@/server/cards/card-image";
 import { isPatronUser, patreonPageUrl } from "@/server/services/patron";
 import { PatreonNotice } from "@/features/economy/PatreonNotice";
 
@@ -20,6 +20,9 @@ export default async function MiColeccionPage() {
   const [cols, album, t, patron] = await Promise.all([myCollections(db, user.id), getMyAlbum(db, user.id), getDict(), isPatronUser(db, user.id)]);
   const patreonUrl = patreonPageUrl();
   const art = await packArtForSets(db, cols.map((c) => c.setId));
+  // Spec 037, RF-7 y RF-12: las vistas previas de cada colección con la imagen holo de las que tiene en holo.
+  const previewIds = cols.flatMap((c) => c.preview);
+  const [holoOwned, holoImages] = await Promise.all([ownedHoloIds(db, user.id, previewIds), holoImageIds(db, previewIds)]);
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-6 md:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -91,7 +94,7 @@ export default async function MiColeccionPage() {
                           {c.preview.map((id) => (
                             <li key={id} className="overflow-hidden rounded-m border-2 border-k-lavanda/40">
                               {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
-                              <img src={cardImageUrl(id, "thumb", user.id)} alt="" className="aspect-[700/991] w-full object-cover" />
+                              <img src={cardImage(id, "thumb", user.id, { holoCopy: holoOwned.has(id), holoImage: holoImages.has(id) }).src} alt="" className="aspect-[700/991] w-full object-cover" />
                             </li>
                           ))}
                         </ul>

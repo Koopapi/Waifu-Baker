@@ -82,3 +82,17 @@ describe("spec 018 — cuándo se genera la imagen fija", () => {
     });
   });
 });
+
+describe("spec 037 — la imagen holo con el dibujo real", () => {
+  it("test_s037_rf11_la_imagen_holo_es_la_carta_con_la_vista_previa_holo_y_mide_lo_mismo", async () => {
+    await inRollback(async (tx) => {
+      const { store, card } = await setup(tx);
+      expect(await size(store, card.keyHoloThumb)).toEqual([300, 425]);
+      expect(await size(store, card.keyHoloMid)).toEqual([700, 991]);
+      expect(await size(store, card.keyHoloPublic)).toEqual([600, 849]);
+      const normal = (await store.get(card.keyMid!))!.body;
+      const holo = (await store.get(card.keyHoloMid!))!.body;
+      expect(Buffer.compare(normal, holo)).not.toBe(0);
+    });
+  });
+});

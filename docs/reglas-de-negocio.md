@@ -6,7 +6,7 @@ regla cita la suya. Si una regla cambia, se cambia primero la spec y después es
 Estado de cada regla: **Vigente** (construida y con tests) o **Aprobada** (en una spec aprobada,
 pendiente de construir).
 
-Última actualización: 15 de octubre de 2026. Todas las reglas de las specs 001, 003, 004, 006, 007 (parte beta), 008 y 009 están vigentes.
+Última actualización: 11 de noviembre de 2026 (spec 037). Desde el 15 de octubre de 2026: Todas las reglas de las specs 001, 003, 004, 006, 007 (parte beta), 008 y 009 están vigentes.
 
 ---
 
@@ -362,6 +362,18 @@ Decisiones del dueño del 9 nov 2026.
 | Regla | Enunciado | Estado | Spec |
 |---|---|---|---|
 | RN-258 | Cuando una versión nueva de pruebas o de producción responde bien en su comprobación de salud, el grupo de Telegram del equipo recibe un mensaje: entorno con fecha y hora de Ciudad de México, un renglón por PR entrado desde el aviso anterior (hasta 15, títulos de menos de 90 caracteres) y la dirección. Uno solo por versión; sin cambios, ninguno. Si un despliegue falla, avisa Coolify. Un fallo de Telegram o de GitHub nunca impide que la web arranque. | Vigente | 035 RF-1 a RF-11 |
+
+## 29. El sobre y la carta del armador en todas las vistas (spec 037)
+
+Decisiones del dueño del 11 nov 2026.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-259 | Todo sobre que se ve (Mis sobres, apertura, «Abrir todos», simulador, celebraciones de recompensas, llegadas de regalos, premio de Expediciones y ajustes del panel) es la miniatura del sobre del armador: su diseño plata o gold o, sin diseño, el sobre básico. El sobre plano anterior ya no existe. | Vigente | 037 RF-1 a RF-6 |
+| RN-260 | En las cuadrículas y miniaturas (colección, set, personaje, álbum propio y público, Expediciones, resumen de un sobre y portada de la barra) la carta es su imagen fija, la del armador en reposo; al tocarla se abre viva. | Vigente | 037 RF-7 a RF-10 |
+| RN-261 | Cada carta armada tiene también una imagen fija holo, sacada con la vista previa holo; una copia holo se ve con ella en las cuadrículas, el resumen y el álbum público. Si la carta aún no la tiene, se ve la normal con el acabado holo. | Vigente | 037 RF-11 a RF-16, RF-19, RF-20 |
+| RN-262 | Al desplegar una receta nueva de imagen fija, el servidor regenera solo las cartas atrasadas, una a una; si una falla, conserva su imagen y aparece en el panel con el motivo, y «Regenerar imágenes» la reintenta. | Vigente | 037 RF-17, RF-18 |
+| RN-263 | Al revelar una carta armada y en el resumen del sobre no hay letrero de rareza (la carta trae su sello); la rareza queda para los lectores de pantalla. Las cartas sin capas conservan su insignia. La estrella del efecto especial y la cinta de celebración se quedan. | Vigente | 037 RF-21 a RF-25 |
 
 ## Parámetros en un vistazo
 

@@ -6,7 +6,7 @@ import { auth } from "@/auth";
 import { db } from "@/db/client";
 import { packs } from "@/db/schema";
 import type { LabCard } from "@/features/opening/fakePack";
-import { cardImageUrl } from "@/server/cards/image-urls";
+import { cardImage, holoImageIds } from "@/server/cards/card-image";
 import { translateError } from "@/i18n/errors";
 import { getDict } from "@/i18n/server";
 import type { Dict } from "@/i18n";
@@ -32,21 +32,26 @@ async function country() {
 
 /** Spec 018, RF-6: cada carta va con su carta viva (el usuario acaba de recibirla) para montarla al revelarla. */
 async function toLabCards(t: Dict, r: OpeningResult, userId: string): Promise<LabCard[]> {
-  const lives = await Promise.all(r.cards.map((c) => liveCardConfig(db, userId, c.cardId)));
-  return r.cards.map((c, i) => ({
+  const [lives, holoImages] = await Promise.all([Promise.all(r.cards.map((c) => liveCardConfig(db, userId, c.cardId))), holoImageIds(db, r.cards.map((c) => c.cardId))]);
+  return r.cards.map((c, i) => {
+    // Spec 037, RF-14: la copia holo, con su imagen fija holo en el resumen.
+    const img = cardImage(c.cardId, "mid", userId, { holoCopy: c.holo, holoImage: holoImages.has(c.cardId) });
+    return {
     id: `${r.packId}-${i}`,
     name: c.name || t.packs.actions.cardFallback(String(c.number).padStart(3, "0")),
     number: c.number,
     rarity: c.rarity,
     holo: c.holo,
-    image: cardImageUrl(c.cardId, "mid", userId),
+    image: img.src,
+    holoFinish: img.holoFinish,
     framed: true,
     live: lives[i],
     isNew: c.isNew,
     note: [c.isNew ? t.packs.notes.isNew : t.packs.notes.owned(c.qtyAfter), c.holo ? t.packs.notes.holo : null, c.pity ? t.packs.notes.pity : null]
       .filter(Boolean)
       .join(" · "),
-  }));
+    };
+  });
 }
 
 async function fail(e: unknown): Promise<Fail> {
@@ -94,6 +99,8 @@ export interface OpenAllCard {
   qtyAfter: number;
   pity: boolean;
   image: string;
+  /** Spec 037, RF-14 y RF-19: la copia es holo y la carta aún no tiene imagen holo (acabado de CSS). */
+  holoFinish: boolean;
   /** Spec 019, RF-1: de qué sobre del lote salió (0 = el primero), para la ráfaga. */
   pack: number;
   /** Spec 019, RF-6: la carta viva, solo en las destacadas del foco. */
@@ -110,6 +117,7 @@ export async function openAllPacksAction(setId: string, kindParam?: string): Pro
     const results = await openAllPacks(db, { userId, setId, kind: parsePackKind(kindParam), country: await country() });
     await ackOpenings(db, userId, results.map((r) => r.packId));
     const cardIds = new Map<string, string>();
+    const holoImages = await holoImageIds(db, results.flatMap((r) => r.cards.map((c) => c.cardId)));
     const cards: OpenAllCard[] = results.flatMap((r, pack) =>
       r.cards.map((c, i) => {
         cardIds.set(`${r.packId}-${i}`, c.cardId);
@@ -122,7 +130,8 @@ export async function openAllPacksAction(setId: string, kindParam?: string): Pro
           isNew: c.isNew,
           qtyAfter: c.qtyAfter,
           pity: c.pity,
-          image: cardImageUrl(c.cardId, "mid", userId),
+          image: cardImage(c.cardId, "mid", userId, { holoCopy: c.holo, holoImage: holoImages.has(c.cardId) }).src,
+          holoFinish: c.holo && !holoImages.has(c.cardId),
           pack,
         };
       }),

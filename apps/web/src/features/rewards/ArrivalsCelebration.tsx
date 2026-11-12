@@ -3,14 +3,16 @@
 import { useEffect } from "react";
 import { markCelebratedAction } from "@/app/packs/arrivals-actions";
 import { arrivalsKey, type ArrivalOrigin } from "@/domain/rewards/arrivals";
-import { PackArt, type PackArtData } from "@/features/packs/PackArt";
+import { PrizePack } from "@/features/packs/PrizePack";
+import type { PackViewData } from "@/domain/packs/view";
 import { useCelebrations } from "@/features/rewards/celebrations";
 import { useT } from "@/i18n/client";
 
 export interface ArrivalsGroupDTO {
   total: number;
   ids: string[];
-  sets: { setId: string; code: string; name: string; count: number; art: PackArtData }[];
+  /** Spec 037, RF-2 y RF-5: cada colección con la vista del sobre (plata o gold) que llegó. */
+  sets: { setId: string; code: string; name: string; count: number; kind: "silver" | "gold"; pack: PackViewData | null }[];
   origin: ArrivalOrigin;
 }
 
@@ -31,7 +33,7 @@ export function ArrivalsCelebration({ group }: { group: ArrivalsGroupDTO | null 
       title: t.arrivals.title(group.total),
       detail: group.sets.map((s) => (s.count > 1 ? `${s.name} ×${s.count}` : s.name)).join(" · "),
       count: group.total,
-      art: <PackArt setId={first.setId} code={first.code} name={first.name} art={first.art} className="w-[min(180px,26dvh)]" />,
+      art: first.pack ? <PrizePack view={first.pack} className="w-[min(180px,26dvh)]" /> : undefined,
       primary: { label: t.goToPacks, href: "/packs" },
       onShown: () => void markCelebratedAction(group.ids),
     });

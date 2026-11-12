@@ -1,7 +1,8 @@
 // RF-20: enlaces de imagen firmados para un usuario y con caducidad.
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-export type ImageSize = "thumb" | "mid" | "full";
+/** Spec 037, RF-12 a RF-14: `*-holo` es la imagen fija holo (si la carta no la tiene, se sirve la normal). */
+export type ImageSize = "thumb" | "mid" | "full" | "thumb-holo" | "mid-holo";
 
 export interface ImageGrant {
   cardId: string;

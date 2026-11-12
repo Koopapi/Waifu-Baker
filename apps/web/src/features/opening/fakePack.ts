@@ -21,6 +21,11 @@ export interface LabCard {
   live?: LiveCard | null;
   /** Spec 023: primera copia del coleccionista («¡Nueva!» al revelarla). */
   isNew?: boolean;
+  /**
+   * Spec 037, RF-14 y RF-19: la imagen fija ya es la holo (`false`) o hay que ponerle el acabado holo de CSS (`true`).
+   * Sin el campo (laboratorio, simulador), el acabado sigue a `holo`.
+   */
+  holoFinish?: boolean;
 }
 
 export const RARITY_ORDER: Rarity[] = ["common", "rare", "epic", "legendary", "ex"];

@@ -11,7 +11,7 @@ const src = (f: string) => readFileSync(path.resolve(__dirname, "../..", f), "ut
 
 describe("spec 015 — celebración de llegadas al entrar", () => {
   it("test_s015_rf6_no_pinta_nada_por_si_misma_la_cola_decide_cuando_sale", () => {
-    const group = { total: 2, ids: ["a", "b"], origin: "gift" as const, sets: [{ setId: "s", code: "FA01", name: "Fan Art", count: 2, art: { coverVersion: null, packImage: null } }] };
+    const group = { total: 2, ids: ["a", "b"], origin: "gift" as const, sets: [{ setId: "s", code: "FA01", name: "Fan Art", count: 2, kind: "silver" as const, pack: null }] };
     expect(renderToStaticMarkup(<ArrivalsCelebration group={group} />)).toBe("");
     expect(renderToStaticMarkup(<ArrivalsCelebration group={null} />)).toBe("");
   });

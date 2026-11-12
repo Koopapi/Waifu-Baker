@@ -12,6 +12,8 @@ export interface ArrivalPack {
   source: ArrivalSource;
   reason: string | null;
   grantedAt: Date;
+  /** Spec 037, RF-2 y RF-5: plata o gold, para mostrar su sobre. */
+  kind: "silver" | "gold";
 }
 
 export type ArrivalOrigin = "welcome" | "gift" | "tier" | "mixed";
@@ -30,8 +32,8 @@ export function originOf(p: Pick<ArrivalPack, "source" | "reason">): Exclude<Arr
 export interface ArrivalsGroup {
   total: number;
   ids: string[];
-  /** Por colección, en orden de código. */
-  sets: { setId: string; code: string; name: string; count: number }[];
+  /** Por colección, en orden de código; `kind` es el tipo del primer sobre que llegó de esa colección (spec 037, RF-5). */
+  sets: { setId: string; code: string; name: string; count: number; kind: "silver" | "gold" }[];
   origin: ArrivalOrigin;
 }
 
@@ -40,7 +42,7 @@ export function groupArrivals(packs: readonly ArrivalPack[]): ArrivalsGroup | nu
   if (packs.length === 0) return null;
   const sets = new Map<string, ArrivalsGroup["sets"][number]>();
   for (const p of packs) {
-    const s = sets.get(p.setId) ?? { setId: p.setId, code: p.code, name: p.name, count: 0 };
+    const s = sets.get(p.setId) ?? { setId: p.setId, code: p.code, name: p.name, count: 0, kind: p.kind };
     s.count += 1;
     sets.set(p.setId, s);
   }

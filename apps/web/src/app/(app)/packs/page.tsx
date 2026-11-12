@@ -4,10 +4,9 @@ import { requireUser } from "@/server/auth/require-user";
 import { cookies } from "next/headers";
 import { now } from "@/server/clock";
 import { listMyPacks, pendingOpening } from "@/server/services/packs";
-import { packArtForSets } from "@/server/services/pack-art";
 import { newArrivalsBySet } from "@/server/services/arrivals";
 import { PackThumb } from "@/ui/game/sobre-capas/PackThumb";
-import { packViewsFor } from "@/server/services/pack-designs";
+import { packViewsFor, withSilverPacks } from "@/server/services/pack-designs";
 import { packViewKey } from "@/domain/packs/view";
 import { MarkPacksSeen } from "@/features/packs/MarkPacksSeen";
 import { claimableSets, rewardsSummary } from "@/server/services/rewards";
@@ -37,13 +36,12 @@ export default async function MisSobresPage() {
     // Spec 015, RF-8: llegadas que el coleccionista aún no había visto.
     newArrivalsBySet(db, user.id),
   ]);
-  const [art, views] = await Promise.all([
-    packArtForSets(db, [...new Set([...groups.map((g) => g.setId), ...plainSets.map((s) => s.id)])]),
+  const [views, sets] = await Promise.all([
     // Spec 030, RF-14 a RF-16: el sobre de cada grupo (su diseño o el básico) con su miniatura.
     packViewsFor(db, user.id, groups.map((g) => ({ setId: g.setId, kind: g.kind }))),
+    // Spec 015, RF-5 y spec 037, RF-1: el sobre de la colección elegida, con su diseño, sale en la celebración del día 7.
+    withSilverPacks(db, user.id, plainSets),
   ]);
-  // Spec 015, RF-5: el sobre de la colección elegida sale en la celebración del día 7.
-  const sets = plainSets.map((s) => ({ ...s, art: art.get(s.id) ?? { coverVersion: null, packImage: null } }));
   const total = groups.reduce((a, g) => a + g.sealed, 0);
   const t = await getDict();
   // Spec 021, RF-9.

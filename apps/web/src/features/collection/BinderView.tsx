@@ -19,8 +19,12 @@ export interface BinderSlotDTO {
     qty: number;
     holoQty: number;
     firstObtainedAt: string;
+    /** Spec 037, RF-12: la imagen fija holo si tiene una copia holo y la carta la tiene. */
     thumb: string;
+    /** Spec 037: la carta tiene imagen fija holo (si no, la holo se marca con el acabado de CSS). */
+    holoImage: boolean;
     mid: string;
+    midHolo: string | null;
     /** Spec 020, RF-25: vínculo de su personaje y hora de vuelta si está de expedición (por versión). */
     bondLevel: number;
     /** Spec 029: su personaje, para ir a su línea. */
@@ -75,7 +79,7 @@ export function BinderView({ slots, setCode }: { slots: BinderSlotDTO[]; setCode
               <button
                 type="button"
                 onClick={() => setOpen(s.number)}
-                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? "binder-card--holo holo-finish" : ""}`}
+                className={`binder-card group relative block w-full overflow-hidden rounded-l ${focusRing} ${s.owned.holoQty > 0 ? `binder-card--holo${s.owned.holoImage ? "" : " holo-finish"}` : ""}`}
                 aria-label={t.collection.binder.viewCard(pad(s.number))}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}

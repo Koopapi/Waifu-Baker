@@ -5,6 +5,7 @@ import { cards, cardVersions, characters, dropTables, sets } from "@/db/schema";
 import { consecutiveNumbers, isCardComplete, rarityCounts, rarityGaps } from "@/domain/catalog/card-rules";
 import { validateUpload } from "@/domain/catalog/upload-rules";
 import { mapLimit } from "@/lib/map-limit";
+import { regenerateCardFlat } from "./flat-regen";
 import { drawPack } from "@/domain/catalog/draw";
 import type { PackKind } from "@/domain/catalog/default-odds";
 import { cryptoRng } from "@/server/rng";
@@ -265,18 +266,27 @@ export async function getSetOverview(db: DbLike, setId: string) {
   return { set, odds, gold, cards: plain, counts: rarityCounts(plain), gaps: rarityGaps(plain, slots) };
 }
 
-/** Regenera todas las cartas de una colección (por ejemplo, tras cambiar el marco en Pencil). */
+/**
+ * Regenera todas las cartas de una colección (por ejemplo, tras cambiar el marco en Pencil). Spec 037, RF-18: también
+ * reintenta las que fallaron; una carta armada que falla queda con su motivo y no corta las demás.
+ */
 export async function regenerateSet(db: DbLike, store: CardStore, actorUserId: string, setId: string) {
   const [set] = await db.select().from(sets).where(eq(sets.id, setId));
   if (!set) throw new AdminError("not_found", "La colección no existe.", { entity: "set" });
   const rows = await db.select().from(cards).where(eq(cards.setId, setId)).orderBy(asc(cards.number));
-  const keys = await mapLimit(rows, COMPOSE_PARALLEL, (r) => composeAndStore(store, r, set.code));
-  for (const [i, r] of rows.entries()) {
+  const layered = rows.filter((r) => r.layers);
+  const plain = rows.filter((r) => !r.layers);
+  const keys = await mapLimit(plain, COMPOSE_PARALLEL, (r) => composeAndStore(store, r, set.code));
+  for (const [i, r] of plain.entries()) {
     await db.update(cards).set(keys[i]).where(eq(cards.id, r.id));
   }
-  await recordAudit(db, { actorUserId, action: "set_regenerate", entityType: "set", entityId: setId, after: { cards: rows.length } });
-  await deleteKeys(store, rows.flatMap(composedKeys), db);
-  return rows.length;
+  await deleteKeys(store, plain.flatMap(composedKeys), db);
+  let failed = 0;
+  for (const r of layered) {
+    if ((await regenerateCardFlat(db, store, r.id)).ok === false) failed += 1;
+  }
+  await recordAudit(db, { actorUserId, action: "set_regenerate", entityType: "set", entityId: setId, after: { cards: rows.length, failed } });
+  return rows.length - failed;
 }
 
 /**
@@ -317,7 +327,7 @@ export async function reviewCard(db: DbLike, store: CardStore, actorUserId: stri
       const k = cur.pendingKeys;
       toDelete.push(...composedKeys(cur));
       layersToRelease.push(...imageKeys(cur.layers));
-      patch = { ...patch, layers: cur.layersPending, keyFull: k.full, keyMid: k.mid, keyThumb: k.thumb, keyPublic: k.public, blurhash: k.blurhash, layersPending: null, pendingKeys: null };
+      patch = { ...patch, layers: cur.layersPending, keyFull: k.full, keyMid: k.mid, keyThumb: k.thumb, keyPublic: k.public, keyHoloMid: k.holoMid ?? null, keyHoloThumb: k.holoThumb ?? null, keyHoloPublic: k.holoPublic ?? null, flatVersion: k.version ?? 0, blurhash: k.blurhash, layersPending: null, pendingKeys: null };
     }
     const [updated] = await tx
       .update(cards)

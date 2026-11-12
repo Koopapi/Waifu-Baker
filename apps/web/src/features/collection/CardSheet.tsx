@@ -88,9 +88,9 @@ export function CardSheet({ slot, setCode, onClose }: { slot: BinderSlotDTO & { 
             {showLive && live ? (
               <CartaCapas ref={card} tier={live.tier} image="" config={live.config} holo={holo} label={name} zone={art} className="w-full max-w-[280px]" />
             ) : (
-              <span className={`block w-full max-w-[280px] overflow-hidden rounded-l ${holo || bondHolo ? "holo-finish" : ""}`} data-testid="card-sheet-flat">
+              <span className={`block w-full max-w-[280px] overflow-hidden rounded-l ${(holo && !o.midHolo) || bondHolo ? "holo-finish" : ""}`} data-testid="card-sheet-flat">
                 {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
-                <img src={o.mid} alt="" className="block aspect-[700/991] w-full object-cover" draggable={false} />
+                <img src={holo && o.midHolo ? o.midHolo : o.mid} alt="" className="block aspect-[700/991] w-full object-cover" draggable={false} />
               </span>
             )}
           </div>

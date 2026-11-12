@@ -54,7 +54,8 @@ export async function composeAndStore(store: CardStore, card: Pick<CardRow, "id"
     keys[size] = `sets/${card.setId}/cards/${card.id}/${size}.${tag}.webp`;
     await store.put(keys[size], composed[size]);
   }
-  return { keyFull: keys.full, keyMid: keys.mid, keyThumb: keys.thumb, keyPublic: keys.public, blurhash: composed.blurhash };
+  // Spec 037, RF-20: una carta sin capas no tiene imagen holo.
+  return { keyFull: keys.full, keyMid: keys.mid, keyThumb: keys.thumb, keyPublic: keys.public, keyHoloMid: null, keyHoloThumb: null, keyHoloPublic: null, blurhash: composed.blurhash };
 }
 
 /**
@@ -66,7 +67,7 @@ export async function deleteKeys(store: CardStore, keys: (string | null | undefi
   let candidates = [...new Set(keys.filter((k): k is string => Boolean(k)))];
   if (db && candidates.length) {
     const inUse = await db
-      .select({ a: cards.keyFull, b: cards.keyMid, c: cards.keyThumb, d: cards.keyPublic, e: cards.originalKey, f: cards.pendingOriginalKey })
+      .select({ a: cards.keyFull, b: cards.keyMid, c: cards.keyThumb, d: cards.keyPublic, e: cards.originalKey, f: cards.pendingOriginalKey, g: cards.keyHoloMid, h: cards.keyHoloThumb, i: cards.keyHoloPublic })
       .from(cards)
       .where(
         or(
@@ -76,6 +77,9 @@ export async function deleteKeys(store: CardStore, keys: (string | null | undefi
           inArray(cards.keyPublic, candidates),
           inArray(cards.originalKey, candidates),
           inArray(cards.pendingOriginalKey, candidates),
+          inArray(cards.keyHoloMid, candidates),
+          inArray(cards.keyHoloThumb, candidates),
+          inArray(cards.keyHoloPublic, candidates),
         ),
       );
     const used = new Set(inUse.flatMap((r) => Object.values(r)).filter(Boolean));
@@ -84,7 +88,15 @@ export async function deleteKeys(store: CardStore, keys: (string | null | undefi
   await Promise.all(candidates.map((k) => store.delete(k)));
 }
 
-export const composedKeys = (c: Pick<CardRow, "keyFull" | "keyMid" | "keyThumb" | "keyPublic">) => [c.keyFull, c.keyMid, c.keyThumb, c.keyPublic];
+export const composedKeys = (c: Pick<CardRow, "keyFull" | "keyMid" | "keyThumb" | "keyPublic" | "keyHoloMid" | "keyHoloThumb" | "keyHoloPublic">) => [
+  c.keyFull,
+  c.keyMid,
+  c.keyThumb,
+  c.keyPublic,
+  c.keyHoloMid,
+  c.keyHoloThumb,
+  c.keyHoloPublic,
+];
 
 export interface CardPatch {
   name?: string;
@@ -197,10 +209,23 @@ export async function releaseLayerImages(db: DbLike, store: CardStore, setId: st
 }
 
 /** Las claves de la imagen fija pendiente de revisión (spec 018). */
-export const pendingFlatKeys = (k: CardRow["pendingKeys"]) => (k ? [k.full, k.mid, k.thumb, k.public] : []);
+export const pendingFlatKeys = (k: CardRow["pendingKeys"]) => (k ? [k.full, k.mid, k.thumb, k.public, k.holoMid ?? null, k.holoThumb ?? null, k.holoPublic ?? null] : []);
+
+/** Spec 037, RF-11: lo pendiente de revisión con su imagen holo. */
+export const toPendingKeys = (k: { keyFull: string; keyMid: string; keyThumb: string; keyPublic: string; keyHoloMid: string | null; keyHoloThumb: string | null; keyHoloPublic: string | null; blurhash: string; flatVersion: number }) => ({
+  full: k.keyFull,
+  mid: k.keyMid,
+  thumb: k.keyThumb,
+  public: k.keyPublic,
+  holoMid: k.keyHoloMid,
+  holoThumb: k.keyHoloThumb,
+  holoPublic: k.keyHoloPublic,
+  blurhash: k.blurhash,
+  version: k.flatVersion,
+});
 
 /** Las imágenes fijas llevan el id de la carta en la clave: las que ya no usa ni lo vigente ni lo pendiente, se borran. */
 export async function deleteUnusedFlat(store: CardStore, card: CardRow, keys: (string | null)[]) {
-  const inUse = new Set([card.keyFull, card.keyMid, card.keyThumb, card.keyPublic, ...pendingFlatKeys(card.pendingKeys)]);
+  const inUse = new Set([...composedKeys(card), ...pendingFlatKeys(card.pendingKeys)]);
   await Promise.all(keys.filter((k): k is string => Boolean(k) && !inUse.has(k)).map((k) => store.delete(k)));
 }

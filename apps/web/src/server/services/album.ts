@@ -140,14 +140,16 @@ export async function publicAlbum(db: DbLike, slug: string) {
 
 /** RF-15: la carta pertenece a un álbum público activo y es SFW; devuelve su imagen con marca de agua. */
 export async function publicCardImageKey(db: DbLike, slug: string, cardId: string) {
-  const [row] = await db
-    .select({ key: cards.keyPublic })
+  const rows = await db
+    .select({ key: cards.keyPublic, holoKey: cards.keyHoloPublic, holo: userCards.holo })
     .from(albums)
     .innerJoin(users, eq(users.id, albums.userId))
     .innerJoin(userCards, eq(userCards.userId, albums.userId))
     .innerJoin(cards, eq(cards.id, userCards.cardId))
     .innerJoin(sets, eq(sets.id, cards.setId))
     .where(and(eq(albums.slug, slug), eq(albums.isPublic, true), eq(albums.moderation, "none"), isNull(users.deletedAt), eq(cards.id, cardId), eq(sets.isAdult, false), inArray(sets.status, ["published", "archived"])))
-    .limit(1);
-  return row?.key ?? null;
+    .limit(2);
+  // Spec 037, RF-16: si el dueño del álbum tiene la copia holo, su imagen holo (con la marca de agua del álbum).
+  const holo = rows.find((r) => r.holo && r.holoKey);
+  return holo?.holoKey ?? rows[0]?.key ?? null;
 }

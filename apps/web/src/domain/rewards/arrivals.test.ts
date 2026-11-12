@@ -10,6 +10,7 @@ const pack = (id: string, over: Partial<ArrivalPack> = {}): ArrivalPack => ({
   source: "manual",
   reason: null,
   grantedAt: at("2026-10-18T10:00:00Z"),
+  kind: "silver",
   ...over,
 });
 
@@ -36,12 +37,20 @@ describe("spec 015 — llegadas", () => {
     expect(g.total).toBe(3);
     expect(g.ids).toEqual(["a", "b", "c"]);
     expect(g.sets).toEqual([
-      { setId: "aa01", code: "AA01", name: "Alfa", count: 1 },
-      { setId: "fa01", code: "FA01", name: "Fan Art · Vol. 1", count: 2 },
+      { setId: "aa01", code: "AA01", name: "Alfa", count: 1, kind: "silver" },
+      { setId: "fa01", code: "FA01", name: "Fan Art · Vol. 1", count: 2, kind: "silver" },
     ]);
     expect(g.origin).toBe("gift");
     expect(groupArrivals([pack("a", { source: "tier_grant" }), pack("b")])!.origin).toBe("mixed");
     expect(groupArrivals([])).toBeNull();
+  });
+
+  it("test_s037_rf5_cada_coleccion_de_la_llegada_lleva_el_tipo_de_su_sobre", () => {
+    const g = groupArrivals([pack("a", { kind: "gold" }), pack("b"), pack("c", { setId: "aa01", code: "AA01", name: "Alfa" })])!;
+    expect(g.sets.map((s) => [s.code, s.kind])).toEqual([
+      ["AA01", "silver"],
+      ["FA01", "gold"],
+    ]);
   });
 
   it("test_s015_rf7_la_misma_tanda_tiene_la_misma_identidad_en_cualquier_orden", () => {

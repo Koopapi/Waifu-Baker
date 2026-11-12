@@ -88,6 +88,8 @@ test("sobres gratis con espera y recompensa diaria", async ({ browser, request }
     const celebration = fan.locator('[data-testid="celebration-dialog"]');
     await expect(celebration).toBeVisible();
     await expect(celebration).toContainText(es.fx.streak.title);
+    // Spec 037, RF-1: el sobre que se gana, con la miniatura del armador (plata).
+    await expect(celebration.locator('[data-testid="prize-pack"][data-kind="silver"]')).toBeVisible();
     await celebration.locator('[data-testid="celebration-close"]').click();
     await expect(celebration).toHaveCount(0);
     await expect(fan.locator('[data-testid="reward-announce"]')).toHaveText(es.fx.sr.gotPack);

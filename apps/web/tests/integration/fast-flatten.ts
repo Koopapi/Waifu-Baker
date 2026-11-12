@@ -5,9 +5,9 @@ import { createHash } from "node:crypto";
 import sharp from "sharp";
 import type { LayersConfig } from "@/domain/cards/layers";
 import { AdminError } from "@/server/errors";
-import { FLAT_SIZES, flatVariants } from "@/server/cards/flatten";
+import { FLAT_SIZES, flatVariants, type FlatCard } from "@/server/cards/flatten";
 
-export async function fastFlatten(config: LayersConfig, images: Map<string, Buffer>) {
+export async function fastFlatten(config: LayersConfig, images: Map<string, Buffer>): Promise<FlatCard> {
   for (const body of images.values()) {
     const ok = await sharp(body)
       .metadata()
@@ -19,6 +19,10 @@ export async function fastFlatten(config: LayersConfig, images: Map<string, Buff
   for (const body of images.values()) h.update(body);
   const [r, g, b] = h.digest();
   const { width, height } = FLAT_SIZES.full;
-  const png = await sharp({ create: { width, height, channels: 4, background: { r, g, b, alpha: 1 } } }).png({ compressionLevel: 0 }).toBuffer();
-  return flatVariants(png);
+  const solid = (c: { r: number; g: number; b: number }) => sharp({ create: { width, height, channels: 4, background: { ...c, alpha: 1 } } }).png({ compressionLevel: 0 }).toBuffer();
+  const flat = await flatVariants(await solid({ r, g, b }));
+  // Spec 037, RF-11 y RF-15: la versión holo, de otro color (la misma si la carta ya es holo).
+  if (config.holo) return { ...flat, holo: "same" };
+  const holo = await flatVariants(await solid({ r: 255 - r, g: 255 - g, b: 255 - b }));
+  return { ...flat, holo: { mid: holo.mid, thumb: holo.thumb, public: holo.public } };
 }

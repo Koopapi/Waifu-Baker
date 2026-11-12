@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { claimDailyAction, claimFreePackAction, type RewardActionState } from "@/app/packs/rewards-actions";
 import { FREE_INTERVAL_MS } from "@/domain/rewards/free-packs";
-import { PackArt, type PackArtData } from "@/features/packs/PackArt";
+import { PrizePack } from "@/features/packs/PrizePack";
+import type { PackViewData } from "@/domain/packs/view";
 import { useCelebrations } from "@/features/rewards/celebrations";
 import { sound } from "@/features/sound/engine";
 import { useT } from "@/i18n/client";
@@ -27,7 +28,8 @@ export interface RewardsDTO {
   free: { charges: number; max: number; nextAt: string | null };
   daily: { claimedToday: boolean; day: number; schedule: Reward[]; atRisk: boolean };
   cookies: number;
-  sets: { id: string; code: string; name: string; art: PackArtData }[];
+  /** Spec 037, RF-1: cada colección con la vista de su sobre plata (el de las recompensas). */
+  sets: { id: string; code: string; name: string; pack: PackViewData | null }[];
   timeZoneCookie: string | null;
 }
 
@@ -164,7 +166,7 @@ export function RewardsPanel({ data, layout = "grid" }: { data: RewardsDTO; layo
       kickerTone: "mint",
       title: fx.streak.title,
       detail: fx.streak.detail(set?.name ?? ""),
-      art: set ? <PackArt setId={set.id} code={set.code} name={set.name} art={set.art} className="w-[min(180px,26dvh)]" /> : <Sticker name="pack" className="size-32" />,
+      art: set?.pack ? <PrizePack view={set.pack} className="w-[min(180px,26dvh)]" /> : <Sticker name="pack" className="size-32" />,
       onClosed: () => void packLands(rectOf(document.querySelector('[data-testid="celebration-dialog"]'))),
     });
   };
