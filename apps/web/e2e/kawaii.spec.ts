@@ -29,7 +29,10 @@ test("demo kawaii: sobres, apertura con suspense, recompensas y colección", asy
   await test.step("RF-6: el administrador elige la portada del sobre", async () => {
     await admin.goto(`/admin/sets/${setId}`);
     const box = admin.locator('[data-testid="pack-settings"]');
-    await expect(box.locator('[role="img"]')).toBeVisible();
+    // Spec 037, RF-4: los ajustes muestran el sobre plata y el gold.
+    await expect(box.locator('[role="img"]')).toHaveCount(2);
+    await expect(box.locator('[data-testid="prize-pack"][data-kind="silver"]')).toBeVisible();
+    await expect(box.locator('[data-testid="prize-pack"][data-kind="gold"]')).toBeVisible();
     await choose(box, es.admin.set.pack.cover, /^001 ·/);
     await expect(admin.getByText(es.admin.set.pack.coverSaved)).toBeVisible();
   });
