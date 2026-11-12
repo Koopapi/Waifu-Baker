@@ -87,7 +87,8 @@ for (const theme of ["kawaii", "street"] as const)
 test(`barrido de calidad de todas las páginas (${theme})`, async ({ browser }) => {
   desktopOnly();
   // Incluye los reinicios controlados del servidor entre páginas (abajo) y la recompilación que les sigue.
-  test.setTimeout(900_000);
+  // En el CI ya tardaba entre 12 y 14.7 minutos: 20 de límite para que la lentitud del equipo no lo tumbe.
+  test.setTimeout(1_200_000);
   const problems: Problem[] = [];
 
   const admin = await login(browser, "admin-sweep", true);
