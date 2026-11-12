@@ -23,7 +23,7 @@ describe("spec 028 — valores por defecto de las cartas", () => {
 
   it("test_s028_rf1_rf15_con_otros_valores_del_panel_la_carta_nueva_sale_con_ellos", () => {
     const c = configFromCharacter(key(1), "ssr", 7, other);
-    expect(c.sello).toMatchObject({ texto: "LEG", tamano: 22 });
+    expect(c.sello).toMatchObject({ texto: "SSR", tamano: 22 });
     expect(c.borde).toBe(5.5);
   });
 

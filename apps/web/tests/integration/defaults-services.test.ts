@@ -61,7 +61,7 @@ describe("spec 028 — cartas nuevas y re-estiladas", () => {
       expect(after.layers).toMatchObject({ borde: 4.5, sello: { tamano: 20 } });
       // Al re-estilarse (cambio de rareza con estilo automático), la antigua toma los vigentes.
       await updateCard(tx, store, admin.id, before.id, before.version, { rarity: "epic" });
-      expect((await load(before.id)).layers).toMatchObject({ borde: 4.5, sello: { texto: "E", tamano: 20 } });
+      expect((await load(before.id)).layers).toMatchObject({ borde: 4.5, sello: { texto: "UR", tamano: 20 } });
     });
   });
 });

@@ -1,3 +1,4 @@
+import { RARITY_LABEL } from "@/domain/catalog/card-rules";
 import type { common as en } from "../en/common";
 
 export const common: typeof en = {
@@ -41,13 +42,8 @@ export const common: typeof en = {
     lockedSet: "Colección 18+: verifica tu edad para verla",
   },
   toast: { rewardClaimed: "¡Reclamada!", saved: "Listo", failed: "No ha funcionado", opened: "Cartas reveladas" },
-  rarity: {
-    common: "Común",
-    rare: "Rara",
-    epic: "Épica",
-    legendary: "Legendaria",
-    ex: "EX",
-  },
+  // Spec 038: los mismos nombres en los dos idiomas (`RARITY_LABEL`).
+  rarity: RARITY_LABEL,
   /** Spec 022, RF-11: tipos de sobre. */
   packKind: { silver: "Plata", gold: "Gold" },
   aiNotice: "Las ilustraciones de las cartas están generadas con IA. Las cartas no tienen valor monetario ni se pueden intercambiar.",

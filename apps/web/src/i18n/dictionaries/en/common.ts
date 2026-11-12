@@ -1,3 +1,4 @@
+import { RARITY_LABEL } from "@/domain/catalog/card-rules";
 // Textos compartidos por toda la web. Solo los edita la base de i18n (spec 008).
 export const common = {
   brand: "WAIFU BAKER",
@@ -40,13 +41,8 @@ export const common = {
     lockedSet: "18+ set: verify your age to see it",
   },
   toast: { rewardClaimed: "Claimed!", saved: "All set", failed: "That didn’t work", opened: "Cards revealed" },
-  rarity: {
-    common: "Common",
-    rare: "Rare",
-    epic: "Epic",
-    legendary: "Legendary",
-    ex: "EX",
-  },
+  // Spec 038: los mismos nombres en los dos idiomas (`RARITY_LABEL`).
+  rarity: RARITY_LABEL,
   /** Spec 022, RF-11: tipos de sobre. */
   packKind: { silver: "Silver", gold: "Gold" },
   aiNotice: "Card illustrations are AI-generated. Cards are digital, have no monetary value and cannot be traded.",

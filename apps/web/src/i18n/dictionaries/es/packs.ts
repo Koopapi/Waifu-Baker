@@ -1,3 +1,4 @@
+import { RARITY_GROUP_LABEL } from "@/domain/catalog/card-rules";
 import type { packs as en } from "../en/packs";
 import { plural } from "../../plural";
 
@@ -51,7 +52,7 @@ export const packs: typeof en = {
     focusHint: "Toca la carta o «Siguiente» para pasar a la próxima",
     openedTitle: (n) => `Abriste ${n} ${plural(n, "sobre", "sobres")}`,
     totals: { cards: "Cartas", fresh: "Nuevas", holo: "Holo" },
-    group: { common: "Comunes", rare: "Raras", epic: "Épicas", legendary: "Legendarias", ex: "EX" },
+    group: RARITY_GROUP_LABEL,
     copies: (n) => `×${n}`,
   },
   opener: {

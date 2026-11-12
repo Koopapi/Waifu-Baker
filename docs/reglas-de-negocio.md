@@ -6,7 +6,7 @@ regla cita la suya. Si una regla cambia, se cambia primero la spec y después es
 Estado de cada regla: **Vigente** (construida y con tests) o **Aprobada** (en una spec aprobada,
 pendiente de construir).
 
-Última actualización: 11 de noviembre de 2026 (spec 037). Desde el 15 de octubre de 2026: Todas las reglas de las specs 001, 003, 004, 006, 007 (parte beta), 008 y 009 están vigentes.
+Última actualización: 11 de noviembre de 2026 (specs 037 y 038). Desde el 15 de octubre de 2026: Todas las reglas de las specs 001, 003, 004, 006, 007 (parte beta), 008 y 009 están vigentes.
 
 ---
 
@@ -374,6 +374,15 @@ Decisiones del dueño del 11 nov 2026.
 | RN-261 | Cada carta armada tiene también una imagen fija holo, sacada con la vista previa holo; una copia holo se ve con ella en las cuadrículas, el resumen y el álbum público. Si la carta aún no la tiene, se ve la normal con el acabado holo. | Vigente | 037 RF-11 a RF-16, RF-19, RF-20 |
 | RN-262 | Al desplegar una receta nueva de imagen fija, el servidor regenera solo las cartas atrasadas, una a una; si una falla, conserva su imagen y aparece en el panel con el motivo, y «Regenerar imágenes» la reintenta. | Vigente | 037 RF-17, RF-18 |
 | RN-263 | Al revelar una carta armada y en el resumen del sobre no hay letrero de rareza (la carta trae su sello); la rareza queda para los lectores de pantalla. Las cartas sin capas conservan su insignia. La estrella del efecto especial y la cinta de celebración se quedan. | Vigente | 037 RF-21 a RF-25 |
+
+## 30. Nombres nuevos de las rarezas (spec 038)
+
+Decisiones del dueño del 11 nov 2026.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-264 | Las rarezas se llaman, de menor a mayor, Common, Rare, Ultra Rare, SSR y EX, igual en español y en inglés y en toda la web, panel incluido; en plural, Commons, Rares, Ultra Rares, SSR y EX. Lo que se guarda para cada rareza no cambia. | Vigente | 038 RF-1 a RF-5 |
+| RN-265 | Los sellos de rareza son C, R, UR, SSR y EX. Al desplegar, las cartas ya armadas cambian E por UR y LEG por SSR (también lo pendiente de revisión 18+, sin pedir otra revisión), quedan con una versión «Nombres nuevos de rareza» en su historial y se regeneran sus imágenes. Un sello escrito a mano no se toca. | Vigente | 038 RF-6 a RF-11 |
 
 ## Parámetros en un vistazo
 

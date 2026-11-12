@@ -85,11 +85,11 @@ test("valores por defecto, ajustes del panel y cartas de portada", async ({ brow
     await admin.goto("/admin/settings");
     const form = admin.locator('[data-testid="odds-defaults-form"]');
     const row = form.locator('[data-testid="odds-defaults-silver-base"]');
-    await row.getByLabel("Sobre plata: Ranuras normales, Común").fill("70");
+    await row.getByLabel("Sobre plata: Ranuras normales, Common").fill("70");
     await expect(row).toHaveAttribute("data-invalid", "true");
     await form.locator('[data-testid="odds-defaults-save"]').click();
     await expect(form.getByText("Sobre plata, ranuras normales: suma 98 % en vez de 100 %. No se guardó nada.")).toBeVisible();
-    await row.getByLabel("Sobre plata: Ranuras normales, Rara").fill("24");
+    await row.getByLabel("Sobre plata: Ranuras normales, Rare").fill("24");
     await expect(row).not.toHaveAttribute("data-invalid", "true");
     await form.locator('[data-testid="odds-defaults-save"]').click();
     await expect(form.getByText("Probabilidades guardadas.")).toBeVisible();
@@ -111,13 +111,13 @@ test("valores por defecto, ajustes del panel y cartas de portada", async ({ brow
     await admin.click(`a:text-is('${fresh}')`);
     await admin.waitForURL(/\/admin\/sets\/[0-9a-f-]+$/);
     const silver = admin.locator('[data-testid="odds-silver"]');
-    await expect(silver.getByLabel("Ranura 1, Común")).toHaveValue("70");
-    await expect(silver.getByLabel("Ranura 1, Rara")).toHaveValue("24");
+    await expect(silver.getByLabel("Ranura 1, Common")).toHaveValue("70");
+    await expect(silver.getByLabel("Ranura 1, Rare")).toHaveValue("24");
     await expect(silver.getByLabel("Ranura 3, EX")).toHaveValue("0.2");
     await expect(silver.locator('input[data-testid="odds-pity-silver"]')).toHaveValue("10");
     await admin.getByRole("tab", { name: "Gold" }).click();
     const gold = admin.locator('[data-testid="odds-gold"]');
-    await expect(gold.getByLabel("Ranura 3, Épica")).toHaveValue("72");
+    await expect(gold.getByLabel("Ranura 3, Ultra Rare")).toHaveValue("72");
     await expect(gold.locator('input[data-testid="odds-pity-gold"]')).toHaveValue("25");
   });
 

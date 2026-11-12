@@ -35,6 +35,8 @@ const ALLOWED = [
   /^server\/services\/cards\.ts$/,
   // Spec 037, RF-17: la regeneración de imágenes fijas lee las capas en el servidor para dibujarlas; no las expone.
   /^server\/services\/flat-regen\.ts$/,
+  // Spec 038, RF-7: el cambio de los sellos a los nombres nuevos de rareza, en el servidor.
+  /^server\/services\/seal-rename\.ts$/,
   /^server\/services\/library\.ts$/,
   /^server\/services\/live-card\.ts$/,
   /^app\/admin\//,

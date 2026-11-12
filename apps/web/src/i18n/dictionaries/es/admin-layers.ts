@@ -273,7 +273,7 @@ export const adminLayers: typeof en = {
       version: (n: number) => `Versión ${n}`,
       by: (name: string) => `por ${name}`,
       unknown: "por una cuenta que ya no existe",
-      changed: { ficha: "ficha", capas: "capas", ambas: "ficha y capas" } as Record<string, string>,
+      changed: { ficha: "ficha", capas: "capas", ambas: "ficha y capas", rareza: "Nombres nuevos de rareza" } as Record<string, string>,
       pending: "pendiente de revisión 18+",
       restore: "Volver a esta versión",
       restored: (n: number) => `Versión ${n} cargada como cambios sin guardar. Guarda para conservarla.`,

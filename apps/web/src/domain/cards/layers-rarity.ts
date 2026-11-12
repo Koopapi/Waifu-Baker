@@ -14,11 +14,11 @@ interface Preset {
  * tamaño del sello ya no depende del escalón; lo ponen los valores por defecto (`CardDefaults`).
  */
 export const TIER_PRESETS: Record<RarityTier, Preset> = {
-  // Spec 022: un sello por rareza, como en la maqueta (C, R, E, LEG, EX).
+  // Spec 022: un sello por rareza. Spec 038, RF-6: C, R, UR, SSR y EX (antes C, R, E, LEG y EX).
   n: { particles: null, seal: { texto: "C", estilo: "plata" }, holo: false },
   r: { particles: { particulas: "destellos-arcoiris", cantidad: 16, tamano: 0.8, opacidad: 0.75 }, seal: { texto: "R", estilo: "azul" }, holo: false },
-  sr: { particles: { particulas: "destellos-arcoiris", cantidad: 36 }, seal: { texto: "E", estilo: "morado" }, holo: false },
-  ssr: { particles: { particulas: "destellos-dorados", cantidad: 55 }, seal: { texto: "LEG", estilo: "oro" }, holo: false },
+  sr: { particles: { particulas: "destellos-arcoiris", cantidad: 36 }, seal: { texto: "UR", estilo: "morado" }, holo: false },
+  ssr: { particles: { particulas: "destellos-dorados", cantidad: 55 }, seal: { texto: "SSR", estilo: "oro" }, holo: false },
   ur: { particles: { particulas: "destellos-arcoiris", cantidad: 65 }, seal: { texto: "EX", estilo: "arcoiris" }, holo: true },
 };
 

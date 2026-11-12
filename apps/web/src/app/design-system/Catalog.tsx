@@ -114,8 +114,8 @@ export function Catalog() {
               options={[
                 { value: "n", label: "C", swatch: "var(--ui-k-plata)" },
                 { value: "r", label: "R", swatch: "var(--ui-k-menta)" },
-                { value: "sr", label: "E", swatch: "var(--ui-k-lavanda)" },
-                { value: "ssr", label: "LEG", swatch: "var(--ui-k-limon)" },
+                { value: "sr", label: "UR", swatch: "var(--ui-k-lavanda)" },
+                { value: "ssr", label: "SSR", swatch: "var(--ui-k-limon)" },
               ]}
             />
             {/* Spec 033: fichas de varias opciones, con número (los filtros de la cuadrícula de cartas). */}
@@ -127,7 +127,7 @@ export function Catalog() {
               options={[
                 { value: "n", label: "C", count: 12 },
                 { value: "r", label: "R", count: 6 },
-                { value: "sr", label: "E", count: 3 },
+                { value: "sr", label: "UR", count: 3 },
               ]}
             />
           </Card>

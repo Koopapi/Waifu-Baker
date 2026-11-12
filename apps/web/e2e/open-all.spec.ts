@@ -66,11 +66,11 @@ test("abrir todos: ráfaga, foco en las destacadas y resumen", async ({ browser 
     await expect(result.locator("h2")).toHaveText("Abriste 3 sobres");
     await expect(fan.locator('[data-testid="open-all-totals"] dd').first()).toHaveText("6");
     const rares = fan.locator('[data-testid="open-all-group-rare"]');
-    await expect(rares.locator("h3")).toContainText("Raras · 3");
+    await expect(rares.locator("h3")).toContainText("Rares · 3");
     await expect(rares.locator('[data-testid="open-all-version"]')).toHaveCount(1);
     await expect(rares.locator('[data-testid="copies"]')).toHaveText("×3");
     await expect(rares.locator(".oa-card__new")).toHaveText("¡Nueva!");
-    await expect(fan.locator('[data-testid="open-all-group-common"] h3')).toContainText("Comunes · 3");
+    await expect(fan.locator('[data-testid="open-all-group-common"] h3')).toContainText("Commons · 3");
     await fan.screenshot({ path: `test-results/screens/${project}-abrir-todos-resumen.png`, fullPage: true });
   });
 });

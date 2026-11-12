@@ -64,16 +64,16 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   await test.step("RF-14: asignar personaje y rareza en lote", async () => {
     await page.click("text=Seleccionar todas");
     await choose(page, "Personaje para la selección", "Aiko Hoshino");
-    await choose(page, "Rareza para la selección", /^Común$/);
+    await choose(page, "Rareza para la selección", /^Common$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator(`text=${IMAGES.length} cartas actualizadas.`)).toBeVisible({ timeout: 60_000 });
     await tick(page, "Seleccionar carta 010");
-    await choose(page, "Rareza para la selección", /^Rara$/);
+    await choose(page, "Rareza para la selección", /^Rare$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
     // Spec 022: una legendaria para que el sobre gold pueda dar más legendaria que el plata.
     await tick(page, "Seleccionar carta 009");
-    await choose(page, "Rareza para la selección", /^Legendaria$/);
+    await choose(page, "Rareza para la selección", /^SSR$/);
     await page.click("text=Aplicar a la selección");
     await expect(page.locator("text=1 carta actualizada.")).toBeVisible({ timeout: 30_000 });
   });
@@ -127,23 +127,23 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
   });
 
   await test.step("RF-20: editar probabilidades (rechaza sumas distintas de 100)", async () => {
-    const R = ["Común", "Rara", "Épica", "Legendaria", "EX"];
+    const R = ["Common", "Rare", "Ultra Rare", "SSR", "EX"];
     const fill = async (slot: number, weights: Record<string, number>) => {
       for (const r of R) await page.locator(`[aria-label="Ranura ${slot}, ${r}"]`).fill(String(weights[r] ?? 0));
     };
-    await fill(1, { Común: 90 });
-    await fill(2, { Rara: 100 });
+    await fill(1, { Common: 90 });
+    await fill(2, { Rare: 100 });
     await page.click("text=Guardar probabilidades");
     await expect(page.locator("text=La ranura 1 suma 90 % en vez de 100 %.")).toBeVisible();
-    await fill(1, { Común: 100 });
+    await fill(1, { Common: 100 });
     await page.click("text=Guardar probabilidades");
     await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
     await expect(page.locator('[data-card-tile="10"]')).toContainText("100 % / sobre");
     // Spec 022, RF-21: la tabla del sobre gold, en su pestaña.
     await page.getByRole("tab", { name: "Gold" }).click();
     await expect(page.locator('[data-testid="odds-gold"]')).toBeVisible();
-    await fill(1, { Rara: 100 });
-    await fill(2, { Legendaria: 100 });
+    await fill(1, { Rare: 100 });
+    await fill(2, { SSR: 100 });
     await page.click("text=Guardar probabilidades");
     await expect(page.locator("text=Probabilidades guardadas.")).toBeVisible();
     await page.getByRole("tab", { name: "Plata" }).click();
@@ -169,7 +169,7 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await page.click("text=Comprobar y publicar");
     await page.click('[data-testid="confirm-accept"]');
     await expect(page.locator("text=Colección publicada. Sus probabilidades ya son públicas.")).toBeVisible();
-    await expect(page.locator('[aria-label="Ranura 1, Común"]')).toBeDisabled();
+    await expect(page.locator('[aria-label="Ranura 1, Common"]')).toBeDisabled();
     await expect(page.locator("text=Colección publicada: ya no se pueden añadir cartas (RF-8).")).toBeVisible();
     await expect(page.locator("text=Reordenar")).toHaveCount(0);
     const rates = await page.context().newPage();

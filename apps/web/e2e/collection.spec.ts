@@ -64,7 +64,7 @@ test("colección y álbum público", async ({ browser }) => {
     await expect(items).toHaveCount(2);
     await expect(fan.locator('[data-testid="binder-grid"] li[data-slot="3"]')).toHaveCount(1);
     await fan.click('[data-testid="binder-filters"] >> text=Todas');
-    await choose(fan, "Filtrar por rareza", /^Común$/);
+    await choose(fan, "Filtrar por rareza", /^Common$/);
     await expect(items).toHaveCount(1);
     await choose(fan, "Filtrar por rareza", "Todas las rarezas");
     await expect(items).toHaveCount(4);
@@ -76,7 +76,7 @@ test("colección y álbum público", async ({ browser }) => {
     const sheet = fan.locator('[data-testid="card-sheet"]');
     await expect(sheet).toBeVisible();
     await expect(sheet.locator("h2")).toHaveText("ALB1 carta 003");
-    await expect(sheet).toContainText("Rara");
+    await expect(sheet).toContainText("Rare");
     await expect(sheet).toContainText("La conseguiste por primera vez");
     await expect(sheet.locator("dd").nth(1)).toHaveText("x1");
     // Spec 018: la holo lleva el brillo de la carta viva (o el acabado arcoíris de la imagen fija con movimiento reducido).

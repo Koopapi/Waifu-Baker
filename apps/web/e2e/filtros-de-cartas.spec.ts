@@ -8,7 +8,9 @@ import { LAB, choose, createPublishedSet, login, tick } from "./helpers";
 
 const tiles = (p: Page) => p.locator('[data-testid="card-grid"] [data-card-tile]');
 const numbers = async (p: Page) => (await tiles(p).evaluateAll((els) => els.map((e) => Number(e.getAttribute("data-card-tile"))))) as number[];
-const chip = (p: Page, group: string, name: string | RegExp) => p.locator(`[data-testid="filter-${group}"] button`, { hasText: name });
+// Spec 038: el nombre exacto (como texto, «Rare» también encontraría «Ultra Rare»). La ficha puede llevar su recuento.
+const chip = (p: Page, group: string, name: string | RegExp) =>
+  p.locator(`[data-testid="filter-${group}"] button`, { hasText: typeof name === "string" ? new RegExp(`^${name}(\\s*\\d+)?$`) : name });
 
 test("filtros, búsqueda y orden de las cartas de una colección", async ({ browser }) => {
   test.setTimeout(300_000);
@@ -42,8 +44,8 @@ test("filtros, búsqueda y orden de las cartas de una colección", async ({ brow
   });
 
   await test.step("RF-2, RF-5 y RF-6: varias rarezas suman y se combinan con el personaje", async () => {
-    await chip(admin, "rarity", "Común").click();
-    await chip(admin, "rarity", "Rara").click();
+    await chip(admin, "rarity", "Common").click();
+    await chip(admin, "rarity", "Rare").click();
     await expect(tiles(admin)).toHaveCount(3);
     await chip(admin, "character", `Personaje ${code}`).click();
     await expect.poll(() => numbers(admin)).toEqual([1, 3]);
@@ -77,20 +79,20 @@ test("filtros, búsqueda y orden de las cartas de una colección", async ({ brow
   });
 
   await test.step("RF-12, RF-13 y RF-15: seleccionar las visibles, cambiarlas en bloque y conservar el filtro", async () => {
-    await chip(admin, "rarity", "Común").click();
+    await chip(admin, "rarity", "Common").click();
     await admin.getByRole("button", { name: "Seleccionar las 2 visibles" }).click();
     await expect(admin.locator('[data-card-tile] input[type="checkbox"]:checked')).toHaveCount(2);
     // Lo que deja de verse sale de la selección.
-    await chip(admin, "rarity", "Común").click();
-    await chip(admin, "rarity", "Rara").click();
+    await chip(admin, "rarity", "Common").click();
+    await chip(admin, "rarity", "Rare").click();
     await expect(admin.getByText("0 de 4 seleccionadas")).toBeVisible();
-    await chip(admin, "rarity", "Rara").click();
-    await chip(admin, "rarity", "Común").click();
+    await chip(admin, "rarity", "Rare").click();
+    await chip(admin, "rarity", "Common").click();
     await admin.getByRole("button", { name: "Seleccionar las 2 visibles" }).click();
     await choose(admin, "Personaje para la selección", second);
     await admin.click("text=Aplicar a la selección");
     await expect(admin.locator("text=2 cartas actualizadas.")).toBeVisible({ timeout: 30_000 });
-    await expect(chip(admin, "rarity", "Común")).toHaveAttribute("aria-pressed", "true");
+    await expect(chip(admin, "rarity", "Common")).toHaveAttribute("aria-pressed", "true");
     await expect(chip(admin, "character", second)).toContainText("2");
     expect(await numbers(admin)).toEqual([1, 2]);
   });
@@ -101,7 +103,7 @@ test("filtros, búsqueda y orden de las cartas de una colección", async ({ brow
     await expect(admin).toHaveURL(/rarity=common&q=carta/);
     expect(await admin.evaluate(() => history.length)).toBe(before);
     await admin.reload();
-    await expect(chip(admin, "rarity", "Común")).toHaveAttribute("aria-pressed", "true");
+    await expect(chip(admin, "rarity", "Common")).toHaveAttribute("aria-pressed", "true");
     await expect(admin.locator('[data-testid="filters-search"]')).toHaveValue("carta");
     expect(await numbers(admin)).toEqual([1, 2]);
   });

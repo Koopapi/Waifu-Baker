@@ -108,7 +108,7 @@ test("armado por capas: fondos, encuadre y estilo automático", async ({ browser
 
   await test.step("RF-13 y RF-14: el estilo es automático hasta que se toca a mano", async () => {
     const editor = admin.locator('[data-testid="layers-editor"]');
-    await expect(editor.locator('[data-testid="layers-style"]')).toContainText("Automático · Rara → R");
+    await expect(editor.locator('[data-testid="layers-style"]')).toContainText("Automático · Rare → R");
     await editor.getByRole("button", { name: "Añadir partículas" }).click();
     await expect(editor.locator('[data-testid="layers-style"]')).toContainText("Manual");
     await editor.locator('[data-testid="layers-apply-rarity"]').click();

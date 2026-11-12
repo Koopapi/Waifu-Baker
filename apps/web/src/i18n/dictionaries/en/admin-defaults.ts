@@ -23,7 +23,7 @@ export const adminDefaults = {
   pity: {
     heading: "Guarantees for new sets",
     help: "Packs in a row: with one less and no card of that rarity, the next one brings it. 0 turns it off.",
-    epic: "Epic guarantee (silver packs)",
+    epic: "Ultra Rare guarantee (silver packs)",
     ex: "EX guarantee (gold packs)",
     packs: "packs",
     save: "Save guarantees",

@@ -13,7 +13,7 @@ describe("spec 016 — estilo de la rareza", () => {
   it("test_s016_rf9_aplicar_el_estilo_pone_marco_particulas_y_sello_del_escalon", () => {
     const out = applyTierStyle(config, "ssr", 42);
     expect(out.marco).toBe("ssr");
-    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 15, esquina: "sup-izq" });
+    expect(out.sello).toEqual({ texto: "SSR", estilo: "oro", tamano: 15, esquina: "sup-izq" });
     // Las partículas del preset sustituyen a las que había y van entre el fondo y la personaje.
     expect(out.capas).toEqual([
       { key: key(1), profundidad: 0.2 },
@@ -31,7 +31,7 @@ describe("spec 016 — estilo de la rareza", () => {
 
   it("test_s022_rf9_cada_escalon_lleva_su_propio_sello", () => {
     const texts = (["n", "r", "sr", "ssr", "ur"] as const).map((t) => (applyTierStyle(config, t, 1).sello as { texto: string }).texto);
-    expect(texts).toEqual(["C", "R", "E", "LEG", "EX"]);
+    expect(texts).toEqual(["C", "R", "UR", "SSR", "EX"]);
   });
 
   it("test_s016_rf9_la_ur_activa_el_holo", () => {
@@ -51,7 +51,7 @@ describe("spec 016 — cambio de rareza de una carta con capas", () => {
     expect(out.marco).toBe("ssr");
     // El sello de texto pasa al del escalón, pero conserva la esquina que eligió el administrador (y, desde la spec 028,
     // su tamaño: ya no hay tamaño por escalón).
-    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 12, esquina: "inf-der" });
+    expect(out.sello).toEqual({ texto: "SSR", estilo: "oro", tamano: 12, esquina: "inf-der" });
     expect(out.capas).toEqual(withText.capas);
     expect(imageSealToReview).toBe(false);
   });
@@ -112,7 +112,7 @@ describe("spec 017 — estilo automático", () => {
     const manual = { ...armada, estiloAuto: false };
     const out = retierLayers(manual, "ssr").config;
     expect(out.marco).toBe("ssr");
-    expect(out.sello).toEqual({ texto: "LEG", estilo: "oro", tamano: 12, esquina: "inf-der" });
+    expect(out.sello).toEqual({ texto: "SSR", estilo: "oro", tamano: 12, esquina: "inf-der" });
     expect(out.capas).toEqual(manual.capas);
   });
 
