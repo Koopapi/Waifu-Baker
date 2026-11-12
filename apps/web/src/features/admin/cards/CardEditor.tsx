@@ -14,7 +14,6 @@ import { TextArea, TextField } from "@/ui/form/TextField";
 import { useChoice, useConfirm } from "@/ui/overlay/Confirm";
 import { SaveStatus } from "@/ui/feedback/SaveStatus";
 import { Modal } from "@/ui/overlay/Modal";
-import { CardPreview } from "./CardPreview";
 import { LayersEditor } from "./LayersEditor";
 import { VersionsPanel } from "./VersionsPanel";
 import { emptyLayers, useCardDraft, type SaveTexts } from "./useCardDraft";
@@ -196,17 +195,16 @@ export function CardEditor({
         </div>
       )}
       <div className="grid gap-6 md:grid-cols-[300px_1fr]">
-        <div>
-          <CardPreview card={card} />
-          <p className="mt-2 text-xs text-ui-text-3">{t.tiltHint}</p>
+        <div className="space-y-3">
+          {/* Spec 039, RF-10 a RF-12: la única vista previa de la carta es la del armador (abajo); aquí, el arte. */}
           {card.pendingArtUrl && (
-            <div className="mt-3 space-y-1 rounded-m border border-ui-info/40 p-2">
+            <div className="space-y-1 rounded-m border border-ui-info/40 p-2">
               <p className="text-xs text-ui-info-text">{t.pendingArtNote}</p>
               {/* eslint-disable-next-line @next/next/no-img-element -- original privado servido por la API del panel */}
               <img src={card.pendingArtUrl} alt={t.pendingArtAlt} className="w-full rounded-s" />
             </div>
           )}
-          <div className="mt-3 space-y-2">
+          <div className="space-y-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-ui-text-2">{t.replaceArt}</span>
             <input type="file" accept="image/png,image/webp" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="block w-full text-xs text-ui-text-2" data-testid="replace-art" />
             {file && (

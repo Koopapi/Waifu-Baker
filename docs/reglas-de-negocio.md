@@ -384,6 +384,17 @@ Decisiones del dueño del 11 nov 2026.
 | RN-264 | Las rarezas se llaman, de menor a mayor, Common, Rare, Ultra Rare, SSR y EX, igual en español y en inglés y en toda la web, panel incluido; en plural, Commons, Rares, Ultra Rares, SSR y EX. Lo que se guarda para cada rareza no cambia. | Vigente | 038 RF-1 a RF-5 |
 | RN-265 | Los sellos de rareza son C, R, UR, SSR y EX. Al desplegar, las cartas ya armadas cambian E por UR y LEG por SSR (también lo pendiente de revisión 18+, sin pedir otra revisión), quedan con una versión «Nombres nuevos de rareza» en su historial y se regeneran sus imágenes. Un sello escrito a mano no se toca. | Vigente | 038 RF-6 a RF-11 |
 
+## 31. La carta del armador también en el panel (spec 039)
+
+Decisiones del dueño del 12 nov 2026.
+
+| Regla | Enunciado | Estado | Spec |
+|---|---|---|---|
+| RN-266 | En el simulador de apertura del panel cada carta armada se revela con la vista del armador, como la recibe el coleccionista: sello una sola vez, sin la insignia de la escena, holo si la copia es holo, sin efectos del vínculo y con lo último aprobado de una carta 18+. El resumen muestra su imagen fija (la holo en las copias holo). Las cartas sin capas conservan su insignia. | Vigente | 039 RF-1 a RF-9 |
+| RN-267 | En la escena de apertura (simulador y apertura del coleccionista) el sello de la carta viva se ve completo, también la parte que sobresale de la carta, como en el armador. | Vigente | 039 RF-17 |
+| RN-268 | El editor de una carta solo tiene la vista previa del armador; la vista previa anterior, con su casilla de holo, se quitó. | Vigente | 039 RF-10 a RF-12 |
+| RN-269 | En el diseñador de sobres, las cartas de muestra armadas salen vivas, como en la apertura real; las que no tienen capas, con su imagen fija; sin cartas con rareza, la carta de ejemplo del paquete de diseño. | Vigente | 039 RF-13 a RF-16 |
+
 ## Parámetros en un vistazo
 
 | Parámetro | Valor |
