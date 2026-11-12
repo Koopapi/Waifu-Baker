@@ -23,6 +23,10 @@ export async function fastFlatten(config: LayersConfig, images: Map<string, Buff
   const flat = await flatVariants(await solid({ r, g, b }));
   // Spec 037, RF-11 y RF-15: la versión holo, de otro color (la misma si la carta ya es holo).
   if (config.holo) return { ...flat, holo: "same" };
-  const holo = await flatVariants(await solid({ r: 255 - r, g: 255 - g, b: 255 - b }));
-  return { ...flat, holo: { mid: holo.mid, thumb: holo.thumb, public: holo.public } };
+  // Directa en cada tamaño (sin reducir una imagen grande): así la holo no duplica el tiempo de cada carta de los tests.
+  const inv = { r: 255 - r, g: 255 - g, b: 255 - b, alpha: 1 };
+  const sized = (size: "mid" | "thumb" | "public") =>
+    sharp({ create: { ...FLAT_SIZES[size], channels: 4, background: inv } }).webp({ quality: 50 }).toBuffer();
+  const [mid, thumb, pub] = await Promise.all([sized("mid"), sized("thumb"), sized("public")]);
+  return { ...flat, holo: { mid, thumb, public: pub } };
 }
