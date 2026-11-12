@@ -1,3 +1,4 @@
+import { RARITY_GROUP_LABEL } from "@/domain/catalog/card-rules";
 // Textos del área «packs» (spec 008). La versión en español vive en ../es/packs.ts con la misma forma.
 import { plural } from "../../plural";
 
@@ -52,7 +53,7 @@ export const packs = {
     focusHint: "Tap the card or \"Next\" to see the next one",
     openedTitle: (n: number) => `You opened ${n} ${plural(n, "pack", "packs")}`,
     totals: { cards: "Cards", fresh: "New", holo: "Holo" },
-    group: { common: "Commons", rare: "Rares", epic: "Epics", legendary: "Legendaries", ex: "EX" },
+    group: RARITY_GROUP_LABEL,
     copies: (n: number) => `×${n}`,
   },
   opener: {

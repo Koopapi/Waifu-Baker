@@ -142,7 +142,7 @@ test("sobres por capas: diseñar, guardar, recargar y abrir con una Legendaria",
     // RF-20 y RF-22: el botón la voltea; sale con la estrella de su rareza (y los rayos, salvo movimiento reducido).
     await fan.click('[data-testid="deck-next"]');
     await expect(fan.locator('[data-testid="reveal-info"]')).toBeVisible();
-    await expect(fan.locator('[data-testid="special-star"]')).toHaveText("LEG");
+    await expect(fan.locator('[data-testid="special-star"]')).toHaveText("SSR");
     if (!reduced) await expect(fan.locator(".deck-fx__rays--on")).toHaveCount(1);
     await expect(fan.locator(".hint")).toContainText(es.common.rarity.legendary);
     await shot(fan, "4-legendaria");
@@ -173,7 +173,7 @@ test("sobres por capas: diseñar, guardar, recargar y abrir con una Legendaria",
     if (!reduced) await expect(fan.locator('[data-testid="open-all-burst"]')).toBeVisible();
     const focus = fan.locator('[data-testid="open-all-focus"]');
     await expect(focus).toBeVisible({ timeout: 30_000 });
-    await expect(focus.locator('[data-testid="special-star"]')).toHaveText("LEG");
+    await expect(focus.locator('[data-testid="special-star"]')).toHaveText("SSR");
     await shot(fan, "6-abrir-todos");
   });
 

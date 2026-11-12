@@ -41,7 +41,7 @@ export function publishProblems(input: PublishInput): Problem[] {
   if (gold) {
     out.push(...validateOdds(gold.slots, input.packSize, gold.holoChance, "gold").map((p) => ({ ...p, params: { ...p.params, kind: "gold" } })));
     if (!goldImproves(input.slots, gold.slots)) {
-      out.push({ code: "gold_not_better", message: "El sobre gold tiene que dar más probabilidad de legendaria o EX que el plata.", target: { kind: "set" }, params: { kind: "gold" } });
+      out.push({ code: "gold_not_better", message: "El sobre gold tiene que dar más probabilidad de SSR o EX que el plata.", target: { kind: "set" }, params: { kind: "gold" } });
     }
   }
   const allSlots = gold ? [...input.slots, ...gold.slots] : input.slots;

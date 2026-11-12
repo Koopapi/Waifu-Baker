@@ -76,7 +76,7 @@ test("coleccionista: de sobres regalados a colección", async ({ browser }) => {
     // Spec 019: tras la animación (saltada), el resumen con sus totales y la rareza más alta primero.
     expect(await openAllAndSkip(fan)).toBe(4);
     await expect(fan.locator('[data-testid="open-all-result"] h2')).toHaveText("Abriste 2 sobres");
-    await expect(fan.locator('[data-testid="open-all-result"] h3').first()).toContainText("Raras");
+    await expect(fan.locator('[data-testid="open-all-result"] h3').first()).toContainText("Rares");
     await fan.waitForTimeout(800);
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-3-abrir-todos.png`, fullPage: true });
     await fan.goto("/packs");

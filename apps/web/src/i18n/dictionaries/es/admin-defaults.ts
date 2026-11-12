@@ -25,7 +25,7 @@ export const adminDefaults: typeof en = {
   pity: {
     heading: "Garantías de las colecciones nuevas",
     help: "Sobres seguidos: con uno menos y sin ninguna carta de esa rareza, el siguiente la trae. 0 la desactiva.",
-    epic: "Garantía de Épica (sobres plata)",
+    epic: "Garantía de Ultra Rare (sobres plata)",
     ex: "Garantía de EX (sobres gold)",
     packs: "sobres",
     save: "Guardar garantías",

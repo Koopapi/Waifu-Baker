@@ -167,7 +167,7 @@ export const errors: Record<string, Msg> = {
   // Spec 022, RF-13 a RF-16.
   guarantee_slot: (p) => `La última ranura del sobre ${p.kind === "gold" ? "gold" : "plata"} solo puede dar ${rarity(p.rarity)} o mejor.`,
   missing_table: (p) => `Falta la tabla de probabilidades del sobre ${p.kind === "gold" ? "gold" : "plata"}.`,
-  gold_not_better: "El sobre gold tiene que dar más probabilidad de legendaria o de EX que el plata.",
+  gold_not_better: "El sobre gold tiene que dar más probabilidad de SSR o de EX que el plata.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: tiene probabilidad en el sobre pero ninguna carta.`,
   card_incomplete: (p) =>
     `Carta ${pad(p.number)}: falta ${String(p.missing ?? "")

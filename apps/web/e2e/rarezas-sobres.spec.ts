@@ -104,7 +104,7 @@ test("rarezas y sobres plata y gold", async ({ browser }) => {
       return;
     }
     await expect(art.locator(".cc-card")).toBeVisible();
-    await expect(art.locator(".cc-sello")).toHaveText("LEG");
+    await expect(art.locator(".cc-sello")).toHaveText("SSR");
     await fan.screenshot({ path: `test-results/screens/${test.info().project.name}-s022-legendaria.png` });
   });
 });

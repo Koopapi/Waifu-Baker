@@ -227,7 +227,7 @@ export const games: typeof en = {
     lootFragments: (d) => `Fragmentos · ${d}`,
     lootPack: (d) => `Sobre % · ${d}`,
     simulator: "Simulador",
-    simulatorHint: "Prueba una zona con un equipo de comunes, uno mixto y uno de legendarias antes de abrirla.",
+    simulatorHint: "Prueba una zona con un equipo de Commons, uno mixto y uno de SSR antes de abrirla.",
     simZone: "Zona",
     simDuration: "Duración",
     member: (n) => `Carta ${n}`,

@@ -51,7 +51,7 @@ export const panelErrors: Record<string, Msg> = {
     if (p.reason === "range") return "Cada probabilidad va de 0 a 100.";
     const where = `Sobre ${p.kind === "gold" ? "gold" : "plata"}, ${({ base: "ranuras normales", boosted: "ranura mejorada", guaranteed: "última ranura" } as Record<string, string>)[String(p.row)] ?? String(p.row)}`;
     if (p.reason === "slot_sum") return `${where}: suma ${p.sum} % en vez de 100 %. No se guardó nada.`;
-    if (p.reason === "guarantee_slot") return `${where}: solo puede dar ${p.kind === "gold" ? "Épica" : "Rara"} o mejor. No se guardó nada.`;
+    if (p.reason === "guarantee_slot") return `${where}: solo puede dar ${p.kind === "gold" ? "Ultra Rare" : "Rare"} o mejor. No se guardó nada.`;
     return `${where}: las probabilidades no pueden ser negativas. No se guardó nada.`;
   },
   invalid_bond_settings: "Puntos y polvo van de 0 a 100 000, el factor holo de 1 a 5, los costes de 1 a 1 000 000 y cada título hasta 30 caracteres.",

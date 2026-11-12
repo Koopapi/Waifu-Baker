@@ -18,8 +18,8 @@ export interface CardSheet {
   variant: CardVariant;
 }
 
-/** Lo que cambió en un guardado (RF-19). */
-export const CHANGED_PARTS = ["ficha", "capas", "ambas"] as const;
+/** Lo que cambió en un guardado (RF-19). Spec 038, RF-10: `rareza` = el sello pasó a los nombres nuevos de rareza. */
+export const CHANGED_PARTS = ["ficha", "capas", "ambas", "rareza"] as const;
 export type ChangedPart = (typeof CHANGED_PARTS)[number];
 
 export interface CardSnapshot {

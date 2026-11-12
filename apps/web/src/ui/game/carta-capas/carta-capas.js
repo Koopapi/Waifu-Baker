@@ -463,8 +463,8 @@
     // guardan el suyo (15 desde la spec 028, ver domain/cards/layers-rarity.ts).
     n:   { marco: 'n',   particulas: null, sello: { texto: 'C', estilo: 'plata', tamano: 10 }, holo: false },
     r:   { marco: 'r',   particulas: { particulas: 'destellos-arcoiris', cantidad: 16, tamano: 0.8, opacidad: 0.75 }, sello: { texto: 'R', estilo: 'azul', tamano: 10 }, holo: false },
-    sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'E', estilo: 'morado', tamano: 12 }, holo: false },
-    ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'LEG', estilo: 'oro', tamano: 13 }, holo: false },
+    sr:  { marco: 'sr',  particulas: { particulas: 'destellos-arcoiris', cantidad: 36 }, sello: { texto: 'UR', estilo: 'morado', tamano: 12 }, holo: false },
+    ssr: { marco: 'ssr', particulas: { particulas: 'destellos-dorados', cantidad: 55 }, sello: { texto: 'SSR', estilo: 'oro', tamano: 13 }, holo: false },
     ur:  { marco: 'ur',  particulas: { particulas: 'destellos-arcoiris', cantidad: 65 }, sello: { texto: 'EX', estilo: 'arcoiris', tamano: 14 }, holo: true }
   };
   PRESETS.ex = PRESETS.ur; PRESETS.comun = PRESETS.n; PRESETS.rara = PRESETS.r; PRESETS.epica = PRESETS.sr;

@@ -4,11 +4,24 @@
 export const RARITIES = ["common", "rare", "epic", "legendary", "ex"] as const;
 export type Rarity = (typeof RARITIES)[number];
 
+/**
+ * Spec 038, RF-1 y RF-2: el nombre de cada rareza, igual en español y en inglés. Es la única definición: los
+ * diccionarios y los mensajes del servidor lo toman de aquí. Lo que se guarda (`common`, `rare`, `epic`…) no cambia.
+ */
 export const RARITY_LABEL: Record<Rarity, string> = {
-  common: "Común",
-  rare: "Rara",
-  epic: "Épica",
-  legendary: "Legendaria",
+  common: "Common",
+  rare: "Rare",
+  epic: "Ultra Rare",
+  legendary: "SSR",
+  ex: "EX",
+};
+
+/** Spec 038, RF-4: los nombres en plural, para agrupar cartas por rareza. */
+export const RARITY_GROUP_LABEL: Record<Rarity, string> = {
+  common: "Commons",
+  rare: "Rares",
+  epic: "Ultra Rares",
+  legendary: "SSR",
   ex: "EX",
 };
 

@@ -274,7 +274,7 @@ export const adminLayers = {
       version: (n: number) => `Version ${n}`,
       by: (name: string) => `by ${name}`,
       unknown: "by an account that no longer exists",
-      changed: { ficha: "card details", capas: "layers", ambas: "details and layers" } as Record<string, string>,
+      changed: { ficha: "card details", capas: "layers", ambas: "details and layers", rareza: "New rarity names" } as Record<string, string>,
       pending: "pending 18+ review",
       restore: "Restore this version",
       restored: (n: number) => `Version ${n} loaded as unsaved changes. Save to keep it.`,

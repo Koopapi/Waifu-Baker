@@ -1,0 +1,2 @@
+ALTER TABLE "card_versions" DROP CONSTRAINT "card_versions_changed_check";--> statement-breakpoint
+ALTER TABLE "card_versions" ADD CONSTRAINT "card_versions_changed_check" CHECK ("card_versions"."changed" in ('ficha', 'capas', 'ambas', 'rareza'));

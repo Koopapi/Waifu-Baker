@@ -51,7 +51,7 @@ export const panelErrors: Record<string, Msg> = {
     if (p.reason === "range") return "Each chance goes from 0 to 100.";
     const where = `${p.kind === "gold" ? "Gold" : "Silver"} pack, ${({ base: "normal slots", boosted: "boosted slot", guaranteed: "last slot" } as Record<string, string>)[String(p.row)] ?? String(p.row)}`;
     if (p.reason === "slot_sum") return `${where}: adds up to ${p.sum}% instead of 100%. Nothing was saved.`;
-    if (p.reason === "guarantee_slot") return `${where}: it can only give ${p.kind === "gold" ? "Epic" : "Rare"} or better. Nothing was saved.`;
+    if (p.reason === "guarantee_slot") return `${where}: it can only give ${p.kind === "gold" ? "Ultra Rare" : "Rare"} or better. Nothing was saved.`;
     return `${where}: chances can't be negative. Nothing was saved.`;
   },
   invalid_bond_settings: "Points and dust go from 0 to 100,000, the holo factor from 1 to 5, crafting costs from 1 to 1,000,000 and each title up to 30 characters.",

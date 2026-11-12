@@ -39,7 +39,7 @@ describe("spec 025 — cambio de rareza", () => {
     const { config } = retierLayers(custom, "ssr");
     expect(config.marco).toBe("personalizado");
     expect(config.marcoColores).toEqual(custom.marcoColores);
-    expect(config.sello).toMatchObject({ texto: "LEG" });
+    expect(config.sello).toMatchObject({ texto: "SSR" });
     expect(retierLayers({ ...base, marco: "ninguno" }, "ur").config.marco).toBe("ninguno");
     // Con el marco de la rareza, sigue como antes.
     expect(retierLayers(base, "ssr").config.marco).toBe("ssr");

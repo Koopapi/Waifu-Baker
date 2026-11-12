@@ -167,7 +167,7 @@ export const errors: Record<string, Msg> = {
   // Spec 022, RF-13 to RF-16.
   guarantee_slot: (p) => `The last slot of the ${p.kind === "gold" ? "gold" : "silver"} pack can only give ${rarity(p.rarity)} or better.`,
   missing_table: (p) => `The ${p.kind === "gold" ? "gold" : "silver"} pack drop rate table is missing.`,
-  gold_not_better: "The gold pack must give a higher chance of Legendary or EX than the silver one.",
+  gold_not_better: "The gold pack must give a higher chance of SSR or EX than the silver one.",
   rarity_without_cards: (p) => `${rarity(p.rarity)}: has a chance in the pack but no cards.`,
   card_incomplete: (p) =>
     `Card ${pad(p.number)}: missing ${String(p.missing ?? "")

@@ -227,7 +227,7 @@ export const games = {
     lootFragments: (d: string) => `Fragments · ${d}`,
     lootPack: (d: string) => `Pack % · ${d}`,
     simulator: "Simulator",
-    simulatorHint: "Try a zone with a team of commons, a mixed one and one of legendaries before opening it.",
+    simulatorHint: "Try a zone with a team of Commons, a mixed one and one of SSRs before opening it.",
     simZone: "Zone",
     simDuration: "Duration",
     member: (n: number) => `Card ${n}`,

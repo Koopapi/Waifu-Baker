@@ -80,8 +80,8 @@ describe("spec 022 — marcos de las cinco rarezas", () => {
     expect(new Set(grosor).size).toBe(5);
   });
 
-  it("test_s022_rf9_los_sellos_son_los_de_la_maqueta", () => {
-    expect(tiers.map((t) => presets[t].sello?.texto)).toEqual(["C", "R", "E", "LEG", "EX"]);
+  it("test_s038_rf6_los_sellos_son_c_r_ur_ssr_y_ex", () => {
+    expect(tiers.map((t) => presets[t].sello?.texto)).toEqual(["C", "R", "UR", "SSR", "EX"]);
   });
 });
 

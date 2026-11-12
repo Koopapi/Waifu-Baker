@@ -197,7 +197,7 @@ export const cardVersions = pgTable(
     actorUserId: uuid("actor_user_id").references(() => users.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("card_versions_card_number_uq").on(t.cardId, t.number), check("card_versions_changed_check", sql`${t.changed} in ('ficha', 'capas', 'ambas')`)],
+  (t) => [uniqueIndex("card_versions_card_number_uq").on(t.cardId, t.number), check("card_versions_changed_check", sql`${t.changed} in ('ficha', 'capas', 'ambas', 'rareza')`)],
 );
 
 export const libraryKind = pgEnum("library_kind", ["fondo", "sello", "adorno", "particulas"]);
