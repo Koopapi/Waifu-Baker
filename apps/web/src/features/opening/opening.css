@@ -762,6 +762,14 @@
 .card3d__front:has(.card3d__live .cc-card:not(.cc-cargando)) > :not(.card3d__live) {
   opacity: 0;
 }
+/*
+ * Spec 039, RF-17: con la carta viva ya cargada, la cara no la recorta: el sello del armador sobresale por la esquina
+ * como en el armador (la carta viva redondea sus propias esquinas).
+ */
+.card3d__front:has(.card3d__live .cc-card:not(.cc-cargando)) {
+  overflow: visible;
+  contain: layout;
+}
 
 /* ---------- spec 023: apertura nueva ---------- */
 

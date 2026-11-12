@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Rarity } from "@/domain/catalog/card-rules";
+import type { SampleCard } from "@/domain/packs/designer-samples";
 import { rarityTier } from "@/domain/catalog/rarity-tier";
 import type { PackRegistro } from "@/domain/packs/design";
 import { SOBRE_TIMELINE } from "@/domain/opening/sobre";
@@ -15,13 +15,7 @@ import { SobreCapas, type SobreCapasHandle } from "@/ui/game/sobre-capas/SobreCa
 import type { SobreRegistro } from "@/ui/game/sobre-capas/sobre-capas";
 import { cx } from "@/ui/variants";
 
-export interface SampleCard {
-  image: string;
-  rarity: Rarity;
-  name: string;
-  /** La imagen es arte suelto (la carta de muestra del paquete), no una carta compuesta. */
-  raw?: boolean;
-}
+export type { SampleCard };
 
 export type Scene = "rayos" | "oscuro" | "claro";
 
@@ -88,8 +82,11 @@ export function DesignerStage({
   }, [phase]);
 
   useEffect(() => {
-    if (phase === "revealing") top.current?.entrar();
-  }, [phase, index]);
+    if (phase !== "revealing") return;
+    // Spec 039, RF-13: la carta viva hace su entrada cuando sus capas terminan de cargar.
+    if (deck[index]?.live) top.current?.entrarAlCargar();
+    else top.current?.entrar();
+  }, [phase, index]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const next = () => {
     if (phase !== "revealing") return;
@@ -128,7 +125,12 @@ export function DesignerStage({
             <div className="pack-designer__deck" data-step={step} aria-hidden={phase === "closed"} onClick={next}>
               {deck.map((c, i) => (
                 <div key={i} className="pack-designer__card" style={{ zIndex: 20 - i, visibility: step !== "hidden" && i === index && phase !== "done" ? "visible" : "hidden" }}>
-                  <CartaCapas ref={i === index ? top : undefined} tier={rarityTier(c.rarity)} image={c.image} rawArt={c.raw} label={c.name} sealHidden className="w-full" />
+                  {/* Spec 039, RF-13 y RF-14: la carta a la vista, viva como en la apertura real; las demás, fijas. */}
+                  {c.live && i === index ? (
+                    <CartaCapas ref={top} tier={c.live.tier} image="" config={c.live.config} label={c.name} sealHidden className="w-full" />
+                  ) : (
+                    <CartaCapas ref={i === index ? top : undefined} tier={rarityTier(c.rarity)} image={c.image} rawArt={c.raw} label={c.name} sealHidden className="w-full" />
+                  )}
                 </div>
               ))}
             </div>

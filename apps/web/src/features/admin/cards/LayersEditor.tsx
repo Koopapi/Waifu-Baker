@@ -51,6 +51,7 @@ import { Slider } from "@/ui/form/Slider";
 import { TextField } from "@/ui/form/TextField";
 import { CartaCapas, type CartaCapasHandle } from "@/ui/game/CartaCapas";
 import { VIEW_DEFAULTS, finalCardConfig } from "@/domain/cards/final-card";
+import { adminAssetUrl } from "@/domain/cards/admin-card";
 import { PreviewStage } from "@/ui/game/PreviewStage";
 import cartaCapas from "@/ui/game/carta-capas/carta-capas.js";
 import type { CartaCapasApi } from "@/ui/game/carta-capas/carta-capas";
@@ -66,7 +67,7 @@ import { kindForLayer, layerFromPreset } from "@/domain/cards/library";
 type Upload = { id: number; name: string; status: "uploading" | "ok" | "warning" | "error"; message?: string };
 
 const lib = cartaCapas as unknown as CartaCapasApi;
-const asset = (key: string) => `/api/admin/assets/${key}`;
+const asset = adminAssetUrl;
 const emptyConfig = (card: CardDTO): LayersConfig => ({ capas: [], marco: rarityTier(card.rarity), sello: null });
 const randomSeed = () => 1 + Math.floor(Math.random() * 9_999);
 /** Profundidad y margen de partida de la capa n (0 = fondo): el fondo casi quieto y con margen, el resto delante. */

@@ -102,15 +102,10 @@ test("panel de administración: de colección vacía a sobre regalado", async ({
     await expect(page.locator("[data-card-tile] >> text=Lista")).toHaveCount(IMAGES.length);
   });
 
-  await test.step("RF-22: vista previa de la carta compuesta con efecto holo", async () => {
+  await test.step("RF-22 (spec 039, RF-10 y RF-11): la única vista previa de la carta es la del armador", async () => {
     await page.click('[aria-label="Editar carta 010"]');
-    const preview = page.locator('[data-testid="card-preview"]');
-    await expect(preview.locator("img")).toHaveAttribute("src", /\/api\/admin\/assets\/.+\/mid\.[0-9a-f]+\.webp$/);
-    // Spec 018: la imagen fija de la carta por capas (700 × 991).
-    await expect.poll(() => preview.locator("img").evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(700);
-    await expect(preview.locator(".card3d--holo")).toHaveCount(0);
-    await tick(page, "Ver con efecto holo");
-    await expect(preview.locator(".card3d--holo .holo--foil")).toHaveCount(1);
+    await expect(page.locator('[data-testid="layers-preview"]')).toBeVisible();
+    await expect(page.locator('[data-testid="card-preview"]')).toHaveCount(0);
     await page.keyboard.press("Escape");
     await expect(page.locator('[data-testid="card-editor"]')).toHaveCount(0);
   });

@@ -12,6 +12,7 @@ import { isAdminError } from "@/server/errors";
 import type { LabCard } from "@/features/opening/fakePack";
 import { RARITIES, type Rarity } from "@/domain/catalog/card-rules";
 import { parsePackKind } from "@/domain/catalog/default-odds";
+import { adminCardView } from "@/domain/cards/admin-card";
 
 const paths = (setId: string) => [`/admin/sets/${setId}`, "/admin/sets", "/admin"];
 const rarityOf = (v: unknown): Rarity | null | undefined =>
@@ -100,7 +101,8 @@ export async function simulatePackAction(setId: string, kind?: string): Promise<
         number: c.number,
         rarity: c.rarity!,
         holo: c.holo,
-        image: `/api/admin/assets/${c.keyMid}`,
+        // Spec 039, RF-1 a RF-9: la carta del armador, como en la apertura del coleccionista.
+        ...adminCardView({ rarity: c.rarity!, layers: c.layers, keyMid: c.keyMid!, keyHoloMid: c.keyHoloMid }, c.holo),
         framed: true,
         note: c.substitutedFrom ? t.admin.simulate.substituted(t.common.rarity[c.substitutedFrom as Rarity]) : undefined,
       })),
