@@ -33,6 +33,8 @@ const ALLOWED = [
   /^server\/services\/card-save\.ts$/,
   /^server\/services\/card-shared\.ts$/,
   /^server\/services\/cards\.ts$/,
+  // Spec 037, RF-17: la regeneración de imágenes fijas lee las capas en el servidor para dibujarlas; no las expone.
+  /^server\/services\/flat-regen\.ts$/,
   /^server\/services\/library\.ts$/,
   /^server\/services\/live-card\.ts$/,
   /^app\/admin\//,

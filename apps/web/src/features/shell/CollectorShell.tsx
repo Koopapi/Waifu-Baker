@@ -18,7 +18,8 @@ import { CelebrationsProvider } from "@/features/rewards/celebrations";
 import { ArrivalsCelebration } from "@/features/rewards/ArrivalsCelebration";
 import { groupArrivals } from "@/domain/rewards/arrivals";
 import { pendingArrivals } from "@/server/services/arrivals";
-import { packArtForSets } from "@/server/services/pack-art";
+import { packViewsFor } from "@/server/services/pack-designs";
+import { packViewKey } from "@/domain/packs/view";
 import { CookiesDetail } from "./CookiesDetail";
 import { HeaderSoundToggle } from "./HeaderSoundToggle";
 
@@ -41,8 +42,9 @@ export async function CollectorShell({ userId, children }: { userId: string; chi
   const sh = t.common.shell;
   // Spec 015, RF-6: llegadas sin celebrar, con el sobre de cada colección; la cola las muestra cuando toca.
   const arrivals = groupArrivals(await pendingArrivals(db, user.id));
-  const arrivalsArt = arrivals ? await packArtForSets(db, arrivals.sets.map((x) => x.setId)) : null;
-  const arrivalsGroup = arrivals && arrivalsArt ? { ...arrivals, sets: arrivals.sets.map((x) => ({ ...x, art: arrivalsArt.get(x.setId) ?? { coverVersion: null, packImage: null } })) } : null;
+  // Spec 037, RF-2 y RF-5: el sobre plata o gold que llegó, con su diseño.
+  const arrivalViews = arrivals ? await packViewsFor(db, user.id, arrivals.sets.map((x) => ({ setId: x.setId, kind: x.kind }))) : null;
+  const arrivalsGroup = arrivals && arrivalViews ? { ...arrivals, sets: arrivals.sets.map((x) => ({ ...x, pack: arrivalViews.get(packViewKey(x.setId, x.kind)) ?? null })) } : null;
   const packs: NavItem = { href: "/packs", label: t.common.nav.myPacks, icon: "packs", badge: s.sealed, flyTarget: "packs" };
   const collection: NavItem = { href: "/collection", label: t.common.nav.myCollection, icon: "collection" };
   const rewards: NavItem = { href: "/rewards", label: sh.rewards, icon: "rewards", badge: s.rewardsReady };

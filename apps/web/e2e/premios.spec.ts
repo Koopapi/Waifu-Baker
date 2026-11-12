@@ -51,7 +51,8 @@ test("premios con vida: llegadas, galletas y sobres que vuelan, racha y errores 
     await expect(dialog).toContainText(fx.arrivals.title(2));
     await expect(dialog.locator('[data-testid="celebration-kicker"]')).toHaveText(fx.arrivals.gift);
     await expect(dialog.locator('[data-testid="celebration-count"]')).toHaveText("×2");
-    await expect(dialog.locator(".pack-art")).toBeVisible();
+    // Spec 037, RF-2: el sobre que llegó, con la miniatura del armador.
+    await expect(dialog.locator('[data-testid="prize-pack"]')).toBeVisible();
     await expect(fan.locator('[data-testid="toast"]')).toHaveCount(0);
     // Centrada y entera dentro de la pantalla, también en una pantalla baja (el portátil del usuario: 868 × 625).
     const centered = async () => {

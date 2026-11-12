@@ -433,13 +433,21 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
       {current && shown && (
         <div className={`reveal-info rarity-${current.rarity}`} data-testid="reveal-info" aria-live="polite">
           {current.isNew && <p className="reveal-info__new">{t.packs.stage.newTitle}</p>}
-          <span className="reveal-info__badge" aria-label={t.common.rarity[current.rarity]}>
-            {RARITY_SEAL[current.rarity]}
-          </span>
+          {/* Spec 037, RF-21, RF-24 y RF-25: la carta armada ya trae su sello; la insignia solo queda en las cartas sin
+              capas. La rareza sigue en el texto para los lectores de pantalla. */}
+          {current.live ? (
+            <span className="sr-only" data-testid="reveal-rarity">
+              {t.common.rarity[current.rarity]}
+            </span>
+          ) : (
+            <span className="reveal-info__badge" aria-label={t.common.rarity[current.rarity]} data-testid="reveal-badge">
+              {RARITY_SEAL[current.rarity]}
+            </span>
+          )}
           <div className="reveal-info__foot">
             <p className="reveal-info__name">{current.name}</p>
             <p className="reveal-info__set">
-              <span className="reveal-info__mini">{RARITY_SEAL[current.rarity]}</span>
+              {!current.live && <span className="reveal-info__mini">{RARITY_SEAL[current.rarity]}</span>}
               {setLine ?? view.code}
               {current.holo ? t.packs.stage.holoSuffix.toUpperCase() : ""}
             </p>
@@ -468,14 +476,22 @@ export function OpeningStage({ draw, view = LAB_VIEW, setLine, autoOpen = false,
             <div className="summary__grid">
               {cards.map((c, i) => (
                 <div key={i} className={`summary__row rarity-${c.rarity}`}>
-                  <span className={`summary__thumb ${c.holo ? "holo-finish" : ""}`}>
+                  <span className={`summary__thumb ${(c.holoFinish ?? c.holo) ? "holo-finish" : ""}`}>
                     {/* eslint-disable-next-line @next/next/no-img-element -- imagen firmada de la carta */}
                     <img src={c.image} alt="" draggable={false} />
                   </span>
-                  <span className="badge">
-                    {t.common.rarity[c.rarity]}
-                    {c.holo ? t.packs.stage.holoSuffix : ""}
-                  </span>
+                  {/* Spec 037, RF-23 a RF-25: sin letrero de rareza en las cartas armadas (ya traen su sello). */}
+                  {c.live ? (
+                    <span className="sr-only">
+                      {t.common.rarity[c.rarity]}
+                      {c.holo ? t.packs.stage.holoSuffix : ""}
+                    </span>
+                  ) : (
+                    <span className="badge" data-testid="summary-badge">
+                      {t.common.rarity[c.rarity]}
+                      {c.holo ? t.packs.stage.holoSuffix : ""}
+                    </span>
+                  )}
                   <span className="summary__name">{c.name}</span>
                   {c.note && <small className="summary__note">{c.note}</small>}
                 </div>

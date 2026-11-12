@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { imageKeys, type LayersConfig } from "@/domain/cards/layers";
 import type { CardStore } from "@/server/ports/card-store";
 import { AdminError } from "@/server/errors";
+import { FLAT_VERSION } from "@/domain/cards/flat-version";
 import { renderFlatCard, type FlatCard } from "./flatten";
 
 /** Quien dibuja la imagen fija: Chromium con carta-capas.js; los tests pueden poner uno rápido (puerto inyectable). */
@@ -42,5 +43,20 @@ export async function storeFlat(store: CardStore, card: { id: string; setId: str
     keyPublic: `sets/${card.setId}/cards/${card.id}/public.${tag}.webp`,
   };
   await Promise.all([store.put(keys.keyFull, flat.full), store.put(keys.keyMid, flat.mid), store.put(keys.keyThumb, flat.thumb), store.put(keys.keyPublic, flat.public)]);
-  return { ...keys, blurhash: flat.blurhash };
+  return { ...keys, ...(await storeHolo(store, card, flat, keys)), blurhash: flat.blurhash, flatVersion: FLAT_VERSION, flatError: null };
+}
+
+/** Spec 037, RF-11 y RF-15: las claves de la imagen holo (las mismas que la normal si la carta ya es holo). */
+async function storeHolo(store: CardStore, card: { id: string; setId: string }, flat: FlatCard, keys: { keyMid: string; keyThumb: string; keyPublic: string }) {
+  if (flat.holo === "same") return { keyHoloMid: keys.keyMid, keyHoloThumb: keys.keyThumb, keyHoloPublic: keys.keyPublic };
+  if (!flat.holo) return { keyHoloMid: null, keyHoloThumb: null, keyHoloPublic: null };
+  const h = flat.holo;
+  const tag = sha256(h.mid).slice(0, 10);
+  const holo = {
+    keyHoloMid: `sets/${card.setId}/cards/${card.id}/holo-mid.${tag}.webp`,
+    keyHoloThumb: `sets/${card.setId}/cards/${card.id}/holo-thumb.${tag}.webp`,
+    keyHoloPublic: `sets/${card.setId}/cards/${card.id}/holo-public.${tag}.webp`,
+  };
+  await Promise.all([store.put(holo.keyHoloMid, h.mid), store.put(holo.keyHoloThumb, h.thumb), store.put(holo.keyHoloPublic, h.public)]);
+  return holo;
 }

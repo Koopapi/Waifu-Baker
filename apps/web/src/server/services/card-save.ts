@@ -18,6 +18,7 @@ import {
   applyPatch,
   characterRequired,
   composeAndStore,
+  toPendingKeys,
   composedKeys,
   deleteUnusedFlat,
   needsRecompose,
@@ -129,7 +130,7 @@ export async function saveCard(db: DbLike, store: CardStore, actorUserId: string
       if (pendingMode) {
         release = [...imageKeys(cur.layersPending), ...settled.temps];
         oldFlat = pendingFlatKeys(cur.pendingKeys);
-        change = { ...change, layersPending: settled.config, pendingKeys: { full: flatKeys.keyFull, mid: flatKeys.keyMid, thumb: flatKeys.keyThumb, public: flatKeys.keyPublic, blurhash: flatKeys.blurhash } };
+        change = { ...change, layersPending: settled.config, pendingKeys: toPendingKeys(flatKeys) };
         pending = true;
       } else {
         release = [...imageKeys(cur.layers), ...settled.temps];

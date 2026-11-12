@@ -169,6 +169,13 @@
       "when": 1793989663989,
       "tag": "0023_sobres_por_capas",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794457152877,
+      "tag": "0024_flat_holo",
+      "breakpoints": true
     }
   ]
 }

@@ -17,6 +17,8 @@ const env = {
   SENTRY_DSN: "",
   NEXT_PUBLIC_SENTRY_DSN: "",
   SCHEDULER: "",
+  // Spec 037: la regeneración de imágenes fijas no corre durante las E2E (cada test siembra las suyas al día).
+  FLAT_REGEN: "0",
   // Spec 010: modo demo con una colección pequeña hecha con las imágenes de public/lab.
   DEMO_MODE: "1",
   DEMO_MANIFEST: "e2e/demo-manifest.json",

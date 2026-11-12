@@ -105,10 +105,12 @@ test("cartas por capas: revelación viva", async ({ browser }) => {
 
   await test.step("RF-5 y RF-9: la holo lleva su acabado en la miniatura y su brillo en la ficha viva", async () => {
     await fan.keyboard.press("Escape");
-    await expect(fan.locator('[data-slot="2"] button')).toHaveClass(/holo-finish/);
+    // Spec 037, RF-12: la miniatura de la holo es su imagen fija holo (sin el acabado de CSS).
+    await expect(fan.locator('[data-slot="2"] button')).toHaveClass(/binder-card--holo/);
+    await expect(fan.locator('[data-slot="2"] img')).toHaveAttribute("src", /&s=thumb-holo&/);
     await fan.click('[aria-label="Ver carta 002"]');
     const art = fan.locator('[data-testid="card-sheet-art"]');
-    await expect(art.locator(reduced ? ".holo-finish" : ".cc-card.cc-con-holo")).toHaveCount(1);
+    await expect(art.locator(reduced ? 'img[src*="&s=mid-holo&"]' : ".cc-card.cc-con-holo")).toHaveCount(1);
   });
 });
 

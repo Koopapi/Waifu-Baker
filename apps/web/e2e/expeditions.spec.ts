@@ -159,6 +159,8 @@ test("expediciones: zonas en el panel, equipo, envío, reclamo con reporte y sob
     const celebration = fan.locator('[data-testid="celebration-dialog"]');
     await expect(celebration).toBeVisible();
     await expect(celebration).toContainText(g.report.packTitle);
+    // Spec 037, RF-3: el sobre del premio, con la miniatura del armador.
+    await expect(celebration.locator('[data-testid="prize-pack"]')).toBeVisible();
     await dismissCelebration(fan, 10_000);
     await fan.goto("/packs");
     await expect(fan.locator('[data-testid="group-EXPE"]')).toBeVisible();

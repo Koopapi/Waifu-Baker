@@ -55,7 +55,7 @@ export function OpenAllFocus({ items, reduced, onDone }: { items: OpenAllCard[];
         {live && c.live ? (
           <CartaCapas key={c.key} tier={c.live.tier} image="" config={c.live.config} holo={c.holo} label={c.name} entrance className="w-full" />
         ) : (
-          <span key={c.key} className={`block overflow-hidden rounded-l ${c.holo ? "holo-finish" : ""}`}>
+          <span key={c.key} className={`block overflow-hidden rounded-l ${c.holoFinish ? "holo-finish" : ""}`}>
             {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
             <img src={c.image} alt="" className="block aspect-[700/991] w-full object-cover" draggable={false} />
           </span>

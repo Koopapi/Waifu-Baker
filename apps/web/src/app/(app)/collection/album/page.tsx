@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { db } from "@/db/client";
 import { getDict } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
-import { cardImageUrl } from "@/server/cards/image-urls";
+import { cardImage, holoImageIds, ownedHoloIds } from "@/server/cards/card-image";
 import { featurableCards, getMyAlbum } from "@/server/services/album";
 import { AlbumSettings } from "@/features/collection/AlbumSettings";
 
@@ -11,6 +11,9 @@ import { AlbumSettings } from "@/features/collection/AlbumSettings";
 export default async function AlbumSettingsPage() {
   const user = await requireUser("/collection/album");
   const [album, cards, t] = await Promise.all([getMyAlbum(db, user.id), featurableCards(db, user.id), getDict()]);
+  // Spec 037, RF-8 y RF-12: la imagen fija holo de las cartas que tiene en holo.
+  const ids = cards.map((c) => c.cardId);
+  const [holoOwned, holoImages] = await Promise.all([ownedHoloIds(db, user.id, ids), holoImageIds(db, ids)]);
   const h = await headers();
   const origin = `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
   return (
@@ -40,7 +43,7 @@ export default async function AlbumSettingsPage() {
               }
             : null
         }
-        cards={cards.map((c) => ({ ...c, rarity: c.rarity ?? "common", thumb: cardImageUrl(c.cardId, "thumb", user.id) }))}
+        cards={cards.map((c) => ({ ...c, rarity: c.rarity ?? "common", thumb: cardImage(c.cardId, "thumb", user.id, { holoCopy: holoOwned.has(c.cardId), holoImage: holoImages.has(c.cardId) }).src }))}
       />
     </main>
   );

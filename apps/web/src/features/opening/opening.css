@@ -123,9 +123,6 @@
   position: absolute;
   inset: 0;
 }
-.pack__art .pack-art {
-  width: 100%;
-}
 .pack--art .pack__strip {
   left: 6%;
   right: 6%;

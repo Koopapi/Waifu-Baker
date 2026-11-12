@@ -5,7 +5,7 @@ import { db } from "@/db/client";
 import { getDict, getLocale } from "@/i18n/server";
 import { gamesDictionaries } from "@/i18n/games";
 import { requireUser } from "@/server/auth/require-user";
-import { cardImageUrl } from "@/server/cards/image-urls";
+import { cardImage, holoImageIds } from "@/server/cards/card-image";
 import { characterLine } from "@/server/services/bonds";
 import { CharacterLineView } from "@/features/collection/CharacterLineView";
 import { BondBar } from "@/ui/game/BondBar";
@@ -18,6 +18,8 @@ export default async function CharacterPage({ params }: { params: Promise<{ char
   const [line, t, locale] = await Promise.all([characterLine(db, user.id, characterId), getDict(), getLocale()]);
   if (!line) notFound();
   const tb = gamesDictionaries[locale].bond;
+  // Spec 037, RF-7 y RF-12: con una copia holo, su imagen fija holo.
+  const holoImages = await holoImageIds(db, line.cards.map((c) => c.cardId));
   const { bond } = line;
   const title = bond.titleLevel ? (bond.customTitle ?? tb.titles[`${bond.titleLevel}`]) : null;
   const span = bond.to === null ? 1 : bond.to - bond.from;
@@ -51,7 +53,7 @@ export default async function CharacterPage({ params }: { params: Promise<{ char
         cards={line.cards.map((c) => ({
           ...c,
           rarityLabel: t.common.rarity[c.rarity],
-          thumb: c.owned.normal + c.owned.holo > 0 ? cardImageUrl(c.cardId, "thumb", user.id) : null,
+          thumb: c.owned.normal + c.owned.holo > 0 ? cardImage(c.cardId, "thumb", user.id, { holoCopy: c.owned.holo > 0, holoImage: holoImages.has(c.cardId) }).src : null,
         }))}
       />
     </main>

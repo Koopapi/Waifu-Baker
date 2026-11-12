@@ -87,7 +87,7 @@ export function PreparePanel({
                   {c ? (
                     <button type="button" className="xslot__card" onClick={() => toggle(c)} aria-label={t.prepare.remove(c.characterName ?? c.name)} data-testid="team-member">
                       {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
-                      <img src={c.thumb} alt="" className={cx("xslot__img", c.holo && "holo-finish")} />
+                      <img src={c.thumb} alt="" className={cx("xslot__img", c.holoFinish && "holo-finish")} />
                       <span className="xslot__name">{c.characterName ?? c.name}</span>
                     </button>
                   ) : (
@@ -174,7 +174,7 @@ export function PreparePanel({
                     data-holo={c.holo ? "1" : "0"}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- enlace firmado y privado */}
-                    <img src={c.thumb} alt="" className={cx("xpick__img", c.holo && "holo-finish")} loading="lazy" />
+                    <img src={c.thumb} alt="" className={cx("xpick__img", c.holoFinish && "holo-finish")} loading="lazy" />
                     <span className="xpick__body">
                       <span className="block truncate text-xs font-bold">{c.characterName ?? c.name}</span>
                       <span className="block truncate text-[10px] text-ui-text-3">

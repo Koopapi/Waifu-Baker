@@ -13,7 +13,8 @@ import {
 import type { ExpeditionResult } from "@/db/schema";
 import type { Rarity } from "@/domain/catalog/card-rules";
 import { BOND_XP, type DurationMin, type Rating, type Role, type Terrain, type ZoneLoot } from "@/domain/expeditions/rules";
-import { PackArt, type PackArtData } from "@/features/packs/PackArt";
+import { PrizePack } from "@/features/packs/PrizePack";
+import type { PackViewData } from "@/domain/packs/view";
 import { useCelebrations } from "@/features/rewards/celebrations";
 import { Countdown } from "@/features/rewards/Countdown";
 import { sound } from "@/features/sound/engine";
@@ -54,7 +55,10 @@ export interface PickCardDTO {
   role: Role | null;
   bondLevel: number;
   busyUntil: string | null;
+  /** Spec 037, RF-9 y RF-12: la imagen fija (holo si la copia es holo y la carta la tiene). */
   thumb: string;
+  /** La copia es holo y la carta aún no tiene imagen holo: se marca con el acabado de CSS. */
+  holoFinish: boolean;
 }
 export interface ExpeditionDTO {
   id: string;
@@ -76,7 +80,8 @@ export interface ExpeditionsDTO {
   expeditions: ExpeditionDTO[];
   pendingPacks: { id: string; zoneName: string }[];
   cards: PickCardDTO[];
-  sets: { id: string; code: string; name: string; art: PackArtData }[];
+  /** Spec 037, RF-3: cada colección con la vista de su sobre plata (el premio). */
+  sets: { id: string; code: string; name: string; pack: PackViewData | null }[];
 }
 
 /** Sitios de las zonas en el mapa (en %), por orden; el mapa es decorativo y no depende de coordenadas guardadas. */
@@ -139,7 +144,7 @@ export function ExpeditionsView({ data }: { data: ExpeditionsDTO }) {
       kickerTone: "lemon",
       title: t.report.packTitle,
       detail: set?.name,
-      art: set ? <PackArt setId={set.id} code={set.code} name={set.name} art={set.art} className="w-[min(180px,26dvh)]" /> : <Sticker name="pack" className="size-32" />,
+      art: set?.pack ? <PrizePack view={set.pack} className="w-[min(180px,26dvh)]" /> : <Sticker name="pack" className="size-32" />,
       onClosed: async () => {
         await flights.fly({ from: document.querySelector('[data-testid="celebration-dialog"]')?.getBoundingClientRect() ?? centerRect(), to: "packs", sticker: "pack" });
         sound.play("pack");

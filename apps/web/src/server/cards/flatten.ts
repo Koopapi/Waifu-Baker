@@ -19,12 +19,24 @@ export const FLAT_SIZES = {
 } as const;
 export type FlatSize = keyof typeof FLAT_SIZES;
 
+/** Spec 037, RF-11: la imagen fija holo (sin la grande: ninguna vista la usa). */
+export interface FlatHolo {
+  mid: Buffer;
+  thumb: Buffer;
+  public: Buffer;
+}
+
 export interface FlatCard {
   full: Buffer;
   mid: Buffer;
   thumb: Buffer;
   public: Buffer;
   blurhash: string;
+  /**
+   * Spec 037, RF-11 y RF-15: la versión holo. `"same"` = la carta ya se guardó con el holo activado y su imagen normal
+   * ya es holo; ausente = sin versión holo (cartas sin capas).
+   */
+  holo?: FlatHolo | "same";
 }
 
 // Un navegador por proceso: se abre al primer uso y se reutiliza (abrirlo cuesta ~1 s; cada carta, una página nueva).
@@ -107,9 +119,15 @@ export async function flattenCard(config: LayersConfig, images: Map<string, Buff
   }
 }
 
-/** RF-1, RF-2 y RF-15: la imagen fija en todos sus tamaños (la pública, con marca de agua) y su blurhash. */
-export async function renderFlatCard(config: LayersConfig, images: Map<string, Buffer>, opts: { holo?: boolean } = {}): Promise<FlatCard> {
-  return flatVariants(await flattenCard(config, images, opts));
+/**
+ * RF-1, RF-2 y RF-15: la imagen fija en todos sus tamaños (la pública, con marca de agua) y su blurhash. Spec 037,
+ * RF-11: también la holo, sacada con la vista previa holo activada (si la carta ya es holo, es la misma).
+ */
+export async function renderFlatCard(config: LayersConfig, images: Map<string, Buffer>): Promise<FlatCard> {
+  const flat = await flatVariants(await flattenCard(config, images));
+  if (config.holo) return { ...flat, holo: "same" };
+  const holo = await flatVariants(await flattenCard(config, images, { holo: true }));
+  return { ...flat, holo: { mid: holo.mid, thumb: holo.thumb, public: holo.public } };
 }
 
 /** Los cuatro tamaños y el blurhash a partir de la carta dibujada a 1400 × 1982. */

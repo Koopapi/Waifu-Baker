@@ -16,7 +16,6 @@ import { PackDesignLinks } from "@/features/admin/sets/PackDesignLinks";
 import { packViewsFor } from "@/server/services/pack-designs";
 import { requireAdmin } from "@/server/auth/require-admin";
 import { packViewKey } from "@/domain/packs/view";
-import { packArtForSets } from "@/server/services/pack-art";
 import { getSetOverview } from "@/server/services/cards";
 import { listCharacters } from "@/server/services/characters";
 import { getCardDefaults } from "@/server/services/settings";
@@ -42,7 +41,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   if (!z.string().uuid().safeParse(id).success) notFound();
   // Spec 031, RF-3 y RF-4: sin la biblioteca (la pide la ventana de una carta al abrirse), así no se leen las cartas
   // de las demás colecciones.
-  const [overview, characters, packArts, cardDefaults] = await Promise.all([getSetOverview(db, id), listCharacters(db), packArtForSets(db, [id]), getCardDefaults(db)]);
+  const [overview, characters, cardDefaults] = await Promise.all([getSetOverview(db, id), listCharacters(db), getCardDefaults(db)]);
   if (!overview) notFound();
   const { set, counts, gaps } = overview;
   const tt = await getDict();
@@ -65,6 +64,7 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
   const incomplete = cards.filter((c) => c.status !== "ready").length;
   // Spec 017, RF-15: cartas sin chica o sin fondo, enlazadas, antes de intentar publicar.
   const notAssembled = cards.filter((c) => missingParts(c.layers).length > 0);
+  const flatFailed = overview.cards.filter((c) => c.flatError);
   const tl = adminLayersDictionaries[await getLocale()];
   // Spec 030, RF-1: el sobre plata y el gold de la colección (con el enlace firmado para quien mira el panel).
   const admin = await requireAdmin(`/admin/sets/${id}`);
@@ -130,7 +130,8 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
       <Card title={t.pack.title}>
         <PackSettings
           set={{ id: set.id, code: set.code, name: set.name }}
-          art={packArts.get(set.id) ?? { coverVersion: null, packImage: null }}
+          views={(["silver", "gold"] as const).map((k) => packViews.get(packViewKey(set.id, k))!).filter(Boolean)}
+          hasPackImage={Boolean(set.packImageKey)}
           chosenCoverId={set.coverCardId}
           cards={overview.cards
             .filter((c) => c.rarity)
@@ -229,6 +230,24 @@ export default async function SetDetailPage({ params }: { params: Promise<{ id: 
                     ))}
                   </li>
                 )}
+              </ul>
+            </Alert>
+          </div>
+        )}
+        {/* Spec 037, RF-18: las cartas cuya imagen fija no se pudo regenerar, con su motivo. */}
+        {flatFailed.length > 0 && (
+          <div data-testid="flat-failed">
+            <Alert tone="warning">
+              <p>{tt.admin.cards.flatFailed(flatFailed.length)}</p>
+              <ul className="mt-2 space-y-1 text-sm">
+                {flatFailed.map((c) => (
+                  <li key={c.id}>
+                    <a href={`#carta-${String(c.number).padStart(3, "0")}`} className="underline underline-offset-4">
+                      {String(c.number).padStart(3, "0")}
+                    </a>{" "}
+                    · {c.flatError}
+                  </li>
+                ))}
               </ul>
             </Alert>
           </div>

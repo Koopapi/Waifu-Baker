@@ -206,3 +206,12 @@ export async function servePackAsset(db: DbLike, store: CardStore, userId: strin
 }
 
 export type { PackDesign };
+
+/**
+ * Spec 037, RF-1 y RF-3: las colecciones que se pueden ganar (recompensas, Expediciones), cada una con la vista de su
+ * sobre plata para la celebración.
+ */
+export async function withSilverPacks<T extends { id: string }>(db: DbLike, userId: string, list: readonly T[], now = Date.now()) {
+  const views = await packViewsFor(db, userId, list.map((s) => ({ setId: s.id, kind: "silver" as const })), now);
+  return list.map((s) => ({ ...s, pack: views.get(packViewKey(s.id, "silver")) ?? null }));
+}

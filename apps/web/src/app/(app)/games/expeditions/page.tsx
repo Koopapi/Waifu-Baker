@@ -2,10 +2,10 @@ import { db } from "@/db/client";
 import { gamesDictionaries } from "@/i18n/games";
 import { getLocale } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
-import { cardImageUrl } from "@/server/cards/image-urls";
+import { cardImage, holoImageIds } from "@/server/cards/card-image";
 import { now } from "@/server/clock";
 import { expeditionsHome } from "@/server/services/expeditions";
-import { packArtForSets } from "@/server/services/pack-art";
+import { withSilverPacks } from "@/server/services/pack-designs";
 import { claimableSets } from "@/server/services/rewards";
 import { patreonPageUrl } from "@/server/services/patron";
 import { ExpeditionsView, type ExpeditionsDTO } from "@/features/games/ExpeditionsView";
@@ -19,10 +19,9 @@ export default async function ExpeditionsPage() {
   const user = await requireUser("/games/expeditions");
   const at = now();
   const [home, plainSets] = await Promise.all([expeditionsHome(db, user.id, at), claimableSets(db)]);
-  const art = await packArtForSets(
-    db,
-    plainSets.map((s) => s.id),
-  );
+  // Spec 037, RF-3: el sobre del premio, con su diseño.
+  const sets = await withSilverPacks(db, user.id, plainSets, at.getTime());
+  const holoImages = await holoImageIds(db, home.cards.map((c) => c.cardId));
   const data: ExpeditionsDTO = {
     serverNow: at.toISOString(),
     profile: home.profile,
@@ -49,8 +48,11 @@ export default async function ExpeditionsPage() {
       team: e.team.map((m) => ({ cardId: m.cardId, holo: m.holo, name: m.name, characterId: m.characterId })),
     })),
     pendingPacks: home.pendingPacks.map((e) => ({ id: e.id, zoneName: e.zoneName })),
-    cards: home.cards.map((c) => ({ ...c, thumb: cardImageUrl(c.cardId, "thumb", user.id, at.getTime()) })),
-    sets: plainSets.map((s) => ({ ...s, art: art.get(s.id) ?? { coverVersion: null, packImage: null } })),
+    cards: home.cards.map((c) => {
+      const img = cardImage(c.cardId, "thumb", user.id, { holoCopy: c.holo, holoImage: holoImages.has(c.cardId) }, at.getTime());
+      return { ...c, thumb: img.src, holoFinish: img.holoFinish };
+    }),
+    sets,
   };
   return (
     <main className="mx-auto max-w-5xl px-4 py-6 md:px-8">

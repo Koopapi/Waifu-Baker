@@ -55,6 +55,10 @@ Desde `apps/web` (pnpm 10 por corepack; Postgres 16 local de Homebrew, sin Docke
   la restaura en `<bd>_restore` y `var/restore/cards` y la compara con su manifiesto. Necesitan `pg_dump`/`pg_restore`.
   Las tareas periódicas (Patreon, cuentas vencidas, copia diaria) se activan con `SCHEDULER=1`.
 - CI: `.github/workflows/ci.yml` corre lint, tipos, Vitest y E2E de escritorio en cada push a `main`.
+- Imágenes fijas (spec 037): cada carta armada tiene imagen fija normal y holo (`key_holo_*`). Al arrancar, el servidor
+  regenera las cartas cuya `flat_version` es menor que `FLAT_VERSION` (`src/domain/cards/flat-version.ts`); súbela
+  cuando cambie cómo se dibuja la imagen fija. `FLAT_REGEN=0` la apaga (las E2E lo hacen). Los fallos quedan en
+  `flat_error` y se ven en el set del panel.
 - Compilación de producción: `NEXT_DIST_DIR=.next-prod pnpm build` (no pisa `pnpm dev`).
 - Validación RF por RF: `node scripts/rf-coverage.mjs ../../specs/<spec>` (escribe `validation.md`; los tests
   se nombran `test_s<NNN>_rfN_*` —la 003 puede omitir `s003_`— y cada E2E declara su spec en la

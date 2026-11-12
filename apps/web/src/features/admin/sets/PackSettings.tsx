@@ -3,7 +3,8 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { removePackImageAction, setCoverAction } from "@/app/admin/sets/actions";
-import { PackArt, type PackArtData } from "@/features/packs/PackArt";
+import { PrizePack } from "@/features/packs/PrizePack";
+import type { PackViewData } from "@/domain/packs/view";
 import { useT } from "@/i18n/client";
 import { Button } from "@/ui/action/Button";
 import { useToast } from "@/ui/feedback/Toast";
@@ -11,15 +12,21 @@ import { Select } from "@/ui/form/Select";
 
 const AUTO = "auto";
 
-/** Spec 014, RF-6 y RF-7: portada del sobre de la colección y sobre hecho a mano, con vista previa. */
+/**
+ * Spec 014, RF-6 y RF-7: portada del sobre de la colección y sobre hecho a mano. Spec 037, RF-4: la vista previa es la
+ * miniatura del sobre plata y la del gold, como las ve el coleccionista.
+ */
 export function PackSettings({
   set,
-  art,
+  views,
+  hasPackImage,
   chosenCoverId,
   cards,
 }: {
   set: { id: string; code: string; name: string };
-  art: PackArtData;
+  views: PackViewData[];
+  /** Tiene un sobre hecho a mano (se puede quitar). */
+  hasPackImage: boolean;
   chosenCoverId: string | null;
   cards: { id: string; label: string }[];
 }) {
@@ -51,7 +58,11 @@ export function PackSettings({
 
   return (
     <div className="flex flex-col gap-5 sm:flex-row sm:items-start" data-testid="pack-settings">
-      <PackArt setId={set.id} code={set.code} name={set.name} art={art} className="mx-auto w-[150px] sm:mx-0" />
+      <div className="mx-auto flex shrink-0 gap-3 sm:mx-0">
+        {views.map((v) => (
+          <PrizePack key={v.kind} view={v} className="w-[96px]" />
+        ))}
+      </div>
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         <p className="text-sm text-ui-text-2">{t.intro}</p>
         <Select
@@ -78,7 +89,7 @@ export function PackSettings({
             <Button variant="secondary" loading={uploading} onClick={() => file.current?.click()}>
               {t.upload}
             </Button>
-            {art.packImage && (
+            {hasPackImage && (
               <Button variant="ghost" disabled={pending} onClick={() => start(async () => done(await removePackImageAction(set.id)))}>
                 {t.remove}
               </Button>

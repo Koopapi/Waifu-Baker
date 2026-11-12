@@ -258,6 +258,7 @@ export const admin: typeof en = {
     orderSaved: "Orden guardado.",
     deleted: "Carta eliminada.",
     regenerated: (n) => `${n} ${plural(n, "carta regenerada", "cartas regeneradas")} con el marco actual.`,
+    flatFailed: (n) => `${plural(n, "No se pudo regenerar la imagen de esta carta", `No se pudieron regenerar las imágenes de ${n} cartas`)}: conservan su imagen anterior. Pulsa «Regenerar imágenes» para reintentar.`,
     reviewedShort: "Revisada.",
     reviewedAdult: "Carta revisada: personaje claramente adulto.",
     reviewRemoved: "Revisión retirada.",

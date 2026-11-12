@@ -5,6 +5,7 @@ import { db } from "@/db/client";
 import { getDict } from "@/i18n/server";
 import { requireUser } from "@/server/auth/require-user";
 import { cardImageUrl } from "@/server/cards/image-urls";
+import { cardImage, holoImageIds } from "@/server/cards/card-image";
 import { myBinder } from "@/server/services/collection";
 import { expeditionInfoForCards } from "@/server/services/expeditions";
 import { characterOfCards } from "@/server/services/bonds";
@@ -21,7 +22,7 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
   const [b, t, patron] = await Promise.all([myBinder(db, user.id, setId), getDict(), isPatronUser(db, user.id)]);
   if (!b) notFound();
   const ownedIds = b.slots.flatMap((s) => (s.owned ? [s.owned.cardId] : []));
-  const [info, characterOf] = await Promise.all([expeditionInfoForCards(db, user.id, ownedIds), characterOfCards(db, ownedIds)]);
+  const [info, characterOf, holoImages] = await Promise.all([expeditionInfoForCards(db, user.id, ownedIds), characterOfCards(db, ownedIds), holoImageIds(db, ownedIds)]);
   const slots: BinderSlotDTO[] = b.slots.map((s) =>
     s.owned
       ? {
@@ -29,8 +30,11 @@ export default async function BinderPage({ params }: { params: Promise<{ setId: 
           owned: {
             ...s.owned,
             firstObtainedAt: s.owned.firstObtainedAt.toISOString(),
-            thumb: cardImageUrl(s.owned.cardId, "thumb", user.id),
+            // Spec 037, RF-7 y RF-12: con una copia holo, la imagen fija holo.
+            thumb: cardImage(s.owned.cardId, "thumb", user.id, { holoCopy: s.owned.holoQty > 0, holoImage: holoImages.has(s.owned.cardId) }).src,
+            holoImage: holoImages.has(s.owned.cardId),
             mid: cardImageUrl(s.owned.cardId, "mid", user.id),
+            midHolo: holoImages.has(s.owned.cardId) ? cardImageUrl(s.owned.cardId, "mid-holo", user.id) : null,
             bondLevel: info.bonds.get(s.owned.cardId) ?? 1,
             // Spec 029, RF-15: enlace a la línea de su personaje.
             characterId: characterOf.get(s.owned.cardId) ?? null,

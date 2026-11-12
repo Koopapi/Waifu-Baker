@@ -6,7 +6,7 @@ import type { DbLike } from "@/server/db-types";
 
 async function sealedArrivals(db: DbLike, userId: string): Promise<ArrivalPack[]> {
   const rows = await db
-    .select({ id: packs.id, setId: packs.setId, code: sets.code, name: sets.name, source: packs.source, reason: packs.reason, grantedAt: packs.grantedAt, celebratedAt: packs.celebratedAt })
+    .select({ id: packs.id, setId: packs.setId, code: sets.code, name: sets.name, source: packs.source, reason: packs.reason, grantedAt: packs.grantedAt, celebratedAt: packs.celebratedAt, kind: packs.kind })
     .from(packs)
     .innerJoin(sets, eq(sets.id, packs.setId))
     .where(and(eq(packs.userId, userId), eq(packs.status, "sealed"), inArray(packs.source, [...ARRIVAL_SOURCES])))
