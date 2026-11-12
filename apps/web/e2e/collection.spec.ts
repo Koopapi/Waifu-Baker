@@ -47,7 +47,8 @@ test("colección y álbum público", async ({ browser }) => {
     // Las dos siluetas (la común sin conseguir y la legendaria de los gold) no revelan su nombre.
     for (const i of [0, 1]) await expect(missing.nth(i)).not.toContainText("ALB1 carta");
     const img = grid.locator('[data-slot="3"] img');
-    await expect(img).toHaveAttribute("src", /^\/api\/cards\/img\?c=.+&s=thumb&/);
+    // Spec 037, RF-12: con holo al 100 % la copia es holo y se ve con su imagen fija holo.
+    await expect(img).toHaveAttribute("src", /^\/api\/cards\/img\?c=.+&s=thumb-holo&/);
     await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(300);
     await shot(fan, "2-album-coleccion");
   });
@@ -80,7 +81,8 @@ test("colección y álbum público", async ({ browser }) => {
     await expect(sheet.locator("dd").nth(1)).toHaveText("x1");
     // Spec 018: la holo lleva el brillo de la carta viva (o el acabado arcoíris de la imagen fija con movimiento reducido).
     const art = sheet.locator('[data-testid="card-sheet-art"]');
-    const holoOn = art.locator(".cc-card.cc-con-holo, .holo-finish");
+    // Spec 037: con movimiento reducido, la imagen fija holo.
+    const holoOn = art.locator('.cc-card.cc-con-holo, img[src*="&s=mid-holo&"]');
     await expect(holoOn).toHaveCount(1);
     await expect.poll(() => art.locator("img").first().evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
     await fan.waitForTimeout(500);
