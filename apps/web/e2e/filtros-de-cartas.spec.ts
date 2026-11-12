@@ -8,7 +8,9 @@ import { LAB, choose, createPublishedSet, login, tick } from "./helpers";
 
 const tiles = (p: Page) => p.locator('[data-testid="card-grid"] [data-card-tile]');
 const numbers = async (p: Page) => (await tiles(p).evaluateAll((els) => els.map((e) => Number(e.getAttribute("data-card-tile"))))) as number[];
-const chip = (p: Page, group: string, name: string | RegExp) => p.locator(`[data-testid="filter-${group}"] button`, { hasText: name });
+// Spec 038: el nombre exacto (como texto, «Rare» también encontraría «Ultra Rare»). La ficha puede llevar su recuento.
+const chip = (p: Page, group: string, name: string | RegExp) =>
+  p.locator(`[data-testid="filter-${group}"] button`, { hasText: typeof name === "string" ? new RegExp(`^${name}(\\s*\\d+)?$`) : name });
 
 test("filtros, búsqueda y orden de las cartas de una colección", async ({ browser }) => {
   test.setTimeout(300_000);

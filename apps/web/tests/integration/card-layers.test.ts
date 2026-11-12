@@ -219,7 +219,7 @@ describe("spec 016 — la carta conserva sus datos, colecciones publicadas y cam
       expect(updated.layersSealToReview).toBe(false);
       const saved = await load();
       expect(saved.layers?.marco).toBe("ssr");
-      expect(saved.layers?.sello).toMatchObject({ texto: "LEG", esquina: "inf-izq" });
+      expect(saved.layers?.sello).toMatchObject({ texto: "SSR", esquina: "inf-izq" });
     });
   });
 
@@ -292,7 +292,7 @@ describe("spec 017 — estilo automático", () => {
       const r = await saveCardLayers(tx, store, admin.id, card.id, { config: auto(await stage(10), await stage(200)), expectedVersion: card.version });
       await updateCard(tx, store, admin.id, card.id, r.card.version, { rarity: "legendary" });
       const saved = (await load()).layers!;
-      expect(saved).toMatchObject({ marco: "ssr", estiloAuto: true, sello: { texto: "LEG" } });
+      expect(saved).toMatchObject({ marco: "ssr", estiloAuto: true, sello: { texto: "SSR" } });
       expect(saved.capas.map((l) => ("key" in l ? l.rol : l.particulas))).toEqual(["fondo", "destellos-dorados", "personaje"]);
     });
   });
