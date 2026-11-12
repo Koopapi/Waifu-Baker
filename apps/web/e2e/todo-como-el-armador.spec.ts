@@ -5,7 +5,7 @@
 import path from "node:path";
 import { dictionaries } from "../src/i18n/index";
 import { expect, test } from "./fixtures";
-import { LAB, createPublishedSet, dismissCelebration, giftPacks, login, openDeck, revealTop, tear } from "./helpers";
+import { LAB, createPublishedSet, dismissCelebration, dismissTop, giftPacks, login, revealTop, tear } from "./helpers";
 
 const es = dictionaries.es;
 
@@ -49,8 +49,11 @@ test("el sobre y la carta del armador en todas las vistas", async ({ browser }) 
   });
 
   await test.step("RF-23 y RF-14: el resumen sin letrero de rareza y con la imagen fija holo", async () => {
-    await fan.locator('.card3d[role="button"]').first().click();
-    await openDeck(fan);
+    // Sobre de 2 cartas: se aparta la revelada y se revela y aparta la segunda.
+    await dismissTop(fan);
+    await revealTop(fan);
+    await dismissTop(fan);
+    await expect(fan.locator(".summary")).toBeVisible();
     await expect(fan.locator('[data-testid="summary-badge"]')).toHaveCount(0);
     const img = fan.locator(".summary__thumb img").first();
     await expect(img).toHaveAttribute("src", /&s=mid-holo&/);
@@ -68,6 +71,8 @@ test("el sobre y la carta del armador en todas las vistas", async ({ browser }) 
 
   await test.step("RF-8 y RF-12: en el álbum, las copias holo con su imagen fija holo", async () => {
     await fan.goto("/collection/album");
+    // Las cartas para destacar salen con el álbum activado.
+    await fan.getByRole("button", { name: "Activar álbum público" }).click();
     await expect(fan.locator('img[src*="&s=thumb-holo&"]').first()).toBeVisible();
   });
 

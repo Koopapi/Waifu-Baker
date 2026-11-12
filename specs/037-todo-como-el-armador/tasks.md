@@ -67,7 +67,7 @@ Tareas de 20 a 30 minutos, en orden de dependencia. Tests antes que el código.
   - Depende de: —
   - Hecho cuando: el E2E de apertura comprueba que no hay insignia, que la rareza está en el nombre accesible y que una
     carta sin capas la conserva.
-- [ ] **T13 — Validación**
+- [x] **T13 — Validación**
   - RF: todos
   - Depende de: T1–T12
   - Hecho cuando: `rf-coverage` sin RF descubiertos, `pnpm test` en verde y E2E de escritorio y afectadas en verde.
