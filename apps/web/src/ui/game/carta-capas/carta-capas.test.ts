@@ -184,3 +184,13 @@ describe("spec 030 — motor compartido con sobre-capas.js", () => {
     expect(api.seguro.mezcla("hue")).toBe("hue");
   });
 });
+
+describe("spec 040 — capas con mezcla en iPhone", () => {
+  it("test_s040_rf1_el_arte_de_la_carta_es_un_grupo_aislado", () => {
+    // Safari de iPhone deja de pintar las capas de debajo de una capa con mezcla si el arte no es un grupo aislado.
+    expect(src).toMatch(/'\.cc-art\{[^']*isolation:isolate[^']*\}'/);
+    // Versión nueva del CSS inyectado: reemplaza al de antes si ya estaba en la página.
+    expect(src).toMatch(/getAttribute\('data-v'\) === '4n'/);
+    expect(src).toMatch(/setAttribute\('data-v', '4n'\)/);
+  });
+});

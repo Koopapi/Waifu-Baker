@@ -103,7 +103,8 @@
     '.cc-card:focus-visible .cc-in{outline:2px solid #ff8ab0;outline-offset:4px}',
     '.cc-in{position:absolute;inset:0;border-radius:inherit;background:#1a120e;box-shadow:0 0 9cqw var(--cc-aura),0 10cqw 18cqw -7cqw rgba(0,0,0,.8)}',
     '.cc-frame{position:absolute;inset:0;border-radius:inherit;padding:var(--cc-borde);pointer-events:none;z-index:4;background:var(--cc-marco);background-size:240% 240%;background-position:calc(var(--px)*100%) calc(var(--py)*100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}',
-    '.cc-art{position:absolute;inset:var(--cc-borde);border-radius:max(1.5cqw,calc(5.4cqw - var(--cc-borde)));overflow:hidden;background:#0c0f18}',
+    // Spec 040: grupo aislado; sin él, Safari de iPhone deja de pintar las capas de debajo de una capa con mezcla.
+    '.cc-art{position:absolute;inset:var(--cc-borde);border-radius:max(1.5cqw,calc(5.4cqw - var(--cc-borde)));overflow:hidden;background:#0c0f18;isolation:isolate}',
     '.cc-sin-marco .cc-frame{display:none}',
     '.cc-sin-marco .cc-art{inset:0;border-radius:inherit}',
     '.cc-art::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:8;box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),inset 0 0 6cqw rgba(0,0,0,.3)}',
@@ -169,11 +170,11 @@
 
   function inyectarCSS() {
     var prev = document.getElementById('carta-capas-css');
-    if (prev && prev.getAttribute('data-v') === '4m') return;
+    if (prev && prev.getAttribute('data-v') === '4n') return;
     if (prev) prev.remove();
     var s = document.createElement('style');
     s.id = 'carta-capas-css';
-    s.setAttribute('data-v', '4m');
+    s.setAttribute('data-v', '4n');
     s.textContent = CSS;
     document.head.appendChild(s);
   }
