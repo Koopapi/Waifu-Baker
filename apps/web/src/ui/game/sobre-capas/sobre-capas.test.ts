@@ -51,7 +51,7 @@ describe("spec 030 — sobre-capas.js en el juego", () => {
   it("test_s030_rf17_mientras_esta_cerrado_no_se_ve_ninguna_carta", () => {
     // El sobre tapa el mazo: sus partes llevan fondo opaco (y en 3D la silueta del plástico), y el mazo va detrás de
     // él hasta que se abre (opening.css: el sobre por encima de las cartas; las cartas, ocultas antes de abrir).
-    expect(src).toContain(".sc-pila{position:absolute;inset:0;overflow:hidden;background:#3B2FC9}");
+    expect(src).toContain(".sc-pila{position:absolute;inset:0;overflow:hidden;background:#3B2FC9");
     const css = readFileSync(path.resolve(__dirname, "../../../features/opening/opening.css"), "utf8");
     expect(css).toMatch(/\.stage__center \{\n {2}z-index: 2;/);
     expect(css).toMatch(/\.stage \.cards \{\n {2}z-index: 1;/);
@@ -61,5 +61,13 @@ describe("spec 030 — sobre-capas.js en el juego", () => {
     expect(src).toMatch(/if \(!op\.estatica\) raf = requestAnimationFrame\(cuadro\)/);
     expect(src).toMatch(/if \(!op\.estatica\) \{ zona\.addEventListener\('pointermove', onZona\)/);
     expect(src).toMatch(/if \(estado !== 'cerrado' \|\| op\.gestos === false\) return;/);
+  });
+});
+
+describe("spec 040 — capas con mezcla en iPhone", () => {
+  it("test_s040_rf2_las_capas_del_sobre_son_un_grupo_aislado", () => {
+    expect(src).toMatch(/'\.sc-pila\{[^']*isolation:isolate[^']*\}',\s*\/\/ spec 040/);
+    expect(src).toMatch(/getAttribute\('data-v'\) === '2n'/);
+    expect(src).toMatch(/setAttribute\('data-v', '2n'\)/);
   });
 });

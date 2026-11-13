@@ -22,6 +22,7 @@
  *   - opción `textos` (indicación, etiqueta accesible, «carta/cartas» y guías) para los diccionarios;
  *   - colores de sellos e insignia y URL del patrón y del logo por las listas cerradas de CartaCapas.seguro;
  *   - `estatica` (sin bucle ni escuchas), `gestos: false` (solo teclado o abrir()), `alVibrar` y `alSonido`.
+ * Spec 040: `.sc-pila` es un grupo aislado (marcado «spec 040»), para que Safari de iPhone pinte las capas con mezcla.
  */
 (function (global) {
   'use strict';
@@ -44,7 +45,7 @@
     '.sc-sobre:focus-visible{outline:3px solid #C6F432;outline-offset:6px}',
     '.sc-parte{position:absolute;inset:0}',
     '.sc-v3d .sc-parte,.sc-v3d .sc-interior{-webkit-mask:var(--sc-silueta) 0 0/100% 100% no-repeat;mask:var(--sc-silueta) 0 0/100% 100% no-repeat}',
-    '.sc-pila{position:absolute;inset:0;overflow:hidden;background:#3B2FC9}',
+    '.sc-pila{position:absolute;inset:0;overflow:hidden;background:#3B2FC9;isolation:isolate}',   // spec 040: grupo aislado (capas con mezcla en iPhone)
     '.sc-pila .cc-capa{transform:translate3d(calc(var(--x)*var(--d,0)*-4cqw),calc(var(--y)*var(--d,0)*-4cqw),0)}',
     '.sc-c{position:absolute;inset:0;pointer-events:none}',
     '.sc-pila .cc-holo{z-index:auto;opacity:0}',
@@ -147,10 +148,10 @@
 
   function inyectarCSS() {
     var prev = document.getElementById('sobre-capas-css');
-    if (prev && prev.getAttribute('data-v') === '2m') return;
+    if (prev && prev.getAttribute('data-v') === '2n') return;
     if (prev) prev.remove();
     var s = document.createElement('style');
-    s.id = 'sobre-capas-css'; s.setAttribute('data-v', '2m'); s.textContent = CSS;
+    s.id = 'sobre-capas-css'; s.setAttribute('data-v', '2n'); s.textContent = CSS;
     document.head.appendChild(s);
   }
 
